@@ -6,9 +6,16 @@ import org.jlab.io.base.DataEvent;
 import cnuphys.ced.alldata.datacontainer.ACommonADCData;
 
 public class CNDADCData extends ACommonADCData {
+	
+	//adc bank name
+	public static final String BANK_NAME = "CND::adc";
 
 	// singleton
 	private static volatile CNDADCData _instance;
+	
+	public CNDADCData() {
+		super(BANK_NAME);
+	}
 
 	/**
 	 * Public access to the singleton
@@ -29,7 +36,7 @@ public class CNDADCData extends ACommonADCData {
 
 	@Override
 	public void update(DataEvent event) {
-		DataBank bank = event.getBank("CND::adc");
+		DataBank bank = event.getBank(BANK_NAME);
 
 		if (bank == null) {
 			return;
@@ -41,8 +48,6 @@ public class CNDADCData extends ACommonADCData {
         order = bank.getByte("order");
         adc = bank.getInt("ADC");
         time = bank.getFloat("time");
-
-        computeMaxADC();
 	}
 
 }

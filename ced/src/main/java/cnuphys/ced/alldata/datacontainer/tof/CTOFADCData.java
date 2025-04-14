@@ -5,12 +5,20 @@ import java.awt.Color;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
 
+import cnuphys.ced.alldata.ADCSupport;
 import cnuphys.ced.alldata.datacontainer.ACommonADCData;
 import cnuphys.ced.alldata.datacontainer.AdcColorScale;
 
 public class CTOFADCData extends ACommonADCData {
 	// singleton
 	private static volatile CTOFADCData _instance;
+	
+	// adc bank name
+	public static final String BANK_NAME = "CTOF::adc";
+	
+	public CTOFADCData() {
+		super(BANK_NAME);
+	}
 
 	/**
 	 * Public access to the singleton
@@ -31,7 +39,7 @@ public class CTOFADCData extends ACommonADCData {
 
 	@Override
 	public void update(DataEvent event) {
-		DataBank bank = event.getBank("CTOF::adc");
+		DataBank bank = event.getBank(BANK_NAME);
 
 		if (bank == null) {
 			return;
@@ -43,8 +51,6 @@ public class CTOFADCData extends ACommonADCData {
         order = bank.getByte("order");
         adc = bank.getInt("ADC");
         time = bank.getFloat("time");
-
-        computeMaxADC();
 	}
 
 	/**
@@ -56,10 +62,10 @@ public class CTOFADCData extends ACommonADCData {
 	 * @return the color, or null if no data
 	 */
 	public Color getColor(byte sector, byte layer, short component, byte order) {
-		computeMaxADC();
 
 		int adc = getComponentAverageADC(sector, layer, component, order);
 		if (adc > 0) {
+			int maxADC = ADCSupport.getMaxADC(BANK_NAME);
 			double fract = ((double) adc) / maxADC;
 			fract = Math.max(0, Math.min(1.0, fract));
 			return AdcColorScale.getInstance().getAlphaColor(fract, 255);

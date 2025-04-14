@@ -12,8 +12,6 @@ import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.cal.ECalADCData;
 import cnuphys.ced.alldata.datacontainer.cal.PCalADCData;
-import cnuphys.ced.alldata.datacontainer.cc.HTCCADCData;
-import cnuphys.ced.alldata.datacontainer.cc.LTCCADCData;
 import cnuphys.ced.alldata.datacontainer.cnd.CNDADCData;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.alldata.datacontainer.ftcal.FTCalADCData;
@@ -139,8 +137,6 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 
 	//data containers
 	private CNDADCData cndADCData = CNDADCData.getInstance();
-	private HTCCADCData htccADCData = HTCCADCData.getInstance();
-	private LTCCADCData ltccADCData = LTCCADCData.getInstance();
 	private ECalADCData ecADCData = ECalADCData.getInstance();
 	private PCalADCData pcADCData = PCalADCData.getInstance();
 	private FTOFADCData ftofADCData = FTOFADCData.getInstance();
@@ -981,41 +977,73 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	// accumulate htcc
 	private void accumHTCC() {
 
-		//use the adc arrays to accumulate
-		for (int i = 0; i < htccADCData.count(); i++) {
-			if (htccADCData.adc[i] > 0) {
-				int sect0 = htccADCData.sector[i] - 1;
+		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
 
-				//sometimes happens
-				if (sect0 < 0) {
-					continue;
+		String bankName = "HTCC::adc";
+		if (dataEvent.hasBank(bankName)) {
+			int adc[] = _dataWarehouse.getInt(bankName, "ADC");
+			int count = adc != null ? adc.length : 0;
+			if (count > 0) {
+				byte sector[] = _dataWarehouse.getByte(bankName, "sector");
+				byte layer[] = _dataWarehouse.getByte(bankName, "layer");
+				short component[] = _dataWarehouse.getShort(bankName, "component");
+
+				for (int i = 0; i < count; i++) {
+					int sect0 = sector[i] - 1;
+					
+					if (adc[i] <= 0) {
+						continue;
+					}
+					
+					//sometimes happens
+					if (sect0 < 0) {
+						continue;
+					}
+
+					int half0 = layer[i] - 1;
+					int ring0 = component[i] - 1;
+
+					_HTCCAccumulatedData[sect0][half0][ring0] += 1;
 				}
-
-				int half0 = htccADCData.layer[i] - 1;
-				int ring0 = htccADCData.component[i] - 1;
-				_HTCCAccumulatedData[sect0][half0][ring0] += 1;
 			}
 		}
+
 	}
 
 	// accumulate ltcc
 	private void accumLTCC() {
+		
+		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
 
-		//use the adc arrays to accumulate
-		for (int i = 0; i < ltccADCData.count(); i++) {
-			if (ltccADCData.adc[i] > 0) {
-				int sect0 = ltccADCData.sector[i] - 1;
+		String bankName = "LTCC::adc";
+		if (dataEvent.hasBank(bankName)) {
+			int adc[] = _dataWarehouse.getInt(bankName, "ADC");
+			int count = adc != null ? adc.length : 0;
+			if (count > 0) {
+				byte sector[] = _dataWarehouse.getByte(bankName, "sector");
+				byte layer[] = _dataWarehouse.getByte(bankName, "layer");
+				short component[] = _dataWarehouse.getShort(bankName, "component");
 
-				//sometimes happens
-				if (sect0 < 0) {
-					continue;
+				for (int i = 0; i < count; i++) {
+					int sect0 = sector[i] - 1;
+					
+					if (adc[i] <= 0) {
+						continue;
+					}
+					
+					//sometimes happens
+					if (sect0 < 0) {
+						continue;
+					}
+
+					int half0 = layer[i] - 1;
+					int ring0 = component[i] - 1;
+
+					_LTCCAccumulatedData[sect0][half0][ring0] += 1;
 				}
-
-				int half0 = ltccADCData.layer[i] - 1;
-				int ring0 = ltccADCData.component[i] - 1;
-				_LTCCAccumulatedData[sect0][half0][ring0] += 1;
 			}
 		}
+
 	}
 
 	// accumulate ecal data

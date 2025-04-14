@@ -227,6 +227,19 @@ public class DataWarehouse implements IClasIoEventListener {
 		}
         return null;
     }
+	
+	/**
+	 * Get a bank in the current event
+	 * @param bankName the bank name
+	 * @return the bank or null
+	 */
+	public DataBank getBank(String bankName) {
+		DataEvent event = getCurrentEvent();
+		if (event != null) {
+			return event.getBank(bankName);
+		}
+		return null;
+	}
 
 	/**
 	 * Get a byte array for the bank and column names in the current event
@@ -236,15 +249,13 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return a byte array or null.
 	 */
 	public byte[] getByte(String bankName, String columnName) {
-		DataEvent event = getCurrentEvent();
-		if (event != null) {
-			DataBank bank = event.getBank(bankName);
-			if (bank != null) {
-				return bank.getByte(columnName);
-			}
+		DataBank bank = getBank(bankName);
+		if (bank != null) {
+			return bank.getByte(columnName);
 		}
 		return null;
 	}
+	
 	/**
 	 * Get a float array for the bank and column names in the current event
 	 *
@@ -253,12 +264,9 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return a float array or null.
 	 */
 	public float[] getFloat(String bankName, String columnName) {
-		DataEvent event = getCurrentEvent();
-		if (event != null) {
-			DataBank bank = event.getBank(bankName);
-			if (bank != null) {
-				return bank.getFloat(columnName);
-			}
+		DataBank bank = getBank(bankName);
+		if (bank != null) {
+			return bank.getFloat(columnName);
 		}
 		return null;
 	}
@@ -270,12 +278,9 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return a short array or null.
 	 */
 	public short[] getShort(String bankName, String columnName) {
-		DataEvent event = getCurrentEvent();
-        if (event != null) {
-			DataBank bank = event.getBank(bankName);
-			if (bank != null) {
-				return bank.getShort(columnName);
-			}
+		DataBank bank = getBank(bankName);
+		if (bank != null) {
+			return bank.getShort(columnName);
 		}
 		return null;
 	}
@@ -287,17 +292,9 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return a short array or null.
 	 */
 	public int[] getInt(String bankName, String columnName) {
-		DataEvent event = getCurrentEvent();
-		if (event != null) {
-			DataBank bank = event.getBank(bankName);
-			if (bank != null) {
-				try {
-					return bank.getInt(columnName);
-				} catch (NullPointerException e) {
-					System.err.println("Error getting int array for " + bankName + " " + columnName);
-					System.err.println("Event number is " + ClasIoEventManager.getInstance().getSequentialEventNumber());
-				}
-			}
+		DataBank bank = getBank(bankName);
+		if (bank != null) {
+			return bank.getInt(columnName);
 		}
 		return null;
 	}
@@ -310,12 +307,9 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return a short array or null.
 	 */
 	public long[] getLong(String bankName, String columnName) {
-		DataEvent event = getCurrentEvent();
-		if (event != null) {
-			DataBank bank = event.getBank(bankName);
-			if (bank != null) {
-				return bank.getLong(columnName);
-			}
+		DataBank bank = getBank(bankName);
+		if (bank != null) {
+			return bank.getLong(columnName);
 		}
 		return null;
    }
@@ -328,12 +322,9 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return a short array or null.
 	 */
 	public double[] getDouble(String bankName, String columnName) {
-		DataEvent event = getCurrentEvent();
-		if (event != null) {
-			DataBank bank = event.getBank(bankName);
-			if (bank != null) {
-				return bank.getDouble(columnName);
-			}
+		DataBank bank = getBank(bankName);
+		if (bank != null) {
+			return bank.getDouble(columnName);
 		}
 		return null;
 	}
@@ -347,7 +338,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	public void notifyListeners(DataEvent event) {
 
 		try {
-			eventNotifier.triggerEvent(event);
+			eventNotifier.nonThreadedTriggerEvent(event);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
@@ -360,7 +351,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	public void notifyListeners() {
 
 		try {
-			eventNotifier.triggerEvent(null);
+			eventNotifier.nonThreadedTriggerEvent(null);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}

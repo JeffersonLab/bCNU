@@ -188,7 +188,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 		view.pack();
 
 		// add quick zooms
-		view.addQuickZoom("BST & BMT", -190, -190, 190, 190);
+		view.addQuickZoom("BST & BMT", 190, -190, -190, 190);
 
 		// i.e. if none were in the properties
 		if (view.hasNoBankMatches()) {

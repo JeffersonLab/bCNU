@@ -230,7 +230,7 @@ public class DCGeometry extends ACachedGeometry {
 		if (dcw == null) {
 			return false;
 		}
-		return GeometryManager.getProjectedPolygon(dcw, projectionPlane, 10, 6, wp, centroid);
+		return GeometryManager.getProjectedPolygon(dcw, projectionPlane, 10, 6, wp, centroid, false);
 	}
 
 	/**
@@ -247,7 +247,7 @@ public class DCGeometry extends ACachedGeometry {
 	public static Point2D.Double getCenter(int superlayer, int layer, int wire, Plane3D projectionPlane) {
 
 		Point2D.Double centroid = new Point2D.Double();
-		projectionPlane = GeometryManager.constantPhiPlane(0);
+//		projectionPlane = GeometryManager.constantPhiPlane(0);
 
 		DriftChamberWire dcw = DCGeometry.getWire(superlayer, layer, wire);
 		Line3D l3D = dcw.getLine();

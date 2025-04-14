@@ -3,6 +3,7 @@ package cnuphys.ced.alldata.datacontainer;
 import java.awt.Color;
 import java.util.List;
 
+import cnuphys.ced.alldata.ADCSupport;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
 
@@ -33,16 +34,16 @@ public abstract class ACommonADCData implements IDataContainer {
 
 	/** time value */
 	public float time[];
-
-	/** max adc value */
-	public int maxADC;
-
+	
+	//the adc bank name
+	private String bankName;
 
 	/**
 	 * Create a data container and notify the data warehouse that it wants to be
 	 * notified of data events.
      */
-	public ACommonADCData() {
+	public ACommonADCData(String bankName) {
+		this.bankName = bankName;
 		_dataWarehouse.addDataContainerListener(this);
 	}
 
@@ -69,31 +70,10 @@ public abstract class ACommonADCData implements IDataContainer {
 	 * @return the color
 	 */
 	public Color getADCColor(int adc) {
-		if (adc > 0) {
-			double fract = ((double) adc) / maxADC;
-			fract = Math.max(0, Math.min(1.0, fract));
-			int alpha = 128 + (int) (127 * fract);
-			alpha = Math.min(255, alpha);
-
-			return AdcColorScale.getInstance().getAlphaColor(fract, alpha);
-		}
-		return ADCZERO;
+		return ADCSupport.getADCColor(bankName, adc);
 	}
 
-	// compute the max adc
-	protected void computeMaxADC() {
-		// get the max adc
-		int n = (adc == null) ? 0 : adc.length;
-		maxADC = 0;
 
-		for (int i = 0; i < n; i++) {
-			int a = adc[i];
-			if (a > maxADC) {
-				maxADC = a;
-			}
-		}
-
-	}
 
 	/**
 	 * Common feedback format for ADC values

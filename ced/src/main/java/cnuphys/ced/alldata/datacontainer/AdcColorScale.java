@@ -30,7 +30,7 @@ public class AdcColorScale extends ColorScaleModel {
 	 */
 	private static double[] getScaleValues() {
 
-		int len = ColorScaleModel.getWeatherMapColors(8).length + 1;
+		int len = ColorScaleModel.getSimpleMapColors(8).length + 1;
 
 		double values[] = new double[len];
 

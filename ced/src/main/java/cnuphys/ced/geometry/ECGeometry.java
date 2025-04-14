@@ -446,6 +446,7 @@ public class ECGeometry extends ACachedGeometry {
 
 		Point2D.Double wp[] = GeometryManager.allocate(4);
 		boolean isects = GeometryManager.getProjectedPolygon(strip, projectionPlane, 6, 4, wp, null);
+		
 
 		// note reordering
 		Point2D.Double p2d[] = new Point2D.Double[4];

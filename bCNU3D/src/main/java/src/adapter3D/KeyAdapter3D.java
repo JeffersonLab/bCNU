@@ -98,7 +98,6 @@ public class KeyAdapter3D implements KeyListener {
 		int keyCode = e.getKeyCode();
 
 		if (keyCode == KeyEvent.VK_F5) {
-			System.err.println("refreshing");
 			_panel3D.refresh();
 		}
 	}

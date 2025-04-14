@@ -36,6 +36,7 @@ import cnuphys.bCNU.util.Environment;
 import cnuphys.bCNU.util.FileUtilities;
 import cnuphys.bCNU.util.Jar;
 import cnuphys.bCNU.util.PropertySupport;
+import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.PlotView;
 import cnuphys.bCNU.view.ViewManager;
 import cnuphys.bCNU.view.VirtualView;
@@ -100,7 +101,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private static String _geoVariation = "default";
 
 	// ced release
-	public static final String release = "1.9.3t";
+	public static final String release = "1.9.4t";
 
 	//minimum java major version
 	private static final int _minJavaVersion = 17;
@@ -189,7 +190,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	// the about string
 	private static String _aboutString = "<html><span style=\"font-size:12px\">ced: the cLAS eVENT dISPLAY&nbsp;&nbsp;&nbsp;&nbsp;"
 			+ release + "<br><br>Developed by Christopher Newport University"
-			+ "<br><br>Download the latest version at <a href=\"https://userweb.jlab.org/~heddle/ced/builds/\">https://userweb.jlab.org/~heddle/ced/builds/</a>"
 			+ "<br><br>Email bug reports to david.heddle@cnu.edu";
 
 	// for the traveling salesperson dialog
@@ -801,10 +801,19 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		}
 	}
 
+	// refresh all views (with containers)
 	private static void refreshAllViews() {
-	    for (JInternalFrame frame : Desktop.getInstance().getAllFrames()) {
-	        frame.repaint();
-	    }
+		for (JInternalFrame frame : Desktop.getInstance().getAllFrames()) {
+
+			if (frame.isVisible()) {
+				if (frame instanceof BaseView) {
+					BaseView view = (BaseView) frame;
+					if (view.isViewVisible()) {
+						frame.repaint();
+					}
+				}
+			}
+		}
 	}
 
 	/**

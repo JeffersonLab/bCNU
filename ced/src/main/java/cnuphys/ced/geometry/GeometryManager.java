@@ -440,7 +440,7 @@ public class GeometryManager {
 
 		return isectsCount > 2;
 	}
-
+	
 	/**
 	 * Get a world 2D polygon from a clas geo object like a FTOF slab.
 	 *
@@ -454,6 +454,22 @@ public class GeometryManager {
 	 */
 	public static boolean getProjectedPolygon(AbstractComponent geoObj, Plane3D projectionPlane, int startIndex,
 			int count, Point2D.Double wp[], Point2D.Double centroid) {
+		return getProjectedPolygon(geoObj, projectionPlane, startIndex, count, wp, centroid, true);
+	}
+
+	/**
+	 * Get a world 2D polygon from a clas geo object like a FTOF slab.
+	 *
+	 * @param geoObj          the geometric object
+	 * @param projectionPlane the projection plane
+	 * @param startIndex      the firstIndex of the volume edges corresponding to a
+	 *                        "long" edge
+	 * @param count           the number of such edges (should be contiguous!)
+	 * @param wp              will hold the world 2D polygon
+	 * @param centroid        optionally compute the centroid.
+	 */
+	public static boolean getProjectedPolygon(AbstractComponent geoObj, Plane3D projectionPlane, int startIndex,
+			int count, Point2D.Double wp[], Point2D.Double centroid, boolean checkIntersects) {
 
 		if (count > _workPoints.length) {
             _workPoints = new Point3D[count];
@@ -486,8 +502,12 @@ public class GeometryManager {
 		if (centroid != null) {
 			average(wp, centroid);
 		}
+		
+		if (checkIntersects) {
+			return doesProjectedPolyIntersect(geoObj, projectionPlane, startIndex, count);	
+		}
 
-		return doesProjectedPolyIntersect(geoObj, projectionPlane, startIndex, count);
+		return true;
 	}
 
 	// faster than centroid, and good enough

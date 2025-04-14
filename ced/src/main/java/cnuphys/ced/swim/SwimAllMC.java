@@ -94,7 +94,7 @@ public class SwimAllMC implements ISwimAll {
 		} //for trd
 
 		try {
-			swimNotifier.triggerEvent(null);
+			swimNotifier.nonThreadedTriggerEvent(null);
 			swimNotifier.shutdown();
 		} catch (InterruptedException | java.util.concurrent.ExecutionException e) {
 			e.printStackTrace();

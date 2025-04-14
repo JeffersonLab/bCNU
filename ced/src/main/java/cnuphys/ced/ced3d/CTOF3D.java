@@ -27,7 +27,6 @@ public class CTOF3D extends DetectorItem3D {
 		for (int paddleId = 1; paddleId <= 48; paddleId++) {
 			_paddles[paddleId - 1] = new CTOFPaddle3D(paddleId);
 		}
-
 	}
 
 	@Override

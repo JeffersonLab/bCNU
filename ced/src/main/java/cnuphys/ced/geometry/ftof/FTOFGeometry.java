@@ -308,7 +308,6 @@ public class FTOFGeometry extends ACachedGeometry {
 	 * @param projectionPlane the projection plane
 	 */
 	public static boolean getIntersections(int superlayer, int paddleid, Plane3D projectionPlane, Point2D.Double wp[]) {
-//		FTOFLayer ftofLayer = _clas_sector0.getSuperlayer(superlayer).getLayer(0);
 		FTOFLayer ftofLayer = ftofLayers[0][superlayer];
 		ScintillatorPaddle paddle = ftofLayer.getComponent(paddleid);
 		return GeometryManager.getProjectedPolygon(paddle, projectionPlane, 6, 4, wp, null);

@@ -6,9 +6,16 @@ import org.jlab.io.base.DataEvent;
 import cnuphys.ced.alldata.datacontainer.ACommonADCData;
 
 public class FTCalADCData extends ACommonADCData {
+	
+	//adc bank name
+	public static final String BANK_NAME = "FTCAL::adc";
 
 	// singleton
 	private static volatile FTCalADCData _instance;
+	
+	public FTCalADCData() {
+		super(BANK_NAME);
+	}
 
 	/**
 	 * Public access to the singleton
@@ -29,7 +36,7 @@ public class FTCalADCData extends ACommonADCData {
 
 	@Override
 	public void update(DataEvent event) {
-		DataBank bank = event.getBank("FTCAL::adc");
+		DataBank bank = event.getBank(BANK_NAME);
 
 		if (bank == null) {
 			return;
@@ -41,8 +48,6 @@ public class FTCalADCData extends ACommonADCData {
         order = bank.getByte("order");
         adc = bank.getInt("ADC");
         time = bank.getFloat("time");
-
-        computeMaxADC();
 	}
 
 }

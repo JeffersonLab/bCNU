@@ -655,26 +655,6 @@ public class ClasIoEventManager {
 	public void setAllReconSwimmer(ISwimAll allSwimmer) {
 		_allReconSwimmer = allSwimmer;
 	}
-	
-	// decode an evio event to hipo
-	private HipoDataEvent YdecodeEvioToHipo(EvioDataEvent event) {
-		if (_decoder == null) {
-			_schemaFactory = new SchemaFactory();
-
-			String dir = ClasUtilsFile.getResourceDir("CLAS12DIR", "etc/bankdefs/hipo4");
-			_schemaFactory.initFromDirectory(dir);
-
-			_decoder = new CLASDecoder4();
-
-			DataWarehouse.getInstance().updateSchema(_schemaFactory);
-
-		}
-		
-		Event decodedEvent = _decoder.getDataEvent(event);
-		return new HipoDataEvent(decodedEvent, _schemaFactory);
-        // Note: The above method will decode the event and return a HipoDataEvent.
-	}
-	
 
 	// decode an evio event to hipo
 	private HipoDataEvent decodeEvioToHipo(EvioDataEvent event) {
@@ -946,7 +926,7 @@ public class ClasIoEventManager {
 		Swimming.setNotifyOn(true); // prevent refreshes
 		for (int index = 0; index < 3; index++) {
 			try {
-				eventNotifier[index].triggerEvent(source);
+				eventNotifier[index].nonThreadedTriggerEvent(source);
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
@@ -963,7 +943,7 @@ public class ClasIoEventManager {
 		Swimming.setNotifyOn(true); // prevent refreshes
 		for (int index = 0; index < 3; index++) {
 			try {
-				eventNotifier[index].triggerEvent(file.getAbsolutePath());
+				eventNotifier[index].nonThreadedTriggerEvent(file.getAbsolutePath());
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
@@ -994,7 +974,7 @@ public class ClasIoEventManager {
 		Swimming.clearAllTrajectories();
 		for (int index = 0; index < 3; index++) {
 			try {
-				eventNotifier[index].triggerEvent(_currentEvent);
+				eventNotifier[index].nonThreadedTriggerEvent(_currentEvent);
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}

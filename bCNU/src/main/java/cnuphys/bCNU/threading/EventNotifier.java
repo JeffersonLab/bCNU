@@ -26,7 +26,15 @@ public class EventNotifier<T> {
         listeners.remove(listener);
     }
 
-    public void triggerEvent(T data) throws InterruptedException, ExecutionException {
+	public void nonThreadedTriggerEvent(T data) throws InterruptedException, ExecutionException {
+		for (IEventListener<T> listener : listeners) {
+			listener.newEvent(data);
+		}
+	}
+
+
+
+    public void threadedTriggerEvent(T data) throws InterruptedException, ExecutionException {
         for (IEventListener<T> listener : listeners) {
             completionService.submit(() -> {
                 listener.newEvent(data);

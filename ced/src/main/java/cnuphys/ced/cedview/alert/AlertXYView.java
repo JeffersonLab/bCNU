@@ -25,7 +25,6 @@ import cnuphys.bCNU.item.YouAreHereItem;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.bCNU.view.BaseView;
-import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.datacontainer.tof.CTOFADCData;
 import cnuphys.ced.alldata.datacontainer.tof.CTOFClusterData;
 import cnuphys.ced.cedview.CedView;
@@ -97,7 +96,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 	private AlertProjectionPanel _dcPanel;
 	
 	//max  adc in this event
-	private int _maxADCThisEvent = -1;
+//	private int _maxADCThisEvent = -1;
 	
 	// data containers
 	private CTOFADCData _ctofADCData = CTOFADCData.getInstance();
@@ -197,7 +196,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 		view._dcPanel = view._controlPanel.getAlertDCPanel();
 		
 		// add quick zooms
-		view.addQuickZoom("ALERT", -120, -120, 120, 120);
+		view.addQuickZoom("ALERT", 120, -120, -120, 120);
 
 
 		return view;
@@ -278,7 +277,6 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 					_hitDrawer.draw(g, container);
 
 					if (view.isSingleEventMode()) {
-						_maxADCThisEvent =DataWarehouse.getMaxIntValue("AHDC::adc", "ADC");
 						drawSingleModeHits(g, container);
 						if (showClusters()) {
 							_clusterDrawer.draw(g, container);
@@ -286,7 +284,6 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 					}
 
 					else {
-						_maxADCThisEvent = -1;
 						drawAccumulatedHits(g, container);
 					}
 
@@ -305,13 +302,6 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 		getContainer().setAfterDraw(afterDraw);
 	}
 	
-	/**
-	 * Get the maximum AHDC ADC value for this event
-	 * @return the maximum AHDC ADC value for this event
-	 */
-	public int getMaxADCThisEvent() {
-		return _maxADCThisEvent;
-	}
 
 	//draw data selected highlighted data
 	private void drawDataSelectedHighlight(Graphics g, IContainer container) {
