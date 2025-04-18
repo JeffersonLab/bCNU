@@ -3,7 +3,7 @@
         "entries": [
             {
                 "info": "hit id",
-                "name": "ID",
+                "name": "id",
                 "type": "S"
             },
             {
@@ -23,7 +23,7 @@
             },
             {
                 "info": "distance od closest approch (mm) is actually the distance from time2distance calibration",
-                "name": "Doca",
+                "name": "doca",
                 "type": "D"
             },
             {
@@ -40,11 +40,16 @@
                 "info": "time (ns) is leadingEdgeTime from AHDC::adc minus t0 from calibration",
                 "name": "time",
                 "type": "D"
+            },
+            {
+                "info": "track id, is -1 if not associated to a Track",
+                "name": "trackid",
+                "type": "I"
             }
         ],
         "group": 23000,
         "info": "Raw Hits",
         "item": 23,
-        "name": "AHDC::Hits"
+        "name": "AHDC::hits"
     }
 ]

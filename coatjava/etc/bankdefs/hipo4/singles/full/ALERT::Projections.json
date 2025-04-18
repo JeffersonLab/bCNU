@@ -8,7 +8,7 @@
             },
             {
                 "info": "id of the track that was projected",
-                "name": "trackID",
+                "name": "trackid",
                 "type": "S"
             },
             {
@@ -28,12 +28,12 @@
             },
             {
                 "info": "path length at atof bar (inner surface) in mm",
-                "name": "L_at_bar",
+                "name": "l_at_bar",
                 "type": "F"
             },
             {
                 "info": "path length inside atof bar in mm",
-                "name": "L_in_bar",
+                "name": "l_in_bar",
                 "type": "F"
             },
             {
@@ -53,18 +53,18 @@
             },
             {
                 "info": "path length at atof wedge (inner surface) in mm",
-                "name": "L_at_wedge",
+                "name": "l_at_wedge",
                 "type": "F"
             },
             {
                 "info": "path length inside atof wedge in mm",
-                "name": "L_in_wedge",
+                "name": "l_in_wedge",
                 "type": "F"
             }
         ],
         "group": 23000,
         "info": "Track Projections to ATOF",
         "item": 31,
-        "name": "ALERT::Projections"
+        "name": "ALERT::projections"
     }
 ]

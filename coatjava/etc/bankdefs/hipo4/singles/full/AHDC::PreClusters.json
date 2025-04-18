@@ -2,19 +2,19 @@
     {
         "entries": [
             {
-                "info": "X info (mm)",
-                "name": "X",
+                "info": "x info (mm)",
+                "name": "x",
                 "type": "F"
             },
             {
-                "info": "Y info (mm)",
-                "name": "Y",
+                "info": "y info (mm)",
+                "name": "y",
                 "type": "F"
             }
         ],
         "group": 23000,
         "info": "Pre Clusters info",
         "item": 24,
-        "name": "AHDC::PreClusters"
+        "name": "AHDC::preclusters"
     }
 ]

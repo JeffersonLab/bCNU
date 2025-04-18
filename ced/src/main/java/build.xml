@@ -10,7 +10,7 @@
 		<property name="cnuphysdir" value="${user.home}/coatjava/common-tools/cnuphys"/>
 		
 		<!-- for making classpath -->
-		<property name="coat" value="coatjava/lib/clas/coat-libs-12.0.3t-SNAPSHOT.jar"/>
+		<property name="coat" value="coatjava/lib/clas/coat-libs-12.0.4t-SNAPSHOT.jar"/>
 		<property name="glue" value="JOGL/gluegen-rt.jar"/>
 		<property name="jogl" value="JOGL/jogl-all.jar"/>
 		<property name="f2j" value="numRec/lib/f2jutil.jar"/>

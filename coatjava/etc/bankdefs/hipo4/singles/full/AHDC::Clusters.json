@@ -2,24 +2,24 @@
     {
         "entries": [
             {
-                "info": "X info (mm)",
-                "name": "X",
+                "info": "x info (mm)",
+                "name": "x",
                 "type": "F"
             },
             {
-                "info": "Y info (mm)",
-                "name": "Y",
+                "info": "y info (mm)",
+                "name": "y",
                 "type": "F"
             },
             {
-                "info": "Z info (mm)",
-                "name": "Z",
+                "info": "z info (mm)",
+                "name": "z",
                 "type": "F"
             }
         ],
         "group": 23000,
         "info": "Clusters info",
         "item": 25,
-        "name": "AHDC::Clusters"
+        "name": "AHDC::clusters"
     }
 ]

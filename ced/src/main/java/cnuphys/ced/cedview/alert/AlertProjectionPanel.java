@@ -29,7 +29,7 @@ public class AlertProjectionPanel extends JPanel {
 
     private static final Font FONT = Fonts.tweenFont;
 
-    public static final int DEFAULT_Z = 150;
+    public static final int DEFAULT_Z = 0;
 
     //TOF view radio buttons
     JRadioButton showAllTOF;
@@ -49,7 +49,7 @@ public class AlertProjectionPanel extends JPanel {
         zSliderLabel = createLabel("  ");
         add(zSliderLabel);
 
-        zSlider = createSlider(0, 300, DEFAULT_Z, 50, 10, this::updateZLabel, true);
+        zSlider = createSlider(-150, 150, DEFAULT_Z, 50, 10, this::updateZLabel, true);
         this.alertXYView.setProjectionPlane(DEFAULT_Z);
         add(zSlider);
 
@@ -76,6 +76,7 @@ public class AlertProjectionPanel extends JPanel {
         bPanel.add(showAllTOF);
         bPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
         bPanel.add(showIntersectingTOF);
+        showIntersectingTOF.setEnabled(false);
         panel.add(bPanel);
  
         // Set default selection
