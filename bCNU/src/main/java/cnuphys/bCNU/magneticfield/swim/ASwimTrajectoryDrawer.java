@@ -327,7 +327,7 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHints(renderHints);
 
-		Stroke oldStroke = g2.getStroke();
+		BasicStroke oldStroke = (BasicStroke) g2.getStroke();
 		Point pp1 = new Point();
 		Point pp2 = new Point();
 
@@ -368,7 +368,7 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 
 			Color segColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
 			g2.setColor(segColor);
-			BasicStroke stroke = GraphicsUtilities.copyWithNewWidth(planeStroke, lineWidth);
+			BasicStroke stroke = GraphicsUtilities.copyWithNewWidth(oldStroke, lineWidth);
 			g2.setStroke(stroke);
 
 			container.worldToLocal(pp1, oldWP);
