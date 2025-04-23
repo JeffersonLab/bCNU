@@ -40,57 +40,9 @@ public class SwimTrajectoryDrawerZ extends ASwimTrajectoryDrawer {
 			super.draw(g, container);
 			g2.setClip(oldClip);
 
-//
-//			// mc
-//			if (SwimMenu.getInstance().showMonteCarloTracks()) {
-//				List<SwimTrajectory> trajectories = Swimming.getMCTrajectories();
-//				if ((trajectories != null) && (trajectories.size() > 0)) {
-//
-//					Rectangle sr = container.getInsetRectangle();
-//					Graphics2D g2 = (Graphics2D) g;
-//
-//					Shape oldClip = g2.getClip();
-//
-//					g2.clipRect(sr.x, sr.y, sr.width, sr.height);
-//					super.draw(g, container);
-//					g2.setClip(oldClip);
-//				}
-//			}
-//
-//			// recon
-//			if (SwimMenu.getInstance().showReconstructedTracks()) {
-//				List<SwimTrajectory> trajectories = Swimming.getReconTrajectories();
-//				if ((trajectories == null) || (trajectories.size() < 1)) {
-//					return;
-//				}
-//
-//				Rectangle sr = container.getInsetRectangle();
-//				Graphics2D g2 = (Graphics2D) g;
-//
-//				Shape oldClip = g2.getClip();
-//
-//				g2.clipRect(sr.x, sr.y, sr.width, sr.height);
-//				super.draw(g, container);
-//				g2.setClip(oldClip);
-//			}
-
 		}
 	}
 
-	/**
-	 * Here we have a chance to veto a trajectory. For example, we may decide that
-	 * the trajectory won't appear on this view (assuming a view owns this drawer)
-	 * and so don't bother to compute it. The default implementation vetoes nothing.
-	 *
-	 * @param trajectory the trajectory to test.
-	 * @return <code>true</code> if this trajectory is vetoed.
-	 */
-	@Override
-	protected boolean veto(SwimTrajectory trajectory) {
-//		double theta = trajectory.getOriginalTheta();
-//		return theta < 30 || theta > 150;
-		return false;
-	}
 
 	/**
 	 * From detector xyz get the projected world point.

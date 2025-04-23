@@ -31,7 +31,7 @@ import cnuphys.ced.geometry.urwell.UrWELLGeometry;
 public class GeometryCache {
 
 	// the cache file name
-	private static String _cacheFileName = "cache/geometry.cache";
+	private static String _cacheFileName = ".cedGeometry.cache";
 
 	private static ArrayList<IGeometryCache> _geometries = new ArrayList<>();
 
@@ -261,7 +261,7 @@ public class GeometryCache {
 
 	// get the cache file assumed in the current working directory
 	private static File getCacheFile() {
-		return new File(System.getProperty("user.dir"), _cacheFileName);
+		return new File(System.getProperty("user.home"), _cacheFileName);
 	}
 
 	/**

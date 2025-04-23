@@ -127,7 +127,7 @@ public class GraphicsUtilities {
 	 * aren't created over and over again. There should not be many--each linewidth
 	 * and solid or dashed combination--probably no more than six or eight.
 	 */
-	protected static Hashtable<String, Stroke> strokes = new Hashtable<>(47);
+	protected static Hashtable<String, BasicStroke> strokes = new Hashtable<>();
 
 	/**
 	 * Set component to small size variant. Probably only works on Mac.
@@ -198,12 +198,12 @@ public class GraphicsUtilities {
 	 * @param lineStyle the desired line style.
 	 * @return the appropriate stroke.
 	 */
-	public static Stroke getStroke(float lineWidth, LineStyle lineStyle) {
+	public static BasicStroke getStroke(float lineWidth, LineStyle lineStyle) {
 
 		// linewidth 0 same as linewidth 1
 
 		String hashKey = "STROKE_LW_" + lineWidth + "_LT_" + lineStyle;
-		Stroke stroke = null;
+		BasicStroke stroke = null;
 
 		if (strokes != null) {
 			stroke = (strokes.get(hashKey));
@@ -239,6 +239,25 @@ public class GraphicsUtilities {
 		}
 		return stroke;
 	}
+	
+	
+	/**
+	 * Copy a stroke but change the width
+	 * @param original
+	 * @param newWidth
+	 * @return
+	 */
+	public static BasicStroke copyWithNewWidth(BasicStroke original, float newWidth) {
+	    return new BasicStroke(
+	        newWidth,
+	        original.getEndCap(),
+	        original.getLineJoin(),
+	        original.getMiterLimit(),
+	        original.getDashArray(),
+	        original.getDashPhase()
+	    );
+	}
+
 
 	/**
 	 * Create four points corresponding to the corners of a rectangle. Useful for

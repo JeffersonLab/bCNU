@@ -135,7 +135,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 		_hitDrawer = new CentralXYHitDrawer(this, this);
 
 		// draws any swum trajectories (in the after draw)
-		_swimTrajectoryDrawer = new SwimTrajectoryDrawer(this);
+		_swimTrajectoryDrawer = new SwimTrajectoryDrawer(this, 0, 280);
 		_swimTrajectoryDrawer.setMaxPathLength(getTrajMaxPathlength());
 
 		// add the CND polys

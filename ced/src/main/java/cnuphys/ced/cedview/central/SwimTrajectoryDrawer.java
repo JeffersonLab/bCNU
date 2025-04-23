@@ -17,8 +17,21 @@ public class SwimTrajectoryDrawer extends ASwimTrajectoryDrawer {
 
 	private CedXYView _view;
 
+	/**
+	 * Constructor Trajectory drawer for the CedXYView.
+	 * 
+	 * @param view the view that owns this drawer.
+	 */
 	public SwimTrajectoryDrawer(CedXYView view) {
 		_view = view;
+	}
+
+	public SwimTrajectoryDrawer(CedXYView view, double zView, double delZ) {
+		_view = view;
+		// zEffect is true by default
+		this.zEffect = true;
+		this.zView = zView;
+		this.delZ = delZ; // max distance from the z view point for z effect
 	}
 
 	/**
@@ -41,19 +54,6 @@ public class SwimTrajectoryDrawer extends ASwimTrajectoryDrawer {
 			super.draw(g, container);
 			g2.setClip(oldClip);
 		}
-	}
-
-	/**
-	 * Here we have a chance to veto a trajectory. For example, we may decide that
-	 * the trajectory won't appear on this view (assuming a view owns this drawer)
-	 * and so don't bother to compute it. The default implementation vetoes nothing.
-	 *
-	 * @param trajectory the trajectory to test.
-	 * @return <code>true</code> if this trajectory is vetoed.
-	 */
-	@Override
-	protected boolean veto(SwimTrajectory trajectory) {
-		return false;
 	}
 
 	/**

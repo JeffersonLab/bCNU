@@ -53,9 +53,6 @@ import cnuphys.swim.SwimTrajectory2D;
 public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralXYView {
 
 
-	// camera Z for projection
-//	private double _zcamera = 450;
-
 	// for naming clones
 	private static int CLONE_COUNT = 0;
 
@@ -117,7 +114,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 	private AlertXYView(Object... keyVals) {
 		super(keyVals);
 		// draws any swum trajectories (in the after draw)
-		_swimTrajectoryDrawer = new SwimTrajectoryDrawer(this);
+		_swimTrajectoryDrawer = new SwimTrajectoryDrawer(this, AlertProjectionPanel.DEFAULT_Z, 150); // zEffect is true by default);
 		_swimTrajectoryDrawer.setMaxPathLength(getTrajMaxPathlength());
 		_dcHitDrawer = new AlertDCHitDrawer(this);
 		_tofHitDrawer = new AlertTOFHitDrawer(this);
@@ -186,8 +183,6 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 
 		view._controlPanel.getMatchedBankPanel().update();
 		
-//		RangeSlider trajRangeSlider = view._controlPanel.getTrajRangeSlider();
-//		trajRangeSlider.setOnChange(value -> view.trajRangeChanging(value));
 		
 		RangeSlider minADCSlider = view._controlPanel.getMinADCRangeSlider();
 		minADCSlider.setOnChange(value -> view.minADCChanging(value));
@@ -210,12 +205,6 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 		return _controlPanel.getMinADCRangeSlider().getValue();
 	}
 	
-
-	//respond to the traj range change
-	private void trajRangeChanging(int currentVal) {
-		_swimTrajectoryDrawer.setMaxPathLength(currentVal);
-		refresh();
-	}
 	
 	//respond to the min adc cutoffs
 	private void minADCChanging(int currentVal) {
@@ -343,6 +332,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 
 	//set the projection plane
 	public void setProjectionPlane(double z) {
+		_swimTrajectoryDrawer.setZView(z);
 		Plane3D plane = GeometryManager.constantZPlane(z);
 		this.projectionPlane = plane;
 	}
@@ -393,12 +383,6 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 	public void labToWorld(double x, double y, double z, Point2D.Double wp) {
 		wp.x = x;
 		wp.y = y;
-
-		//do the projection
-//		double zp = getFixedZ();
-//		double scale = (_zcamera - zp) / _zcamera;
-//		wp.x = x*scale;
-//		wp.y = y*scale;
 	}
 
 	/**

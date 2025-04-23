@@ -1,5 +1,6 @@
 package cnuphys.bCNU.magneticfield.swim;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -33,11 +34,17 @@ import cnuphys.swim.Swimming;
  */
 public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements IProjector {
 	
-	private double _maxPathLength = 2000; //whatever units the trajectory
+	// used by XY plots to indicate for the z effect
+	protected boolean zEffect;  //whether it is on or off
+	protected double zView; // z view point for z effect
+	protected double delZ; // max distance from the z view point for z effect 
+	protected int maxLineWidth = 3;
+	
+	private double _maxPathLength = 1500; //whatever units the trajectory
 
 	// colors
 	protected static final Color sectChangeColor = X11Colors.getX11Color("purple", 128);
-	protected static final Stroke planeStroke = GraphicsUtilities.getStroke(1.5f, LineStyle.SOLID);
+	protected static final BasicStroke planeStroke = GraphicsUtilities.getStroke(1.5f, LineStyle.SOLID);
 
 	private static RenderingHints renderHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
 			RenderingHints.VALUE_ANTIALIAS_ON);
@@ -52,6 +59,7 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 
 	protected double _minMarkR = 25; // cm
 
+	
 	/**
 	 * Actual drawing method
 	 *
@@ -76,7 +84,7 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 					// give a chance to veto a trajectory, e.g. no chance it
 					// will appear on this view (for example)
 					if (!veto(trajectory)) {
-						_trajectories2D.add(new SwimTrajectory2D(trajectory, this));
+						_trajectories2D.add(new SwimTrajectory2D(trajectory, this, zEffect));
 					}
 				}
 			}
@@ -94,7 +102,7 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 					// will
 					// appear on this view (for example)
 					if (!veto(trajectory)) {
-						_trajectories2D.add(new SwimTrajectory2D(trajectory, this));
+						_trajectories2D.add(new SwimTrajectory2D(trajectory, this, zEffect));
 					}
 				}
 			}
@@ -108,7 +116,7 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 
 				for (SwimTrajectory trajectory : trajectories) {
 					if (!veto(trajectory)) {
-						_trajectories2D.add(new SwimTrajectory2D(trajectory, this));
+						_trajectories2D.add(new SwimTrajectory2D(trajectory, this, zEffect));
 					}
 				}
 			}
@@ -121,6 +129,14 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 		for (SwimTrajectory2D trajectory2D : _trajectories2D) {
 			drawSwimTrajectory(g, container, trajectory2D);
 		}
+	}
+	
+	/**
+	 * The the z view. Only relevant if zEffect is true.
+	 * @param zView the new value
+	 */
+	public void setZView(double zView) {
+		this.zView = zView;
 	}
 
 	/**
@@ -184,67 +200,46 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 		String source = trajectory.getSource().toLowerCase();
 
 		if (source.contains("hitbasedtrkg::hbtracks")) {
-			plainDrawSwimTrajectory(g, container, trajectory, Color.yellow);
+			draw2DTrajectory(g, container, trajectory, Color.yellow);
 			return;
 		} else if (source.contains("timebasedtrkg::tbtracks")) {
-			plainDrawSwimTrajectory(g, container, trajectory, X11Colors.getX11Color("dark orange"));
+			draw2DTrajectory(g, container, trajectory, X11Colors.getX11Color("dark orange"));
 			return;
 		} else if (source.contains("cvtrec::tracks")) {
-			plainDrawSwimTrajectory(g, container, trajectory, X11Colors.getX11Color("green"));
+			draw2DTrajectory(g, container, trajectory, X11Colors.getX11Color("green"));
 			return;
 		} else if (source.contains("cvt::tracks")) {
-			plainDrawSwimTrajectory(g, container, trajectory, X11Colors.getX11Color("coral"));
+			draw2DTrajectory(g, container, trajectory, X11Colors.getX11Color("coral"));
 			return;
 		} else if (source.contains("hitbasedtrkg::aitracks")) {
-			plainDrawSwimTrajectory(g, container, trajectory, X11Colors.getX11Color("spring green"));
+			draw2DTrajectory(g, container, trajectory, X11Colors.getX11Color("spring green"));
 			return;
 		} else if (source.contains("timebasedtrkg::aitracks")) {
-			plainDrawSwimTrajectory(g, container, trajectory, X11Colors.getX11Color("magenta"));
+			draw2DTrajectory(g, container, trajectory, X11Colors.getX11Color("magenta"));
 			return;
 		}
-
-		Graphics2D g2 = (Graphics2D) g;
-		g2.setRenderingHints(renderHints);
-
-		Stroke oldStroke = g2.getStroke();
-
-		Polygon poly = new Polygon();
-		Point2D.Double path[] = trajectory.getPath();
-
-		if (path == null) {
-			return;
-		}
-
-		Point pp = new Point();
-		Point2D.Double oldWP = null;
-		
-		//running pathlength in cm
-		double pathLength = 0;
-
-		for (Point2D.Double wp : path) {
-			if (oldWP != null) {
-				pathLength += wp.distance(oldWP);
-			} 
-			oldWP = wp;
-			if (pathLength > _maxPathLength) {
-				break;
-			}
-
-			container.worldToLocal(pp, wp);
-			poly.addPoint(pp.x, pp.y);
-		}
-
-		if (poly.npoints > 1) {
+		else {
+			Graphics2D g2 = (Graphics2D) g;
+	
+			Stroke oldStroke = g2.getStroke();
 			LundStyle style = LundStyle.getStyle(lid);
 			g.setColor(style.getLineColor());
 			g2.setStroke(style.getStroke());
-			g2.drawPolyline(poly.xpoints, poly.ypoints, poly.npoints);
+			draw2DTrajectory(g, container, trajectory, style.getLineColor());
+		
+			g2.setStroke(oldStroke);
 		}
-
-		g2.setStroke(oldStroke);
 	}
 
 	public abstract boolean acceptSimpleTrack(SwimTrajectory2D trajectory);
+	
+	private void draw2DTrajectory(Graphics g, IContainer container, SwimTrajectory2D trajectory, Color color) {
+		if (zEffect) {
+			zEffectDrawSwimTrajectory(g, container, trajectory, color);
+		} else {
+			plainDrawSwimTrajectory(g, container, trajectory, color);
+		}
+	}
 
 	/**
 	 * Draw a trajectory
@@ -258,13 +253,10 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHints(renderHints);
 
-		Stroke oldStroke = g2.getStroke();
-
 		Polygon poly = new Polygon();
 		Point2D.Double path[] = trajectory.getPath();
 
 		if (path == null) {
-//			System.err.println("Null path");
 			return;
 		}
 
@@ -293,11 +285,102 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 			g2.setStroke(planeStroke);
 			g.drawPolyline(poly.xpoints, poly.ypoints, poly.npoints);
 		}
-
-		g2.setStroke(oldStroke);
 	}
 
+	
+	/**
+	 * Draw a trajectory
+	 *
+	 * @param g          the graphics object
+	 * @param container  the rendering container
+	 * @param trajectory the 2D (already projected) trajectory to draw
+	 */
+	private void zEffectDrawSwimTrajectory(Graphics g, IContainer container, SwimTrajectory2D trajectory, Color color) {
+ 
+		double zValues[] = trajectory.getZValues();
+		if (zValues == null) {
+			plainDrawSwimTrajectory(g, container, trajectory, color);
+			return; // no z effect
+		}
+		
+		Point2D.Double path[] = trajectory.getPath();
 
+		if (path == null) {
+			return;
+		}
+		
+		if (path.length != zValues.length) {
+			System.err.println("SwimTrajectoryDrawer: path and zValues lengths do not match");
+			plainDrawSwimTrajectory(g, container, trajectory, color);
+			return;
+		}
+		
+		//draw with z effect. The trajectory is drawn in segments of varying line width
+		// and alpha. The line varies from maxLineWidth to 1 pixel width based on how 
+		// far (in an absolute sense) the z value is from the zView point. It should
+		// drop from maxLineWidth to 1 pixel width at delZ distance from the zView point,
+		// then stay at 1 pixel width for larger distances. The color of the segment
+		//should be the provided color with an alpha that varies from 255 to 64 up to
+		// delZ, then drops to 32 for larger distances.This is to give a 3D effect for the line.
+
+		
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setRenderingHints(renderHints);
+
+		Stroke oldStroke = g2.getStroke();
+		Point pp1 = new Point();
+		Point pp2 = new Point();
+
+
+		Point2D.Double oldWP = null;
+		double pathLength = 0;
+
+		for (int i = 1; i < path.length; i++) {
+			oldWP = path[i - 1];
+			Point2D.Double wp = path[i];
+			
+			double dz1 = Math.abs(zValues[i - 1] - zView);
+			double dz2 = Math.abs(zValues[i] - zView);
+			
+			pathLength += oldWP.distance(wp);
+			if (pathLength > _maxPathLength) {
+				break;
+			}
+
+			// interpolate attributes for the segment
+			double avgDZ = 0.5 * (dz1 + dz2);
+
+			// line width calculation
+			float lineWidth = (float) (avgDZ < delZ
+					? 1 + (maxLineWidth - 1) * (1 - avgDZ / delZ)
+					: 1);
+
+			// alpha calculation
+			int alpha;
+			if (avgDZ < delZ) {
+				double frac = avgDZ / delZ;
+				alpha = (int) (255 - frac * (255 - 96));
+			} else {
+				lineWidth = 1f; // minimum line width
+				alpha = 64;
+			}
+			alpha = Math.max(0, Math.min(255, alpha)); // clamp
+
+			Color segColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+			g2.setColor(segColor);
+			BasicStroke stroke = GraphicsUtilities.copyWithNewWidth(planeStroke, lineWidth);
+			g2.setStroke(stroke);
+
+			container.worldToLocal(pp1, oldWP);
+			container.worldToLocal(pp2, wp);
+			g2.drawLine(pp1.x, pp1.y, pp2.x, pp2.y);
+		}
+
+		g2.setStroke(oldStroke);
+
+	}
+		
+	
 	/**
 	 * Get the distance of closest approach to any 2D (projected) trajectory.
 	 *
