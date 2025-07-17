@@ -76,7 +76,6 @@ public class AlertProjectionPanel extends JPanel {
         bPanel.add(showAllTOF);
         bPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
         bPanel.add(showIntersectingTOF);
-        showIntersectingTOF.setEnabled(false);
         panel.add(bPanel);
  
         // Set default selection

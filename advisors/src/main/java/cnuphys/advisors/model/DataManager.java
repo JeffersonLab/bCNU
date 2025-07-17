@@ -90,7 +90,7 @@ public class DataManager {
 	public static final DataAttribute specialAtt = new DataAttribute("SPECIAL", 50);
 	public static final DataAttribute bannerBlockAtt = new DataAttribute("BANNER_BLOCK_CODE", 40);
 
-	public static final DataAttribute prefFirstAtt = new DataAttribute("PREFIRST", 72);
+	public static final DataAttribute prefFirstAtt = new DataAttribute("PREFERRED_NAME", 72);
 	public static final DataAttribute cnuEmailAtt = new DataAttribute("CNU_EMAIL", 170);
 	public static final DataAttribute bannerSportAtt = new DataAttribute("BANNER_SPRT", 70);
 	public static final DataAttribute prStr1Att = new DataAttribute("PRSTR1", 70);

@@ -99,7 +99,7 @@ public class StudentData extends DataModel {
 		int plpIndex = getColumnIndex(DataManager.plpAtt);
 		int honrIndex = getColumnIndex(DataManager.honrAtt);
 		int pspIndex = getColumnIndex(DataManager.pspAtt);
-		int prelawIndex = getColumnIndex(DataManager.prelawAtt);
+//		int prelawIndex = getColumnIndex(DataManager.prelawAtt);
 		int majorIndex = getColumnIndex(DataManager.majorAtt);
 		int bannerBlockIndex = getColumnIndex(DataManager.bannerBlockAtt);
 
