@@ -689,10 +689,10 @@ public class ClasIoEventManager {
 			double tScale = (torus == null) ? -1 : torus.getScaleFactor();
 			double sScale = (solenoid == null) ? 1 : solenoid.getScaleFactor();
 
-			Bank header = _decoder.createHeaderBank(-1, 0, (float) tScale, (float) sScale);
-			if (header != null) {
-				decodedEvent.write(header);
-			}
+//			Bank header = _decoder.createHeaderBank(-1, 0, (float) tScale, (float) sScale);
+//			if (header != null) {
+//				decodedEvent.write(header);
+//			}
 			_decoder.extractPulses(decodedEvent);
 			return new HipoDataEvent(decodedEvent, _schemaFactory);
 		}
