@@ -42,6 +42,7 @@ import cnuphys.ced.cedview.ILabCoordinates;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.component.ControlPanel;
 import cnuphys.ced.component.DisplayBits;
+import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.BMTGeometry;
 import cnuphys.ced.geometry.BSTGeometry;
 import cnuphys.ced.geometry.BSTxyPanel;
@@ -210,7 +211,10 @@ public class CentralZView extends CedView implements ChangeListener, ILabCoordin
 				}
 
 				drawGEMCHits(g, container);
-				drawBSTPanels(g, container);
+
+				if (!Ced.forVeronique()) {
+					drawBSTPanels(g, container);
+				}
 
 				// not very sophisticated
 				denoteBMT(g, container);

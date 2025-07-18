@@ -321,6 +321,13 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		}
 	}
 
+	/**
+	 * Is this a special release for Veronique
+	 * @return <code>true</code> if this is a special release for Veronique
+	 */
+	public static boolean forVeronique() {
+		return release.contains("vz");
+	}
 
 	//get a string that tells us what version of coatjava.
 	//uses the class path.
@@ -1270,6 +1277,9 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 				FilterManager.getInstance().setUpFilterMenu();
 				System.out.println(String.format("ced %s is ready. COATJAVA: %s Geometry variation: %s", versionString(), getCoatJavaVersion(), _geoVariation));
+				if (forVeronique()) {
+					System.out.println("This is a special release for Veronique.");
+				}
 			}
 
 		});

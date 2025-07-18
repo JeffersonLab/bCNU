@@ -14,6 +14,12 @@ public class GeometryVersion extends ACachedGeometry {
 
 	@Override
 	public boolean readGeometry(Kryo kryo, Input input) {
+		
+		
+		if (Ced.forVeronique()) {
+			return false; // no cache geo for Veronique
+		}
+		
 		// Read version string
 		String cachedVersion = kryo.readObject(input, String.class);
 		if (!cachedVersion.equals(versionString())) {
@@ -26,6 +32,11 @@ public class GeometryVersion extends ACachedGeometry {
 
 	@Override
 	public boolean writeGeometry(Kryo kryo, Output output) {
+		
+		if (Ced.forVeronique()) {
+			return false; // no cache geo for Veronique
+		}
+		
 		kryo.writeObject(output, versionString());
 		return true;
 	}

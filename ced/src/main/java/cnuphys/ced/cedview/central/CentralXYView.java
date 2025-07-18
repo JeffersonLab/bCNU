@@ -422,10 +422,12 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 		g2.clipRect(sr.x, sr.y, sr.width, sr.height);
 
 		// BST panels
-		for (BSTxyPanel panel : panels) {
-			drawBSTPanel(g2, container, panel, _panelColors[(panel.getSector()) % 2]);
-		}
+		if (!Ced.forVeronique()) {
 
+			for (BSTxyPanel panel : panels) {
+				drawBSTPanel(g2, container, panel, _panelColors[(panel.getSector()) % 2]);
+			}
+		}
 		// CND Polys
 		for (int layer = 1; layer <= 3; layer++) {
 			for (int paddleId = 1; paddleId <= 48; paddleId++) {
