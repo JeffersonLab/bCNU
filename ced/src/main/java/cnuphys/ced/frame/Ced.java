@@ -10,6 +10,9 @@ import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -103,7 +106,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private static String _geoVariation = "default";
 
 	// ced release
-	public static final String release = "1.9.7vz";
+	public static final String release = "1.9.7";
 
 	//minimum java major version
 	private static final int _minJavaVersion = 17;
@@ -1155,6 +1158,27 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		DataWarehouse.getInstance();
 	}
 
+    public static void relevelAllLogging(Level level) {
+
+        Logger root = Logger.getLogger("");
+
+
+
+        // Relevel logging at the root level
+
+        root.setLevel(level);
+
+        // Also turn off any existing handlers (unsure if necessary)
+
+        for (Handler h : root.getHandlers()) {
+
+        	h.setLevel(level);
+
+        }
+
+    }
+
+
 	/**
 	 * Main program launches the ced gui.
 	 * <p>
@@ -1181,6 +1205,9 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 		//this is supposed to create less pounding of ccdb
 		DefaultLogger.initialize();
+		
+		// to suppress prints when switched to coatjava 1.3
+		relevelAllLogging(Level.CONFIG);
 
 		String variation = System.getProperty("GEOVARIATION");
 		if (variation != null) {

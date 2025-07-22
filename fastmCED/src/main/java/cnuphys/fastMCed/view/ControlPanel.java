@@ -120,7 +120,7 @@ public class ControlPanel extends JPanel {
 
 		// feedback
 		if (Bits.checkBit(controlPanelBits, FEEDBACK)) {
-			_feedbackPane = new FeedbackPane(FEEDBACKWIDTH);
+			_feedbackPane = new FeedbackPane();
 			view.getContainer().setFeedbackPane(_feedbackPane);
 			// box.add(_feedbackPane);
 			// box.add(Box.createVerticalGlue());
