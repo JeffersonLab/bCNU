@@ -1207,10 +1207,11 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		DefaultLogger.initialize();
 		
 		// to suppress prints when switched to coatjava 1.3
-		relevelAllLogging(Level.CONFIG);
+		relevelAllLogging(Level.WARNING);
 
 		String variation = System.getProperty("GEOVARIATION");
 		if (variation != null) {
+			System.err.println("Using GEOVARIATION: " + variation);
 			_geoVariation = new String(variation);
 		}
 
