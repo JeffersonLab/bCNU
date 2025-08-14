@@ -11,8 +11,8 @@
   <modules>
     <module>exp4j</module>
     <module>tinyMS</module>
-    <module>bCNU</module>
     <module>bCNU3D</module>
+    <module>bCNU</module>
     <module>ced</module>
   </modules>
 
