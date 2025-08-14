@@ -15,11 +15,8 @@ defaults:
   run:
     shell: bash
 
-env:
-  java_version: 17
-  java_distribution: zulu
-  CCDB_CONNECTION: 'sqlite:////cvmfs/oasis.opensciencegrid.org/jlab/hallb/clas12/sw/noarch/data/ccdb/ccdb_latest.sqlite'
-  nthreads: 1
+#env:
+#  CCDB_CONNECTION: 'sqlite:////cvmfs/oasis.opensciencegrid.org/jlab/hallb/clas12/sw/noarch/data/ccdb/ccdb_latest.sqlite'
 
 jobs:
   build:
@@ -34,24 +31,24 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: ${{ env.java_version }}
-          distribution: ${{ env.java_distribution }}
-      - name: install xrootd-client (linux)
-        if: ${{ matrix.runner == 'ubuntu-latest' }}
-        run: |
-          sudo apt -y update
-          sudo apt -y upgrade
-          sudo apt -y install xrootd-client
-      - name: install xrootd-client (macos)
-        if: ${{ matrix.runner == 'macos-latest' }}
-        run: brew install xrootd
-      - name: setup cvmfs
-        uses: cvmfs-contrib/github-action-cvmfs@v5
-        with:
-          cvmfs_repositories: 'oasis.opensciencegrid.org'
-      - name: cvmfs
-        run: ls /cvmfs/oasis.opensciencegrid.org/jlab/hallb/clas12/sw/noarch/data/ccdb/ccdb_latest.sqlite
-      - name: build
+          java-version: 17
+          distribution: zulu
+#      - name: install xrootd-client (linux)
+#        if: ${{ matrix.runner == 'ubuntu-latest' }}
+#        run: |
+#          sudo apt -y update
+#          sudo apt -y upgrade
+#          sudo apt -y install xrootd-client
+#      - name: install xrootd-client (macos)
+#        if: ${{ matrix.runner == 'macos-latest' }}
+#        run: brew install xrootd
+#      - name: setup cvmfs
+#        uses: cvmfs-contrib/github-action-cvmfs@v5
+#        with:
+#          cvmfs_repositories: 'oasis.opensciencegrid.org'
+#      - name: cvmfs
+#        run: ls /cvmfs/oasis.opensciencegrid.org/jlab/hallb/clas12/sw/noarch/data/ccdb/ccdb_latest.sqlite
+#      - name: build
         run: mvn install
 #      - name: tar # tarball to preserve permissions
 #        run: tar czvf coatjava.tar.gz coatjava
