@@ -48,7 +48,7 @@ jobs:
 #          cvmfs_repositories: 'oasis.opensciencegrid.org'
 #      - name: cvmfs
 #        run: ls /cvmfs/oasis.opensciencegrid.org/jlab/hallb/clas12/sw/noarch/data/ccdb/ccdb_latest.sqlite
-#      - name: build
+      - name: build
         run: mvn install
 #      - name: tar # tarball to preserve permissions
 #        run: tar czvf coatjava.tar.gz coatjava
