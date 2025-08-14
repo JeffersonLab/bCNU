@@ -1,0 +1,106 @@
+[
+    {
+        "entries": [
+            {
+                "id": 1,
+                "info": "DB status + U strip*10",
+                "name": "dbstU",
+                "type": "S"
+            },
+            {
+                "id": 2,
+                "info": "DB status + V strip*10",
+                "name": "dbstV",
+                "type": "S"
+            },
+            {
+                "id": 3,
+                "info": "DB status + W strip*10",
+                "name": "dbstW",
+                "type": "S"
+            },
+            {
+                "id": 4,
+                "info": "raw U peak energy",
+                "name": "rawEU",
+                "type": "F"
+            },
+            {
+                "id": 5,
+                "info": "raw V peak energy",
+                "name": "rawEV",
+                "type": "F"
+            },
+            {
+                "id": 6,
+                "info": "raw W peak energy",
+                "name": "rawEW",
+                "type": "F"
+            },
+            {
+                "id": 7,
+                "info": "recon U peak energy (GeV)",
+                "name": "recEU",
+                "type": "F"
+            },
+            {
+                "id": 8,
+                "info": "recon V peak energy (GeV)",
+                "name": "recEV",
+                "type": "F"
+            },
+            {
+                "id": 9,
+                "info": "recon W peak energy (GeV)",
+                "name": "recEW",
+                "type": "F"
+            },
+            {
+                "id": 10,
+                "info": "recon U peak TDC time (ns)",
+                "name": "recDTU",
+                "type": "F"
+            },
+            {
+                "id": 11,
+                "info": "recon V peak TDC time (ns)",
+                "name": "recDTV",
+                "type": "F"
+            },
+            {
+                "id": 12,
+                "info": "recon W peak TDC time (ns)",
+                "name": "recDTW",
+                "type": "F"
+            },
+            {
+                "id": 13,
+                "info": "recon U peak FADC time (ns)",
+                "name": "recFTU",
+                "type": "F"
+            },
+            {
+                "id": 14,
+                "info": "recon V peak FADC time (ns)",
+                "name": "recFTV",
+                "type": "F"
+            },
+            {
+                "id": 15,
+                "info": "recon W peak FADC time (ns)",
+                "name": "recFTW",
+                "type": "F"
+            },
+            {
+                "id": 16,
+                "info": "cluster size",
+                "name": "size",
+                "type": "F"
+            }
+        ],
+        "group": 300,
+        "info": "Calorimeter Cluster Parameters",
+        "item": 46,
+        "name": "REC::CaloExtras"
+    }
+]

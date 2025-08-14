@@ -1,0 +1,80 @@
+[
+    {
+        "entries": [
+            {
+                "info": "id of the track",
+                "name": "id",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 1",
+                "name": "Clus1_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 2",
+                "name": "Clus2_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 3",
+                "name": "Clus3_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 4",
+                "name": "Clus4_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 5",
+                "name": "Clus5_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 6",
+                "name": "Clus6_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 7",
+                "name": "Clus7_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 8",
+                "name": "Clus8_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 9",
+                "name": "Clus9_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 10",
+                "name": "Clus10_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 11",
+                "name": "Clus11_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of cluster on track in layer 12",
+                "name": "Clus12_ID",
+                "type": "S"
+            },
+            {
+                "info": "AI seed probability",
+                "name": "prob",
+                "type": "F"
+            }
+        ],
+        "group": 20500,
+        "info": "Ids of clusters on track for 12 layers of CVT",
+        "item": 44,
+        "name": "CVTRec::SeedClusters"
+    }
+]

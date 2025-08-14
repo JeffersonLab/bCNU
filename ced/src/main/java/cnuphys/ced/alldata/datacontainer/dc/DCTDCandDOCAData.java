@@ -59,6 +59,9 @@ public class DCTDCandDOCAData extends ACommonTDCData {
 
 	/** stime value */
 	public float stime[];
+	
+	/** for dc::tot bank */
+	public short tot[];
 
 	//counts hits in each sector
 	private int _sectorCounts[] = new int[6];
@@ -87,12 +90,24 @@ public class DCTDCandDOCAData extends ACommonTDCData {
 		}
 
 	}
+	
+	private boolean isEmpty(DataBank bank) {
+		return (bank == null) || (bank.rows() == 0);
+	}
 
 	@Override
 	public void update(DataEvent event) {
 		DataBank bank = event.getBank("DC::tdc");
+		
+		boolean dctot = false;
+		
+		//new altbank starting with coatjava 1.3.2
+		if (isEmpty(bank)) {
+			bank = event.getBank("DC::tot");
+			dctot = true;
+		}
 
-		if (bank == null) {
+		if (isEmpty(bank)) {
 			return;
 		}
 
@@ -101,6 +116,12 @@ public class DCTDCandDOCAData extends ACommonTDCData {
         component = bank.getShort("component");
         order = bank.getByte("order");
         tdc = bank.getInt("TDC");
+        
+		if (dctot) {
+			tot = bank.getShort("ToT");
+		} else {
+			tot = null;
+		}
 
         //get the layer6 and superlayer from the layer
         if (layer != null) {
@@ -145,7 +166,11 @@ public class DCTDCandDOCAData extends ACommonTDCData {
 		if (tdc[index] < 0) {
 			return "";
 		} else {
-			return "tdc: " + tdc[index] + "  order: " + order[index];
+			if (tot == null) {
+				return "tdc " + tdc[index] + "  order " + order[index];
+			} else {
+				return "tdc " + tdc[index] + "  order " + order[index] + "  ToT: " + tot[index];
+			}
 		}
 	}
 

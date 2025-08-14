@@ -1,0 +1,45 @@
+[
+    {
+        "entries": [
+            {
+                "info": "REC::Particle index",
+                "name": "pindex",
+                "type": "S"
+            },
+            {
+                "info": "MC::Particle index",
+                "name": "mcindex",
+                "type": "S"
+            },
+            {
+                "info": "layers from the 1st set of detectors hit by Recon particle",
+                "name": "player1",
+                "type": "L"
+            },
+            {
+                "info": "layers from the 1st set of detectors hit by Recon particle",
+                "name": "player2",
+                "type": "L"
+            },
+            {
+                "info": "layers from the 1st set of detectors hit by MC particle",
+                "name": "mclayer1",
+                "type": "L"
+            },
+            {
+                "info": "layers from the 2nd set of detectors hit by MC particle",
+                "name": "mclayer2",
+                "type": "L"
+            },
+            {
+                "info": "matching quality parameter",
+                "name": "quality",
+                "type": "F"
+            }
+        ],
+        "group": 40,
+        "info": "Rec::Particle -> MC::Particle matching",
+        "item": 7,
+        "name": "MC::RecMatch"
+    }
+]

@@ -1,0 +1,80 @@
+[
+    {
+        "entries": [
+            {
+                "info": "id",
+                "name": "id",
+                "type": "S"
+            },
+            {
+                "info": "related row in the RICH::hits bank",
+                "name": "hindex",
+                "type": "S"
+            },
+            {
+                "info": "related row in the REC::Particle bank",
+                "name": "pindex",
+                "type": "B"
+            },
+            {
+                "info": "photon sector",
+                "name": "sector",
+                "type": "B"
+            },
+            {
+                "info": "photon hit pmt",
+                "name": "pmt",
+                "type": "S"
+            },
+            {
+                "info": "photon hit anode",
+                "name": "anode",
+                "type": "B"
+            },
+            {
+                "info": "PID hypothesis for photon reconstruction",
+                "name": "hypo",
+                "type": "I"
+            },
+            {
+                "info": "time mismatch for traced solution",
+                "name": "dtime",
+                "type": "F"
+            },
+            {
+                "info": "Cherenkov angle as traced solution",
+                "name": "etaC",
+                "type": "F"
+            },
+            {
+                "info": "probability for the given hypothesis",
+                "name": "prob",
+                "type": "F"
+            },
+            {
+                "info": "flag for use in the likelihood",
+                "name": "use",
+                "type": "B"
+            },
+            {
+                "info": "angular range subtended by the pixel",
+                "name": "dangle",
+                "type": "F"
+            },
+            {
+                "info": "sequence of hit layers (reflections)",
+                "name": "layers",
+                "type": "I"
+            },
+            {
+                "info": "sequence of hit components (reflections)",
+                "name": "compos",
+                "type": "I"
+            }
+        ],
+        "group": 21800,
+        "info": "Reconstructed Cherenov information for single photon",
+        "item": 36,
+        "name": "RICH::Ring"
+    }
+]

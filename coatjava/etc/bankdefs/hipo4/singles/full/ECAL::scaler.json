@@ -1,0 +1,45 @@
+[
+    {
+        "entries": [
+            {
+                "info": "sector (1-6)",
+                "name": "sector",
+                "type": "B"
+            },
+            {
+                "info": "layer (1..9)",
+                "name": "layer",
+                "type": "B"
+            },
+            {
+                "info": "strip",
+                "name": "component",
+                "type": "S"
+            },
+            {
+                "info": "ADC counts",
+                "name": "acount",
+                "type": "I"
+            },
+            {
+                "info": "TDC counts",
+                "name": "tcount",
+                "type": "I"
+            },
+            {
+                "info": "ADC value",
+                "name": "avalue",
+                "type": "I"
+            },
+            {
+                "info": "TDC value",
+                "name": "tvalue",
+                "type": "I"
+            }
+        ],
+        "group": 20700,
+        "info": "Occupancy bank for the Electromagnetic Calorimeter",
+        "item": 26,
+        "name": "ECAL::scaler"
+    }
+]

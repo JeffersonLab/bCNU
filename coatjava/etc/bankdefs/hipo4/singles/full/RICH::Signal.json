@@ -1,0 +1,75 @@
+[
+    {
+        "entries": [
+            {
+                "info": "Signal id",
+                "name": "id",
+                "type": "S"
+            },
+            {
+                "info": "Signal hindex",
+                "name": "hindex",
+                "type": "S"
+            },
+            {
+                "info": "Signal sector",
+                "name": "sector",
+                "type": "S"
+            },
+            {
+                "info": "Signal pmt",
+                "name": "pmt",
+                "type": "S"
+            },
+            {
+                "info": "Signal anode",
+                "name": "anode",
+                "type": "S"
+            },
+            {
+                "info": "Signal size",
+                "name": "size",
+                "type": "S"
+            },
+            {
+                "info": "Signal status",
+                "name": "status",
+                "type": "S"
+            },
+            {
+                "info": "Signal x",
+                "name": "x",
+                "type": "F"
+            },
+            {
+                "info": "Signal y",
+                "name": "y",
+                "type": "F"
+            },
+            {
+                "info": "Signal z",
+                "name": "z",
+                "type": "F"
+            },
+            {
+                "info": "Signal time",
+                "name": "time",
+                "type": "F"
+            },
+            {
+                "info": "Signal rawtime",
+                "name": "rawtime",
+                "type": "F"
+            },
+            {
+                "info": "Signal charge",
+                "name": "charge",
+                "type": "F"
+            }
+        ],
+        "group": 21800,
+        "info": "Reconstructed Signals in RICH",
+        "item": 41,
+        "name": "RICH::Signal"
+    }
+]

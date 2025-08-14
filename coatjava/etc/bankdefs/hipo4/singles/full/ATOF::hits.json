@@ -1,0 +1,60 @@
+[
+    {
+        "entries": [
+            {
+                "info": "hit id",
+                "name": "id",
+                "type": "S"
+            },
+            {
+                "info": "atof sector",
+                "name": "sector",
+                "type": "I"
+            },
+            {
+                "info": "atof layer",
+                "name": "layer",
+                "type": "I"
+            },
+            {
+                "info": "atof component",
+                "name": "component",
+                "type": "I"
+            },
+            {
+                "info": "time in ns",
+                "name": "time",
+                "type": "F"
+            },
+            {
+                "info": "x position in mm",
+                "name": "x",
+                "type": "F"
+            },
+            {
+                "info": "y position in mm",
+                "name": "y",
+                "type": "F"
+            },
+            {
+                "info": "z position in mm",
+                "name": "z",
+                "type": "F"
+            },
+            {
+                "info": "deposited energy in MeV",
+                "name": "energy",
+                "type": "F"
+            },
+            {
+                "info": "id of cluster to which the hit was associated",
+                "name": "clusterid",
+                "type": "S"
+            }
+        ],
+        "group": 22500,
+        "info": "Reconstructed ATOF hits",
+        "item": 21,
+        "name": "ATOF::hits"
+    }
+]

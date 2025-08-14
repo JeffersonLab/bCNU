@@ -106,7 +106,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private static String _geoVariation = "default";
 
 	// ced release
-	public static final String release = "1.9.7";
+	public static final String release = "1.9.8.1";
 
 	//minimum java major version
 	private static final int _minJavaVersion = 17;
@@ -1206,8 +1206,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		//this is supposed to create less pounding of ccdb
 		DefaultLogger.initialize();
 		
-		// to suppress prints when switched to coatjava 1.3
-		relevelAllLogging(Level.WARNING);
+    	relevelAllLogging(Level.WARNING);
 
 		String variation = System.getProperty("GEOVARIATION");
 		if (variation != null) {

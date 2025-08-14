@@ -1,0 +1,25 @@
+[
+    {
+        "entries": [
+            {
+                "info": "crate",
+                "name": "crate",
+                "type": "B"
+            },
+            {
+                "info": "slot",
+                "name": "slot",
+                "type": "B"
+            },
+            {
+                "info": "timestamp (in units of 8 ns)",
+                "name": "timestamp",
+                "type": "L"
+            }
+        ],
+        "group": 20600,
+        "info": "DCRB timestamps bank",
+        "item": 13,
+        "name": "DC::jitter"
+    }
+]

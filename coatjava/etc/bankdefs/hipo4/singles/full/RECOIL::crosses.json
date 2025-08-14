@@ -1,0 +1,65 @@
+[
+    {
+        "entries": [
+            {
+                "info": "id of the cross",
+                "name": "id",
+                "type": "S"
+            },
+            {
+                "info": "sector of RECOIL",
+                "name": "sector",
+                "type": "B"
+            },
+            {
+                "info": "region of RECOIL",
+                "name": "region",
+                "type": "B"
+            },
+            {
+                "info": "energy of the cross (eV)",
+                "name": "energy",
+                "type": "F"
+            },
+            {
+                "info": "time of the cross (ns)",
+                "name": "time",
+                "type": "F"
+            },
+            {
+                "info": "x coordinate (cm)",
+                "name": "x",
+                "type": "F"
+            },
+            {
+                "info": "y coordinate (cm)",
+                "name": "y",
+                "type": "F"
+            },
+            {
+                "info": "z coordinate (cm)",
+                "name": "z",
+                "type": "F"
+            },
+            {
+                "info": "id of the cluster in the V layer",
+                "name": "cluster1",
+                "type": "S"
+            },
+            {
+                "info": "id of the cluster in the W layer",
+                "name": "cluster2",
+                "type": "S"
+            },
+            {
+                "info": "status of the cluster",
+                "name": "status",
+                "type": "S"
+            }
+        ],
+        "group": 22600,
+        "info": "reconstructed crosses from RECOIL",
+        "item": 23,
+        "name": "RECOIL::crosses"
+    }
+]

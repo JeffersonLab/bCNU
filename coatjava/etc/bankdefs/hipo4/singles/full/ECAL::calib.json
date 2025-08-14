@@ -1,0 +1,118 @@
+[
+    {
+        "entries": [
+            {
+                "id": 1,
+                "info": "sector of ECAL",
+                "name": "sector",
+                "type": "B"
+            },
+            {
+                "id": 2,
+                "info": "Layer of ECAL (1-3:PCAL, 4-6:ECIN, 7-9:ECOUT",
+                "name": "layer",
+                "type": "B"
+            },
+            {
+                "id": 3,
+                "info": "the cluster size",
+                "name": "size",
+                "type": "F"
+            },
+            {
+                "id": 4,
+                "info": "DB status + U strip*10",
+                "name": "dbstU",
+                "type": "S"
+            },
+            {
+                "id": 5,
+                "info": "DB status + V strip*10",
+                "name": "dbstV",
+                "type": "S"
+            },
+            {
+                "id": 6,
+                "info": "DB status + W strip*10",
+                "name": "dbstW",
+                "type": "S"
+            },
+            {
+                "id": 7,
+                "info": "raw U peak energy",
+                "name": "rawEU",
+                "type": "F"
+            },
+            {
+                "id": 8,
+                "info": "raw V peak energy",
+                "name": "rawEV",
+                "type": "F"
+            },
+            {
+                "id": 9,
+                "info": "raw W peak energy",
+                "name": "rawEW",
+                "type": "F"
+            },
+            {
+                "id": 10,
+                "info": "recon U peak energy",
+                "name": "recEU",
+                "type": "F"
+            },
+            {
+                "id": 11,
+                "info": "recon V peak energy",
+                "name": "recEV",
+                "type": "F"
+            },
+            {
+                "id": 12,
+                "info": "recon W peak energy",
+                "name": "recEW",
+                "type": "F"
+            },
+            {
+                "id": 13,
+                "info": "recon U peak Dtime",
+                "name": "recDTU",
+                "type": "F"
+            },
+            {
+                "id": 14,
+                "info": "recon V peak Dtime",
+                "name": "recDTV",
+                "type": "F"
+            },
+            {
+                "id": 15,
+                "info": "recon W peak Dtime",
+                "name": "recDTW",
+                "type": "F"
+            },
+            {
+                "id": 16,
+                "info": "recon U peak Ftime",
+                "name": "recFTU",
+                "type": "F"
+            },
+            {
+                "id": 17,
+                "info": "recon V peak Ftime",
+                "name": "recFTV",
+                "type": "F"
+            },
+            {
+                "id": 18,
+                "info": "recon W peak Ftime",
+                "name": "recFTW",
+                "type": "F"
+            }
+        ],
+        "group": 20700,
+        "info": "Raw and recon peak energy and recon peak time from ECAL",
+        "item": 24,
+        "name": "ECAL::calib"
+    }
+]

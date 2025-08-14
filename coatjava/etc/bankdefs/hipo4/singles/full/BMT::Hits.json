@@ -1,0 +1,65 @@
+[
+    {
+        "entries": [
+            {
+                "info": "hit ID",
+                "name": "ID",
+                "type": "S"
+            },
+            {
+                "info": "hit sector",
+                "name": "sector",
+                "type": "B"
+            },
+            {
+                "info": "hit layer",
+                "name": "layer",
+                "type": "B"
+            },
+            {
+                "info": "hit strip",
+                "name": "strip",
+                "type": "S"
+            },
+            {
+                "info": "energy",
+                "name": "energy",
+                "type": "F"
+            },
+            {
+                "info": "time (ns)",
+                "name": "time",
+                "type": "F"
+            },
+            {
+                "info": "fitted hit residual",
+                "name": "fitResidual",
+                "type": "F"
+            },
+            {
+                "info": "tracking status",
+                "name": "trkingStat",
+                "type": "B"
+            },
+            {
+                "info": "associated cluster ID",
+                "name": "clusterID",
+                "type": "S"
+            },
+            {
+                "info": "associated track ID",
+                "name": "trkID",
+                "type": "S"
+            },
+            {
+                "info": "status (0=good)",
+                "name": "status",
+                "type": "B"
+            }
+        ],
+        "group": 20100,
+        "info": "reconstructed BMT hits on track",
+        "item": 31,
+        "name": "BMT::Hits"
+    }
+]
