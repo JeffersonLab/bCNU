@@ -97,18 +97,18 @@ public class DCTDCandDOCAData extends ACommonTDCData {
 
 	@Override
 	public void update(DataEvent event) {
-		DataBank bank = event.getBank("DC::tdc");
 		
 		boolean dctot = false;
 		
-		//new altbank starting with coatjava 1.3.2
+		DataBank bank = event.getBank("DC::tdc");
+		
+		//new altbank starting with coatjava 13.2
 		if (isEmpty(bank)) {
 			bank = event.getBank("DC::tot");
+			if (isEmpty(bank)) {
+				return;
+			}
 			dctot = true;
-		}
-
-		if (isEmpty(bank)) {
-			return;
 		}
 
         sector = bank.getByte("sector");
