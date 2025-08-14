@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.jlab.clas12.ced</groupId>
+  <artifactId>ced-aggregator</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>JOGL</module>
+    <module>advisors</module>
+    <module>bCNU</module>
+    <module>bCNU3D</module>
+    <module>ced</module>
+    <module>cnf</module>
+    <module>coatjava</module>
+    <module>eventManager</module>
+    <module>exp4j</module>
+    <module>fastmCED</module>
+    <module>hev</module>
+    <module>kinetic</module>
+    <module>kryo</module>
+    <module>simanneal</module>
+    <module>tinyMS</module>
+  </modules>
+
+</project>
