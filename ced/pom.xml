@@ -42,6 +42,12 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>org.jlab.clas12.ced</groupId>
+            <artifactId>simanneal</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <scope>system</scope>
             <systemPath>${project.basedir}/../JOGL/jogl-all.jar</systemPath>
             <groupId>com.jogamp</groupId>
@@ -55,8 +61,21 @@
             <artifactId>kryo</artifactId>
             <version>5.6.2</version>
         </dependency>
+        <dependency>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../kryo/lib/objenesis-3.4.jar</systemPath>
+            <groupId>com.kryo</groupId>
+            <artifactId>objenesis</artifactId>
+            <version>3.4</version>
+        </dependency>
+        <dependency>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../kryo/lib/reflectasm-1.11.9.jar</systemPath>
+            <groupId>com.kryo</groupId>
+            <artifactId>reflectasm</artifactId>
+            <version>1.11.9</version>
+        </dependency>
     </dependencies>
-    
 
     <repositories>
       <repository>

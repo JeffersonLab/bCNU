@@ -13,6 +13,7 @@
     <module>tinyMS</module>
     <module>bCNU3D</module>
     <module>bCNU</module>
+    <module>simanneal</module>
     <module>ced</module>
   </modules>
 
