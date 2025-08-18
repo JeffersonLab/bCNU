@@ -26,7 +26,7 @@
       <dependency>
         <groupId>org.jlab.coat</groupId>
         <artifactId>coat-libs</artifactId>
-        <version>13.2.0</version>
+        <version>13.2.0-CED</version>
         <type>jar</type>
       </dependency>
     </dependencies> 
