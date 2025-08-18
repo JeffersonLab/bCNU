@@ -21,7 +21,33 @@
       </plugin>
     </plugins>
     </build>
+
     <dependencies>
+        <dependency>
+            <groupId>org.jlab.coat</groupId>
+            <artifactId>coat-libs</artifactId>
+            <version>13.2.0-CED</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.jlab.clas12.ced</groupId>
+            <artifactId>bCNU</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.jlab.clas12.ced</groupId>
+            <artifactId>bCNU3D</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../JOGL/jogl-all.jar</systemPath>
+            <groupId>com.jogamp</groupId>
+            <artifactId>opengl</artifactId>
+            <version>2.4</version>
+        </dependency>
         <dependency>
             <scope>system</scope>
             <systemPath>${project.basedir}/../kryo/lib/kryo-5.6.2.jar</systemPath>
@@ -30,15 +56,7 @@
             <version>5.6.2</version>
         </dependency>
     </dependencies>
-    <!-- 
-    <dependencies>
-      <dependency>
-        <groupId>org.jlab.coat</groupId>
-        <artifactId>coat-libs</artifactId>
-        <version>13.2.0-SNAPSHOT</version>
-         <type>jar</type>
-      </dependency>
-    </dependencies> 
+    
 
     <repositories>
       <repository>
@@ -46,5 +64,5 @@
         <url>https://clasweb.jlab.org/.clas12maven</url>
       </repository>
     </repositories>
-    -->
+
 </project>
