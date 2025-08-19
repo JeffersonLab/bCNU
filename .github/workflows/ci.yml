@@ -50,11 +50,10 @@ jobs:
 #        run: ls /cvmfs/oasis.opensciencegrid.org/jlab/hallb/clas12/sw/noarch/data/ccdb/ccdb_latest.sqlite
       - name: install-custom-coatjava
         run: |
-          git clone -b Clas12swimtest-nabo https://github.com/jeffersonlab/coatjava coatjava2
-          cd coatjava2
+          git clone -b Clas12swimtest-nabo https://github.com/jeffersonlab/coatjava coatjava-build
+          cd coatjava-build
           ./build-coatjava.sh
-          cd -
-          ./util/mvn-install-coatjava.sh ./coatjava2/coatjava
+          ../util/mvn-install-coatjava.sh ./coatjava
       - name: build
         run: mvn install
 #      - name: tar # tarball to preserve permissions
