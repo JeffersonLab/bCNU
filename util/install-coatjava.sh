@@ -7,6 +7,7 @@ branch_or_tag=$2
 set -e
 
 # git and build coatjava:
+rm -rf cjvbuild
 git clone https://github.com/jeffersonlab/coatjava cjvbuild
 cd cjvbuild
 git checkout $branch_or_tag
