@@ -53,7 +53,7 @@ jobs:
           git clone -b Clas12swimtest-nabo https://github.com/jeffersonlab/coatjava coatjava-build
           cd coatjava-build
           ./build-coatjava.sh
-          ../util/mvn-install-coatjava.sh ./coatjava
+          ../util/mvn-install-coatjava.sh 13.2.0-CED ./coatjava
       - name: build
         run: mvn install
 #      - name: tar # tarball to preserve permissions
