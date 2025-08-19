@@ -48,6 +48,13 @@ jobs:
 #          cvmfs_repositories: 'oasis.opensciencegrid.org'
 #      - name: cvmfs
 #        run: ls /cvmfs/oasis.opensciencegrid.org/jlab/hallb/clas12/sw/noarch/data/ccdb/ccdb_latest.sqlite
+      - name: install-custom-coatjava
+        run: |
+          git clone -b Clas12swimtest-nabo https://github.com/jeffersonlab/coatjava
+          cd coatjava 
+          ./build-coatjava
+          cd -
+          ./util/mvn-install-coatjava.sh ./coatjava/coatjava
       - name: build
         run: mvn install
 #      - name: tar # tarball to preserve permissions
