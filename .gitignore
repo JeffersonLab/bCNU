@@ -1,5 +1,6 @@
 # installed:
 target
+cedbuild
 
 *.class
 *lundfiles*.dat
