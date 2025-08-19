@@ -1,10 +1,10 @@
 #!/bin/bash
 
-version=13.2.0-CED
-coatjava=$1
+version=$1
+path=$2
 
 mvn install:install-file \
-  -Dfile=$coatjava/lib/clas/coat-libs-$version.jar \
+  -Dfile=$path/lib/clas/coat-libs-$version.jar \
   -DgroupId=org.jlab.coat \
   -DartifactId=coat-libs \
   -Dversion=$version \
