@@ -13,9 +13,19 @@ git checkout $branch_or_tag
 ./build-coatjava.sh
 cd -
 
+# install coatjava in local maven repo:
+mvn install:install-file \
+  -Dfile=cjvbuild/coatjava/lib/clas/coat-libs-$version.jar \
+  -DgroupId=org.jlab.coat \
+  -DartifactId=coat-libs \
+  -Dversion=$version \
+  -Dpackaging=jar
+
 # install subset of coatjava in cedbuild:
 mkdir -p cedbuild/coatjava/etc/bankdefs cedbuild/coatjava/lib/clas
 cp -r cjvbuild/coatjava/etc/bankdefs/hipo4 cedbuild/coatjava/etc/bankdefs
 cp -r cjvbuild/coatjava/lib/clas/coat-libs-$version.jar cedbuild/coatjava/lib/clas
+
+# cleanup:
 rm -rf cjvbuild
 
