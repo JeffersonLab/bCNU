@@ -57,10 +57,10 @@ jobs:
       - name: build
         run: mvn install
 #      - name: tar # tarball to preserve permissions
-#        run: tar czvf coatjava.tar.gz coatjava
+#        run: tar czvf cedbuild-${version}.tar.gz coatjava
 #      - uses: actions/upload-artifact@v4
 #        with:
 #          name: build_${{ matrix.runner }}
 #          retention-days: 1
-#          path: coatjava.tar.gz
+#          path: cedbuild-${version}.tar.gz
 
