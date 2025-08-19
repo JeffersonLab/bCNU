@@ -13,7 +13,7 @@ git checkout $branch_or_tag
 ./build-coatjava.sh
 cd -
 
-# install coatjava in local maven repo:
+# install coatjava in local maven repo (so CED can build against it):
 mvn install:install-file \
   -Dfile=cjvbuild/coatjava/lib/clas/coat-libs-$version.jar \
   -DgroupId=org.jlab.coat \
