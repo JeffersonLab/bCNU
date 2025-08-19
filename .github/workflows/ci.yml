@@ -52,7 +52,7 @@ jobs:
         run: |
           git clone -b Clas12swimtest-nabo https://github.com/jeffersonlab/coatjava coatjava2
           cd coatjava2
-          ./build-coatjava
+          ./build-coatjava.sh
           cd -
           ./util/mvn-install-coatjava.sh ./coatjava2/coatjava
       - name: build
