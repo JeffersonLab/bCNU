@@ -1,0 +1,65 @@
+[
+    {
+        "entries": [
+            {
+                "info": "Size of cross bank",
+                "name": "size",
+                "type": "S"
+            },
+            {
+                "info": "Cross ID",
+                "name": "id",
+                "type": "S"
+            },
+            {
+                "info": "Cross sector",
+                "name": "sector",
+                "type": "B"
+            },
+            {
+                "info": "Cross detector",
+                "name": "detector",
+                "type": "B"
+            },
+            {
+                "info": "Cross X position (cm)",
+                "name": "x",
+                "type": "F"
+            },
+            {
+                "info": "Cross Y position (cm)",
+                "name": "y",
+                "type": "F"
+            },
+            {
+                "info": "Cross Z position (cm)",
+                "name": "z",
+                "type": "F"
+            },
+            {
+                "info": "Cross Energy",
+                "name": "energy",
+                "type": "F"
+            },
+            {
+                "info": "Cross Time",
+                "name": "time",
+                "type": "F"
+            },
+            {
+                "info": "ID of the upstream layer cluster in the Cross",
+                "name": "Cluster1ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of the downstream layer cluster in the Cross",
+                "name": "Cluster2ID",
+                "type": "S"
+            }
+        ],
+        "group": 21300,
+        "info": "Reconstructed crosses in FT tracker",
+        "item": 23,
+        "name": "FTTRK::crosses"
+    }
+]

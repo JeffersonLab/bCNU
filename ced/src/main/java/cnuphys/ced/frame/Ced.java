@@ -25,7 +25,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.jlab.logging.DefaultLogger;
 
 import cnuphys.bCNU.application.BaseMDIApplication;
 import cnuphys.bCNU.application.Desktop;
@@ -1204,7 +1203,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 
 		//this is supposed to create less pounding of ccdb
-		DefaultLogger.initialize();
+//		DefaultLogger.initialize();
 		
     	relevelAllLogging(Level.WARNING);
 

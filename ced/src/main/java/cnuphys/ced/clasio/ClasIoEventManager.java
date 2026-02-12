@@ -672,7 +672,8 @@ public class ClasIoEventManager {
 
 			}
 
-			Event decodedEvent = _decoder.getDataEvent(event);
+			Event decodedEvent = _decoder.getDataEvent();
+	//		Event decodedEvent = _decoder.getDataEvent(event);
 
 			Bank trigger = _decoder.createTriggerBank();
 

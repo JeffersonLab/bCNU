@@ -1,0 +1,15 @@
+[
+    {
+        "entries": [
+            {
+                "info": "user-defined variable",
+                "name": "userVar",
+                "type": "F"
+            }
+        ],
+        "group": 40,
+        "info": "User-defined information",
+        "item": 5,
+        "name": "MC::User"
+    }
+]

@@ -1,0 +1,35 @@
+[
+    {
+        "entries": [
+            {
+                "info": "id of the hit",
+                "name": "id",
+                "type": "S"
+            },
+            {
+                "info": "id of the track",
+                "name": "tid",
+                "type": "S"
+            },
+            {
+                "info": "B-field intensity at hit position in tilted-sector system",
+                "name": "B",
+                "type": "F"
+            },
+            {
+                "info": "t propagation along the wire",
+                "name": "TProp",
+                "type": "F"
+            },
+            {
+                "info": "time of flight correction",
+                "name": "TFlight",
+                "type": "F"
+            }
+        ],
+        "group": 20600,
+        "info": "pointers between track and hit banks",
+        "item": 67,
+        "name": "HitBasedTrkg::AIHitTrkId"
+    }
+]

@@ -1,0 +1,50 @@
+[
+    {
+        "entries": [
+            {
+                "info": "Cluster size",
+                "name": "size",
+                "type": "S"
+            },
+            {
+                "info": "Cluster ID",
+                "name": "id",
+                "type": "S"
+            },
+            {
+                "info": "Cluster sector",
+                "name": "sector",
+                "type": "B"
+            },
+            {
+                "info": "Cluster layer",
+                "name": "layer",
+                "type": "B"
+            },
+            {
+                "info": "Cluster total energy",
+                "name": "energy",
+                "type": "F"
+            },
+            {
+                "info": "Seed energy",
+                "name": "maxEnergy",
+                "type": "F"
+            },
+            {
+                "info": "Seed strip",
+                "name": "seed",
+                "type": "S"
+            },
+            {
+                "info": "Centroid strip number",
+                "name": "centroid",
+                "type": "F"
+            }
+        ],
+        "group": 21300,
+        "info": "Reconstructed clusters in FT tracker",
+        "item": 22,
+        "name": "FTTRK::clusters"
+    }
+]

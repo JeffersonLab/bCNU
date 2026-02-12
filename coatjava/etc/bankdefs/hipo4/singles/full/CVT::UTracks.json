@@ -1,0 +1,130 @@
+[
+    {
+        "entries": [
+            {
+                "info": "ID",
+                "name": "ID",
+                "type": "S"
+            },
+            {
+                "info": "charge",
+                "name": "q",
+                "type": "B"
+            },
+            {
+                "info": "total momentum",
+                "name": "p",
+                "type": "F"
+            },
+            {
+                "info": "transverse momentum",
+                "name": "pt",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit parameter: phi at DOCA",
+                "name": "phi0",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit parameter: dip angle",
+                "name": "tandip",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit parameter: value of z at the DOCA",
+                "name": "z0",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit parameter: Distance of Closest Approach",
+                "name": "d0",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit covariance matrix element : delta_d0^2",
+                "name": "cov_d02",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit covariance matrix element : delta_d0.delta_phi0",
+                "name": "cov_d0phi0",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit covariance matrix element : delta_d0.delta_rho",
+                "name": "cov_d0rho",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit covariance matrix element : delta_phi0^2",
+                "name": "cov_phi02",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit covariance matrix element : delta_phi0.delta_rho",
+                "name": "cov_phi0rho",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit covariance matrix element : delta_rho.delta_rho",
+                "name": "cov_rho2",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit covariance matrix element : delta_z0^2",
+                "name": "cov_z02",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit covariance matrix element : delta_z0.delta_tandip",
+                "name": "cov_z0tandip",
+                "type": "F"
+            },
+            {
+                "info": "helical track fit covariance matrix element : delta_tandip^2",
+                "name": "cov_tandip2",
+                "type": "F"
+            },
+            {
+                "info": "Fit chi^2 ",
+                "name": "chi2",
+                "type": "F"
+            },
+            {
+                "info": "Fit ndf ",
+                "name": "ndf",
+                "type": "S"
+            },
+            {
+                "info": "PID assumption",
+                "name": "pid",
+                "type": "I"
+            },
+            {
+                "info": "ID of track seed",
+                "name": "seedID",
+                "type": "S"
+            },
+            {
+                "info": "x offset  ",
+                "name": "xb",
+                "type": "F"
+            },
+            {
+                "info": "y offset  ",
+                "name": "yb",
+                "type": "F"
+            },
+            {
+                "info": "track status : nabc (n = KF iterations a = nb SVT crosses, b = nb BMT Z clusters, c = nb BMT C clusters, used in fit)",
+                "name": "status",
+                "type": "S"
+            }
+        ],
+        "group": 20500,
+        "info": "reconstructed CVT tracks",
+        "item": 37,
+        "name": "CVT::UTracks"
+    }
+]

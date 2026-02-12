@@ -1,0 +1,75 @@
+[
+    {
+        "entries": [
+            {
+                "info": "sector",
+                "name": "sector",
+                "type": "B"
+            },
+            {
+                "info": "2 digits: first digit is superlayer, second digit is layer",
+                "name": "layer",
+                "type": "B"
+            },
+            {
+                "info": "wire number",
+                "name": "component",
+                "type": "S"
+            },
+            {
+                "info": "Stereo angle 0 - in, 1 - out",
+                "name": "order",
+                "type": "B"
+            },
+            {
+                "info": "average of 3 points around the max of ADC",
+                "name": "ADC",
+                "type": "I"
+            },
+            {
+                "info": "time corresponding to the max of ADC (ns)",
+                "name": "time",
+                "type": "F"
+            },
+            {
+                "info": "average ADC of the first 4 samples",
+                "name": "ped",
+                "type": "F"
+            },
+            {
+                "info": "row index in waveform bank",
+                "name": "windex",
+                "type": "S"
+            },
+            {
+                "info": "sum of ADC",
+                "name": "integral",
+                "type": "I"
+            },
+            {
+                "info": "time at half amplitude (ns)",
+                "name": "leadingEdgeTime",
+                "type": "F"
+            },
+            {
+                "info": "time over threshold at half amplitude (ns)",
+                "name": "timeOverThreshold",
+                "type": "F"
+            },
+            {
+                "info": "time from constant fraction discriminator (ns)",
+                "name": "constantFractionTime",
+                "type": "F"
+            },
+            {
+                "info": "waveform type classification, good <= 2, bad=others",
+                "name": "wfType",
+                "type": "S"
+            }
+        ],
+        "group": 22400,
+        "info": "ADC bank for the ALERT Wire Chamber",
+        "item": 11,
+        "name": "AHDC::adc"
+    }
+]

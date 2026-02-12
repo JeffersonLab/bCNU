@@ -1,0 +1,60 @@
+[
+    {
+        "entries": [
+            {
+                "info": "hit id",
+                "name": "id",
+                "type": "S"
+            },
+            {
+                "info": "layer number",
+                "name": "layer",
+                "type": "B"
+            },
+            {
+                "info": "superlayer number",
+                "name": "superlayer",
+                "type": "B"
+            },
+            {
+                "info": "wire number",
+                "name": "wire",
+                "type": "I"
+            },
+            {
+                "info": "distance of closest approch (mm) is actually the distance from time2distance calibration",
+                "name": "doca",
+                "type": "D"
+            },
+            {
+                "info": "residual (mm) calculated by the Kalman Filter",
+                "name": "residual",
+                "type": "D"
+            },
+            {
+                "info": "calibrated time (ns)",
+                "name": "time",
+                "type": "D"
+            },
+            {
+                "info": "calibrated ADC",
+                "name": "adc",
+                "type": "I"
+            },
+            {
+                "info": "calibrated time over threshold (ns)",
+                "name": "timeOverThreshold",
+                "type": "D"
+            },
+            {
+                "info": "track id, is -1 if not associated to a Track",
+                "name": "trackid",
+                "type": "I"
+            }
+        ],
+        "group": 23000,
+        "info": "Raw Hits",
+        "item": 23,
+        "name": "AHDC::hits"
+    }
+]

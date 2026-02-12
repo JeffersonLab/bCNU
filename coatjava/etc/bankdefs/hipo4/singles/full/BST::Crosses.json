@@ -1,0 +1,115 @@
+[
+    {
+        "entries": [
+            {
+                "info": "ID",
+                "name": "ID",
+                "type": "S"
+            },
+            {
+                "info": "sector",
+                "name": "sector",
+                "type": "B"
+            },
+            {
+                "info": "region",
+                "name": "region",
+                "type": "B"
+            },
+            {
+                "info": "BST cross x-coordinate",
+                "name": "x",
+                "type": "F"
+            },
+            {
+                "info": "BST cross y-coordinate",
+                "name": "y",
+                "type": "F"
+            },
+            {
+                "info": "BST cross z-coordinate",
+                "name": "z",
+                "type": "F"
+            },
+            {
+                "info": "BST cross x-coordinate error",
+                "name": "err_x",
+                "type": "F"
+            },
+            {
+                "info": "BST cross y-coordinate error",
+                "name": "err_y",
+                "type": "F"
+            },
+            {
+                "info": "BST cross z-coordinate error",
+                "name": "err_z",
+                "type": "F"
+            },
+            {
+                "info": "BST cross x0-coordinate",
+                "name": "x0",
+                "type": "F"
+            },
+            {
+                "info": "BST cross y0-coordinate",
+                "name": "y0",
+                "type": "F"
+            },
+            {
+                "info": "BST cross z0-coordinate",
+                "name": "z0",
+                "type": "F"
+            },
+            {
+                "info": "BST cross x0-coordinate error",
+                "name": "err_x0",
+                "type": "F"
+            },
+            {
+                "info": "BST cross y0-coordinate error",
+                "name": "err_y0",
+                "type": "F"
+            },
+            {
+                "info": "BST cross z0-coordinate error",
+                "name": "err_z0",
+                "type": "F"
+            },
+            {
+                "info": "BST cross x-direction (track unit tangent vector at the cross)",
+                "name": "ux",
+                "type": "F"
+            },
+            {
+                "info": "BST cross y-direction (track unit tangent vector at the cross)",
+                "name": "uy",
+                "type": "F"
+            },
+            {
+                "info": "BST cross z-direction (track unit tangent vector at the cross)",
+                "name": "uz",
+                "type": "F"
+            },
+            {
+                "info": "ID of the  cluster in the Cross",
+                "name": "Cluster1_ID",
+                "type": "S"
+            },
+            {
+                "info": "ID of the top layer  cluster in the Cross",
+                "name": "Cluster2_ID",
+                "type": "S"
+            },
+            {
+                "info": "associated track ID",
+                "name": "trkID",
+                "type": "S"
+            }
+        ],
+        "group": 20200,
+        "info": "reconstructed BST crosses",
+        "item": 35,
+        "name": "BST::Crosses"
+    }
+]

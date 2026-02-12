@@ -1,0 +1,95 @@
+[
+    {
+        "entries": [
+            {
+                "info": "id of the track",
+                "name": "id",
+                "type": "S"
+            },
+            {
+                "info": "detector type id",
+                "name": "detector",
+                "type": "B"
+            },
+            {
+                "info": "id of the detector layer",
+                "name": "layer",
+                "type": "B"
+            },
+            {
+                "info": "id of the measureents surface",
+                "name": "index",
+                "type": "B"
+            },
+            {
+                "info": "track x position at detector surface (cm)",
+                "name": "x",
+                "type": "F"
+            },
+            {
+                "info": "track y position at detector surface (cm)",
+                "name": "y",
+                "type": "F"
+            },
+            {
+                "info": "track z position at detector surface (cm)",
+                "name": "z",
+                "type": "F"
+            },
+            {
+                "info": "track x momentum at detector surface (GeV)",
+                "name": "px",
+                "type": "F"
+            },
+            {
+                "info": "track y momentum at detector surface (GeV)",
+                "name": "py",
+                "type": "F"
+            },
+            {
+                "info": "track z momentum at detector surface (GeV)",
+                "name": "pz",
+                "type": "F"
+            },
+            {
+                "info": "track path length from previous point",
+                "name": "path",
+                "type": "F"
+            },
+            {
+                "info": "track path length through the surface material",
+                "name": "dx",
+                "type": "F"
+            },
+            {
+                "info": "track energy loss",
+                "name": "dE",
+                "type": "F"
+            },
+            {
+                "info": "track residual (-999 for passive layer)",
+                "name": "trackRes",
+                "type": "F"
+            },
+            {
+                "info": "filtered residual (-999 for passive layer)",
+                "name": "transportedRes",
+                "type": "F"
+            },
+            {
+                "info": "filtered residual (-999 for passive layer)",
+                "name": "filteredRes",
+                "type": "F"
+            },
+            {
+                "info": "smoothed residual (-999 for passive layer)",
+                "name": "smoothedRes",
+                "type": "F"
+            }
+        ],
+        "group": 20500,
+        "info": "Trajectory bank output from KF",
+        "item": 42,
+        "name": "CVT::KFTrajectory"
+    }
+]

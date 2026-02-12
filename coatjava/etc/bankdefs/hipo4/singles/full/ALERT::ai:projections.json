@@ -1,0 +1,20 @@
+[
+    {
+        "entries": [
+            {
+                "info": "track id",
+                "name": "trackid",
+                "type": "I"
+            },
+            {
+                "info": "id of the matched ATOF hit, -1 if no hit was matched",
+                "name": "matched_atof_hit_id",
+                "type": "I"
+            }
+        ],
+        "group": 23000,
+        "info": "Track Projections to ATOF given by AI",
+        "item": 32,
+        "name": "ALERT::ai:projections"
+    }
+]

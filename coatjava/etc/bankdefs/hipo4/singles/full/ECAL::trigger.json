@@ -1,0 +1,20 @@
+[
+    {
+        "entries": [
+            {
+                "info": "trigger bit",
+                "name": "bit",
+                "type": "S"
+            },
+            {
+                "info": "bit count",
+                "name": "counts",
+                "type": "I"
+            }
+        ],
+        "group": 20700,
+        "info": "Occupancy bank for trigger bits",
+        "item": 27,
+        "name": "ECAL::trigger"
+    }
+]
