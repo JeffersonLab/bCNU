@@ -31,6 +31,7 @@ import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.component.ControlPanel;
 import cnuphys.ced.component.DisplayBits;
 import cnuphys.ced.geometry.GeometryManager;
+import cnuphys.ced.geometry.urwt.UrWTDetectorData;
 import cnuphys.ced.geometry.urwt.UrWTGeometry;
 import cnuphys.ced.item.HexSectorItem;
 
@@ -49,7 +50,7 @@ public class UrWTXYView extends HexView {
 	private UrWELLHexSectorItem _hexItems[];
 
 	// chamber outline items
-	private UrWTDetectorItem _chamberItems[][];
+	private UrWTDetectorItem detectorItems[][];
 
 	private SwimTrajectoryDrawer _swimTrajectoryDrawer;
 
@@ -150,10 +151,10 @@ public class UrWTXYView extends HexView {
 		}
 
 		//chamber outline items
-		_chamberItems = new UrWTDetectorItem[6][3];
-		for (int sector = 0; sector < 6; sector++) {
-			for (int chamber = 0; chamber < 3; chamber++) {
-				_chamberItems[sector][chamber] = UrWTDetectorItem.createUrWELLChamberItem(detectorLayer, sector+1, chamber+1);
+		detectorItems = new UrWTDetectorItem[6][4];
+		for (int sector = 0; sector < 1; sector++) {
+			for (int layer = 0; layer < 1; layer++) {
+				detectorItems[sector][layer] = UrWTDetectorItem.createUrWELLChamberItem(detectorLayer, sector+1, layer+1);
 			}
 		}
 
@@ -206,12 +207,30 @@ public class UrWTXYView extends HexView {
 					drawCoordinateSystem(g, container, null);
 					drawSectorNumbers(g, container, null, 145);
 				} // not acumulating
+				
+				
+				for (int layer = 3; layer <= 4; layer++) {
+					drawAllStrips(g, container, 1, layer);
+				}
 			}
 
 		};
 
 
 		getContainer().setAfterDraw(afterDraw);
+	}
+	
+	private void drawAllStrips(Graphics g, IContainer container, int sector, int layer) {
+				UrWTDetectorData data = UrWTGeometry.getDetectorData(sector, layer);
+				g.setColor(Color.yellow);
+				for (int strip = 1; strip <= data.count; strip++) {
+					if (strip % 100 == 0) {
+
+					projectStrip(container, sector, layer, strip);
+					}
+					g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
+				}
+
 	}
 
 

@@ -55,9 +55,9 @@ public class UrWTDetectorItem extends PolygonItem {
 		Point2D.Double points[] = new Point2D.Double[4];
 
 		int layerm1 = layer-1;
-		points[0] = new Point2D.Double(UrWTGeometry.minX[layerm1], -UrWTGeometry.minY[layerm1]);
-		points[1] = new Point2D.Double(UrWTGeometry.maxX[layerm1], -UrWTGeometry.maxY[layerm1]);
-		points[2] = new Point2D.Double(UrWTGeometry.maxX[layerm1], UrWTGeometry.maxY[layerm1]);
+		points[0] = new Point2D.Double(UrWTGeometry.minX[layerm1], UrWTGeometry.maxY[layerm1]);
+		points[1] = new Point2D.Double(UrWTGeometry.maxX[layerm1], UrWTGeometry.maxY[layerm1]);
+		points[2] = new Point2D.Double(UrWTGeometry.maxX[layerm1], UrWTGeometry.minY[layerm1]);
 		points[3] = new Point2D.Double(UrWTGeometry.minX[layerm1], UrWTGeometry.minY[layerm1]);
 
 		//rotate if not sector 1

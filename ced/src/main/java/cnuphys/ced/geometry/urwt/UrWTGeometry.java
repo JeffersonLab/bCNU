@@ -53,6 +53,16 @@ public class UrWTGeometry extends ACachedGeometry {
 	public UrWTGeometry() {
 		super(NAME);
 	}
+	
+	/**
+	 * Get the detector data for a given sector and layer
+	 * @param sector the 1-based sector [1..6]
+	 * @param layer the 1-based layer [1..4]
+	 * @return the detector data
+	 */
+	public static UrWTDetectorData getDetectorData(int sector, int layer) {
+		return detectorData[sector - 1][layer - 1];
+	}
 
 
 	/**
@@ -80,16 +90,42 @@ public class UrWTGeometry extends ACachedGeometry {
 		// get the bounds from sector 1, will rotate as needed for other sectors
 		for (int layer = 1; layer <= NUM_LAYERS; layer++) {
 			UrWTDetectorData data = detectorData[0][layer - 1];
-			for (int strip = 1; strip <= data.count; strip++) {
-				double x1 = data.strips[strip - 1].origin().x();
-				double y1 = data.strips[strip - 1].origin().y();
-				double x2 = data.strips[strip - 1].end().x();
-				double y2 = data.strips[strip - 1].end().y();
-				minX[layer - 1] = Math.min(minX[layer - 1], Math.min(x1, x2));
-				maxX[layer - 1] = Math.max(maxX[layer - 1], Math.max(x1, x2));
-				minY[layer - 1] = Math.min(minY[layer - 1], Math.min(y1, y2));
-				maxY[layer - 1] = Math.max(maxY[layer - 1], Math.max(y1, y2));
-			}
+			
+			Line3D firstStrip = data.strips[0];
+			Line3D lastStrip = data.strips[data.count - 1];
+			
+			minX[layer - 1] = Math.min(firstStrip.origin().x(), minX[layer - 1]);
+			minX[layer - 1] = Math.min(firstStrip.end().x(), minX[layer - 1]);	
+			minX[layer - 1] = Math.max(lastStrip.origin().x(), minX[layer - 1]);
+			minX[layer - 1] = Math.max(lastStrip.end().x(), minX[layer - 1]);
+			
+			minY[layer - 1] = Math.min(firstStrip.origin().y(), minY[layer - 1]);
+			minY[layer - 1] = Math.min(firstStrip.end().y(), minY[layer - 1]);	
+			minY[layer - 1] = Math.max(lastStrip.origin().y(), minY[layer - 1]);
+			minY[layer - 1] = Math.max(lastStrip.end().y(), minY[layer - 1]);
+			
+			maxX[layer - 1] = Math.max(firstStrip.origin().x(), maxX[layer - 1]);
+			maxX[layer - 1] = Math.max(firstStrip.end().x(), maxX[layer - 1]);
+			maxX[layer - 1] = Math.max(lastStrip.origin().x(), maxX[layer - 1]);
+			maxX[layer - 1] = Math.max(lastStrip.end().x(), maxX [layer - 1]);
+			
+			maxY[layer - 1] = Math.max(firstStrip.origin().y(), maxY[layer - 1]);
+			maxY[layer - 1] = Math.max(firstStrip.end().y(), maxY[layer - 1]);
+			maxY[layer - 1] = Math.max(lastStrip.origin().y(), maxY[layer - 1]);
+			maxY[layer - 1] = Math.max(lastStrip.end().y(), maxY[layer - 1]);
+			
+			
+			
+//			for (int strip = 1; strip <= data.count; strip++) {
+//				double x1 = data.strips[strip - 1].origin().x();
+//				double y1 = data.strips[strip - 1].origin().y();
+//				double x2 = data.strips[strip - 1].end().x();
+//				double y2 = data.strips[strip - 1].end().y();
+//				minX[layer - 1] = Math.min(minX[layer - 1], Math.min(x1, x2));
+//				maxX[layer - 1] = Math.max(maxX[layer - 1], Math.max(x1, x2));
+//				minY[layer - 1] = Math.min(minY[layer - 1], Math.min(y1, y2));
+//				maxY[layer - 1] = Math.max(maxY[layer - 1], Math.max(y1, y2));
+//			}
 		}
 
 		System.out.println("URWT strip bounds by layer:");
