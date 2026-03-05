@@ -13,7 +13,7 @@ import cnuphys.ced.item.HexSectorItem;
 
 public class UrWELLHexSectorItem extends HexSectorItem {
 
-	private UrWELLXYView _view;
+	private UrWTXYView _view;
 
 	/**
 	 * Get a hex sector item
@@ -21,7 +21,7 @@ public class UrWELLHexSectorItem extends HexSectorItem {
 	 * @param itemList the item list
 	 * @param sector   the 1-based sector
 	 */
-	public UrWELLHexSectorItem(ItemList itemList, UrWELLXYView view, int sector) {
+	public UrWELLHexSectorItem(ItemList itemList, UrWTXYView view, int sector) {
 		super(itemList, view, sector);
 		_view = view;
 	}

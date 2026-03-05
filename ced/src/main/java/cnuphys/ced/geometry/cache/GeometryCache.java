@@ -26,7 +26,7 @@ import cnuphys.ced.geometry.PCALGeometry;
 import cnuphys.ced.geometry.alert.AlertGeometry;
 import cnuphys.ced.geometry.fmt.FMTGeometry;
 import cnuphys.ced.geometry.ftof.FTOFGeometry;
-import cnuphys.ced.geometry.urwell.UrWELLGeometry;
+import cnuphys.ced.geometry.urwt.UrWTGeometry;
 
 public class GeometryCache {
 
@@ -61,7 +61,7 @@ public class GeometryCache {
 	 * @param kryo the Kryo instance to be configured for caching geometry objects.
 	 */
 	private static void registerClasses(Kryo kryo) {
-		kryo.register(cnuphys.ced.geometry.urwell.ChamberData.class);
+		kryo.register(cnuphys.ced.geometry.urwt.UrWTDetectorData.class);
 		kryo.register(org.jlab.geom.component.ScintillatorPaddle.class);
 		kryo.register(org.jlab.geom.prim.Vector3D.class);
 		kryo.register(org.jlab.geom.prim.Line3D.class);
@@ -273,7 +273,7 @@ public class GeometryCache {
 		new AlertGeometry();
 		new GeometryVersion();
 		new DCGeometry();
-		new UrWELLGeometry();
+		new UrWTGeometry();
 		new CTOFGeometry();
 		new FTCALGeometry();
 		new CNDGeometry();

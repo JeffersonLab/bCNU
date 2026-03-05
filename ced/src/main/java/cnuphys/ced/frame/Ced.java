@@ -62,7 +62,7 @@ import cnuphys.ced.cedview.ft.FTCalXYView;
 import cnuphys.ced.cedview.ftof.FTOFView;
 import cnuphys.ced.cedview.sectorview.DisplaySectors;
 import cnuphys.ced.cedview.sectorview.SectorView;
-import cnuphys.ced.cedview.urwell.UrWELLXYView;
+import cnuphys.ced.cedview.urwell.UrWTXYView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventMenu;
 import cnuphys.ced.clasio.ClasIoEventView;
@@ -167,7 +167,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private FTCalXYView _ftcalXyView;
 	private DCXYView _dcXyView;
 	private DCHexView _dcHexView;
-	private UrWELLXYView _urwellXyView;
+	private UrWTXYView _urwellXyView;
 
 	private ECView _ecView;
 	private PCALView _pcalView;
@@ -449,7 +449,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		_ftcalXyView = FTCalXYView.createFTCalXYView();
 
 		//add a urwell xy view
-		_urwellXyView = UrWELLXYView.createUrWELLView();
+		_urwellXyView = UrWTXYView.createUrWELLView();
 
 
 		// add an RTPC vie

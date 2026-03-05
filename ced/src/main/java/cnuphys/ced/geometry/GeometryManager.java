@@ -14,7 +14,7 @@ import org.jlab.geom.prim.Vector3D;
 import cnuphys.ced.geometry.alert.AlertGeometry;
 import cnuphys.ced.geometry.cache.GeometryCache;
 import cnuphys.ced.geometry.fmt.FMTGeometry;
-import cnuphys.ced.geometry.urwell.UrWELLGeometry;
+import cnuphys.ced.geometry.urwt.UrWTGeometry;
 import cnuphys.swim.SwimTrajectory;
 
 public class GeometryManager {

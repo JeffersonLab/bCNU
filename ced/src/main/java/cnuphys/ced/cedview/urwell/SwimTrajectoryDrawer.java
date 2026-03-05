@@ -11,9 +11,9 @@ import cnuphys.swim.SwimTrajectory2D;
 
 public class SwimTrajectoryDrawer extends ASwimTrajectoryDrawer {
 
-	private UrWELLXYView _view;
+	private UrWTXYView _view;
 
-	public SwimTrajectoryDrawer(UrWELLXYView view) {
+	public SwimTrajectoryDrawer(UrWTXYView view) {
 		_view = view;
 	}
 
