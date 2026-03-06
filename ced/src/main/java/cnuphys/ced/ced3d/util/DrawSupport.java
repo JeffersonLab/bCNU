@@ -1,0 +1,105 @@
+package cnuphys.ced.ced3d.util;
+
+import java.util.List;
+
+import org.jlab.geom.prim.Line3D;
+
+import com.jogamp.opengl.GL2;
+
+public class DrawSupport {
+
+	public static void drawPlaneAndHull(GL2 gl, Plane plane, List<Point> hullPoints, float scale) {
+	    // 1. Draw the Plane as a semi-transparent Quad
+	    float[] coords = plane.planeQuadCoordinates(scale); //
+	    if (coords != null) {
+	        gl.glColor4f(0.2f, 0.5f, 0.8f, 0.3f); // Transparent blue
+	        gl.glBegin(GL2.GL_QUADS);
+	        for (int i = 0; i < coords.length; i += 3) {
+	            gl.glVertex3f(coords[i], coords[i+1], coords[i+2]);
+	        }
+	        gl.glEnd();
+	    }
+
+	    // 2. Draw the Convex Hull boundary
+	    gl.glColor3f(1.0f, 1.0f, 0.0f); // Bright yellow
+	    gl.glLineWidth(2.0f);
+	    gl.glBegin(GL2.GL_LINE_LOOP);
+	    for (Point p : hullPoints) {
+	        gl.glVertex3d(p.x, p.y, p.z); //
+	    }
+	    gl.glEnd();
+	}
+	
+	
+	/**
+	 * Determines if a set of Line3D objects are coplanar.
+	 * @param lines An array of Line3D objects.
+	 * @param tolerance The distance tolerance for planarity.
+	 * @return A Plane object if coplanar, otherwise null.
+	 */
+	public static Plane findCommonPlane(Line3D[] lines, double tolerance) {
+	    if (lines == null || lines.length == 0) return null;
+
+	    // 1. Get the first two points from the first line
+	    // Using the requested line.origin().x() style access
+	    Point p0 = new Point(lines[0].origin().x(), lines[0].origin().y(), lines[0].origin().z());
+	    Point p1 = new Point(lines[0].end().x(), lines[0].end().y(), lines[0].end().z());
+	    
+	    Point p2 = null;
+	    
+	    // 2. Find a third point in the array that is not collinear with p0 and p1
+	    for (int i = 1; i < lines.length; i++) {
+	        // Check both origin and end of subsequent lines to find a non-collinear point
+	        Point[] candidates = {
+	            new Point(lines[i].origin().x(), lines[i].origin().y(), lines[i].origin().z()),
+	            new Point(lines[i].end().x(), lines[i].end().y(), lines[i].end().z())
+	        };
+
+	        for (Point pCheck : candidates) {
+	            // Vector v1 = p1 - p0
+	            double dx1 = p1.x - p0.x; double dy1 = p1.y - p0.y; double dz1 = p1.z - p0.z;
+	            // Vector v2 = pCheck - p0
+	            double dx2 = pCheck.x - p0.x; double dy2 = pCheck.y - p0.y; double dz2 = pCheck.z - p0.z;
+	            
+	            // Cross product magnitude checks for collinearity
+	            double cpX = dy1 * dz2 - dz1 * dy2;
+	            double cpY = dz1 * dx2 - dx1 * dz2;
+	            double cpZ = dx1 * dy2 - dy1 * dx2;
+	            
+	            double crossMag = Math.sqrt(cpX * cpX + cpY * cpY + cpZ * cpZ);
+	            
+	            // If the cross product is significant, these three points define a unique plane
+	            if (crossMag > tolerance) {
+	                p2 = pCheck;
+	                break;
+	            }
+	        }
+	        if (p2 != null) break;
+	    }
+
+	    // If no third point is found, all points are collinear (a line, not a unique plane)
+	    if (p2 == null) return null;
+
+	    // 3. Create the Plane
+	    // We use the cross product of (p1-p0) and (p2-p0) as the normal vector
+	    double dx1 = p1.x - p0.x; double dy1 = p1.y - p0.y; double dz1 = p1.z - p0.z;
+	    double dx2 = p2.x - p0.x; double dy2 = p2.y - p0.y; double dz2 = p2.z - p0.z;
+	    
+	    double nx = dy1 * dz2 - dz1 * dy2;
+	    double ny = dz1 * dx2 - dx1 * dz2;
+	    double nz = dx1 * dy2 - dy1 * dx2;
+	    
+	    // Use your Plane constructor: Plane(double nx, double ny, double nz, double px, double py, double pz)
+	    Plane plane = new Plane(nx, ny, nz, p0.x, p0.y, p0.z);
+
+	    // 4. Verification: Check if every endpoint of every line lies on this plane
+	    for (Line3D line : lines) {
+	        if (plane.distance(line.origin().x(), line.origin().y(), line.origin().z()) > tolerance ||
+	            plane.distance(line.end().x(), line.end().y(), line.end().z()) > tolerance) {
+	            return null;
+	        }
+	    }
+
+	    return plane;
+	}
+}

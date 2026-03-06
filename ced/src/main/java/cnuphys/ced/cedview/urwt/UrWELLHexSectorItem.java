@@ -1,4 +1,4 @@
-package cnuphys.ced.cedview.urwell;
+package cnuphys.ced.cedview.urwt;
 
 import java.awt.Graphics;
 import java.awt.Point;
@@ -39,26 +39,6 @@ public class UrWELLHexSectorItem extends HexSectorItem {
 		}
 
 		super.drawItem(g, container);
-
-//		_view.drawStrips(g, container, _sector, 1, 1, Color.red);
-//		_view.drawStrips(g, container, _sector, 1, 2, Color.green);
-//		_view.drawStrips(g, container, _sector, 2, 1, Color.blue);
-//		_view.drawStrips(g, container, _sector, 2, 2, Color.yellow);
-//
-//		_view.drawStrips(g, container, _sector, 3, 1, Color.orange);
-//		_view.drawStrips(g, container, _sector, 3, 2, Color.magenta);
-
-
-//		g.setColor(Color.white);
-//		for (int supl = 1; supl <= 6; supl++) {
-//			polys[supl - 1] = superLayerPoly(container, supl);
-//			g.fillPolygon(polys[supl - 1]);
-//		}
-//
-//		for (int supl = 1; supl <= 6; supl++) {
-//			g.setColor(suplColor);
-//			g.fillPolygon(polys[supl - 1]);
-//		}
 
 	}
 

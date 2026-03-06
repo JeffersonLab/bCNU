@@ -1,0 +1,50 @@
+[
+    {
+        "entries": [
+            {
+                "info": "AHDC trackid",
+                "name": "trackid",
+                "type": "I"
+            },
+            {
+                "info": "ATOF cluster id",
+                "name": "clusterid",
+                "type": "I"
+            },
+            {
+                "info": "argmax PID",
+                "name": "prepid",
+                "type": "I"
+            },
+            {
+                "info": "P(pid=2212)",
+                "name": "p2212",
+                "type": "F"
+            },
+            {
+                "info": "P(pid=45)",
+                "name": "p45",
+                "type": "F"
+            },
+            {
+                "info": "P(pid=46)",
+                "name": "p46",
+                "type": "F"
+            },
+            {
+                "info": "P(pid=47)",
+                "name": "p47",
+                "type": "F"
+            },
+            {
+                "info": "P(pid=49)",
+                "name": "p49",
+                "type": "F"
+            }
+        ],
+        "group": 23000,
+        "info": "ALERT AI-assisted PrePID to be used for Kalman Filter",
+        "item": 33,
+        "name": "ALERT::ai:prepid"
+    }
+]

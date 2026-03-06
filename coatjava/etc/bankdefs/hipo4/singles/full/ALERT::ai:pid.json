@@ -1,0 +1,50 @@
+[
+    {
+        "entries": [
+            {
+                "info": "AHDC trackid",
+                "name": "trackid",
+                "type": "I"
+            },
+            {
+                "info": "ATOF cluster id",
+                "name": "clusterid",
+                "type": "I"
+            },
+            {
+                "info": "argmax PID",
+                "name": "pid",
+                "type": "I"
+            },
+            {
+                "info": "P(pid=2212)",
+                "name": "prob_2212",
+                "type": "F"
+            },
+            {
+                "info": "P(pid=45)",
+                "name": "prob_45",
+                "type": "F"
+            },
+            {
+                "info": "P(pid=46)",
+                "name": "prob_46",
+                "type": "F"
+            },
+            {
+                "info": "P(pid=47)",
+                "name": "prob_47",
+                "type": "F"
+            },
+            {
+                "info": "P(pid=49)",
+                "name": "prob_49",
+                "type": "F"
+            }
+        ],
+        "group": 23000,
+        "info": "AI-assisted PID for ALERT",
+        "item": 34,
+        "name": "ALERT::ai:pid"
+    }
+]

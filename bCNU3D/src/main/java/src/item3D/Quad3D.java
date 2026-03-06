@@ -49,14 +49,13 @@ public class Quad3D extends Item3D {
 	 * @param x4
 	 * @param y4
 	 * @param z4
-
+	 *
 	 * @param color     the quad color
 	 * @param lineWidth the line width
 	 * @param frame     frame the quad
 	 */
-	public Quad3D(Panel3D panel3d, float x1, float y1, float z1, float x2, float y2, float z2,
-			float x3, float y3, float z3, float x4, float y4, float z4,
-			Color color, float lineWidth, boolean frame) {
+	public Quad3D(Panel3D panel3d, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3,
+			float z3, float x4, float y4, float z4, Color color, float lineWidth, boolean frame) {
 		super(panel3d);
 		_coords = new float[12];
 		_coords[0] = x1;
@@ -81,6 +80,7 @@ public class Quad3D extends Item3D {
 
 	/**
 	 * Create a quad to serve as a constant z plane
+	 *
 	 * @param panel3d
 	 * @param z
 	 * @param size
@@ -89,10 +89,9 @@ public class Quad3D extends Item3D {
 	 * @param frame
 	 * @return
 	 */
-	public static Quad3D constantZQuad(Panel3D panel3d, float z, float size,
-       Color color, float lineWidth, boolean frame) {
+	public static Quad3D constantZQuad(Panel3D panel3d, float z, float size, Color color, float lineWidth,
+			boolean frame) {
 		float coords[] = new float[12];
-
 
 		coords[0] = -size;
 		coords[1] = -size;
@@ -115,5 +114,21 @@ public class Quad3D extends Item3D {
 		Support3D.drawQuads(drawable, _coords, getFillColor(), getLineWidth(), _frame);
 	}
 
+	public float[] getCentroid() {
+		float cx = 0;
+		float cy = 0;
+		float cz = 0;
+		for (int i = 0; i < 4; i++) {
+			cx += _coords[3 * i];
+			cy += _coords[3 * i + 1];
+			cz += _coords[3 * i + 2];
+		}
+		return new float[] { cx / 4, cy / 4, cz / 4 };
+	}
+
+	@Override
+	public float[] getSortPoint() {
+		return getCentroid();
+	}
 
 }

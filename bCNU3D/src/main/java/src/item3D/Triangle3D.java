@@ -65,11 +65,7 @@ public class Triangle3D extends Item3D {
 		_coords[8] = z3;
 		_frame = frame;
 
-		// test triangulation
-//	_coords = Support3D.triangulateTriangle(_coords, 4);
-//	System.err.println("Coords len: " + _coords.length);
-
-		setFillColor(color);
+        setFillColor(color);
 
 		setLineWidth(lineWidth);
 	}
@@ -77,6 +73,13 @@ public class Triangle3D extends Item3D {
 	@Override
 	public void draw(GLAutoDrawable drawable) {
 		Support3D.drawTriangles(drawable, _coords, getFillColor(), getLineWidth(), _frame);
+	}
+
+
+	@Override
+	public float[] getSortPoint() {
+		return new float[] { (_coords[0] + _coords[3] + _coords[6]) / 3, (_coords[1] + _coords[4] + _coords[7]) / 3,
+				(_coords[2] + _coords[5] + _coords[8]) / 3 };
 	}
 
 }

@@ -7,12 +7,12 @@
                 "type": "S"
             },
             {
-                "info": "sector of URWELL",
+                "info": "sector of URWT",
                 "name": "sector",
                 "type": "B"
             },
             {
-                "info": "region of URWELL",
+                "info": "region of URWT",
                 "name": "region",
                 "type": "B"
             },
@@ -58,8 +58,8 @@
             }
         ],
         "group": 22300,
-        "info": "reconstructed crosses from URWELL",
+        "info": "reconstructed crosses from URWT",
         "item": 23,
-        "name": "URWELL::crosses"
+        "name": "URWT::crosses"
     }
 ]

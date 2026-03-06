@@ -12,78 +12,108 @@
                 "type": "S"
             },
             {
-                "info": "C11 covariance matrix element at last superlayer used in the fit",
+                "info": "var(x) (cm^2)",
                 "name": "C11",
                 "type": "F"
             },
             {
-                "info": "C12 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(x,y)",
                 "name": "C12",
                 "type": "F"
             },
             {
-                "info": "C13 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(x,z)",
                 "name": "C13",
                 "type": "F"
             },
             {
-                "info": "C14 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(x,theta)",
                 "name": "C14",
                 "type": "F"
             },
             {
-                "info": "C15 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(x,phi)",
                 "name": "C15",
                 "type": "F"
             },
             {
-                "info": "C22 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(x,p)",
+                "name": "C16",
+                "type": "F"
+            },
+            {
+                "info": "var(y) (cm^2)",
                 "name": "C22",
                 "type": "F"
             },
             {
-                "info": "C23 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(y,z)",
                 "name": "C23",
                 "type": "F"
             },
             {
-                "info": "C24 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(y,theta)",
                 "name": "C24",
                 "type": "F"
             },
             {
-                "info": "C25 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(y,phi)",
                 "name": "C25",
                 "type": "F"
             },
             {
-                "info": "C33 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(y,p)",
+                "name": "C26",
+                "type": "F"
+            },
+            {
+                "info": "var(z) (cm^2)",
                 "name": "C33",
                 "type": "F"
             },
             {
-                "info": "C34 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(z,theta)",
                 "name": "C34",
                 "type": "F"
             },
             {
-                "info": "C35 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(z,phi)",
                 "name": "C35",
                 "type": "F"
             },
             {
-                "info": "C44 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(z,p)",
+                "name": "C36",
+                "type": "F"
+            },
+            {
+                "info": "var(theta) (rad^2)",
                 "name": "C44",
                 "type": "F"
             },
             {
-                "info": "C45 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(theta,phi)",
                 "name": "C45",
                 "type": "F"
             },
             {
-                "info": "C55 covariance matrix element at last superlayer used in the fit",
+                "info": "cov(theta,p)",
+                "name": "C46",
+                "type": "F"
+            },
+            {
+                "info": "var(phi) (rad^2)",
                 "name": "C55",
+                "type": "F"
+            },
+            {
+                "info": "cov(phi,p)",
+                "name": "C56",
+                "type": "F"
+            },
+            {
+                "info": "var(p) (GeV^2)",
+                "name": "C66",
                 "type": "F"
             }
         ],

@@ -1,4 +1,4 @@
-package cnuphys.ced.cedview.urwell;
+package cnuphys.ced.cedview.urwt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,8 +36,10 @@ import cnuphys.ced.geometry.urwt.UrWTGeometry;
 import cnuphys.ced.item.HexSectorItem;
 
 
+@SuppressWarnings("serial")
 public class UrWTXYView extends HexView {
 
+	//data warehouse
 	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
 
 	private static int CLONE_COUNT = 0;

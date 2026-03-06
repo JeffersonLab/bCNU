@@ -7,12 +7,12 @@
                 "type": "S"
             },
             {
-                "info": "sector of URWELL",
+                "info": "sector of URWT",
                 "name": "sector",
                 "type": "B"
             },
             {
-                "info": "layer of URWELL",
+                "info": "layer of URWT",
                 "name": "layer",
                 "type": "B"
             },
@@ -73,8 +73,8 @@
             }
         ],
         "group": 22300,
-        "info": "reconstructed clusters from URWELL",
+        "info": "reconstructed clusters from URWT",
         "item": 22,
-        "name": "URWELL::clusters"
+        "name": "URWT::clusters"
     }
 ]

@@ -1,4 +1,4 @@
-package cnuphys.ced.cedview.urwell;
+package cnuphys.ced.cedview.urwt;
 
 /**
  * This will hold the highlighted data from uRWell banks

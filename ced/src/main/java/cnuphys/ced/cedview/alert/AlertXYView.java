@@ -36,7 +36,7 @@ import cnuphys.ced.cedview.central.CentralXYHitDrawer;
 import cnuphys.ced.cedview.central.ClusterDrawerXY;
 import cnuphys.ced.cedview.central.ICentralXYView;
 import cnuphys.ced.cedview.central.SwimTrajectoryDrawer;
-import cnuphys.ced.cedview.urwell.HighlightData;
+import cnuphys.ced.cedview.urwt.HighlightData;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.component.ControlPanel;
 import cnuphys.ced.component.DisplayBits;

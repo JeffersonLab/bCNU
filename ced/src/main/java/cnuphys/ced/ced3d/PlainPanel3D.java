@@ -261,7 +261,6 @@ public abstract class PlainPanel3D extends Panel3D {
 	/**
 	 * Snapshot of the panel.
 	 */
-	@Override
 	public void snapshot() {
 		GraphicsUtilities.saveAsPng(this);
 	}

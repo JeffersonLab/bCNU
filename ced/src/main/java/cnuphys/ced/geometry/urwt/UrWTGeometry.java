@@ -1,7 +1,5 @@
 package cnuphys.ced.geometry.urwt;
 
-import org.jlab.detector.calib.utils.DatabaseConstantProvider;
-import org.jlab.detector.geant4.v2.MPGD.URWT.URWTConstants;
 import org.jlab.detector.geant4.v2.MPGD.URWT.URWTStripFactory;
 import org.jlab.geom.prim.Line3D;
 
@@ -10,6 +8,8 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.bCNU.util.UnicodeSupport;
+import cnuphys.ced.ced3d.util.DrawSupport;
+import cnuphys.ced.ced3d.util.Plane;
 import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
@@ -76,8 +76,6 @@ public class UrWTGeometry extends ACachedGeometry {
 		System.out.println("=======================================");
 
 		String variationName = Ced.getGeometryVariation();
-		DatabaseConstantProvider cp = new DatabaseConstantProvider(11, variationName);
-		
 		
 		factory = new URWTStripFactory(11, variationName);
 				
@@ -114,21 +112,12 @@ public class UrWTGeometry extends ACachedGeometry {
 			maxY[layer - 1] = Math.max(lastStrip.origin().y(), maxY[layer - 1]);
 			maxY[layer - 1] = Math.max(lastStrip.end().y(), maxY[layer - 1]);
 			
-			
-			
-//			for (int strip = 1; strip <= data.count; strip++) {
-//				double x1 = data.strips[strip - 1].origin().x();
-//				double y1 = data.strips[strip - 1].origin().y();
-//				double x2 = data.strips[strip - 1].end().x();
-//				double y2 = data.strips[strip - 1].end().y();
-//				minX[layer - 1] = Math.min(minX[layer - 1], Math.min(x1, x2));
-//				maxX[layer - 1] = Math.max(maxX[layer - 1], Math.max(x1, x2));
-//				minY[layer - 1] = Math.min(minY[layer - 1], Math.min(y1, y2));
-//				maxY[layer - 1] = Math.max(maxY[layer - 1], Math.max(y1, y2));
-//			}
 		}
 
-		System.out.println("URWT strip bounds by layer:");
+		for (int layer = 1; layer <= NUM_LAYERS; layer++) {
+			Plane plane = DrawSupport.findCommonPlane(detectorData[0][layer - 1].strips, 1e-6);
+			System.out.println("Layer " + layer + " plane: " + plane);
+		}
 	}
 	
 

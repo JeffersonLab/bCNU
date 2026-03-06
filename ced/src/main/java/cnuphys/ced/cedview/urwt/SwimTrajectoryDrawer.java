@@ -1,4 +1,4 @@
-package cnuphys.ced.cedview.urwell;
+package cnuphys.ced.cedview.urwt;
 
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
@@ -6,7 +6,6 @@ import java.awt.geom.Point2D;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.magneticfield.swim.ASwimTrajectoryDrawer;
 import cnuphys.ced.clasio.ClasIoEventManager;
-import cnuphys.swim.SwimTrajectory;
 import cnuphys.swim.SwimTrajectory2D;
 
 public class SwimTrajectoryDrawer extends ASwimTrajectoryDrawer {

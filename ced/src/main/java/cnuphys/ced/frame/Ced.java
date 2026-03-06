@@ -62,7 +62,7 @@ import cnuphys.ced.cedview.ft.FTCalXYView;
 import cnuphys.ced.cedview.ftof.FTOFView;
 import cnuphys.ced.cedview.sectorview.DisplaySectors;
 import cnuphys.ced.cedview.sectorview.SectorView;
-import cnuphys.ced.cedview.urwell.UrWTXYView;
+import cnuphys.ced.cedview.urwt.UrWTXYView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventMenu;
 import cnuphys.ced.clasio.ClasIoEventView;
