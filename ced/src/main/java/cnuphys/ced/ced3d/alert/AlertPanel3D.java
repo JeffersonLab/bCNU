@@ -1,9 +1,11 @@
-package cnuphys.ced.ced3d;
+package cnuphys.ced.ced3d.alert;
 
 
 import java.awt.Color;
 import java.awt.Font;
 
+import cnuphys.ced.ced3d.CedPanel3D;
+import cnuphys.ced.ced3d.TrajectoryDrawer3D;
 import cnuphys.ced.ced3d.view.CedView3D;
 import cnuphys.ced.geometry.alert.AlertGeometry;
 import cnuphys.ced.geometry.alert.DCLayer;

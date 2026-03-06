@@ -1,18 +1,21 @@
 package cnuphys.ced.ced3d.util;
 
+import java.awt.Color;
 import java.util.List;
 
 import org.jlab.geom.prim.Line3D;
 
 import com.jogamp.opengl.GL2;
 
+import bCNU3D.Support3D;
+
 public class DrawSupport {
 
-	public static void drawPlaneAndHull(GL2 gl, Plane plane, List<Point> hullPoints, float scale) {
+	public static void drawPlaneAndHull(GL2 gl, Plane plane, List<Point> hullPoints, float scale, Color color, int volumeAlpha) {
 	    // 1. Draw the Plane as a semi-transparent Quad
 	    float[] coords = plane.planeQuadCoordinates(scale); //
 	    if (coords != null) {
-	        gl.glColor4f(0.2f, 0.5f, 0.8f, 0.3f); // Transparent blue
+	        Support3D.setColor(gl, color);
 	        gl.glBegin(GL2.GL_QUADS);
 	        for (int i = 0; i < coords.length; i += 3) {
 	            gl.glVertex3f(coords[i], coords[i+1], coords[i+2]);
@@ -21,7 +24,7 @@ public class DrawSupport {
 	    }
 
 	    // 2. Draw the Convex Hull boundary
-	    gl.glColor3f(1.0f, 1.0f, 0.0f); // Bright yellow
+        Support3D.setColor(gl, color);
 	    gl.glLineWidth(2.0f);
 	    gl.glBegin(GL2.GL_LINE_LOOP);
 	    for (Point p : hullPoints) {

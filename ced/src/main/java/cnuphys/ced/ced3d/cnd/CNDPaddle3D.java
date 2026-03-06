@@ -1,5 +1,6 @@
-package cnuphys.ced.ced3d;
+package cnuphys.ced.ced3d.cnd;
 
+import cnuphys.ced.ced3d.Paddle3D;
 import cnuphys.ced.geometry.CNDGeometry;
 
 public class CNDPaddle3D extends Paddle3D {

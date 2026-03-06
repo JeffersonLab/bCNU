@@ -17,6 +17,7 @@ import cnuphys.bCNU.dialog.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.util.Fonts;
+import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.ced3d.view.PlainView3D;
 
@@ -146,7 +147,10 @@ public abstract class PlainPanel3D extends Panel3D {
 	public static final String SHOW_FMT_REGION_3 = "FMT Region 3";
 	public static final String SHOW_FMT_REGION_4 = "FMT Region 4";
 
-
+	public static final String SHOW_URWT_LAYER_1 = UnicodeSupport.SMALL_MU +  "RWT Layer 1";
+	public static final String SHOW_URWT_LAYER_2 = UnicodeSupport.SMALL_MU +  "RWT Layer 2";
+	public static final String SHOW_URWT_LAYER_3 = UnicodeSupport.SMALL_MU +  "RWT Layer 3";
+	public static final String SHOW_URWT_LAYER_4 = UnicodeSupport.SMALL_MU +  "RWT Layer 4";
 
 	// Check box array
 	protected CheckBoxArray _checkBoxArray;
@@ -1272,7 +1276,44 @@ public abstract class PlainPanel3D extends Panel3D {
 		}
 		return false;
 	}
+	
+	/**
+	 * Show URWT Layer 1?
+	 *
+	 * @return <code>true</code> if we are to show URWT Layer 1
+	 */
+	public boolean showUrwtLayer1() {
+		return show(PlainPanel3D.SHOW_URWT_LAYER_1);
+	}
+	
+	/**
+	 * Show URWT Layer 2?
+	 *
+	 * @return <code>true</code> if we are to show URWT Layer 2
+	 */
+	public boolean showUrwtLayer2() {
+		return show(PlainPanel3D.SHOW_URWT_LAYER_2);
+	}
+	
+	/**
+	 * Show URWT Layer 3?
+	 *
+	 * @return <code>true</code> if we are to show URWT Layer 3
+	 */
+	public boolean showUrwtLayer3() {
+		return show(PlainPanel3D.SHOW_URWT_LAYER_3);
+	}
 
+	/**
+	 * Show URWT Layer 4?
+	 *
+	 * @return <code>true</code> if we are to show URWT Layer 3
+	 */
+	public boolean showUrwtLayer4() {
+		return show(PlainPanel3D.SHOW_URWT_LAYER_4);
+	}
+	
+	
 	/**
 	 * Show MC truth?
 	 *

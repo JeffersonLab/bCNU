@@ -1,6 +1,9 @@
-package cnuphys.ced.ced3d;
+package cnuphys.ced.ced3d.cnd;
 
 import com.jogamp.opengl.GLAutoDrawable;
+
+import cnuphys.ced.ced3d.CedPanel3D;
+import cnuphys.ced.ced3d.DetectorItem3D;
 
 /**
  * 3D version of the central neutron detector

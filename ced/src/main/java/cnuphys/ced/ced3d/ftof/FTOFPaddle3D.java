@@ -1,4 +1,4 @@
-package cnuphys.ced.ced3d;
+package cnuphys.ced.ced3d.ftof;
 
 import java.awt.Color;
 

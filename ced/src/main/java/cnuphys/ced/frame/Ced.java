@@ -50,6 +50,7 @@ import cnuphys.ced.ced3d.view.FMTView3D;
 import cnuphys.ced.ced3d.view.FTCalView3D;
 import cnuphys.ced.ced3d.view.ForwardView3D;
 import cnuphys.ced.ced3d.view.SwimmingTestView3D;
+import cnuphys.ced.ced3d.view.UrwtView3D;
 import cnuphys.ced.cedview.alert.AlertXYView;
 import cnuphys.ced.cedview.alldc.AllDCView;
 import cnuphys.ced.cedview.allec.ECView;
@@ -179,6 +180,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private SwimmingTestView3D _swimming3DView;
 	private CentralView3D _central3DView;
 	private FTCalView3D _ftCal3DView;
+	private UrwtView3D _urwt3DView;
 
 	private FTOFView _ftofView;
 
@@ -316,9 +318,10 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 			_virtualView.moveTo(_central3DView, 14, VirtualView.BOTTOMLEFT);
 			_virtualView.moveTo(_ftCal3DView, 16, VirtualView.BOTTOMRIGHT);
 			_virtualView.moveTo(_fmt3DView, 15, VirtualView.CENTER);
+			_virtualView.moveTo(_urwt3DView, 17, VirtualView.CENTER);
 
 			if (_experimental) {
-				_virtualView.moveTo(_swimming3DView, 17, VirtualView.CENTER);
+				_virtualView.moveTo(_swimming3DView, 18, VirtualView.CENTER);
 			}
 		}
 	}
@@ -384,10 +387,10 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		// make sure accumulation manager is instantiated
 		AccumulationManager.getInstance();
 
-		// add a virtual view. Count how many cells are needed
+		// add a virtual view. Count how many cells (columns) are needed
 		int numVVCell = 12;
 		if (!_no3D) {
-			numVVCell += 5; // 3D views
+			numVVCell += 6; // 3D views
 			if (_experimental) {
 				numVVCell += 1; // swimming test
 			}
@@ -465,6 +468,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 			_fmt3DView = new FMTView3D();
 			_forward3DView = new ForwardView3D();
 			_ftCal3DView = new FTCalView3D();
+			_urwt3DView = new UrwtView3D();
 
 			if (_experimental) {
 				_swimming3DView = new SwimmingTestView3D();

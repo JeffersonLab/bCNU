@@ -1,5 +1,8 @@
 package cnuphys.ced.geometry.urwt;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jlab.detector.geant4.v2.MPGD.URWT.URWTStripFactory;
 import org.jlab.geom.prim.Line3D;
 
@@ -8,6 +11,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.bCNU.util.UnicodeSupport;
+import cnuphys.ced.ced3d.util.BoundingBox3D;
 import cnuphys.ced.ced3d.util.DrawSupport;
 import cnuphys.ced.ced3d.util.Plane;
 import cnuphys.ced.frame.Ced;
@@ -355,6 +359,17 @@ public class UrWTGeometry extends ACachedGeometry {
 	public static void main(String args[]) {
 		UrWTGeometry geometry = new UrWTGeometry();
 		geometry.initializeUsingCCDB();
+
+		List<Line3D[]> allLines = new ArrayList<>();
+		for (int sector = 1; sector <= NUM_SECTORS; sector++) {
+			for (int layer = 1; layer <= NUM_LAYERS; layer++) {
+				allLines.add(geometry.detectorData[sector - 1][layer - 1].strips);
+			}
+		}
+		
+		
+		BoundingBox3D box = DrawSupport.getBoundingBox(allLines);
+		System.out.println("Bounding Box: " + box);
 		
 
 	}
