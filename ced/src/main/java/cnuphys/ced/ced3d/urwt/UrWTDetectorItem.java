@@ -31,6 +31,8 @@ public class UrWTDetectorItem extends DetectorItem3D {
 
 	private static Color[] layerColors = new Color[] { X11Colors.getX11Color("dark red"),
 			X11Colors.getX11Color("dark green"), X11Colors.getX11Color("dark blue"), X11Colors.getX11Color("orange") };
+	
+	private float[] coords;
 
 	/**
 	 * Create a UrWT detector item
@@ -59,12 +61,21 @@ public class UrWTDetectorItem extends DetectorItem3D {
 			System.err.println(
 					"UrwtDetectorItem: Could not compute convex hull for sector " + sector + " layer " + layer);
 		}
+		
+		
+		coords = new float[convexHull.size() * 3];
+		for (int i = 0; i < convexHull.size(); i++) {
+			Point p = convexHull.get(i);
+			coords[3 * i] = (float) p.x;
+			coords[3 * i + 1] = (float) p.y;
+			coords[3 * i + 2] = (float) p.z;
+		}
 	}
 
 	@Override
 	public void drawShape(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
-		DrawSupport.drawPlaneAndHull(gl, plane, convexHull, 1.0f, layerColors[layer - 1], getVolumeAlpha());
+		DrawSupport.drawPlaneAndHull(gl, plane, convexHull, 100.0f, layerColors[layer - 1], getVolumeAlpha());
 	}
 
 	@Override

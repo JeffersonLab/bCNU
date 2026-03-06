@@ -626,17 +626,19 @@ public class Support3D {
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glLineWidth(lineWidth);
 
-		gl.glBegin(GL2ES3.GL_QUADS);
-		setColor(gl, color);
-
-		int numPoints = coords.length / 3;
-
-		for (int i = 0; i < numPoints; i++) {
-			int j = 3 * i;
-			gl.glVertex3f(coords[j], coords[j + 1], coords[j + 2]);
-		}
-
-		gl.glEnd();
+//		gl.glBegin(GL2ES3.GL_QUADS);
+//		setColor(gl, color);
+//
+//		int numPoints = coords.length / 3;
+//		
+//		System.out.println("Drawing " + numPoints + " points as quads.");
+//
+//		for (int i = 0; i < numPoints; i++) {
+//			int j = 3 * i;
+//			gl.glVertex3f(coords[j], coords[j + 1], coords[j + 2]);
+//		}
+//
+//		gl.glEnd();
 
 		if (lineColor != null) {
 

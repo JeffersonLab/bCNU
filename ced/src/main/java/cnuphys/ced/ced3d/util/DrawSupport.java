@@ -6,33 +6,40 @@ import java.util.List;
 import org.jlab.geom.prim.Line3D;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL2ES3;
 
 import bCNU3D.Support3D;
 
 public class DrawSupport {
-
 	public static void drawPlaneAndHull(GL2 gl, Plane plane, List<Point> hullPoints, float scale, Color color, int volumeAlpha) {
-	    // 1. Draw the Plane as a semi-transparent Quad
-	    float[] coords = plane.planeQuadCoordinates(scale); //
-	    if (coords != null) {
+
+	    gl.glEnable(GL2.GL_BLEND);
+	    gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+
+
+
+	    // fill the hull, not the plane quad
+	    if (hullPoints != null && hullPoints.size() >= 3) {
+	        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), volumeAlpha);
+	        Support3D.setColor(gl, fillColor);
+
+	        gl.glBegin(GL2.GL_POLYGON);
+	        for (Point p : hullPoints) {
+	            gl.glVertex3d(p.x, p.y, p.z);
+	        }
+	        gl.glEnd();
+
 	        Support3D.setColor(gl, color);
-	        gl.glBegin(GL2.GL_QUADS);
-	        for (int i = 0; i < coords.length; i += 3) {
-	            gl.glVertex3f(coords[i], coords[i+1], coords[i+2]);
+	        gl.glLineWidth(2.5f);
+	        gl.glBegin(GL2.GL_LINE_LOOP);
+	        for (Point p : hullPoints) {
+	            gl.glVertex3d(p.x, p.y, p.z);
 	        }
 	        gl.glEnd();
 	    }
 
-	    // 2. Draw the Convex Hull boundary
-        Support3D.setColor(gl, color);
-	    gl.glLineWidth(2.0f);
-	    gl.glBegin(GL2.GL_LINE_LOOP);
-	    for (Point p : hullPoints) {
-	        gl.glVertex3d(p.x, p.y, p.z); //
-	    }
-	    gl.glEnd();
+	    gl.glDisable(GL2.GL_BLEND);
 	}
-	
 	
 	/**
 	 * Determines if a set of Line3D objects are coplanar.
