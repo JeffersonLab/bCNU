@@ -102,4 +102,46 @@ public class DrawSupport {
 
 	    return plane;
 	}
+	
+	/**
+     * Given a list of Line3D arrays, returns a single 3D bounding box 
+     * encompassing all points.
+     * * @param allLines A list where each element is an array of Line3D objects.
+     * @return A BoundingBox3D object containing the min/max extents.
+     */
+    public static BoundingBox3D getBoundingBox(List<Line3D[]> allLines) {
+        BoundingBox3D box = new BoundingBox3D();
+
+        if (allLines == null || allLines.isEmpty()) {
+            return box;
+        }
+
+        for (Line3D[] lineArray : allLines) {
+            if (lineArray == null) continue;
+            
+            for (Line3D line : lineArray) {
+                if (line == null) continue;
+
+                // Check the origin of the line
+                updateBox(box, line.origin().x(), line.origin().y(), line.origin().z());
+
+                // Check the end of the line
+                updateBox(box, line.end().x(), line.end().y(), line.end().z());
+            }
+        }
+
+        return box;
+    }
+
+    // Helper method to update the bounding box with a new point
+    private static void updateBox(BoundingBox3D box, double x, double y, double z) {
+        if (x < box.minX) box.minX = x;
+        if (x > box.maxX) box.maxX = x;
+        
+        if (y < box.minY) box.minY = y;
+        if (y > box.maxY) box.maxY = y;
+        
+        if (z < box.minZ) box.minZ = z;
+        if (z > box.maxZ) box.maxZ = z;
+    }
 }
