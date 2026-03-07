@@ -10,6 +10,9 @@ import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -22,7 +25,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.jlab.logging.DefaultLogger;
 
 import cnuphys.bCNU.application.BaseMDIApplication;
 import cnuphys.bCNU.application.Desktop;
@@ -36,6 +38,7 @@ import cnuphys.bCNU.util.Environment;
 import cnuphys.bCNU.util.FileUtilities;
 import cnuphys.bCNU.util.Jar;
 import cnuphys.bCNU.util.PropertySupport;
+import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.PlotView;
 import cnuphys.bCNU.view.ViewManager;
 import cnuphys.bCNU.view.VirtualView;
@@ -47,6 +50,7 @@ import cnuphys.ced.ced3d.view.FMTView3D;
 import cnuphys.ced.ced3d.view.FTCalView3D;
 import cnuphys.ced.ced3d.view.ForwardView3D;
 import cnuphys.ced.ced3d.view.SwimmingTestView3D;
+import cnuphys.ced.ced3d.view.UrwtView3D;
 import cnuphys.ced.cedview.alert.AlertXYView;
 import cnuphys.ced.cedview.alldc.AllDCView;
 import cnuphys.ced.cedview.allec.ECView;
@@ -59,7 +63,7 @@ import cnuphys.ced.cedview.ft.FTCalXYView;
 import cnuphys.ced.cedview.ftof.FTOFView;
 import cnuphys.ced.cedview.sectorview.DisplaySectors;
 import cnuphys.ced.cedview.sectorview.SectorView;
-import cnuphys.ced.cedview.urwell.UrWELLXYView;
+import cnuphys.ced.cedview.urwt.UrWTXYView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventMenu;
 import cnuphys.ced.clasio.ClasIoEventView;
@@ -89,6 +93,8 @@ import cnuphys.swim.Swimmer;
 
 @SuppressWarnings("serial")
 public class Ced extends BaseMDIApplication implements MagneticFieldChangeListener {
+	
+	private static boolean _no3D; // default is yes to 3D
 
 	// a shared ping
 	private Ping _ping;
@@ -100,7 +106,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private static String _geoVariation = "default";
 
 	// ced release
-	private static final String _release = "1.8.0t";
+	public static final String release = "1.9.8.2";
 
 	//minimum java major version
 	private static final int _minJavaVersion = 17;
@@ -162,7 +168,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private FTCalXYView _ftcalXyView;
 	private DCXYView _dcXyView;
 	private DCHexView _dcHexView;
-	private UrWELLXYView _urwellXyView;
+	private UrWTXYView _urwellXyView;
 
 	private ECView _ecView;
 	private PCALView _pcalView;
@@ -174,6 +180,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private SwimmingTestView3D _swimming3DView;
 	private CentralView3D _central3DView;
 	private FTCalView3D _ftCal3DView;
+	private UrwtView3D _urwt3DView;
 
 	private FTOFView _ftofView;
 
@@ -188,8 +195,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 	// the about string
 	private static String _aboutString = "<html><span style=\"font-size:12px\">ced: the cLAS eVENT dISPLAY&nbsp;&nbsp;&nbsp;&nbsp;"
-			+ _release + "<br><br>Developed by Christopher Newport University"
-			+ "<br><br>Download the latest version at <a href=\"https://userweb.jlab.org/~heddle/ced/builds/\">https://userweb.jlab.org/~heddle/ced/builds/</a>"
+			+ release + "<br><br>Developed by Christopher Newport University"
 			+ "<br><br>Email bug reports to david.heddle@cnu.edu";
 
 	// for the traveling salesperson dialog
@@ -306,17 +312,27 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 		_virtualView.moveTo(_alertXYView, 11, VirtualView.CENTER);
 
-		_virtualView.moveTo(_alert3DView, 12, VirtualView.CENTER);
-		_virtualView.moveTo(_forward3DView, 13, VirtualView.CENTER);
-		_virtualView.moveTo(_central3DView, 14, VirtualView.BOTTOMLEFT);
-		_virtualView.moveTo(_ftCal3DView, 16, VirtualView.BOTTOMRIGHT);
-		_virtualView.moveTo(_fmt3DView, 15, VirtualView.CENTER);
+		if (!_no3D) {
+			_virtualView.moveTo(_alert3DView, 12, VirtualView.CENTER);
+			_virtualView.moveTo(_forward3DView, 13, VirtualView.CENTER);
+			_virtualView.moveTo(_central3DView, 14, VirtualView.BOTTOMLEFT);
+			_virtualView.moveTo(_ftCal3DView, 16, VirtualView.BOTTOMRIGHT);
+			_virtualView.moveTo(_fmt3DView, 15, VirtualView.CENTER);
+			_virtualView.moveTo(_urwt3DView, 17, VirtualView.CENTER);
 
-		if (isExperimental()) {
-			_virtualView.moveTo(_swimming3DView, 17, VirtualView.CENTER);
+			if (_experimental) {
+				_virtualView.moveTo(_swimming3DView, 18, VirtualView.CENTER);
+			}
 		}
 	}
 
+	/**
+	 * Is this a special release for Veronique
+	 * @return <code>true</code> if this is a special release for Veronique
+	 */
+	public static boolean forVeronique() {
+		return release.contains("vz");
+	}
 
 	//get a string that tells us what version of coatjava.
 	//uses the class path.
@@ -371,9 +387,14 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		// make sure accumulation manager is instantiated
 		AccumulationManager.getInstance();
 
-		// add a virtual view. Count how many cells are needed
-
-		int numVVCell = 18;
+		// add a virtual view. Count how many cells (columns) are needed
+		int numVVCell = 12;
+		if (!_no3D) {
+			numVVCell += 6; // 3D views
+			if (_experimental) {
+				numVVCell += 1; // swimming test
+			}
+		}
 
 		_virtualView = VirtualView.createVirtualView(numVVCell);
 		ViewManager.getInstance().getViewMenu().addSeparator();
@@ -431,7 +452,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		_ftcalXyView = FTCalXYView.createFTCalXYView();
 
 		//add a urwell xy view
-		_urwellXyView = UrWELLXYView.createUrWELLView();
+		_urwellXyView = UrWTXYView.createUrWELLView();
 
 
 		// add an RTPC vie
@@ -440,19 +461,21 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
         //FTOF
 		_ftofView = FTOFView.createFTOFView();
 
-		ViewManager.getInstance().getViewMenu().addSeparator();
-		_alert3DView = new AlertView3D();
-		_central3DView = new CentralView3D();
-		_fmt3DView = new FMTView3D();
-		_forward3DView = new ForwardView3D();
-		_ftCal3DView = new FTCalView3D();
+		if (!_no3D) {
+			ViewManager.getInstance().getViewMenu().addSeparator();
+			_alert3DView = new AlertView3D();
+			_central3DView = new CentralView3D();
+			_fmt3DView = new FMTView3D();
+			_forward3DView = new ForwardView3D();
+			_ftCal3DView = new FTCalView3D();
+			_urwt3DView = new UrwtView3D();
 
-
-		if (isExperimental()) {
-			_swimming3DView = new SwimmingTestView3D();
+			if (_experimental) {
+				_swimming3DView = new SwimmingTestView3D();
+			}
 		}
 
-		// add logview
+		// add plotview
 		ViewManager.getInstance().getViewMenu().addSeparator();
 
 		_plotView = new PlotView();
@@ -801,10 +824,19 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		}
 	}
 
+	// refresh all views (with containers)
 	private static void refreshAllViews() {
-	    for (JInternalFrame frame : Desktop.getInstance().getAllFrames()) {
-	        frame.repaint();
-	    }
+		for (JInternalFrame frame : Desktop.getInstance().getAllFrames()) {
+
+			if (frame.isVisible()) {
+				if (frame instanceof BaseView) {
+					BaseView view = (BaseView) frame;
+					if (view.isViewVisible()) {
+						frame.repaint();
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -946,7 +978,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	 * @return the version string
 	 */
 	public static String versionString() {
-		return _release + (_experimental ? " (Experimental)" : "");
+		return release + (_experimental ? " (Experimental)" : "");
 	}
 
 
@@ -1032,13 +1064,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 //		Swimming.clearAllTrajectories();
 		fixTitle();
 		ClasIoEventManager.getInstance().reloadCurrentEvent();
-	}
-	/**
-	 * Is this an experimental version?
-	 * @return <code>true</code> if this version has experimental features
-	 */
-	public static boolean isExperimental() {
-		return _experimental;
 	}
 
 	/**
@@ -1136,6 +1161,27 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		DataWarehouse.getInstance();
 	}
 
+    public static void relevelAllLogging(Level level) {
+
+        Logger root = Logger.getLogger("");
+
+
+
+        // Relevel logging at the root level
+
+        root.setLevel(level);
+
+        // Also turn off any existing handlers (unsure if necessary)
+
+        for (Handler h : root.getHandlers()) {
+
+        	h.setLevel(level);
+
+        }
+
+    }
+
+
 	/**
 	 * Main program launches the ced gui.
 	 * <p>
@@ -1161,10 +1207,13 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 
 		//this is supposed to create less pounding of ccdb
-		DefaultLogger.initialize();
+//		DefaultLogger.initialize();
+		
+    	relevelAllLogging(Level.WARNING);
 
 		String variation = System.getProperty("GEOVARIATION");
 		if (variation != null) {
+			System.err.println("Using GEOVARIATION: " + variation);
 			_geoVariation = new String(variation);
 		}
 
@@ -1191,7 +1240,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		// Log.getInstance().addLogListener(new ConsoleLogListener());
 
 		// splash frame
-		final SplashWindowCED splashWindow = new SplashWindowCED("ced", null, 920, _release);
+		final SplashWindowCED splashWindow = new SplashWindowCED("ced", null, 920, release);
 
 		// now make the frame visible, in the AWT thread
 		try {
@@ -1224,6 +1273,10 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 				} else if (arg[i].contains("EXP")) {
 					_experimental = true;
 					System.out.println("Note: This is an experimental version");
+				} 
+				else if (arg[i].contains("NO3D")) {
+					_no3D = true;
+					System.out.println("Note: No 3D views will be available.");
 				}
 
 				i++;
@@ -1254,6 +1307,9 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 				FilterManager.getInstance().setUpFilterMenu();
 				System.out.println(String.format("ced %s is ready. COATJAVA: %s Geometry variation: %s", versionString(), getCoatJavaVersion(), _geoVariation));
+				if (forVeronique()) {
+					System.out.println("This is a special release for Veronique.");
+				}
 			}
 
 		});

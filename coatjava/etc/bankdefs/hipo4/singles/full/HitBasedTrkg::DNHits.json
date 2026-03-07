@@ -7,6 +7,11 @@
                 "type": "S"
             },
             {
+                "info": "index in the bank DC::TDC",
+                "name": "indexTDC",
+                "type": "S"
+            },
+            {
                 "info": "id of the hit",
                 "name": "status",
                 "type": "S"

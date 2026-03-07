@@ -80,6 +80,10 @@ public class ControlPanel extends JPanel implements ChangeListener {
 	
 	/** trajectory drawing cutoff at a max pathlength */
 	public static final int TRAJCUTOFF = 04000;
+	
+	/** trajectory drawing cutoff at a min ADC */
+	public static final int MINADCCUTOFF = 010000;
+
 
 	// the view parent
 	private CedView _view;
@@ -98,6 +102,9 @@ public class ControlPanel extends JPanel implements ChangeListener {
 	
 	//traj pathlength cutoff
 	private RangeSlider _trajRangeSlider;
+	
+	//min adc cutoff
+	private RangeSlider _minADCRangeSlider;
 
 	// control threshold value of adc to display
 	private JSlider _adcThresholdSlider;
@@ -135,7 +142,7 @@ public class ControlPanel extends JPanel implements ChangeListener {
 	 * Create a view control panel
 	 *
 	 * @param container        the parent container
-	 * @param controlPanelBits the bits fo which components are added
+	 * @param controlPanelBits the bits for which components are added
 	 * @param displayArrayBits the bits for which display flags are added to the
 	 *                         display array.
 	 */
@@ -145,7 +152,7 @@ public class ControlPanel extends JPanel implements ChangeListener {
 		_nc = nc;
 		_hgap = hgap;
 
-		setLayout(new BorderLayout(0, 2));
+		setLayout(new BorderLayout(0, 0));
 
 		// Create a vertical box for components above the feedback
 		_northBox = Box.createVerticalBox();
@@ -270,8 +277,15 @@ public class ControlPanel extends JPanel implements ChangeListener {
 		if (Bits.checkBit(controlPanelBits, TRAJCUTOFF)) {
 			int maxPath = _view.getTrajMaxPathlength();
 			_trajRangeSlider = new RangeSlider(0, maxPath, maxPath, maxPath/5, maxPath/10, false);
-			_trajRangeSlider.setBorder(new CommonBorder("Trajectory Path Length Cutoff"));
+			_trajRangeSlider.setBorder(new CommonBorder("Trajectory Pathlength Cutoff"));
 		}
+		
+		if (Bits.checkBit(controlPanelBits, MINADCCUTOFF)) {
+			int minADC = _view.getMinADC();
+			_minADCRangeSlider = new RangeSlider(0, 2000, minADC, 400, 200, false);
+			_minADCRangeSlider.setBorder(new CommonBorder("Minimum ADC Cutoff"));
+		}
+		
 
 		// alert dc projections
 		if (Bits.checkBit(controlPanelBits, ALERTDC)) {
@@ -297,6 +311,10 @@ public class ControlPanel extends JPanel implements ChangeListener {
 			if (_trajRangeSlider != null) {
 				daPanel.add(_trajRangeSlider);
 			}
+			if (_minADCRangeSlider != null) {
+				daPanel.add(_minADCRangeSlider);
+			}
+
 			if (_alertDCPanel != null) {
 				daPanel.add(_alertDCPanel);
 			}
@@ -601,6 +619,16 @@ public class ControlPanel extends JPanel implements ChangeListener {
 	public RangeSlider getTrajRangeSlider() {
 		return _trajRangeSlider;
 	}
+	
+	/**
+	 * Get the minimum ADC cutoff slider
+	 * 
+	 * @return the minimum ADC cutoff slider
+	 */
+	public RangeSlider getMinADCRangeSlider() {
+		return _minADCRangeSlider;
+	}
+
 
 	@Override
 	public void stateChanged(ChangeEvent e) {

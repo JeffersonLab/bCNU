@@ -2,12 +2,12 @@
     {
         "entries": [
             {
-                "info": "sector 1",
+                "info": "sector",
                 "name": "sector",
                 "type": "B"
             },
             {
-                "info": "layer 1-5",
+                "info": "2 digits: first digit is superlayer, second digit is layer",
                 "name": "layer",
                 "type": "B"
             },
@@ -22,19 +22,19 @@
                 "type": "B"
             },
             {
-                "info": "ADC maximum",
+                "info": "average of 3 points around the max of ADC",
                 "name": "ADC",
                 "type": "I"
             },
             {
-                "info": "time from pulse fit",
+                "info": "time corresponding to the max of ADC (ns)",
                 "name": "time",
                 "type": "F"
             },
             {
-                "info": "pedestal from pulse analysis",
+                "info": "average ADC of the first 4 samples",
                 "name": "ped",
-                "type": "S"
+                "type": "F"
             },
             {
                 "info": "row index in waveform bank",
@@ -47,19 +47,24 @@
                 "type": "I"
             },
             {
-                "info": "time at constant fraction amplitude",
+                "info": "time at half amplitude (ns)",
                 "name": "leadingEdgeTime",
                 "type": "F"
             },
             {
-                "info": "time over threshold at constant fraction amplitude",
+                "info": "time over threshold at half amplitude (ns)",
                 "name": "timeOverThreshold",
                 "type": "F"
             },
             {
-                "info": "time from constant fraction discriminator",
+                "info": "time from constant fraction discriminator (ns)",
                 "name": "constantFractionTime",
                 "type": "F"
+            },
+            {
+                "info": "waveform type classification, good <= 2, bad=others",
+                "name": "wfType",
+                "type": "S"
             }
         ],
         "group": 22400,

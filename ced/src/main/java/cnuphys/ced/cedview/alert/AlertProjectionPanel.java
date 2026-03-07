@@ -29,7 +29,7 @@ public class AlertProjectionPanel extends JPanel {
 
     private static final Font FONT = Fonts.tweenFont;
 
-    public static final int DEFAULT_Z = 150;
+    public static final int DEFAULT_Z = 0;
 
     //TOF view radio buttons
     JRadioButton showAllTOF;
@@ -40,20 +40,20 @@ public class AlertProjectionPanel extends JPanel {
     public AlertProjectionPanel(AlertXYView alertXYView) {
         this.alertXYView = alertXYView;
         setLayout(new VerticalFlowLayout());
-        add(Box.createRigidArea(new Dimension(0, 4))); // Spacer
+        add(Box.createRigidArea(new Dimension(0, 2))); // Spacer
        add(createTOFPanel());
 
-        add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
+        add(Box.createRigidArea(new Dimension(0, 5))); // Spacer
 
         // Z Slider
         zSliderLabel = createLabel("  ");
         add(zSliderLabel);
 
-        zSlider = createSlider(0, 300, DEFAULT_Z, 50, 10, this::updateZLabel, true);
+        zSlider = createSlider(-150, 150, DEFAULT_Z, 50, 10, this::updateZLabel, true);
         this.alertXYView.setProjectionPlane(DEFAULT_Z);
         add(zSlider);
 
-        setBorder(new CommonBorder("Alert Z Projection Plane"));
+        setBorder(new CommonBorder("ALERT Z Projection Plane"));
         updateZLabel(null);
     }
 
@@ -153,13 +153,12 @@ public class AlertProjectionPanel extends JPanel {
         alertXYView.refresh();
     }
 
-
-    //update the z label
-    private void updateZLabel(ChangeEvent e) {
-        zSliderLabel.setText(" z = " + zSlider.getValue() + " mm");
-        alertXYView.setProjectionPlane(zSlider.getValue());
-        alertXYView.refresh();
-    }
+	// update the z label
+	private void updateZLabel(ChangeEvent e) {
+		zSliderLabel.setText(" z = " + zSlider.getValue() + " mm");
+		alertXYView.setProjectionPlane(zSlider.getValue());
+		alertXYView.refresh();
+	}
 
 
 	/**

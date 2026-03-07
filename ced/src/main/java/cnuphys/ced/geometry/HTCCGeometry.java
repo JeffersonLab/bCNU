@@ -2,23 +2,29 @@ package cnuphys.ced.geometry;
 
 import java.awt.geom.Point2D;
 
-public class HTCCGeometry {
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
+import cnuphys.ced.geometry.cache.ACachedGeometry;
+
+public class HTCCGeometry extends ACachedGeometry {
 
 	// place holder hardwired simple geometry from Valery
-	private static final boolean _SIMPLEGEO = true;
 	private static final double _SIMPLETHICKNESS = 5; // cm fake thickness
 	private static final double _SIMPLESTARTANGLE = 5; // degrees
 	private static final double _SIMPLEDELANGLE = 7.5; // degrees
 	private static final double _SIMPLERADIUS = 150; // cm
 
-	public static void initialize() {
+	public HTCCGeometry() {
+        super("HTCCGeometry");
+    }
+	
+	@Override
+	public void initializeUsingCCDB() {
 		System.out.println("\n=====================================");
 		System.out.println("===  HTCC Geometry Initialization ===");
-
-		if (_SIMPLEGEO) {
-			System.out.println("======== WARNING: SIMPLE GEOMETRY ====");
-		}
-
+		System.out.println("======== WARNING: SIMPLE GEOMETRY ====");
 		System.out.println("=====================================");
 	}
 
@@ -32,7 +38,7 @@ public class HTCCGeometry {
 	 */
 	public static void getSimpleWorldPoly(int ring, int half, double localPhi, Point2D.Double wp[]) {
 
-		if (_SIMPLEGEO && (ring > 0) && (ring < 5) && (half > 0) && (half < 3)) {
+		if  ((ring > 0) && (ring < 5) && (half > 0) && (half < 3)) {
 
 			double r1 = (half == 1) ? _SIMPLERADIUS : _SIMPLERADIUS + _SIMPLETHICKNESS;
 			double r2 = r1 + _SIMPLETHICKNESS;
@@ -59,5 +65,18 @@ public class HTCCGeometry {
 			}
 		}
 	}
+
+	@Override
+	public boolean readGeometry(Kryo kryo, Input input) {
+		// At the moment, nothing to read
+		return true;
+	}
+
+	@Override
+	public boolean writeGeometry(Kryo kryo, Output output) {
+		// At the moment, nothing to write
+		return true;
+	}
+
 
 }

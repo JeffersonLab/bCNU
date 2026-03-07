@@ -8,6 +8,7 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
+import java.util.HashMap;
 import java.util.List;
 
 import org.jlab.geom.prim.Line3D;
@@ -77,6 +78,7 @@ public class SuperLayerDrawing {
 	private TBTrkgAISegmentData _tbTrkgAISegmentData = TBTrkgAISegmentData.getInstance();
 
 
+	HashMap<String, Polygon> hexMap = new HashMap<String, Polygon>();
 
 	/**
 	 * Constructor
@@ -113,14 +115,6 @@ public class SuperLayerDrawing {
 
 		// draw layer outlines to guide the eye
 
-//		Shape clip = g2.getClip();
-		// Stroke oldStroke = g2.getStroke();
-
-//		if (lastDrawnPolygon != null) {
-//			g2.setClip(lastDrawnPolygon);
-//		} else {
-//			System.err.println("NULL LAST POLY");
-//		}
 
 		if (!segmentsOnly) {
 			// differentiate the layers
@@ -182,6 +176,33 @@ public class SuperLayerDrawing {
 	// draw a single wire
 	private void drawOneWire(Graphics g, IContainer container, int layer, int wire, boolean reallyClose, Point pp) {
 		g.setColor(CedColors.senseWireColor);
+//		Point2D.Double wp = wire(_iSupl.superlayer(), layer, wire, _iSupl.isLowerSector());
+		
+		Polygon hexagon = getHexagon(container, layer, wire);
+		if (hexagon == null) {
+			return;
+		}
+		
+		pp.x = 0;
+		pp.y = 0;
+		int len = hexagon.npoints;
+		for (int i = 0; i < len; i++) {
+			pp.x += hexagon.xpoints[i];
+			pp.y += hexagon.ypoints[i];
+		}
+		pp.x /= len;
+		pp.y /= len;
+
+		if (reallyClose) {
+			g.setColor(CedColors.hexColor);
+			g.drawPolygon(hexagon);
+		} 				
+		g.fillRect(pp.x, pp.y , 1, 1);
+	}
+	
+	// draw a single wire
+	private void XdrawOneWire(Graphics g, IContainer container, int layer, int wire, boolean reallyClose, Point pp) {
+		g.setColor(CedColors.senseWireColor);
 		Point2D.Double wp = wire(_iSupl.superlayer(), layer, wire, _iSupl.isLowerSector());
 
 		if (wp != null) {
@@ -200,6 +221,7 @@ public class SuperLayerDrawing {
 			}
 		}
 	}
+
 
 	/**
 	 * Draw the masks showing the effect of the noise finding algorithm
@@ -405,6 +427,19 @@ public class SuperLayerDrawing {
 			g.setColor(hitLine);
 			g.drawPolygon(hexagon);
 		}
+		
+		Point pp = new Point();
+		pp.x = 0;
+		pp.y = 0;
+		int len = hexagon.npoints;
+		for (int i = 0; i < len; i++) {
+			pp.x += hexagon.xpoints[i];
+			pp.y += hexagon.ypoints[i];
+		}
+		pp.x /= len;
+		pp.y /= len;
+		g.fillRect(pp.x, pp.y , 1, 1);
+
 	}
 
 	/**
@@ -502,6 +537,7 @@ public class SuperLayerDrawing {
 	public Polygon getLayerPolygon(IContainer container, int layer) {
 
 		if (_iSupl.item().isDirty()) {
+			hexMap.clear();
 			Point2D.Double verticies[] = GeometryManager.allocate(14);
 
 			// all indices in DCGeometry calls are 1-based
@@ -591,7 +627,7 @@ public class SuperLayerDrawing {
 			}
 		}
 	}
-
+	
 	/**
 	 * Get the layer polygon
 	 *
@@ -640,6 +676,11 @@ public class SuperLayerDrawing {
 		}
 	}
 
+	private String hexHashKey(int layer, int wire) {
+		return String.format("%d-%d", layer, wire);
+	}
+
+
 	/**
 	 * Gets the cell hexagon as a screen polygon.
 	 *
@@ -649,6 +690,13 @@ public class SuperLayerDrawing {
 	 * @return the cell hexagon
 	 */
 	public Polygon getHexagon(IContainer container, int layer, int wire) {
+		
+		// check the cache
+		String key = hexHashKey(layer, wire);
+		Polygon hexagon = hexMap.get(key);
+		if (hexagon != null) {
+			return hexagon;
+		}
 
 		Point2D.Double wpoly[] = GeometryManager.allocate(6);
 		// note all indices in calls to DCGeometry are 1-based
@@ -668,6 +716,8 @@ public class SuperLayerDrawing {
 			poly.addPoint(pp.x, pp.y);
 		}
 
+		// cache it
+		hexMap.put(key, poly);
 		return poly;
 	}
 

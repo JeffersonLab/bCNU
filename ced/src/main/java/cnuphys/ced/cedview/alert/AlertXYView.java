@@ -36,7 +36,7 @@ import cnuphys.ced.cedview.central.CentralXYHitDrawer;
 import cnuphys.ced.cedview.central.ClusterDrawerXY;
 import cnuphys.ced.cedview.central.ICentralXYView;
 import cnuphys.ced.cedview.central.SwimTrajectoryDrawer;
-import cnuphys.ced.cedview.urwell.HighlightData;
+import cnuphys.ced.cedview.urwt.HighlightData;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.component.ControlPanel;
 import cnuphys.ced.component.DisplayBits;
@@ -53,9 +53,6 @@ import cnuphys.swim.SwimTrajectory2D;
 public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralXYView {
 
 
-	// camera Z for projection
-//	private double _zcamera = 450;
-
 	// for naming clones
 	private static int CLONE_COUNT = 0;
 
@@ -64,7 +61,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 
 	// units are mm
 //	private static Rectangle2D.Double _defaultWorldRectangle = new Rectangle2D.Double(-120, -120, 240, 240);
-	private static Rectangle2D.Double _defaultWorldRectangle = new Rectangle2D.Double(-400, -400, 800, 800);
+	private static Rectangle2D.Double _defaultWorldRectangle = new Rectangle2D.Double(400, -400, -800, 800);
 
 
 	//for highlighting
@@ -95,6 +92,9 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 	//wire projection
 	private AlertProjectionPanel _dcPanel;
 	
+	//max  adc in this event
+//	private int _maxADCThisEvent = -1;
+	
 	// data containers
 	private CTOFADCData _ctofADCData = CTOFADCData.getInstance();
 	private CTOFClusterData _clusterCTOFData = CTOFClusterData.getInstance();
@@ -114,7 +114,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 	private AlertXYView(Object... keyVals) {
 		super(keyVals);
 		// draws any swum trajectories (in the after draw)
-		_swimTrajectoryDrawer = new SwimTrajectoryDrawer(this);
+		_swimTrajectoryDrawer = new SwimTrajectoryDrawer(this, AlertProjectionPanel.DEFAULT_Z, 150); // zEffect is true by default);
 		_swimTrajectoryDrawer.setMaxPathLength(getTrajMaxPathlength());
 		_dcHitDrawer = new AlertDCHitDrawer(this);
 		_tofHitDrawer = new AlertTOFHitDrawer(this);
@@ -167,8 +167,8 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 				PropertySupport.STANDARDVIEWDECORATIONS, true);
 
 		view._controlPanel = new ControlPanel(view,
-				ControlPanel.DISPLAYARRAY + ControlPanel.FEEDBACK + ControlPanel.ACCUMULATIONLEGEND
-						+ ControlPanel.MATCHINGBANKSPANEL + ControlPanel.ALERTDC + ControlPanel.TRAJCUTOFF,
+				ControlPanel.DISPLAYARRAY + ControlPanel.FEEDBACK+ ControlPanel.ACCUMULATIONLEGEND
+						+ ControlPanel.MATCHINGBANKSPANEL + ControlPanel.ALERTDC + ControlPanel.MINADCCUTOFF,
 						DisplayBits.ACCUMULATION + DisplayBits.CROSSES + DisplayBits.CLUSTERS + DisplayBits.RECONHITS
 						+ DisplayBits.CVTRECTRACKS +  DisplayBits.MCTRUTH
 						+ DisplayBits.CVTRECTRAJ + DisplayBits.CVTRECKFTRAJ + DisplayBits.ADCDATA +
@@ -183,23 +183,31 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 
 		view._controlPanel.getMatchedBankPanel().update();
 		
-		RangeSlider trajRangeSlider = view._controlPanel.getTrajRangeSlider();
-		trajRangeSlider.setOnChange(value -> view.trajRangeChanging(value));
+		
+		RangeSlider minADCSlider = view._controlPanel.getMinADCRangeSlider();
+		minADCSlider.setOnChange(value -> view.minADCChanging(value));
 
 		//add dc projection panel
 		view._dcPanel = view._controlPanel.getAlertDCPanel();
 		
 		// add quick zooms
-		view.addQuickZoom("ALERT", -120, -120, 120, 120);
+		view.addQuickZoom("ALERT", 120, -120, -120, 120);
 
 
 		return view;
 	}
 	
-
-	//respond to the traj range change
-	private void trajRangeChanging(int currentVal) {
-		_swimTrajectoryDrawer.setMaxPathLength(currentVal);
+	/**
+	 * Get the minimum ADC cutoff
+	 * @return the minimum ADC cutoff
+	 */
+	public int getADCThreshold() {
+		return _controlPanel.getMinADCRangeSlider().getValue();
+	}
+	
+	
+	//respond to the min adc cutoffs
+	private void minADCChanging(int currentVal) {
 		refresh();
 	}
 
@@ -209,28 +217,28 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 
 			@Override
 			public void draw(Graphics g, IContainer container) {
-				
-				Graphics2D g2 = (Graphics2D)g;
-				
-				// CND Polys
-				for (int layer = 1; layer <= 3; layer++) {
+
+				if (!_eventManager.isAccumulating()) {
+
+					Graphics2D g2 = (Graphics2D) g;
+
+					// CND Polys
+					for (int layer = 1; layer <= 3; layer++) {
+						for (int paddleId = 1; paddleId <= 48; paddleId++) {
+							if (_cndPoly[layer - 1][paddleId - 1] != null) {
+								_cndPoly[layer - 1][paddleId - 1].draw(g2, container);
+							}
+						}
+
+					}
+
+					// CTOF Polys
 					for (int paddleId = 1; paddleId <= 48; paddleId++) {
-						if (_cndPoly[layer - 1][paddleId - 1] != null) {
-							_cndPoly[layer - 1][paddleId - 1].draw(g2, container);
+						if (_ctofPoly[paddleId - 1] != null) {
+							_ctofPoly[paddleId - 1].draw(g2, container, paddleId, _ctofColors[paddleId % 2]);
 						}
 					}
 
-				}
-
-				// CTOF Polys
-				for (int paddleId = 1; paddleId <= 48; paddleId++) {
-					if (_ctofPoly[paddleId - 1] != null) {
-						_ctofPoly[paddleId - 1].draw(g2, container, paddleId, _ctofColors[paddleId % 2]);
-					}
-				}
-
-
-				if (!_eventManager.isAccumulating()) {
 					drawWires(g, container);
 					drawATOFPaddles(g, container);
 
@@ -253,6 +261,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 			public void draw(Graphics g, IContainer container) {
 
 				if (!_eventManager.isAccumulating()) {
+
 
 					_hitDrawer.draw(g, container);
 
@@ -281,6 +290,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 
 		getContainer().setAfterDraw(afterDraw);
 	}
+	
 
 	//draw data selected highlighted data
 	private void drawDataSelectedHighlight(Graphics g, IContainer container) {
@@ -322,6 +332,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 
 	//set the projection plane
 	public void setProjectionPlane(double z) {
+		_swimTrajectoryDrawer.setZView(z);
 		Plane3D plane = GeometryManager.constantZPlane(z);
 		this.projectionPlane = plane;
 	}
@@ -372,12 +383,6 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 	public void labToWorld(double x, double y, double z, Point2D.Double wp) {
 		wp.x = x;
 		wp.y = y;
-
-		//do the projection
-//		double zp = getFixedZ();
-//		double scale = (_zcamera - zp) / _zcamera;
-//		wp.x = x*scale;
-//		wp.y = y*scale;
 	}
 
 	/**
@@ -439,15 +444,16 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 		basicFeedback(container, pp, wp, "mm", feedbackStrings);
 
 		double z = getFixedZ();
-		feedbackStrings.add("z: " + getFixedZ() + " mm");
 		double r = Math.sqrt(wp.x * wp.x + wp.y * wp.y + z * z);
 		if (r > 0) {
 			double theta = Math.toDegrees(Math.acos(z / r));
 			double phi = Math.toDegrees(Math.atan2(wp.y, wp.x));
-			String ts = String.format("%s: %-6.2f", UnicodeSupport.SMALL_THETA, theta);
-			String ps = String.format("%s: %-6.2f", UnicodeSupport.SMALL_PHI, phi);
-			feedbackStrings.add(ts);
-			feedbackStrings.add(ps);
+
+			String fbs = String.format("(z, %s, %s ) = (%-6.2f mm, %-6.2f, %-6.2f)", UnicodeSupport.SMALL_THETA,
+					UnicodeSupport.SMALL_PHI, z, theta, phi);
+			feedbackStrings.add(fbs);
+		} else {
+			feedbackStrings.add("z: " + getFixedZ() + " mm");
 		}
 
 		Collection<DCLayer> dcLayers = AlertGeometry.getAllDCLayers();

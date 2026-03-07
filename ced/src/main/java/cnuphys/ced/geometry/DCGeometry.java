@@ -15,19 +15,17 @@ import org.jlab.geom.prim.Plane3D;
 import org.jlab.geom.prim.Point3D;
 import org.jlab.geom.prim.Triangle3D;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
 import cnuphys.ced.frame.Ced;
+import cnuphys.ced.geometry.cache.ACachedGeometry;
 
-public class DCGeometry {
-
-	private static DCDetector _dcDetector;
-	private static DCSector sector0;
+public class DCGeometry extends ACachedGeometry {
 
 	private static double minWireX;
 	private static double maxWireX;
-	private static double minWireY;
-	private static double maxWireY;
-	private static double minWireZ;
-	private static double maxWireZ;
 
 	/**
 	 * These are the drift chamber wires from the geometry service. The indices are
@@ -37,14 +35,15 @@ public class DCGeometry {
 	 */
 	private static DriftChamberWire wires[][][];
 
-	//useful for projection onto sector 1 midplane
-	private static 	Plane3D	sector1Midplane = GeometryManager.constantPhiPlane(0);
-
+	public DCGeometry() {
+		super("DriftChamber");
+	}
 
 	/**
 	 * Initialize the DC Geometry by loading all the wires
 	 */
-	public static void initialize() {
+	@Override
+	public void initializeUsingCCDB() {
 
 		int run = 4013;
 		String variation = Ced.getGeometryVariation();
@@ -52,25 +51,12 @@ public class DCGeometry {
 
 		DCGeantFactory factory = new DCGeantFactory();
 
-		_dcDetector = factory.createDetectorCLAS(cp);
+		DCDetector _dcDetector = factory.createDetectorCLAS(cp);
 
-//		if (_dcDataProvider == null) {
-//			_dcDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.DC);
-//		}
-//
-//
-//		DCFactoryUpdated dcFactory = new DCFactoryUpdated();
-//		_dcDetector = dcFactory.createDetectorCLAS(_dcDataProvider);
-
-		sector0 = _dcDetector.getSector(0);
+		DCSector sector0 = _dcDetector.getSector(0);
 
 		minWireX = Double.POSITIVE_INFINITY;
 		maxWireX = Double.NEGATIVE_INFINITY;
-		minWireY = Double.POSITIVE_INFINITY;
-		maxWireY = Double.NEGATIVE_INFINITY;
-		minWireZ = Double.POSITIVE_INFINITY;
-		maxWireZ = Double.NEGATIVE_INFINITY;
-
 
 		wires = new DriftChamberWire[6][6][112];
 		for (int suplay = 0; suplay < 6; suplay++) {
@@ -86,26 +72,12 @@ public class DCGeometry {
 
 					Line3D line = dcw.getLine();
 					double xx0 = line.origin().x();
-					double yy0 = line.origin().y();
-					double zz0 = line.origin().z();
 					double xx1 = line.end().x();
-					double yy1 = line.end().y();
-					double zz1 = line.end().z();
-
 
 					minWireX = Math.min(minWireX, xx0);
 					minWireX = Math.min(minWireX, xx1);
 					maxWireX = Math.max(maxWireX, xx0);
 					maxWireX = Math.max(maxWireX, xx1);
-					minWireY = Math.min(minWireY, yy0);
-					minWireY = Math.min(minWireY, yy1);
-					maxWireY = Math.max(maxWireY, yy0);
-					maxWireY = Math.max(maxWireY, yy1);
-					minWireZ = Math.min(minWireZ, zz0);
-					minWireZ = Math.min(minWireZ, zz1);
-					maxWireZ = Math.max(maxWireZ, zz0);
-					maxWireZ = Math.max(maxWireZ, zz1);
-
 				}
 			}
 		}
@@ -127,31 +99,14 @@ public class DCGeometry {
 		Line3D wire3 = getWire(sector, superlayer, 6, 1);
 		Line3D wire4 = getWire(sector, superlayer, 6, 112);
 
-
 		Triangle3D triangle1 = new Triangle3D(wire1.midpoint(), wire2.origin(), wire2.end());
 		Triangle3D triangle6 = new Triangle3D(wire3.midpoint(), wire4.origin(), wire4.end());
 
-
-
-//		DCSuperlayer sl = sector0.getSuperlayer(superlayer - 1);
-//		DCLayer dcLayer1 = sl.getLayer(0);
-//		DCLayer dcLayer6 = sl.getLayer(5);
-//		Shape3D shape1 = dcLayer1.getBoundary();
-//		Shape3D shape6 = dcLayer6.getBoundary();
-//
-//		Triangle3D triangle1 = (Triangle3D) shape1.face(1);
-//
 		if (triangle1 != null) {
-//			Triangle3D triangle6 = (Triangle3D) shape6.face(1);
 
 			for (int i = 0; i < 3; i++) {
 				Point3D v1 = new Point3D(triangle1.point(i));
 				Point3D v6 = new Point3D(triangle6.point(i));
-
-//				if (sector > 1) {
-//					v1.rotateZ(Math.toRadians(60 * (sector - 1)));
-//					v6.rotateZ(Math.toRadians(60 * (sector - 1)));
-//				}
 
 				int j = 3 * i;
 				int k = j + 9;
@@ -169,75 +124,12 @@ public class DCGeometry {
 	}
 
 	/**
-	 * Get the minimum x of a wire in the sector system (cm)
-	 *
-	 * @return the minimum x of a wire in the sector system (cm)
-	 */
-	public static double getMinWireX() {
-		return minWireX;
-	}
-
-	/**
-	 * Get the maximum x coordinate of all the wires.
-	 *
-	 * @return the max xin cm
-	 */
-	public static double getMaxWireX() {
-		return maxWireX;
-	}
-
-	/**
-	 * Get the minimum y coordinate of all the wires.
-	 *
-	 * @return the min y in cm
-	 */
-	public static double getMinWireY() {
-		return minWireY;
-	}
-
-	/**
-	 * Get the absolute value of the largest y coordinate of any wire.
-	 *
-	 * @return the absolute value of the largest y coordinate of any wire.
-	 */
-	public static double getAbsMaxWireY() {
-		return Math.max(Math.abs(minWireY), maxWireY);
-	}
-
-	/**
 	 * Get the absolute value of the largest x coordinate of any wire.
 	 *
 	 * @return the absolute value of the largest x coordinate of any wire.
 	 */
 	public static double getAbsMaxWireX() {
 		return Math.max(Math.abs(minWireX), maxWireX);
-	}
-
-	/**
-	 * Get the maximum y coordinate of all the wires.
-	 *
-	 * @return the max y in cm
-	 */
-	public static double getMaxWireY() {
-		return maxWireY;
-	}
-
-	/**
-	 * Get the minimum z coordinate of all the wires.
-	 *
-	 * @return the min z in cm
-	 */
-	public static double getMinWireZ() {
-		return minWireZ;
-	}
-
-	/**
-	 * Get the maximum z coordinate of all the wires.
-	 *
-	 * @return the max z in cm
-	 */
-	public static double getMaxWireZ() {
-		return maxWireZ;
 	}
 
 	/**
@@ -336,9 +228,9 @@ public class DCGeometry {
 
 		DriftChamberWire dcw = DCGeometry.getWire(superlayer, layer, wire);
 		if (dcw == null) {
-            return false;
-        }
-		return GeometryManager.getProjectedPolygon(dcw, projectionPlane, 10, 6, wp, centroid);
+			return false;
+		}
+		return GeometryManager.getProjectedPolygon(dcw, projectionPlane, 10, 6, wp, centroid, false);
 	}
 
 	/**
@@ -355,7 +247,7 @@ public class DCGeometry {
 	public static Point2D.Double getCenter(int superlayer, int layer, int wire, Plane3D projectionPlane) {
 
 		Point2D.Double centroid = new Point2D.Double();
-		projectionPlane = GeometryManager.constantPhiPlane(0);
+//		projectionPlane = GeometryManager.constantPhiPlane(0);
 
 		DriftChamberWire dcw = DCGeometry.getWire(superlayer, layer, wire);
 		Line3D l3D = dcw.getLine();
@@ -367,7 +259,6 @@ public class DCGeometry {
 
 		return centroid;
 	}
-
 
 	/**
 	 * Get a point on either side of a layer
@@ -421,7 +312,6 @@ public class DCGeometry {
 		while ((firstWire < 112) && !getHexagon(superLayer, layer, firstWire, plane, hex, null)) {
 			firstWire++;
 		}
-//		System.err.println("FIRST WIRE: " + firstWire);
 
 		getHexagon(superLayer, layer, 1, plane, hex, null);
 
@@ -540,31 +430,62 @@ public class DCGeometry {
 		ext.y = p0.y + (p0.y - p1.y);
 	}
 
-	/**
-	 * Get the position of the sense wire in sector 0
-	 *
-	 * NOTE: the indices are 1-based
-	 *
-	 * @param superlayer the superlayer [1..6]
-	 * @param layer      the layer [1..6]
-	 * @param wire       the wire [1..112]
-	 *
-	 * @return the position of the sense wire
-	 */
-	public static Point2D.Double getCenter(int superlayer, int layer, int wire) {
+	@Override
+	public boolean readGeometry(Kryo kryo, Input input) {
+		try {
+			// Read the min and max wire x values.
+			minWireX = input.readDouble();
+			maxWireX = input.readDouble();
 
-		Line3D l3D = getWire(1, superlayer, layer, wire);
-
-//get the intersection of the wire with the sector 1 midplane
-		Point3D p3 = l3D.midpoint();
-		sector1Midplane.intersection(l3D, p3);
-
-		Point2D.Double centroid = new Point2D.Double(p3.x(), p3.z());
-		return centroid;
-
+			// Read the dimensions of the wires array.
+			int dim1 = input.readInt();
+			wires = new DriftChamberWire[dim1][][];
+			for (int i = 0; i < dim1; i++) {
+				int dim2 = input.readInt();
+				wires[i] = new DriftChamberWire[dim2][];
+				for (int j = 0; j < dim2; j++) {
+					int dim3 = input.readInt();
+					wires[i][j] = new DriftChamberWire[dim3];
+					for (int k = 0; k < dim3; k++) {
+						wires[i][j][k] = kryo.readObjectOrNull(input, DriftChamberWire.class);
+					}
+				}
+			}
+			return true;
+		} catch (Exception e) {
+			System.err.println("DCGeometry: Error reading geometry cache: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
 	}
 
+	@Override
+	public boolean writeGeometry(Kryo kryo, Output output) {
+		try {
+			// Write the min and max wire x values.
+			output.writeDouble(minWireX);
+			output.writeDouble(maxWireX);
 
-
+			// Write the dimensions of the wires 3D array.
+			int dim1 = (wires != null) ? wires.length : 0;
+			output.writeInt(dim1);
+			for (int i = 0; i < dim1; i++) {
+				int dim2 = (wires[i] != null) ? wires[i].length : 0;
+				output.writeInt(dim2);
+				for (int j = 0; j < dim2; j++) {
+					int dim3 = (wires[i][j] != null) ? wires[i][j].length : 0;
+					output.writeInt(dim3);
+					for (int k = 0; k < dim3; k++) {
+						kryo.writeObjectOrNull(output, wires[i][j][k], DriftChamberWire.class);
+					}
+				}
+			}
+			return true;
+		} catch (Exception e) {
+			System.err.println("DCGeometry: Error writing geometry cache: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 }

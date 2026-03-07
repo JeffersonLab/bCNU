@@ -12,7 +12,11 @@ import org.jlab.geom.detector.cnd.CNDSector;
 import org.jlab.geom.detector.cnd.CNDSuperlayer;
 import org.jlab.geom.prim.Point3D;
 
-import bCNU3D.DoubleFormat;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
+import cnuphys.ced.geometry.cache.ACachedGeometry;
 
 /**
  * Central Neutron Detector
@@ -20,22 +24,11 @@ import bCNU3D.DoubleFormat;
  * @author heddle
  *
  */
-public class CNDGeometry {
+public class CNDGeometry extends ACachedGeometry {
 
-	private static ConstantProvider cndDataProvider;
-
-	private static CNDFactory cndFactory;
-
-	private static CNDDetector cndDetector;
-
-	// there is only one sector
-	private static CNDSector cndSector;
-
-	// there is only one superlayer
-	private static CNDSuperlayer cndSuperlayer;
-
-	// there are three superlayers
-	private static CNDLayer[] cndLayers;
+	public CNDGeometry() {
+		super("CNDGeometry");
+	}
 
 	// there are 48 paddles per layer
 	private static ScintillatorPaddle paddles[][];
@@ -43,23 +36,24 @@ public class CNDGeometry {
 	/**
 	 * Initialize the CND Geometry by loading all the wires
 	 */
-	public static void initialize() {
+	@Override
+	public void initializeUsingCCDB() {
 
 		System.out.println("\n=====================================");
 		System.out.println("==== CND Geometry Initialization ====");
 		System.out.println("=====================================");
 
-		cndDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.CND);
+		ConstantProvider cndDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.CND);
 
-		cndFactory = new CNDFactory();
-		cndDetector = cndFactory.createDetectorCLAS(cndDataProvider);
+		CNDFactory cndFactory = new CNDFactory();
+		CNDDetector cndDetector = cndFactory.createDetectorCLAS(cndDataProvider);
 
 		// one sector, one superlayer
-		cndSector = cndDetector.getSector(0);
-		cndSuperlayer = cndSector.getSuperlayer(0);
+		CNDSector cndSector = cndDetector.getSector(0);
+		CNDSuperlayer cndSuperlayer = cndSector.getSuperlayer(0);
 
 		// three layers
-		cndLayers = new CNDLayer[3];
+		CNDLayer[] cndLayers = new CNDLayer[3];
 		paddles = new ScintillatorPaddle[3][48];
 		for (int i = 0; i < cndLayers.length; i++) {
 			cndLayers[i] = cndSuperlayer.getLayer(i);
@@ -84,7 +78,6 @@ public class CNDGeometry {
 	 *             1..2
 	 */
 	public static void geoTripletToRealTriplet(int geo[], int real[]) {
-		int gS = geo[0]; // should be 1
 		int gL = geo[1]; // 1..3
 		int gC = geo[2]; // 1.48
 
@@ -206,88 +199,59 @@ public class CNDGeometry {
 
 	}
 
-	public static void main(String arg[]) {
-		initialize();
-
-		// test conversion geo to real and back
-
-		int gS = 1;
-		int geo[] = new int[3];
-		int real[] = new int[3];
-		int geo2[] = new int[3];
-		for (int gL = 1; gL <= 3; gL++) {
-			for (int gC = 1; gC <= 48; gC++) {
-				geo[0] = gS;
-				geo[1] = gL;
-				geo[2] = gC;
-
-				geoTripletToRealTriplet(geo, real);
-				realTripletToGeoTriplet(geo2, real);
-
-				System.out.println(String.format("geo: [%d, %d, %d] real: [%d, %d, %d] geo2: [%d, %d, %d]", geo[0],
-						geo[1], geo[2], real[0], real[1], real[2], geo2[0], geo2[1], geo2[2]));
-
-				if ((geo[0] != geo2[0]) || (geo[1] != geo2[1]) || (geo[2] != geo2[2])) {
-					System.out.println("BAD CONVERSION  ");
-				}
-			}
-		}
-
-		System.out.println("num sectors: " + cndDetector.getNumSectors());
-		System.out.println("num supl: " + cndSector.getNumSuperlayers());
-		System.out.println("num lay: " + cndSuperlayer.getNumLayers());
-
-//		double xmax = Double.NEGATIVE_INFINITY;
-//		double ymax = Double.NEGATIVE_INFINITY;
-//		double zmax = Double.NEGATIVE_INFINITY;
-//		double zmin = Double.POSITIVE_INFINITY;
-
-		System.out.println("layer, paddle, v1x, v1y, v1z, v2x, v2y, v2z, v3x, v3y, v3z, v4x, v4y, v4z, v5x, v5y, v5z, v6x, vy, v6z, v7x, v7y, v7z, v8x, v8y, v8z");
-
-		for (int layerId = 1; layerId <= 3; layerId++) {
-//			System.out.println("layer: " + layerId + " has "
-//					+ cndLayers[layerId - 1].getNumComponents() + " paddles");
-
-			for (int paddleId = 1; paddleId <= 48; paddleId++) {
-				ScintillatorPaddle paddle = getPaddle(layerId, paddleId);
-
-				System.out.print(layerId + ", " + paddleId);
-				for (int i = 0; i < 8; i++) {
-					Point3D p3d = new Point3D(paddle.getVolumePoint(i));
-
-					String s1 = ", " + DoubleFormat.doubleFormat(p3d.x(), 3);
-					String s2 = ", " + DoubleFormat.doubleFormat(p3d.y(), 3);
-					String s3 = ", " + DoubleFormat.doubleFormat(p3d.z(), 3);
-
-					System.out.print(s1+s2+s3);
-
-
-					if(i == 7) {
-						System.out.println();
+	@Override
+	public boolean readGeometry(Kryo kryo, Input input) {
+		try {
+			int numLayers = input.readInt();
+			if (numLayers == 0) {
+				paddles = null;
+			} else {
+				paddles = new ScintillatorPaddle[numLayers][];
+				// For each layer, read the number of paddles then each paddle
+				for (int i = 0; i < numLayers; i++) {
+					int numPaddles = input.readInt();
+					if (numPaddles == 0) {
+						paddles[i] = null;
+					} else {
+						paddles[i] = new ScintillatorPaddle[numPaddles];
+						for (int j = 0; j < numPaddles; j++) {
+							paddles[i][j] = kryo.readObjectOrNull(input, ScintillatorPaddle.class);
+						}
 					}
-
-
-//					xmax = Math.max(xmax, p3d.x());
-//					ymax = Math.max(ymax, p3d.y());
-//					zmax = Math.max(zmax, p3d.z());
-//					zmin = Math.min(zmin, p3d.z());
 				}
 			}
+			return true;
+		} catch (Exception e) {
+			return false;
 		}
-
-//		System.out.println("xmax: " + xmax);
-//		System.out.println("ymax: " + ymax);
-//		System.out.println("zmax: " + zmax);
-//		System.out.println("zmin: " + zmin);
-//
-//		ScintillatorPaddle paddle = getPaddle(2, 12);
-//		System.out.println("num edges: " + paddle.getNumVolumeEdges());
-//
-//		for (int i = 0; i < 8; i++) {
-//			Point3D p3d = new Point3D(paddle.getVolumePoint(i));
-//			System.out.println("Point [" + (i + 1) + "] " + p3d);
-//		}
 	}
 
+	@Override
+	public boolean writeGeometry(Kryo kryo, Output output) {
+		try {
+			// Write number of layers (first dimension)
+			if (paddles == null) {
+				output.writeInt(0);
+			} else {
+				output.writeInt(paddles.length);
+				// Write each layer array
+				for (int i = 0; i < paddles.length; i++) {
+					ScintillatorPaddle[] layer = paddles[i];
+					if (layer == null) {
+						output.writeInt(0);
+					} else {
+						output.writeInt(layer.length);
+						// Write each paddle; may be null
+						for (ScintillatorPaddle sp : layer) {
+							kryo.writeObjectOrNull(output, sp, ScintillatorPaddle.class);
+						}
+					}
+				}
+			}
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
 }

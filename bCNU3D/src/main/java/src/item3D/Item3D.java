@@ -247,7 +247,7 @@ public abstract class Item3D {
 	public Color getFillColor() {
 		try {
 			Color color = getColor(FILLCOLOR);
-			color = setAlpha(color, getFillAlpha());
+			color = setAlphaOfColor(color, getFillAlpha());
 			return color;
 		} catch (Bad3DPropertyException e) {
 			return _defaultFillColor;
@@ -257,14 +257,18 @@ public abstract class Item3D {
 	/**
 	 * Convenience method to get the fill alpha for this item
 	 *
-	 * @return the fill aplha.
+	 * @return the fill alpha.
 	 */
 	public int getFillAlpha() {
-		try {
-			return getInt(FILLALPHA);
-		} catch (Bad3DPropertyException e) {
-			return _defaultFillAlpha;
-		}
+	    try {
+	        return getInt(FILLALPHA);
+	    } catch (Bad3DPropertyException e) {
+	        try {
+	            return getColor(FILLCOLOR).getAlpha();
+	        } catch (Bad3DPropertyException ignored) {
+	            return _defaultFillAlpha;
+	        }
+	    }
 	}
 
 	/**
@@ -273,11 +277,15 @@ public abstract class Item3D {
 	 * @return the line (frame) alpha.
 	 */
 	public int getLineAlpha() {
-		try {
-			return getInt(LINEALPHA);
-		} catch (Bad3DPropertyException e) {
-			return _defaultLineAlpha;
-		}
+	    try {
+	        return getInt(LINEALPHA);
+	    } catch (Bad3DPropertyException e) {
+	        try {
+	            return getColor(LINECOLOR).getAlpha();
+	        } catch (Bad3DPropertyException ignored) {
+	            return _defaultLineAlpha;
+	        }
+	    }
 	}
 
 	/**
@@ -288,7 +296,7 @@ public abstract class Item3D {
 	public Color getLineColor() {
 		try {
 			Color color = getColor(LINECOLOR);
-			color = setAlpha(color, getLineAlpha());
+			color = setAlphaOfColor(color, getLineAlpha());
 			return color;
 		} catch (Bad3DPropertyException e) {
 			return _defaultLineColor;
@@ -350,7 +358,6 @@ public abstract class Item3D {
 		put(FILLALPHA, alpha);
 	}
 
-
 	/**
 	 * Convenience method to set the line (frame) alpha
 	 *
@@ -359,7 +366,6 @@ public abstract class Item3D {
 	public void setLineAlpha(int alpha) {
 		put(LINEALPHA, alpha);
 	}
-
 
 	/**
 	 * Convenience method to set the text color
@@ -456,16 +462,17 @@ public abstract class Item3D {
 	}
 
 	/**
-	 * Set the alpha of a color. If it already has the given alpha
-	 * it just returns the color. If not, it makes a new color
-	 * with the same RGB components and the new alpha
+	 * Set the alpha of a color. If it already has the given alpha it just returns
+	 * the color. If not, it makes a new color with the same RGB components and the
+	 * new alpha
+	 *
 	 * @param color the color to change
 	 * @param alpha the alpha [0..255] 0 is transparent, 255 is opaque
 	 * @return the color
 	 */
-	public Color setAlpha(Color color, int alpha) {
+	protected Color setAlphaOfColor(Color color, int alpha) {
 
-		alpha = Math.max(0,  Math.min(255, alpha));
+		alpha = Math.max(0, Math.min(255, alpha));
 		int a = color.getAlpha();
 		if (a == alpha) {
 			return color;
@@ -473,5 +480,14 @@ public abstract class Item3D {
 
 		return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
 	}
+
+	/**
+	 * A representative point for transparent sorting, in world coordinates.
+	 * Default is origin. Override in items with a natural center (Sphere, Cube, Cylinder, etc.).
+	 */
+	public float[] getSortPoint() {
+	    return new float[] {0f, 0f, 0f};
+	}
+
 
 }

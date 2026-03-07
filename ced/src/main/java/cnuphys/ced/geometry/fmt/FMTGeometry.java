@@ -1,7 +1,7 @@
 package cnuphys.ced.geometry.fmt;
 
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.geom.base.ConstantProvider;
@@ -11,37 +11,39 @@ import org.jlab.geom.detector.fmt.FMTFactory;
 import org.jlab.geom.detector.fmt.FMTLayer;
 import org.jlab.geom.detector.fmt.FMTSector;
 import org.jlab.geom.detector.fmt.FMTSuperlayer;
-import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Point3D;
-import org.jlab.geom.prim.Vector3D;
-import org.jlab.logging.DefaultLogger;
+
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.frame.Ced;
+import cnuphys.ced.geometry.cache.ACachedGeometry;
 
-public class FMTGeometry {
-	//for debugging
-	private static boolean _debug = false;
+public class FMTGeometry extends ACachedGeometry {
 
 	// the name of the detector
 	public static String NAME = "FMT";
 
-	//the layer objects used for FMT geometry and drawing
-	private static Hashtable<String, FMTLayer> _fmtLayers = new Hashtable<>();
+	// the layer objects used for FMT geometry and drawing
+	private static HashMap<String, FMTLayer> _fmtLayers = new HashMap<>();
 
-	//the dc factory
-	private static FMTFactory fmtFactory = new FMTFactory();
+	public FMTGeometry() {
+		super("FMT");
+	}
 
 	/**
 	 * Init the Alert geometry
 	 */
-	public static void initialize() {
+	@Override
+	public void initializeUsingCCDB() {
 		System.out.println("\n=======================================");
 		System.out.println("===  " + NAME + " Geometry Initialization ===");
 		System.out.println("=======================================");
 
 		String variation = Ced.getGeometryVariation();
-		ConstantProvider constantProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.FMT, 11, variation);
-
+		ConstantProvider constantProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.FMT, 11,
+				variation);
 
 		initialize(constantProvider);
 	}
@@ -49,37 +51,26 @@ public class FMTGeometry {
 	// init the time of flight
 	private static void initialize(ConstantProvider cp) {
 
-
+		FMTFactory fmtFactory = new FMTFactory();
 		FMTDetector fmtDetector = fmtFactory.createDetectorCLAS(cp);
 
 		int numsect = fmtDetector.getNumSectors();
 
-		debugPrint(String.format("numsect: %d", numsect), 0);
-
 		for (int sect = 0; sect < numsect; sect++) {
-			debugPrint("", 2);
-			debugPrint(String.format("  for sect: %d", sect), 1);
 
 			FMTSector fmtSector = fmtFactory.createSector(cp, sect);
 			int numsupl = fmtSector.getNumSuperlayers();
-			debugPrint(String.format("  numsuperlayer: %d", numsupl), 1);
 
 			for (int superlayer = 0; superlayer < numsupl; superlayer++) {
-				debugPrint(String.format("    for superlayer: %d", superlayer), 1);
-
 
 				FMTSuperlayer fmtSuperlayer = fmtFactory.createSuperlayer(cp, sect, superlayer);
 				int numlay = fmtSuperlayer.getNumLayers();
-				debugPrint(String.format("    numlayer: %d", numlay), 1);
 
 				for (int layer = 0; layer < numlay; layer++) {
-					debugPrint(String.format("      for layer: %d", layer), 1);
-                    FMTLayer fmtLayer = fmtFactory.createLayer(cp, sect, superlayer, layer);
+					FMTLayer fmtLayer = fmtFactory.createLayer(cp, sect, superlayer, layer);
 
-					debugPrint(String.format("      for layer: %d  num components: %d", layer, fmtLayer.getNumComponents()), 0);
 					_fmtLayers.put(hash(sect, superlayer, layer), fmtLayer);
-
- 				}
+				}
 			}
 		}
 
@@ -93,37 +84,28 @@ public class FMTGeometry {
 		return null;
 	}
 
-
-	//all 0 based
+	// all 0 based
 	private static String hash(int sector, int superlayer, int layer) {
 		return String.format("%d|%d|%d", sector, superlayer, layer);
 	}
 
-
-
-	// print a debug message
-	private static void debugPrint(String s, int option) {
-		if (_debug) {
-			System.out.println("FMT  " + s);
-		}
-	}
-
 	/**
 	 * Get all the fmt layers
+	 *
 	 * @return the collection of FMT layers
 	 */
 	public static Collection<FMTLayer> getAllFMTLayers() {
 		return _fmtLayers.values();
 	}
 
-
 	/**
 	 * Used by the 3D drawing
-	 * @param sector   the 0-based sector 0..0
-	 * @param superlayer  the 0-based layer 0..0
-	 * @param layer    the 0-based layer 0..5
-	 * @param stripId the 0-based paddle 0..1023
-	 * @param coords   holds 8*3 = 24 values [x1, y1, z1, ..., x8, y8, z8]
+	 *
+	 * @param sector     the 0-based sector 0..0
+	 * @param superlayer the 0-based layer 0..0
+	 * @param layer      the 0-based layer 0..5
+	 * @param stripId    the 0-based paddle 0..1023
+	 * @param coords     holds 8*3 = 24 values [x1, y1, z1, ..., x8, y8, z8]
 	 */
 	public static void stripVertices(int sector, int superlayer, int layer, int stripId, float[] coords) {
 
@@ -142,94 +124,53 @@ public class FMTGeometry {
 		}
 	}
 
-
-	public static void main(String[] arg) {
-		_debug = true;
-		// this is supposed to create less pounding of ccdb
-		DefaultLogger.initialize();
-
-		initialize();
-
-		double xmin = Double.MAX_VALUE;
-		double xmax = -Double.MAX_VALUE;
-		double ymin = Double.MAX_VALUE;
-		double ymax = -Double.MAX_VALUE;
-		double zmin = Double.MAX_VALUE;
-		double zmax = -Double.MAX_VALUE;
-
-		// TrackerStrip strip = getStrip(0, 0, 0, 200);
-
-		for (int layer = 0; layer < 6; layer++) {
-			for (int stripId = 0; stripId < 1024; stripId++) {
-				TrackerStrip strip = getStrip(0, 0, layer, stripId);
-				for (int i = 0; i < 8; i++) {
-					Point3D p = strip.getVolumePoint(i);
-				xmin = Math.min(xmin, p.x());
-				xmax = Math.max(xmax, p.x());
-				ymin = Math.min(ymin, p.y());
-				ymax = Math.max(ymax, p.y());
-				zmin = Math.min(zmin, p.z());
-				zmax = Math.max(zmax, p.z());
-				}
-			}
-		}
-
-		System.out.println("xmin: " + xmin);
-		System.out.println("xmax: " + xmax);
-		System.out.println("ymin: " + ymin);
-
-		System.out.println("ymax: " + ymax);
-		System.out.println("zmin: " + zmin);
-
-		System.out.println("zmax: " + zmax);
-
-		for (int layer = 0; layer < 6; layer++) {
-			for (int stripId = 0; stripId < 1024; stripId++) {
-				if ((stripId == 1023) || (stripId % 10) == 0) {
-				//	if ((stripId % 100) == 0) {
-					TrackerStrip strip = getStrip(0, 0, layer, stripId);
-					Line3D line = strip.getLine();
-					Vector3D v = line.toVector();
-					Point3D p = strip.getMidpoint();
-					double x = p.x();
-					double y = p.y();
-					double z = p.z();
-					double r = Math.sqrt(x * x + y * y + z * z);
-					double rho = Math.sqrt(x * x + y * y);
-					double theta = Math.toDegrees(Math.acos(z / r));
-					double phi = Math.toDegrees(Math.atan2(y, x));
-					System.out.println(String.format("layer: %d    strip: %d    theta: %-7.3f    phi: %-7.3f    rho: %-7.3f    z: %-7.3f",
-							layer + 1, stripId + 1, theta, phi, rho, z));
-				}
-			}
-		}
-
-		System.out.println("done");
-
-	}
-
 	/**
 	 * Get the 1-based region 1..4
+	 *
 	 * @param strip1 the 1-based strip 1..1024
 	 * @return the region 1..4
 	 */
 	public static int getRegion(int strip1) {
 		int i = strip1 - 1;
-        int region = 0;
-        if (i >= 0 && i < 320) {
-            region = 1;
-        }
-        if (i >= 320 && i < 512) {
-            region = 2;
-        }
-        if (i >= 512 && i < 832) {
-            region = 3;
-        }
-        if (i >= 832 && i < 1024) {
-            region = 4;
-        }
+		int region = 0;
+		if (i >= 0 && i < 320) {
+			region = 1;
+		}
+		if (i >= 320 && i < 512) {
+			region = 2;
+		}
+		if (i >= 512 && i < 832) {
+			region = 3;
+		}
+		if (i >= 832 && i < 1024) {
+			region = 4;
+		}
 
-        return region;
+		return region;
+	}
+
+	@Override
+	public boolean readGeometry(Kryo kryo, Input input) {
+		try {
+			_fmtLayers = kryo.readObjectOrNull(input, HashMap.class);
+			return true;
+		} catch (Exception e) {
+			System.err.println("FMTGeometry: Error reading geometry cache: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	@Override
+	public boolean writeGeometry(Kryo kryo, Output output) {
+		try {
+			kryo.writeObjectOrNull(output, _fmtLayers, HashMap.class);
+			return true;
+		} catch (Exception e) {
+			System.err.println("FMTGeometry: Error writing geometry cache: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }

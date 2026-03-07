@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import javax.swing.JComponent;
+import javax.swing.RepaintManager;
 
 import cnuphys.bCNU.drawable.DrawableChangeType;
 import cnuphys.bCNU.drawable.DrawableList;
@@ -37,6 +38,7 @@ import cnuphys.bCNU.item.AItem;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.YouAreHereItem;
 import cnuphys.bCNU.log.Log;
+import cnuphys.bCNU.util.FilteredStackTraceException;
 import cnuphys.bCNU.util.Point2DSupport;
 import cnuphys.bCNU.view.BaseView;
 
@@ -51,7 +53,7 @@ import cnuphys.bCNU.view.BaseView;
 @SuppressWarnings("serial")
 public class BaseContainer extends JComponent
 		implements IContainer, MouseListener, MouseMotionListener, MouseWheelListener, IDrawableListener {
-
+	
 	/**
 	 * A collection of item list. This is the container's model.
 	 */
@@ -205,6 +207,7 @@ public class BaseContainer extends JComponent
 		g.setClip(0, 0, b.width, b.height);
 	}
 
+	
 	/**
 	 * Override the paint command. Draw all the lists.
 	 *
@@ -212,7 +215,12 @@ public class BaseContainer extends JComponent
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+		
+		if ((_view != null) && !_view.isViewVisible()) {
+			return;
+		}
+		
+	    super.paintComponent(g);	
 
 		clipBounds(g);
 
@@ -332,8 +340,6 @@ public class BaseContainer extends JComponent
 			try {
 				worldToLocal.transform(wp, pp);
 			} catch (NullPointerException npe) {
-
-				System.err.println("Null pointer exception in BaseContainer worldToLocal pp = " + pp + "  wp = " + wp);
 				npe.printStackTrace();
 			}
 		}
@@ -448,6 +454,10 @@ public class BaseContainer extends JComponent
      */
 	@Override
 	public void refresh() {
+		if ((_view != null) && !_view.isViewVisible()) {
+			return;
+		}
+
 		repaint();
 
 		if (getToolBar() != null) {

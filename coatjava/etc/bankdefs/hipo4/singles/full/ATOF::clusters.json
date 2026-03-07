@@ -8,12 +8,12 @@
             },
             {
                 "info": "number of hits from the bars",
-                "name": "N_bar",
+                "name": "n_bar",
                 "type": "I"
             },
             {
                 "info": "number of hits from the wedges",
-                "name": "N_wedge",
+                "name": "n_wedge",
                 "type": "I"
             },
             {

@@ -267,7 +267,7 @@ public class DCLayer {
 //			fc = X11Colors.getX11Color("Alice Blue");
 		}
 		
-		double rad = isHit ? WIRERAD : 1.2*WIRERAD;
+		double rad = isHit ? 1.2*WIRERAD : 1.2*WIRERAD;
 		
 		_wrect[wire].setFrame(zp.x-rad, zp.y-rad, 2*rad, 2*rad);
 		WorldGraphicsUtilities.drawWorldOval(g, container, _wrect[wire], fc, lc);

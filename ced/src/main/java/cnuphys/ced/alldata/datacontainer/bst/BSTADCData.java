@@ -11,6 +11,13 @@ public class BSTADCData  extends ACommonADCData {
 
 	// singleton
 	private static volatile BSTADCData _instance;
+	
+	//adc bank name
+	private static final String bankName = "BST::adc";
+	
+	public BSTADCData() {
+		super(bankName);
+	}
 
 	/**
 	 * Public access to the singleton
@@ -31,7 +38,7 @@ public class BSTADCData  extends ACommonADCData {
 
 	@Override
 	public void update(DataEvent event) {
-		DataBank bank = event.getBank("BST::adc");
+		DataBank bank = event.getBank(bankName);
 
 		if (bank == null) {
 			return;
@@ -43,7 +50,6 @@ public class BSTADCData  extends ACommonADCData {
         order = bank.getByte("order");
         adc = bank.getInt("ADC");
         time = bank.getFloat("time");
-        computeMaxADC();
 	}
 
 

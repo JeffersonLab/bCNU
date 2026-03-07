@@ -15,7 +15,13 @@ import org.jlab.geom.detector.ft.FTCALSector;
 import org.jlab.geom.detector.ft.FTCALSuperlayer;
 import org.jlab.geom.prim.Point3D;
 
-public class FTCALGeometry {
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
+import cnuphys.ced.geometry.cache.ACachedGeometry;
+
+public class FTCALGeometry extends ACachedGeometry {
 
 	// values of the gtid limits
 	private static final double gvals[] = { -16.7, -15.2, -13.7, -12.2, -10.7, -9.15, -7.6, -6.1, -4.6, -3.05, -1.5, 0.,
@@ -23,20 +29,6 @@ public class FTCALGeometry {
 
 	// max id, not all Id's are valid
 	public static final int MAXID = 475;
-
-	private static ConstantProvider ftCalDataProvider;
-
-	private static FTCALFactory ftCalFactory;
-
-	private static FTCALDetector ftCalDetector;
-
-	// there is only one sector
-	private static FTCALSector ftCalSector;
-
-	private static FTCALSuperlayer ftCalSuperlayer;
-
-	// there is only one superlayer
-	private static FTCALLayer ftCalLayer;
 
 	// z offset is a shift in z (cm) to place the 3d view at the origin
 	public static final float FTCAL_Z0 = 200f;
@@ -53,23 +45,31 @@ public class FTCALGeometry {
 	private static Hashtable<Point, Integer> indicesToId = new Hashtable<>();
 
 	/**
+	 * Constructor
+	 */
+	public FTCALGeometry() {
+		super("FTCALGeometry");
+	}
+
+	/**
 	 * Initialize the FTCAL Geometry
 	 */
-	public static void initialize() {
+	@Override
+	public void initializeUsingCCDB() {
 
 		System.out.println("\n=====================================");
 		System.out.println("=== FTCAL Geometry Initialization ===");
 		System.out.println("=====================================");
 
-		ftCalDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.FTCAL);
+		ConstantProvider ftCalDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.FTCAL);
 
-		ftCalFactory = new FTCALFactory();
-		ftCalDetector = ftCalFactory.createDetectorCLAS(ftCalDataProvider);
+		FTCALFactory ftCalFactory = new FTCALFactory();
+		FTCALDetector ftCalDetector = ftCalFactory.createDetectorCLAS(ftCalDataProvider);
 
 		// one sector and one superlayer
-		ftCalSector = ftCalDetector.getSector(0);
-		ftCalSuperlayer = ftCalSector.getSuperlayer(0);
-		ftCalLayer = ftCalSuperlayer.getLayer(0);
+		FTCALSector ftCalSector = ftCalDetector.getSector(0);
+		FTCALSuperlayer ftCalSuperlayer = ftCalSector.getSuperlayer(0);
+		FTCALLayer ftCalLayer = ftCalSuperlayer.getLayer(0);
 
 		// get the components. Some entries will be null
 		paddles = new ScintillatorPaddle[MAXID + 1];
@@ -105,9 +105,6 @@ public class FTCALGeometry {
 			paddleXYIndices[id] = p;
 
 			indicesToId.put(p, id);
-
-			// System.err.println("** PADDLE ID: " + id + " good paddle: " +
-			// (paddles[id] != null));
 
 			count++;
 		}
@@ -351,95 +348,76 @@ public class FTCALGeometry {
 		return goodIds[index];
 	}
 
-	public static void main(String arg[]) {
-		initialize();
-
-		System.out.println("num sectors: " + ftCalDetector.getNumSectors());
-		System.out.println("num supl: " + ftCalSector.getNumSuperlayers());
-		System.out.println("num lay: " + ftCalSuperlayer.getNumLayers());
-		System.out.println("num components: " + ftCalLayer.getNumComponents());
-
-		double xmax = Double.NEGATIVE_INFINITY;
-		double ymax = Double.NEGATIVE_INFINITY;
-		double zmax = Double.NEGATIVE_INFINITY;
-		double zmin = Double.POSITIVE_INFINITY;
-
-//		Vector<String> xs = new Vector<String>();
-//		Vector<String> ys = new Vector<String>();
-
-		for (ScintillatorPaddle paddle : paddles) {
-			if (paddle != null) {
-
-				int id = paddle.getComponentId();
-				Point p = paddleXYIndices[id];
-				int testId = xyIndicesToId(p.x, p.y);
-				System.out.println("ID = " + id + "  [X,Y] = " + p + "   INV back to Id: " + testId);
-
-				if (testId != id) {
-					System.out.println("ID MISMATCH!");
-					System.exit(1);
-				}
-
-				for (int i = 0; i < 8; i++) {
-					Point3D p3d = new Point3D(paddle.getVolumePoint(i));
-
-					xmax = Math.max(xmax, p3d.x());
-					ymax = Math.max(ymax, p3d.y());
-					zmax = Math.max(zmax, p3d.z());
-					zmin = Math.min(zmin, p3d.z());
-
-//					String xvStr = String.format("%-6.1f", p3d.x()).trim();
-//					String yvStr = String.format("%-6.1f", p3d.y()).trim();
-//
-//					xs.remove(xvStr);
-//					ys.remove(yvStr);
-//					xs.add(xvStr);
-//					ys.add(yvStr);
-
-				}
+	@Override
+	public boolean readGeometry(Kryo kryo, Input input) {
+		try {
+			// Read paddles[] array.
+			int paddleLen = input.readInt();
+			paddles = new ScintillatorPaddle[paddleLen];
+			for (int i = 0; i < paddleLen; i++) {
+				paddles[i] = kryo.readObjectOrNull(input, ScintillatorPaddle.class);
 			}
+
+			// Read goodIds[] array.
+			int goodIdsLen = input.readInt();
+			goodIds = new short[goodIdsLen];
+			for (int i = 0; i < goodIdsLen; i++) {
+				goodIds[i] = input.readShort();
+			}
+
+			// Read paddleXYIndices[] array.
+			int indicesLen = input.readInt();
+			paddleXYIndices = new Point[indicesLen];
+			for (int i = 0; i < indicesLen; i++) {
+				paddleXYIndices[i] = kryo.readObjectOrNull(input, Point.class);
+			}
+
+			// Read indicesToId Hashtable.
+			int tableSize = input.readInt();
+			indicesToId = new Hashtable<Point, Integer>();
+			for (int i = 0; i < tableSize; i++) {
+				Point key = kryo.readObjectOrNull(input, Point.class);
+				int value = input.readInt();
+				indicesToId.put(key, value);
+			}
+			return true;
+		} catch (Exception e) {
+			return false;
 		}
+	}
 
-//		Comparator<String> c = new Comparator<String>() {
-//
-//			@Override
-//			public int compare(String arg0, String arg1) {
-//				Double d0 = Double.parseDouble(arg0);
-//				Double d1 = Double.parseDouble(arg1);
-//				return d0.compareTo(d1);
-//			}
-//
-//		};
-//
-//		Collections.sort(xs, c);
-//		Collections.sort(ys, c);
-//
-//		for (int i = 0; i < xs.size(); i++) {
-//			System.out.println(xs.get(i) + "   "  + ys.get(i));
-//		}
+	@Override
+	public boolean writeGeometry(Kryo kryo, Output output) {
+		try {
+			// Write paddles[] array.
+			output.writeInt(paddles.length);
+			for (ScintillatorPaddle paddle : paddles) {
+				// Write paddle; it may be null.
+				kryo.writeObjectOrNull(output, paddle, ScintillatorPaddle.class);
+			}
 
-//		System.out.println("xs size: " + xs.size());
-//		System.out.println("ys size: " + ys.size());
-//		System.out.println("xmax: " + xmax);
-//		System.out.println("ymax: " + ymax);
-//		System.out.println("zmax: " + zmax);
-//		System.out.println("zmin: " + zmin);
+			// Write goodIds[] array.
+			output.writeInt(goodIds.length);
+			for (short id : goodIds) {
+				output.writeShort(id);
+			}
 
-//		int numGood = 0;
-//
-//		Point2D.Double wp = new Point2D.Double();
-//		for (int i = 0; i <= 475; i++) {
-//			if (isGoodId(i)) {
-//				numGood++;
-//				 paddleXYCenter(i, wp);
-//
-//				 String lstr = String.format("[%-7.3f, %-7.3f]", wp.x, wp.y);
-//				System.err.println("[" + i +"]  centroid: " + lstr);
-//			}
-//		}
-//
-//		System.err.println("num good paddles: " + numGood);
+			// Write paddleXYIndices[] array.
+			output.writeInt(paddleXYIndices.length);
+			for (Point pt : paddleXYIndices) {
+				kryo.writeObjectOrNull(output, pt, Point.class);
+			}
 
+			// Write indicesToId Hashtable.
+			output.writeInt(indicesToId.size());
+			for (Point key : indicesToId.keySet()) {
+				kryo.writeObjectOrNull(output, key, Point.class);
+				output.writeInt(indicesToId.get(key));
+			}
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 }

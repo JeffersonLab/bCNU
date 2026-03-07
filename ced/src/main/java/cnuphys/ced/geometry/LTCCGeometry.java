@@ -2,10 +2,15 @@ package cnuphys.ced.geometry;
 
 import java.awt.geom.Point2D;
 
-public class LTCCGeometry {
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
+import cnuphys.ced.geometry.cache.ACachedGeometry;
+
+public class LTCCGeometry extends ACachedGeometry {
 
 	// place holder hardwired simple geometry from Valery
-	private static final boolean _SIMPLEGEO = true;
 
 	private static final double _thick = 8.0; // cm
 	private static final double _ro = 670.0; // cm
@@ -21,28 +26,29 @@ public class LTCCGeometry {
 	private static double _delX;
 	private static double _delY;
 
-	public static void initialize() {
+	static {
+		_xo = _ro * Math.cos(Math.toRadians(_thetao));
+		_yo = _ro * Math.sin(Math.toRadians(_thetao));
+		double sintf = Math.sin(Math.toRadians(_thetaf));
+		double costf = Math.cos(Math.toRadians(_thetaf));
+
+		_rf = (_xo + _yo * _tanAlpha) / (sintf * _tanAlpha + costf);
+		_xf = _rf * Math.cos(Math.toRadians(_thetaf));
+		_yf = _rf * Math.sin(Math.toRadians(_thetaf));
+
+		_delX = (_xf - _xo) / 18.;
+		_delY = (_yf - _yo) / 18.;
+	}
+
+	public LTCCGeometry() {
+		super("LTCCGeometry");
+	}
+
+	@Override
+	public void initializeUsingCCDB() {
 		System.out.println("\n=====================================");
 		System.out.println("===  LTCC Geometry Initialization ===");
-
-		if (_SIMPLEGEO) {
-			System.out.println("======== WARNING: SIMPLE GEOMETRY ====");
-
-			_xo = _ro * Math.cos(Math.toRadians(_thetao));
-			_yo = _ro * Math.sin(Math.toRadians(_thetao));
-
-			double sintf = Math.sin(Math.toRadians(_thetaf));
-			double costf = Math.cos(Math.toRadians(_thetaf));
-
-			_rf = (_xo + _yo * _tanAlpha) / (sintf * _tanAlpha + costf);
-			_xf = _rf * Math.cos(Math.toRadians(_thetaf));
-			_yf = _rf * Math.sin(Math.toRadians(_thetaf));
-
-			_delX = (_xf - _xo) / 18.;
-			_delY = (_yf - _yo) / 18.;
-
-		}
-
+		System.out.println("======== WARNING: SIMPLE GEOMETRY ====");
 		System.out.println("=====================================");
 	}
 
@@ -56,7 +62,7 @@ public class LTCCGeometry {
 	 */
 	public static void getSimpleWorldPoly(int ring, int half, double localPhi, Point2D.Double wp[]) {
 
-		if (_SIMPLEGEO && (ring > 0) && (ring < 19) && (half > 0) && (half < 3)) {
+		if ((ring > 0) && (ring < 19) && (half > 0) && (half < 3)) {
 
 			double x0 = _xo + (ring - 1) * _delX;
 			double y0 = _yo + (ring - 1) * _delY;
@@ -94,8 +100,16 @@ public class LTCCGeometry {
 		}
 	}
 
-	public static void main(String arg[]) {
-		LTCCGeometry.initialize();
+	@Override
+	public boolean readGeometry(Kryo kryo, Input input) {
+		// At the moment, nothing to read
+		return true;
+	}
+
+	@Override
+	public boolean writeGeometry(Kryo kryo, Output output) {
+		// At the moment, nothing to write
+		return true;
 	}
 
 }

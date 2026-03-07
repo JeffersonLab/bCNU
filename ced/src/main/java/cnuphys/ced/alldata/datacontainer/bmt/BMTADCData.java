@@ -19,8 +19,13 @@ public class BMTADCData extends ACommonADCData {
 
 	/** cached y coordinate of drawing locations */
 	public int ppy[];
+	
+	private static String bankName = "BMT::adc";
 
 
+	public BMTADCData() {
+		super(bankName);
+	}
 
 	/**
 	 * Public access to the singleton
@@ -47,7 +52,7 @@ public class BMTADCData extends ACommonADCData {
 
 	@Override
 	public void update(DataEvent event) {
-		DataBank bank = event.getBank("BMT::adc");
+		DataBank bank = event.getBank(bankName);
 
 		if (bank == null) {
 			return;
@@ -59,7 +64,6 @@ public class BMTADCData extends ACommonADCData {
         order = bank.getByte("order");
         adc = bank.getInt("ADC");
         time = bank.getFloat("time");
-        computeMaxADC();
 
         int n = (sector != null) ? sector.length : 0;
  		if (n > 0) {

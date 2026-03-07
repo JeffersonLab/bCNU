@@ -7,7 +7,7 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.jlab.geom.component.ScintillatorPaddle;
@@ -54,7 +54,7 @@ public class TOFLayer {
 	public List<ScintillatorPaddle> paddles;
 
 	//used by feedback
-	Hashtable<ScintillatorPaddle, Polygon> polyhash = new Hashtable<>();
+	HashMap<ScintillatorPaddle, Polygon> polyhash = new HashMap<>();
 
 
 	/**
@@ -79,7 +79,6 @@ public class TOFLayer {
 	 * @return the paddle
 	 */
 	public ScintillatorPaddle getPaddle(int paddleId) {
-//		System.err.println(String.format("req paddle index: %d  sect0: %d  supl0: %d  lay0: %d", paddleId, sector, superlayer, layer));
 		try {
 			ScintillatorPaddle paddle = paddles.get(paddleId);
 			return paddle;
@@ -126,6 +125,8 @@ public class TOFLayer {
 			} else {
 				fc = fillColors[sector % 3][paddle.getComponentId() % 2];
 			}
+			
+			
 
 			drawPaddle(g, container, paddle, fc, fc.darker());
 		}
@@ -178,8 +179,11 @@ public class TOFLayer {
 
 		Polygon poly = new Polygon();
 		int paddleId = paddle.getComponentId();
+		
+		if (Double.isNaN(_deltaR)) {
+			setLimitValues();
+		}
 
-	//	System.err.println("   DRAW PADDLE ID " + paddleId);
 
 		if (view.showAllTOF()) { //unrealistic
 
@@ -187,6 +191,7 @@ public class TOFLayer {
 
 				double x = paddle.getVolumePoint(i).x();
 				double y = paddle.getVolumePoint(i).y();
+				
 				wp[i] = new Point2D.Double(x, y);
 
 				// shift the point if not superlayer 0
@@ -213,7 +218,6 @@ public class TOFLayer {
 			if (!intersects) {
 				return;
 			}
-
 
 			Point2D.Double wp[] = getWorldPolygon(view, paddle);
 			if (wp != null) {

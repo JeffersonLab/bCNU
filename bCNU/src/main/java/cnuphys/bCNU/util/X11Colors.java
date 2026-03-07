@@ -130,6 +130,8 @@ public class X11Colors {
 				color = new Color(255, 250, 240);
 			} else if (name.equalsIgnoreCase("Forest Green")) {
 				color = new Color(34, 139, 34);
+			} else if (name.equalsIgnoreCase("Web Green")) {
+				color = new Color(0, 128, 0);
 			} else if (name.equalsIgnoreCase("Fuchsia")) {
 				color = new Color(255, 0, 255);
 			} else if (name.equalsIgnoreCase("Gainsboro")) {

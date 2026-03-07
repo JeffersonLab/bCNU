@@ -725,7 +725,7 @@ public class BaseView extends JInternalFrame implements FocusListener, MouseList
 	 * Refresh the view. Base implementation works only for container views.
 	 */
 	public void refresh() {
-		if (isVisible() && (_container != null)) {
+		if (isViewVisible() && (_container != null)) {
 			_container.refresh();
 		}
 	}

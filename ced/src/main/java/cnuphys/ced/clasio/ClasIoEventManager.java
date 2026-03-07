@@ -128,7 +128,6 @@ public class ClasIoEventManager {
 
 	// private constructor for singleton
 	private ClasIoEventManager() {
-		_dataSource = new HipoDataSource();
 		for (int index = 0; index < 3; index++) {
 			eventNotifier[index] = new EventNotifier<>();
 		}
@@ -273,15 +272,6 @@ public class ClasIoEventManager {
 		}
 
 		return sb.toString();
-	}
-
-	/**
-	 * Get the underlying clas-io data source
-	 *
-	 * @return the DataSource object
-	 */
-	public DataSource getDataSource() {
-		return _dataSource;
 	}
 
 	/**
@@ -655,26 +645,6 @@ public class ClasIoEventManager {
 	public void setAllReconSwimmer(ISwimAll allSwimmer) {
 		_allReconSwimmer = allSwimmer;
 	}
-	
-	// decode an evio event to hipo
-	private HipoDataEvent YdecodeEvioToHipo(EvioDataEvent event) {
-		if (_decoder == null) {
-			_schemaFactory = new SchemaFactory();
-
-			String dir = ClasUtilsFile.getResourceDir("CLAS12DIR", "etc/bankdefs/hipo4");
-			_schemaFactory.initFromDirectory(dir);
-
-			_decoder = new CLASDecoder4();
-
-			DataWarehouse.getInstance().updateSchema(_schemaFactory);
-
-		}
-		
-		Event decodedEvent = _decoder.getDataEvent(event);
-		return new HipoDataEvent(decodedEvent, _schemaFactory);
-        // Note: The above method will decode the event and return a HipoDataEvent.
-	}
-	
 
 	// decode an evio event to hipo
 	private HipoDataEvent decodeEvioToHipo(EvioDataEvent event) {
@@ -692,7 +662,8 @@ public class ClasIoEventManager {
 
 			}
 
-			Event decodedEvent = _decoder.getDataEvent(event);
+			Event decodedEvent = _decoder.getDataEvent();
+	//		Event decodedEvent = _decoder.getDataEvent(event);
 
 			Bank trigger = _decoder.createTriggerBank();
 
@@ -709,10 +680,10 @@ public class ClasIoEventManager {
 			double tScale = (torus == null) ? -1 : torus.getScaleFactor();
 			double sScale = (solenoid == null) ? 1 : solenoid.getScaleFactor();
 
-			Bank header = _decoder.createHeaderBank(-1, 0, (float) tScale, (float) sScale);
-			if (header != null) {
-				decodedEvent.write(header);
-			}
+//			Bank header = _decoder.createHeaderBank(-1, 0, (float) tScale, (float) sScale);
+//			if (header != null) {
+//				decodedEvent.write(header);
+//			}
 			_decoder.extractPulses(decodedEvent);
 			return new HipoDataEvent(decodedEvent, _schemaFactory);
 		}
@@ -946,7 +917,7 @@ public class ClasIoEventManager {
 		Swimming.setNotifyOn(true); // prevent refreshes
 		for (int index = 0; index < 3; index++) {
 			try {
-				eventNotifier[index].triggerEvent(source);
+				eventNotifier[index].nonThreadedTriggerEvent(source);
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
@@ -963,7 +934,7 @@ public class ClasIoEventManager {
 		Swimming.setNotifyOn(true); // prevent refreshes
 		for (int index = 0; index < 3; index++) {
 			try {
-				eventNotifier[index].triggerEvent(file.getAbsolutePath());
+				eventNotifier[index].nonThreadedTriggerEvent(file.getAbsolutePath());
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
@@ -994,7 +965,7 @@ public class ClasIoEventManager {
 		Swimming.clearAllTrajectories();
 		for (int index = 0; index < 3; index++) {
 			try {
-				eventNotifier[index].triggerEvent(_currentEvent);
+				eventNotifier[index].nonThreadedTriggerEvent(_currentEvent);
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}

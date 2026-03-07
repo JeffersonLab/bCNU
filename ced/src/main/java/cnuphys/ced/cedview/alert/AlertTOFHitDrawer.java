@@ -210,8 +210,7 @@ public class AlertTOFHitDrawer {
 							String bankName = "ATOF::tdc";
 							AlertFeedbackSupport.handleInt(bankName, "TDC", i, "$orange$", feedbackStrings);
 							AlertFeedbackSupport.handleByte(bankName, "order", i, "$orange$", feedbackStrings);
-							AlertFeedbackSupport.handleShort(bankName, "ped", i, "$orange$", feedbackStrings);
-							AlertFeedbackSupport.handleFloat(bankName, "time", i, "$orange$", feedbackStrings);
+							AlertFeedbackSupport.handleInt(bankName, "ToT", i, "$orange$", feedbackStrings);
 							return;
 						}
 

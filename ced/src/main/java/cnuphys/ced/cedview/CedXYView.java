@@ -231,7 +231,7 @@ public abstract class CedXYView extends CedView implements ILabCoordinates{
 			return;
 		}
 
-		fbString("yellow", "xy " + Point2DSupport.toString(worldPoint) + " " + units, feedbackStrings);
+		fbString("yellow", "(x,y) = " + Point2DSupport.toString(worldPoint) + " " + units, feedbackStrings);
 		fbString("yellow",
 				"radius " + DoubleFormat.doubleFormat(Math.hypot(worldPoint.x, worldPoint.y), 2) + " " + units,
 				feedbackStrings);

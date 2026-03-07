@@ -1,7 +1,7 @@
 package cnuphys.ced.ced3d.view;
 
-import cnuphys.ced.ced3d.AlertPanel3D;
 import cnuphys.ced.ced3d.CedPanel3D;
+import cnuphys.ced.ced3d.alert.AlertPanel3D;
 
 public class AlertView3D extends CedView3D {
 

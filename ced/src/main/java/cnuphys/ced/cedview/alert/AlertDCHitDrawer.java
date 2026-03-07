@@ -9,6 +9,7 @@ import java.util.List;
 import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.container.IContainer;
+import cnuphys.ced.alldata.ADCSupport;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
@@ -19,6 +20,9 @@ public class AlertDCHitDrawer {
 
 	// data warehouse
 	private DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
+	
+	// the bank name for adc data
+	private static String adcBankName = "AHDC::adc";
 
 	// the alert view
 	private AlertXYView _view;
@@ -55,27 +59,35 @@ public class AlertDCHitDrawer {
 			return;
 		}
 
-		if (dataEvent.hasBank("AHDC::adc") && _view.showADCHits()) {
+		int minADC = _view.getADCThreshold();
+		
+		if (dataEvent.hasBank(adcBankName) && _view.showADCHits()) {
 
 			short component[] = _dataWarehouse.getShort("AHDC::adc", "component");
 			if (component != null) {
 				int count = component.length;
 				if (count > 0) {
-					byte sector[] = _dataWarehouse.getByte("AHDC::adc", "sector");
-					byte compLayer[] = _dataWarehouse.getByte("AHDC::adc", "layer");
-					byte order[] = _dataWarehouse.getByte("AHDC::adc", "order");
+					int adc[] = _dataWarehouse.getInt(adcBankName, "ADC");
+					byte sector[] = _dataWarehouse.getByte(adcBankName, "sector");
+					byte compLayer[] = _dataWarehouse.getByte(adcBankName, "layer");
+					byte order[] = _dataWarehouse.getByte(adcBankName, "order");
 
 					AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
 
 					for (int i = 0; i < count; i++) {
+						if (adc[i] < minADC) {
+							continue;
+						}
 						adcGeom.fromDataNumbering(sector[i], compLayer[i], component[i], order[i]);
 						DCLayer dcl = AlertGeometry.getDCLayer(adcGeom.sector, adcGeom.superlayer, adcGeom.layer);
 						if (dcl == null) {
-							System.err.println("DC layer not found for sector " + adcGeom.sector + ", superlayer "
+							System.err.println("AHDC layer not found for sector " + adcGeom.sector + ", superlayer "
 									+ adcGeom.superlayer + ", layer " + adcGeom.layer);
 							continue;
 						}
-						dcl.drawXYWire(g, container, adcGeom.component, Color.red, Color.red,  _view.getFixedZ(), true);
+					
+						Color color = ADCSupport.getADCColor(adcBankName, adc[i]);
+						dcl.drawXYWire(g, container, adcGeom.component, color, color.darker(),  _view.getFixedZ(), true);
 					}
 				}
 			}
@@ -90,14 +102,14 @@ public class AlertDCHitDrawer {
 	 * @param index     the 0-based index of the hit
 	 */
 	public void drawHighlightHit(Graphics g, IContainer container, DataEvent dataEvent, int index) {
-		if (dataEvent.hasBank("AHDC::adc") && _view.showADCHits()) {
-			short component[] = _dataWarehouse.getShort("AHDC::adc", "component");
+		if (dataEvent.hasBank(adcBankName) && _view.showADCHits()) {
+			short component[] = _dataWarehouse.getShort(adcBankName, "component");
 			if (component != null) {
 				int count = component.length;
 				if (count > index) {
-					byte sector[] = _dataWarehouse.getByte("AHDC::adc", "sector");
-					byte compLayer[] = _dataWarehouse.getByte("AHDC::adc", "layer");
-					byte order[] = _dataWarehouse.getByte("AHDC::adc", "order");
+					byte sector[] = _dataWarehouse.getByte(adcBankName, "sector");
+					byte compLayer[] = _dataWarehouse.getByte(adcBankName, "layer");
+					byte order[] = _dataWarehouse.getByte(adcBankName, "order");
 
 					AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
 					adcGeom.fromDataNumbering(sector[index], compLayer[index], component[index], order[index]);
@@ -158,7 +170,7 @@ public class AlertDCHitDrawer {
 
 
 		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if ((dataEvent == null) || !dataEvent.hasBank("AHDC::adc")) {
+		if ((dataEvent == null) || !dataEvent.hasBank(adcBankName)) {
 			return;
 		}
 
@@ -166,9 +178,13 @@ public class AlertDCHitDrawer {
 		if (component != null) {
 			int count = component.length;
 			if (count > 0) {
-				byte sector[] = _dataWarehouse.getByte("AHDC::adc", "sector");
-				byte compLayer[] = _dataWarehouse.getByte("AHDC::adc", "layer");
-				byte order[] = _dataWarehouse.getByte("AHDC::adc", "order");
+				
+				int maxADC = ADCSupport.getMaxADC(adcBankName);
+
+				feedbackStrings.add(String.format("max AHDC ADC in this event %d", maxADC));
+				byte sector[] = _dataWarehouse.getByte(adcBankName, "sector");
+				byte compLayer[] = _dataWarehouse.getByte(adcBankName, "layer");
+				byte order[] = _dataWarehouse.getByte(adcBankName, "order");
 
 				AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
 
@@ -178,14 +194,13 @@ public class AlertDCHitDrawer {
 
 					if (adcGeom.match(dcl)) {
 						if (dcl.wireContainsXY(component[i] - 1, wp)) {
-							String bankName = "AHDC::adc";
-							AlertFeedbackSupport.handleInt(bankName, "ADC", i, "$orange$", feedbackStrings);
-							AlertFeedbackSupport.handleInt(bankName, "integral", i, "$orange$", feedbackStrings);
-							AlertFeedbackSupport.handleByte(bankName, "order", i, "$orange$", feedbackStrings);
+							AlertFeedbackSupport.handleInt(adcBankName, "ADC", i, "$orange$", feedbackStrings);
+							AlertFeedbackSupport.handleInt(adcBankName, "integral", i, "$orange$", feedbackStrings);
+							AlertFeedbackSupport.handleByte(adcBankName, "order", i, "$orange$", feedbackStrings);
 
-							AlertFeedbackSupport.handleShort(bankName, "ped", i, "$orange$", feedbackStrings);
-							AlertFeedbackSupport.handleFloat(bankName, "time", i, "$orange$", feedbackStrings);
-							AlertFeedbackSupport.handleFloat(bankName, "timeOverThreshold", i, "$orange$", feedbackStrings);
+							AlertFeedbackSupport.handleShort(adcBankName, "ped", i, "$orange$", feedbackStrings);
+							AlertFeedbackSupport.handleFloat(adcBankName, "time", i, "$orange$", feedbackStrings);
+							AlertFeedbackSupport.handleFloat(adcBankName, "timeOverThreshold", i, "$orange$", feedbackStrings);
 
 							return;
 						}
@@ -196,5 +211,7 @@ public class AlertDCHitDrawer {
 		} // component != null
 
 	}
+	
+
 
 }

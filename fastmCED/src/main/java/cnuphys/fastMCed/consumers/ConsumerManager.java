@@ -42,11 +42,11 @@ public class ConsumerManager extends Vector<PhysicsEventConsumer>
 	// private singleton constructor
 	private ConsumerManager() {
 		SocketConsumer socketConsumer = new SocketConsumer();
-		socketConsumer.setActive(true);
+		socketConsumer.setActive(false);
 		add(socketConsumer);
-		CSVTestDataConsumer csvConsumer = new CSVTestDataConsumer();
-		csvConsumer.setActive(false);
-		add(csvConsumer);
+		BinaryFileMLTestData binaryConsumer = new BinaryFileMLTestData();
+		binaryConsumer.setActive(true);
+		add(binaryConsumer);
 		PhysicsEventManager.getInstance().addPhysicsListener(this, 1);
 		StreamManager.getInstance().addStreamListener(this);
 	}

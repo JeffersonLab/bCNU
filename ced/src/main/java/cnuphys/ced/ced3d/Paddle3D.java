@@ -48,7 +48,7 @@ public abstract class Paddle3D {
 	 * @param drawable the drawable
 	 * @param color    the color
 	 */
-	protected void drawPaddle(GLAutoDrawable drawable, Color color) {
+	public void drawPaddle(GLAutoDrawable drawable, Color color) {
 
 		// think in terms of a rectangular slab
 		Support3D.drawQuad(drawable, _coords, 0, 1, 2, 3, color, 1f, _frame); // front

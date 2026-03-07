@@ -145,6 +145,9 @@ public class FeedbackPane extends TextPaneScrollPane {
 	}
 
 
+	public String toString() {
+		return "FeedbackPane";
+	}
 
 
 

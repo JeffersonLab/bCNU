@@ -1,7 +1,7 @@
 package cnuphys.ced.ced3d.view;
 
 import cnuphys.ced.ced3d.CedPanel3D;
-import cnuphys.ced.ced3d.FTCalPanel3D;
+import cnuphys.ced.ced3d.ftcal.FTCalPanel3D;
 
 public class FTCalView3D extends CedView3D {
 

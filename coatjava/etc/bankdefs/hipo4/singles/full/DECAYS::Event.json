@@ -1,0 +1,20 @@
+[
+    {
+        "entries": [
+            {
+                "info": "target mass",
+                "name": "tarmass",
+                "type": "F"
+            },
+            {
+                "info": "beam energy",
+                "name": "beamenergy",
+                "type": "F"
+            }
+        ],
+        "group": 900,
+        "info": "Event Header Bank",
+        "item": 10,
+        "name": "DECAYS::Event"
+    }
+]

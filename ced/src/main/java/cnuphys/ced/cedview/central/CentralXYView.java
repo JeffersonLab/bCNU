@@ -46,15 +46,15 @@ import cnuphys.ced.alldata.datacontainer.tof.CTOFADCData;
 import cnuphys.ced.alldata.datacontainer.tof.CTOFClusterData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
-import cnuphys.ced.cedview.urwell.HighlightData;
+import cnuphys.ced.cedview.urwt.HighlightData;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.component.ControlPanel;
 import cnuphys.ced.component.DisplayBits;
 import cnuphys.ced.frame.Ced;
+import cnuphys.ced.geometry.BSTGeometry;
 import cnuphys.ced.geometry.BSTxyPanel;
 import cnuphys.ced.geometry.CNDGeometry;
 import cnuphys.ced.geometry.CTOFGeometry;
-import cnuphys.ced.geometry.GeometryManager;
 import cnuphys.ced.geometry.bmt.BMTSectorItem;
 import cnuphys.lund.X11Colors;
 import cnuphys.swim.SwimTrajectory2D;
@@ -135,7 +135,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 		_hitDrawer = new CentralXYHitDrawer(this, this);
 
 		// draws any swum trajectories (in the after draw)
-		_swimTrajectoryDrawer = new SwimTrajectoryDrawer(this);
+		_swimTrajectoryDrawer = new SwimTrajectoryDrawer(this, 0, 280);
 		_swimTrajectoryDrawer.setMaxPathLength(getTrajMaxPathlength());
 
 		// add the CND polys
@@ -188,7 +188,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 		view.pack();
 
 		// add quick zooms
-		view.addQuickZoom("BST & BMT", -190, -190, 190, 190);
+		view.addQuickZoom("BST & BMT", 190, -190, -190, 190);
 
 		// i.e. if none were in the properties
 		if (view.hasNoBankMatches()) {
@@ -388,7 +388,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 	 * @return the panel
 	 */
 	public static BSTxyPanel getPanel(int layer, int sector) {
-		List<BSTxyPanel> panels = GeometryManager.getBSTxyPanels();
+		List<BSTxyPanel> panels = BSTGeometry.getBSTxyPanels();
 		if (panels == null) {
 			return null;
 		}
@@ -411,7 +411,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 
 		Shape oldClip = g.getClip();
 
-		List<BSTxyPanel> panels = GeometryManager.getBSTxyPanels();
+		List<BSTxyPanel> panels = BSTGeometry.getBSTxyPanels();
 		if (panels == null) {
 			return;
 		}
@@ -422,10 +422,12 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 		g2.clipRect(sr.x, sr.y, sr.width, sr.height);
 
 		// BST panels
-		for (BSTxyPanel panel : panels) {
-			drawBSTPanel(g2, container, panel, _panelColors[(panel.getSector()) % 2]);
-		}
+		if (!Ced.forVeronique()) {
 
+			for (BSTxyPanel panel : panels) {
+				drawBSTPanel(g2, container, panel, _panelColors[(panel.getSector()) % 2]);
+			}
+		}
 		// CND Polys
 		for (int layer = 1; layer <= 3; layer++) {
 			for (int paddleId = 1; paddleId <= 48; paddleId++) {
@@ -705,7 +707,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 
 	// get the panel closest to a given point
 	private BSTxyPanel getClosest(Point2D.Double wp) {
-		List<BSTxyPanel> panels = GeometryManager.getBSTxyPanels();
+		List<BSTxyPanel> panels = BSTGeometry.getBSTxyPanels();
 		if (panels == null) {
 			return null;
 		}

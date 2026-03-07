@@ -85,12 +85,12 @@ public class CedPanel3D extends PlainPanel3D {
 	protected void addSouth() {
 	}
 
-
-
 	@Override
 	public void refresh() {
 		super.refresh();
-		_pidLegend.repaint();
+		if (_pidLegend != null) {
+			_pidLegend.repaint();
+		}
 	}
 
 

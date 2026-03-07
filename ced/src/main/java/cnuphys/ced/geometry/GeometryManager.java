@@ -4,12 +4,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jlab.detector.base.GeometryFactory;
 import org.jlab.geom.abs.AbstractComponent;
-import org.jlab.geom.base.ConstantProvider;
-import org.jlab.geom.detector.ec.ECDetector;
-import org.jlab.geom.detector.ec.ECFactory;
-import org.jlab.geom.detector.ec.ECSector;
 import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Path3D;
 import org.jlab.geom.prim.Plane3D;
@@ -17,9 +12,9 @@ import org.jlab.geom.prim.Point3D;
 import org.jlab.geom.prim.Vector3D;
 
 import cnuphys.ced.geometry.alert.AlertGeometry;
+import cnuphys.ced.geometry.cache.GeometryCache;
 import cnuphys.ced.geometry.fmt.FMTGeometry;
-import cnuphys.ced.geometry.ftof.FTOFGeometry;
-import cnuphys.ced.geometry.urwell.UrWELLGeometry;
+import cnuphys.ced.geometry.urwt.UrWTGeometry;
 import cnuphys.swim.SwimTrajectory;
 
 public class GeometryManager {
@@ -30,14 +25,7 @@ public class GeometryManager {
 	private static volatile GeometryManager instance;
 
 
-	// BSTxy panels
-	private static ArrayList<BSTxyPanel> _bstXYpanelsLayers = new ArrayList<>(); // new
 
-	// cal sector 0 in clas coordinates
-	public static ECSector clas_Cal_Sector0;
-
-	// cal sector 0 in local coordinates
-	public static ECSector local_Cal_Sector0;
 
 	//work points
 	private static Point3D[] _workPoints;
@@ -57,57 +45,49 @@ public class GeometryManager {
 	 * Private constructor for the singleton.
 	 */
 	private GeometryManager() {
+		GeometryCache.initializeAllGeometry();
 
 		// HTCC Geometry
-		HTCCGeometry.initialize();
+//		HTCCGeometry.initialize();  (USING NEW CACHE SCHEME)
 
 		// LTCC Geometry
-		LTCCGeometry.initialize();
+//		LTCCGeometry.initialize();  (USING NEW CACHE SCHEME)
 
 		// DC Geometry
-		DCGeometry.initialize();
+	//	DCGeometry.initialize();  (USING NEW CACHE SCHEME)
 
 		// BMT geometry
-		BMTGeometry.initialize();
+	//	BMTGeometry.initialize();  (USING NEW CACHE SCHEME)
 
 		// get the FTOF geometry
-		FTOFGeometry.initialize();
+	//	FTOFGeometry.initialize();  (USING NEW CACHE SCHEME)
 
 		// get the CTOF geometry
-		CTOFGeometry.initialize();
+	//	CTOFGeometry.initialize();  (USING NEW CACHE SCHEME)
 
 		// get the uRwell geometry
-		UrWELLGeometry.initialize();
+	//	UrWELLGeometry.initialize(); (USING NEW CACHE SCHEME)
 
 		// get the alert geometry
-		AlertGeometry.initialize();
+	//	AlertGeometry.initialize(); (USING NEW CACHE SCHEME)
 
 		// get the FMT geometry
-		FMTGeometry.initialize();
+	//	FMTGeometry.initialize(); (USING NEW CACHE SCHEME)
 
 		// get BST data
-		BSTGeometry.initialize();
-		getBSTPanels();
-
-		ConstantProvider ecDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.ECAL);
-		ECDetector clas_Cal_Detector = (new ECFactory()).createDetectorCLAS(ecDataProvider);
-
-		// cal sector 0 in clas coordinates
-		clas_Cal_Sector0 = clas_Cal_Detector.getSector(0);
-
-		local_Cal_Sector0 = (new ECFactory()).createDetectorLocal(ecDataProvider).getSector(0);
+	//	BSTGeometry.initialize();  (USING NEW CACHE SCHEME)
 
 		// get EC data
-		ECGeometry.initialize();
+	//	ECGeometry.initialize(); (USING NEW CACHE SCHEME)
 
 		// get PCAL data
-		PCALGeometry.initialize();
+	//	PCALGeometry.initialize();  (USING NEW CACHE SCHEME)
 
 		// CND data
-		CNDGeometry.initialize();
+	//	CNDGeometry.initialize();    (USING NEW CACHE SCHEME)
 
 		// FTCal
-		FTCALGeometry.initialize();
+	//	FTCALGeometry.initialize();   (USING NEW CACHE SCHEME)
 	}
 
 	/**
@@ -126,25 +106,6 @@ public class GeometryManager {
 		return instance;
 	}
 
-	// read the bst geometry
-	private void getBSTPanels() {
-
-		// use the geometry service
-
-		double vals[] = new double[10];
-		for (int layer = 0; layer < 6; layer++) {
-
-			int numSect = BSTGeometry.sectorsPerLayer[layer];
-
-			for (int sector = 0; sector < numSect; sector++) {
-
-				BSTGeometry.getLimitValues(sector, layer, vals);
-
-				_bstXYpanelsLayers.add(new BSTxyPanel(sector + 1, layer + 1, vals));
-			}
-		}
-
-	}
 
 
 	/**
@@ -221,14 +182,6 @@ public class GeometryManager {
 		return absPhi;
 	}
 
-	/**
-	 * Get the list of BST XY panels
-	 *
-	 * @return the panels
-	 */
-	public static List<BSTxyPanel> getBSTxyPanels() {
-		return _bstXYpanelsLayers;
-	}
 
 	/**
 	 * Obtain the 1-based sector from the xyz coordinates
@@ -487,7 +440,7 @@ public class GeometryManager {
 
 		return isectsCount > 2;
 	}
-
+	
 	/**
 	 * Get a world 2D polygon from a clas geo object like a FTOF slab.
 	 *
@@ -501,6 +454,22 @@ public class GeometryManager {
 	 */
 	public static boolean getProjectedPolygon(AbstractComponent geoObj, Plane3D projectionPlane, int startIndex,
 			int count, Point2D.Double wp[], Point2D.Double centroid) {
+		return getProjectedPolygon(geoObj, projectionPlane, startIndex, count, wp, centroid, true);
+	}
+
+	/**
+	 * Get a world 2D polygon from a clas geo object like a FTOF slab.
+	 *
+	 * @param geoObj          the geometric object
+	 * @param projectionPlane the projection plane
+	 * @param startIndex      the firstIndex of the volume edges corresponding to a
+	 *                        "long" edge
+	 * @param count           the number of such edges (should be contiguous!)
+	 * @param wp              will hold the world 2D polygon
+	 * @param centroid        optionally compute the centroid.
+	 */
+	public static boolean getProjectedPolygon(AbstractComponent geoObj, Plane3D projectionPlane, int startIndex,
+			int count, Point2D.Double wp[], Point2D.Double centroid, boolean checkIntersects) {
 
 		if (count > _workPoints.length) {
             _workPoints = new Point3D[count];
@@ -533,8 +502,12 @@ public class GeometryManager {
 		if (centroid != null) {
 			average(wp, centroid);
 		}
+		
+		if (checkIntersects) {
+			return doesProjectedPolyIntersect(geoObj, projectionPlane, startIndex, count);	
+		}
 
-		return doesProjectedPolyIntersect(geoObj, projectionPlane, startIndex, count);
+		return true;
 	}
 
 	// faster than centroid, and good enough

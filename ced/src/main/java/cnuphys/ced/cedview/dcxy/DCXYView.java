@@ -152,7 +152,7 @@ public class DCXYView extends HexView {
 
 		// add a quick zoom
 		double qzlim = 25;
-		addQuickZoom("Central Region", -qzlim, -qzlim, qzlim, qzlim);
+		addQuickZoom("Central Region", qzlim, -qzlim, -qzlim, qzlim);
 
 	}
 
