@@ -1,8 +1,10 @@
-package cnuphys.ced.ced3d;
+package cnuphys.ced.ced3d.fmt;
 
 import java.awt.Color;
 import java.awt.Font;
 
+import cnuphys.ced.ced3d.CedPanel3D;
+import cnuphys.ced.ced3d.TrajectoryDrawer3D;
 import cnuphys.ced.ced3d.view.CedView3D;
 import cnuphys.ced.component.MatchedBankPanel;
 import cnuphys.ced.component.RangePanel;

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 import cnuphys.ced.ced3d.cnd.CND3D;
+import cnuphys.ced.ced3d.ctof.CTOF3D;
 import cnuphys.ced.ced3d.view.CedView3D;
 import cnuphys.ced.geometry.BSTGeometry;
 import cnuphys.lund.X11Colors;

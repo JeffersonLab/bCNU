@@ -1,7 +1,7 @@
 package cnuphys.ced.ced3d.view;
 
 import cnuphys.ced.ced3d.CedPanel3D;
-import cnuphys.ced.ced3d.FMTPanel3D;
+import cnuphys.ced.ced3d.fmt.FMTPanel3D;
 
 public class FMTView3D extends CedView3D {
 

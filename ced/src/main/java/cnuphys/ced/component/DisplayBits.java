@@ -85,6 +85,9 @@ public class DisplayBits {
 
 	/** cvt pass 1 traj */
 	public static final int CVTP1TRAJ = 01000000000;
+	
+	/** four layers for urWT */
+	public static final int URWTLAYERS = 02000000000;
 
 
 

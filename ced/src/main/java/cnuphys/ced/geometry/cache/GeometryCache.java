@@ -61,6 +61,7 @@ public class GeometryCache {
 	 * @param kryo the Kryo instance to be configured for caching geometry objects.
 	 */
 	private static void registerClasses(Kryo kryo) {
+		kryo.register(cnuphys.ced.ced3d.util.Point.class);
 		kryo.register(cnuphys.ced.geometry.urwt.UrWTDetectorData.class);
 		kryo.register(org.jlab.geom.component.ScintillatorPaddle.class);
 		kryo.register(org.jlab.geom.prim.Vector3D.class);

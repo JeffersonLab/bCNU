@@ -6,17 +6,17 @@ import java.awt.Font;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.TrajectoryDrawer3D;
 import cnuphys.ced.ced3d.view.CedView3D;
+import cnuphys.ced.cedview.urwt.UrWTXYView;
 import cnuphys.lund.X11Colors;
 import item3D.Axes3D;
 
+@SuppressWarnings("serial")
 public class UrWTPanel3D extends CedPanel3D {
 	
 	// dimension of this panel are in cm
-	private final float xmin = -200f;
-	private final float xmax = 200f;
-	private final float ymin = -200f;
-	private final float ymax = 200f;
-	private final float zmin = 150f;
+	private final float xmax = 400f;
+	private final float ymax = 400f;
+	private final float zmin = -100f;
 	private final float zmax = 250f;
 
 	
@@ -28,12 +28,14 @@ public class UrWTPanel3D extends CedPanel3D {
 	public UrWTPanel3D(CedView3D view, float angleX, float angleY, float angleZ, float xDist, float yDist,
 			float zDist) {
 		super(view, angleX, angleY, angleZ, xDist, yDist, zDist, _cbaLabels);
+
+		getEastPanel().add(UrWTXYView.layerColorPanel());	
 	}
 
 	@Override
 	public void createInitialItems() {
 		// coordinate axes
-		Axes3D axes = new Axes3D(this, xmin, xmax, ymin, ymax, zmin, zmax, null, Color.darkGray, 1f, 6, 6, 6,
+		Axes3D axes = new Axes3D(this, -xmax, xmax, -ymax, ymax, zmin, zmax, null, Color.darkGray, 1f, 6, 6, 6,
 				Color.black, X11Colors.getX11Color("Dark Green"), new Font("SansSerif", Font.PLAIN, 12), 0);
 		addItem(axes);
 
@@ -44,7 +46,7 @@ public class UrWTPanel3D extends CedPanel3D {
 		//detector items
 		for (int sector = 1; sector <= 6; sector++) {
 			for (int layer = 1; layer <= 4; layer++) {
-				UrWTDetectorItem item = new UrWTDetectorItem(this, sector, layer);
+				UrWTDetectorItem3D item = new UrWTDetectorItem3D(this, sector, layer);
 				addItem(item);
 			}
 		}

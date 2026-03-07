@@ -6,32 +6,44 @@ import java.util.List;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
-import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.ced3d.util.DrawSupport;
-import cnuphys.ced.ced3d.util.Plane;
-import cnuphys.ced.ced3d.util.PlaneHullUtility;
 import cnuphys.ced.ced3d.util.Point;
+import cnuphys.ced.cedview.urwt.UrWTDetectorItem;
 import cnuphys.ced.geometry.urwt.UrWTDetectorData;
 import cnuphys.ced.geometry.urwt.UrWTGeometry;
 
-public class UrWTDetectorItem extends DetectorItem3D {
+public class UrWTDetectorItem3D extends DetectorItem3D {
 
-	// one based sector [1..6]
-	private final int sector;
+	// the color for the frame of the detector
+	private Color frameColor = Color.darkGray;
+	
+	/**
+	 * The sector of this detector item, stored as 1-based values to 
+	 * match the database and geometry conventions. The sector is in the range 
+	 * [1..6].
+	 */
+	public final int sector; // 1-based [1..6]
+	
+	/**
+	 * The layer of this detector item, stored as 1-based values to match the 
+	 * database and geometry conventions. The layer is in the range [1..4].
+	 */
+	public final int layer;  // 1-based [1..4]
 
-	// one based layer [1..4]
-	private final int layer;
-
-	private Plane plane;
-
+	// the data for this detector, including the strip lines and the 
+	// precomputed convex hull of the strip endpoints, which is used for 
+	// drawing the detector
 	private UrWTDetectorData detectorData;
 
+	// the convex hull points of the strip endpoints, used for 
+	// drawing the detector shape
 	private List<Point> convexHull;
 
-	private static Color[] layerColors = new Color[] { X11Colors.getX11Color("dark red"),
-			X11Colors.getX11Color("dark green"), X11Colors.getX11Color("dark blue"), X11Colors.getX11Color("orange") };
 	
+	// the coordinates of the convex hull points, stored as a flat array for 
+	// efficient drawing in 3D with OpenGL. Each group of three floats corresponds 
+	// to the x, y, z coordinates of a point.
 	private float[] coords;
 
 	/**
@@ -41,28 +53,16 @@ public class UrWTDetectorItem extends DetectorItem3D {
 	 * @param sector  1-based sector [1..6]
 	 * @param layer   1-based layer [1..4]
 	 */
-	public UrWTDetectorItem(UrWTPanel3D panel3D, int sector, int layer) {
+	public UrWTDetectorItem3D(UrWTPanel3D panel3D, int sector, int layer) {
 		super(panel3D);
 		this.sector = sector;
 		this.layer = layer;
-		
 
 		detectorData = UrWTGeometry.getDetectorData(sector, layer);
-		plane = DrawSupport.findCommonPlane(detectorData.strips, 1e-6);
 
-		if (plane == null) {
-			System.err.println(
-					"UrwtDetectorItem: Could not find common urwt plane for sector " + sector + " layer " + layer);
-			return;
-		}
-
-		convexHull = PlaneHullUtility.getHullIfCoplanar(detectorData.strips, 1.0e-6);
-		if (convexHull == null) {
-			System.err.println(
-					"UrwtDetectorItem: Could not compute convex hull for sector " + sector + " layer " + layer);
-		}
+		convexHull = detectorData.getConvexHull();
 		
-		
+		// get the OpenGL-friendly coordinates for the convex hull points
 		coords = new float[convexHull.size() * 3];
 		for (int i = 0; i < convexHull.size(); i++) {
 			Point p = convexHull.get(i);
@@ -75,7 +75,9 @@ public class UrWTDetectorItem extends DetectorItem3D {
 	@Override
 	public void drawShape(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
-		DrawSupport.drawPlaneAndHull(gl, plane, convexHull, 100.0f, layerColors[layer - 1], getVolumeAlpha());
+		DrawSupport.drawHull(gl, convexHull, 100.0f, 
+				UrWTDetectorItem.layerColors[layer - 1], 
+				frameColor, getVolumeAlpha());
 	}
 
 	@Override

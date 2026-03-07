@@ -128,7 +128,6 @@ public class ClasIoEventManager {
 
 	// private constructor for singleton
 	private ClasIoEventManager() {
-		_dataSource = new HipoDataSource();
 		for (int index = 0; index < 3; index++) {
 			eventNotifier[index] = new EventNotifier<>();
 		}
@@ -273,15 +272,6 @@ public class ClasIoEventManager {
 		}
 
 		return sb.toString();
-	}
-
-	/**
-	 * Get the underlying clas-io data source
-	 *
-	 * @return the DataSource object
-	 */
-	public DataSource getDataSource() {
-		return _dataSource;
 	}
 
 	/**

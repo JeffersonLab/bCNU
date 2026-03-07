@@ -1,4 +1,4 @@
-package cnuphys.ced.ced3d;
+package cnuphys.ced.ced3d.cal;
 
 import java.awt.Color;
 
@@ -6,6 +6,8 @@ import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
 import cnuphys.ced.alldata.datacontainer.cal.PCalADCData;
+import cnuphys.ced.ced3d.DetectorItem3D;
+import cnuphys.ced.ced3d.PlainPanel3D;
 import cnuphys.ced.geometry.PCALGeometry;
 
 public class PCALViewPlane3D extends DetectorItem3D {

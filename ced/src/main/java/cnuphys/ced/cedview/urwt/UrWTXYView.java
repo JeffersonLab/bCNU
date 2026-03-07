@@ -4,12 +4,19 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.Properties;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Point3D;
@@ -20,6 +27,7 @@ import cnuphys.bCNU.drawable.IDrawable;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
+import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
@@ -43,9 +51,6 @@ public class UrWTXYView extends HexView {
 	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
 
 	private static int CLONE_COUNT = 0;
-
-	//layer colors
-	public static Color layerColors[] = {Color.red, Color.green, Color.blue, X11Colors.getX11Color("coral")};
 
 
 	// sector items
@@ -118,12 +123,39 @@ public class UrWTXYView extends HexView {
 						+ ControlPanel.MATCHINGBANKSPANEL,
 				DisplayBits.ACCUMULATION + DisplayBits.CLUSTERS +  DisplayBits.CROSSES + DisplayBits.RECPART
 						+ DisplayBits.GLOBAL_HB + DisplayBits.GLOBAL_TB + DisplayBits.GLOBAL_AIHB
-						+ DisplayBits.GLOBAL_AITB +
+						+ DisplayBits.GLOBAL_AITB + DisplayBits.URWTLAYERS
 						+ DisplayBits.MCTRUTH + DisplayBits.SECTORCHANGE,
 				3, 5);
 
 		add(_controlPanel, BorderLayout.EAST);
+		_controlPanel.addComponent(layerColorPanel());
 		pack();
+	}
+
+	/**
+	 * Create a panel showing the layer colors.
+	 *
+	 * @return the panel
+	 */
+	public static JComponent layerColorPanel() {
+	    JPanel panel = new JPanel(new GridLayout(1, 4, 10, 0)); // Added 10px horizontal gap
+	    panel.setBackground(Color.white);
+	    panel.setOpaque(true);
+
+	    // 1. Create the visible line border
+	    Border line = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1);
+	    // 2. Create the internal padding (top, left, bottom, right)
+	    Border padding = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+	    // 3. Combine them
+	    panel.setBorder(BorderFactory.createCompoundBorder(line, padding));
+
+	    for (int layer = 1; layer <= 4; layer++) {
+	        JLabel label = new JLabel("Layer " + layer);
+	        label.setFont(Fonts.mediumBoldFont);
+	        label.setForeground(UrWTDetectorItem.layerColors[layer - 1]);
+	        panel.add(label);
+	    }
+	    return panel;
 	}
 
 	/**
@@ -143,20 +175,19 @@ public class UrWTXYView extends HexView {
 	protected void addItems() {
 		ItemList detectorLayer = getContainer().getItemList(_detectorLayerName);
 
-
-
 		_hexItems = new UrWELLHexSectorItem[6];
 
+		//hex items that form the outline of the sectors
 		for (int sector = 0; sector < 6; sector++) {
 			_hexItems[sector] = new UrWELLHexSectorItem(detectorLayer, this, sector + 1);
 			_hexItems[sector].getStyle().setFillColor(Color.lightGray);
 		}
 
-		//chamber outline items
+		//the detector items 
 		detectorItems = new UrWTDetectorItem[6][4];
-		for (int sector = 0; sector < 1; sector++) {
-			for (int layer = 0; layer < 1; layer++) {
-				detectorItems[sector][layer] = UrWTDetectorItem.createUrWELLChamberItem(detectorLayer, sector+1, layer+1);
+		for (int sector = 0; sector < 6; sector++) {
+			for (int layer = 3; layer >= 0; layer--) {
+				detectorItems[sector][layer] = new UrWTDetectorItem(detectorLayer, sector+1, layer+1);
 			}
 		}
 
@@ -212,29 +243,34 @@ public class UrWTXYView extends HexView {
 				
 				
 				for (int layer = 3; layer <= 4; layer++) {
-					drawAllStrips(g, container, 1, layer);
+					drawAllStrips(g, container, 3, layer);
+				}
+				
+				for (int sector = 1; sector <= 6; sector++) {
+					for (int layer = 1; layer <= 4; layer++) {
+						UrWTDetectorItem item = detectorItems[sector - 1][layer - 1];
+						item.frame(g, container);
+					}
 				}
 			}
 
 		};
 
-
 		getContainer().setAfterDraw(afterDraw);
 	}
-	
-	private void drawAllStrips(Graphics g, IContainer container, int sector, int layer) {
-				UrWTDetectorData data = UrWTGeometry.getDetectorData(sector, layer);
-				g.setColor(Color.yellow);
-				for (int strip = 1; strip <= data.count; strip++) {
-					if (strip % 100 == 0) {
 
-					projectStrip(container, sector, layer, strip);
-					}
-					g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
-				}
+	//just for testing, draw all the strips for a given sector and layer
+	private void drawAllStrips(Graphics g, IContainer container, int sector, int layer) {
+		UrWTDetectorData data = UrWTGeometry.getDetectorData(sector, layer);
+		g.setColor(Color.yellow);
+		for (int strip = 1; strip <= data.count; strip++) {
+			if (strip % 100 == 0) {
+				projectStrip(container, sector, layer, strip);
+			}
+			g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
+		}
 
 	}
-
 
 
 	//draw the crosses
@@ -369,36 +405,47 @@ public class UrWTXYView extends HexView {
 
 	//draw the hits
 	private void drawHits(Graphics g, IContainer container) {
-//
-//		if (isSingleEventMode()) {
-//			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-//			if (event == null) {
-//				return;
-//			}
-//
-//			byte sector[] = _dataWarehouse.getByte("URWELL::hits", "sector");
-//
-//			int count = (sector == null) ? 0 : sector.length;
-//			if (count == 0) {
-//				return;
-//			}
-//
-//			byte layer[] = _dataWarehouse.getByte("URWELL::hits", "layer");
-//			short strip[] = _dataWarehouse.getShort("URWELL::hits","strip");
-//
+
+		if (isSingleEventMode()) {
+			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
+			if (event == null) {
+				return;
+			}
+
+			byte sector[] = _dataWarehouse.getByte("URWT::hits", "sector");
+
+			int count = (sector == null) ? 0 : sector.length;
+			if (count == 0) {
+				return;
+			}
+
+			byte layer[] = _dataWarehouse.getByte("URWT::hits", "layer");
+			short strip[] = _dataWarehouse.getShort("URWT::hits","strip");
+			
+			if (layer == null || strip == null) {
+				return;
+			}
+
+			for (int i = 0; i < count; i++) {
+				UrWTDetectorItem item = detectorItems[sector[i] - 1][layer[i] - 1];
+				g.setColor(UrWTDetectorItem.layerColors[layer[i] - 1]);
+				projectStrip(container, sector[i], layer[i], strip[i]);
+				g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
+			}
+
 //			int data[];
-//
+
 //			for (int i = 0; i < count; i++) {
 //				g.setColor(_layerColors[layer[i]-1]);
 //				data = UrWELLGeometry.chamberStrip(strip[i]);
 //				projectStrip(container, sector[i], data[0], layer[i], data[1]);
 //				g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
 //			}
-//
-//
-//		} else {
-//			drawAccumulatedHits(g, container);
-//		}
+
+
+		} else {
+			drawAccumulatedHits(g, container);
+		}
 	}
 
 	/**
@@ -406,20 +453,27 @@ public class UrWTXYView extends HexView {
 	 * @param container the container
 	 * @param sector 1-based sector [1..6]
 	 * @param layer 1-based layer [1..4]
-	 * @param chamberStrip 1-based strip
+	 * @param strip 1-based strip
 	 */
-	private void projectStrip(IContainer container, int sector, int layer, int chamberStrip) {
+	private void projectStrip(IContainer container, int sector, int layer, int strip) {
 
-
-		Line3D line = UrWTGeometry.getStrip(sector, layer, chamberStrip);
+		UrWTDetectorData data = UrWTGeometry.getDetectorData(sector, layer);
+		Line3D line = data.getStrip(strip);
+		
 		if (line == null) {
-			System.err.println(String.format("null strip in UrWELLXYView projectStrip for [sector, layer, chamberStrip] = [%d, %d, %d]",
-					sector, layer, chamberStrip));
+			System.err.println(String.format("null strip in UrWTXYView projectStrip for [sector, layer, chamberStrip] = [%d, %d, %d]",
+					sector, layer, strip));
 			return;
 		}
-		projectClasToWorld(line.origin(), projectionPlane, _wp1);
-		projectClasToWorld(line.end(), projectionPlane, _wp2);
-
+//		projectClasToWorld(line.origin(), projectionPlane, _wp1);
+//		projectClasToWorld(line.end(), projectionPlane, _wp2);
+//
+//		container.worldToLocal(_pp1, _wp1);
+//		container.worldToLocal(_pp2, _wp2);
+		
+		_wp1.setLocation(line.origin().x(), line.origin().y());
+		_wp2.setLocation(line.end().x(), line.end().y());
+		
 		container.worldToLocal(_pp1, _wp1);
 		container.worldToLocal(_pp2, _wp2);
 	}
@@ -471,7 +525,7 @@ public class UrWTXYView extends HexView {
 
 		Properties props = new Properties();
 		props.put(PropertySupport.TITLE, title);
-		props.put(PropertySupport.PROPNAME, "URWELLXY");
+		props.put(PropertySupport.PROPNAME, "URWTXY");
 
 		// set to a fraction of screen
 		Dimension d = GraphicsUtilities.screenFraction(0.65);

@@ -1,10 +1,12 @@
-package cnuphys.ced.ced3d;
+package cnuphys.ced.ced3d.ctof;
 
 import java.awt.Color;
 
 import com.jogamp.opengl.GLAutoDrawable;
 
 import cnuphys.ced.alldata.datacontainer.tof.CTOFADCData;
+import cnuphys.ced.ced3d.CedPanel3D;
+import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.lund.X11Colors;
 
 public class CTOF3D extends DetectorItem3D {

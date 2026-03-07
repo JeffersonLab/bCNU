@@ -6,12 +6,12 @@ import java.util.List;
 import org.jlab.geom.prim.Line3D;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GL2ES3;
 
 import bCNU3D.Support3D;
 
 public class DrawSupport {
-	public static void drawPlaneAndHull(GL2 gl, Plane plane, List<Point> hullPoints, float scale, Color color, int volumeAlpha) {
+	public static void drawHull(GL2 gl, List<Point> hullPoints, float scale, 
+			Color color, Color frameColor, int volumeAlpha) {
 
 	    gl.glEnable(GL2.GL_BLEND);
 	    gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
@@ -29,8 +29,8 @@ public class DrawSupport {
 	        }
 	        gl.glEnd();
 
-	        Support3D.setColor(gl, color);
-	        gl.glLineWidth(2.5f);
+	        Support3D.setColor(gl, frameColor);
+	        gl.glLineWidth(1f);
 	        gl.glBegin(GL2.GL_LINE_LOOP);
 	        for (Point p : hullPoints) {
 	            gl.glVertex3d(p.x, p.y, p.z);

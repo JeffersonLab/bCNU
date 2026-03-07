@@ -69,8 +69,6 @@ public final class Desktop extends JDesktopPane implements MouseListener, MouseM
 	// optional after drawer
 	private IDrawable _afterDraw;
 
-	private boolean mouseReleased = false;
-
 	//hack related to internal frame drag bug
 	private static Ping _ping;
 	private JInternalFrame _dragFrame;
@@ -124,6 +122,12 @@ public final class Desktop extends JDesktopPane implements MouseListener, MouseM
 	}
 
 
+	// This is a hack to deal with a bug in the internal frame dragging. 
+	//If the mouse is released while dragging an internal frame, the mouse 
+	//released event is sometimes missed, which causes the frame to be 
+	//"stuck" to the mouse cursor. The heartbeat method checks if the mouse
+	// has been dragging for too long without a release event and simulates a 
+	// mouse release if necessary.
 	private void heartbeat() {
 		if (_dragFrame == null) {
 			return;
@@ -410,13 +414,11 @@ public final class Desktop extends JDesktopPane implements MouseListener, MouseM
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		mouseReleased = false;
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		mouseReleased = true;
-        _dragFrame = null;
+       _dragFrame = null;
         _lastDragTime = Long.MAX_VALUE;
      }
 

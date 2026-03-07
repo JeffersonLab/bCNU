@@ -1,4 +1,4 @@
-package cnuphys.ced.ced3d;
+package cnuphys.ced.ced3d.ftcal;
 
 import java.awt.Color;
 
@@ -6,6 +6,8 @@ import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
 import cnuphys.ced.alldata.datacontainer.ftcal.FTCalADCData;
+import cnuphys.ced.ced3d.CedPanel3D;
+import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.geometry.FTCALGeometry;
 import cnuphys.lund.X11Colors;
 

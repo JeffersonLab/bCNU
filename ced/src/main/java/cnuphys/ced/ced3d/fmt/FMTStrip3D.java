@@ -1,4 +1,4 @@
-package cnuphys.ced.ced3d;
+package cnuphys.ced.ced3d.fmt;
 
 import java.awt.Color;
 
@@ -7,6 +7,8 @@ import org.jlab.io.base.DataEvent;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
+import cnuphys.ced.ced3d.CedPanel3D;
+import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.geometry.fmt.FMTGeometry;
 import cnuphys.lund.X11Colors;

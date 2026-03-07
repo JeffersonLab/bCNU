@@ -1,7 +1,13 @@
 package cnuphys.ced.geometry.urwt;
 
+import java.awt.geom.Point2D;
+import java.util.List;
+
 import org.jlab.detector.geant4.v2.MPGD.URWT.URWTStripFactory;
 import org.jlab.geom.prim.Line3D;
+
+import cnuphys.ced.ced3d.util.PlaneHullUtility;
+import cnuphys.ced.ced3d.util.Point;
 
 public class UrWTDetectorData {
 
@@ -16,6 +22,18 @@ public class UrWTDetectorData {
 
 	// the strips
 	public Line3D[] strips;
+	
+	// the centroid of the detector, used for some calculations
+	private Point centroid;
+	
+	// the convex hull of the strip endpoints, used for some drawing
+	private List<Point> convexHull;
+
+	// for 2D drawing, the coordinates of the convex hull points, stored as a 
+	// flat array for efficient drawing in 2D with Java2D.
+	private Point2D.Double[] xyPoints;
+	
+	private double[] deltaZ = {-2.0, -1.0, 0.0, 1.0}; // for 3D drawing, the z offsets for the layers
 
 	/**
 	 * Some useful chamber data
@@ -54,6 +72,78 @@ public class UrWTDetectorData {
 			}
 
 		}
+		
+		// compute the convex hull of the strip endpoints, which is used 
+		//for 3D drawing. 
+		convexHull = PlaneHullUtility.getHullIfCoplanar(strips, 1.0e-6);
+		if (convexHull == null) {
+			System.err.println(
+					"UrwtDetectorItem: Could not compute convex hull for sector " + sector + " layer " + layer);
+		}
+		
+		// offset the z coords of the strips for 3D drawing, so that the layers
+		// don't z fight
+		
+		for (int i = 0; i < convexHull.size(); i++) {
+			Point p = convexHull.get(i);
+			p.z += deltaZ[layer - 1];
+		}		
+		
+		//get the xy points for 2D drawing
+		xyPoints = new Point2D.Double[convexHull.size()];
+		for (int i = 0; i < convexHull.size(); i++) {
+			Point p = convexHull.get(i);
+			xyPoints[i] = new Point2D.Double(p.x, p.y);
+		}
 
 	}
+	
+	/**
+	 * Get the convex hull of the strip endpoints, which is used for some drawing
+	 * @return the convex hull points
+	 */
+	public List<Point> getConvexHull() {
+		return convexHull;
+	}
+	
+	/**
+	 * Get the xy coordinates of the convex hull points, which is used for some 2D drawing
+	 * @return the xy points
+	 */
+	public Point2D.Double[] getXYPoints() {
+		return xyPoints;
+	}
+	
+	/**
+	 * Get the centroid of the detector, which is used for some calculations
+	 * @return the centroid
+	 */
+	public Point getCentroid() {
+		if (centroid == null) {
+			double x = 0;
+			double y = 0;
+			double z = 0;
+			for (Line3D strip : strips) {
+				x += strip.midpoint().x();
+				y += strip.midpoint().y();
+				z += strip.midpoint().z();
+			}
+			int n = strips.length;
+			centroid = new Point(x / n, y / n, z / n);
+		}
+		return centroid;
+	}
+	
+	/**
+	 * Get a strip by its 1-based strip number
+	 * @param strip the 1-based strip number [1..count]
+	 * @return the strip, or null if the strip number is out of range
+	 */
+	public Line3D getStrip(int strip) {
+		if (strip < 1 || strip > count) {
+			System.err.println("Bad strip number: " + strip);
+			return null;
+		}
+		return strips[strip - 1];
+	}	
 }

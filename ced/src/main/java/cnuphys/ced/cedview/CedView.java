@@ -978,7 +978,59 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 		}
 		return _controlPanel.getDisplayArray().showCosmics();
 	}
+	
+	/**
+	 * Convenience method to see it we show the layer 1 in uRWT.
+	 *
+	 * @return <code>true</code> if we are to show the layer 1 hits, if it is
+	 *         available.
+	 */
+	public boolean showLayer1() {
+		if ((_controlPanel == null) || (_controlPanel.getDisplayArray() == null)) {
+			return false;
+		}
+		return _controlPanel.getDisplayArray().showLayer1();
+	}
 
+	/**
+	 * Convenience method to see it we show the layer 2 in urWT.
+	 *
+	 * @return <code>true</code> if we are to show the layer 2 hits, if it is
+	 *         available.
+	 */
+	public boolean showLayer2() {
+		if ((_controlPanel == null) || (_controlPanel.getDisplayArray() == null)) {
+			return false;
+		}
+		return _controlPanel.getDisplayArray().showLayer2();
+	}
+	
+	/**
+	 * Convenience method to see it we show the layer 3 in urWT.
+	 *
+	 * @return <code>true</code> if we are to show the layer 3 hits, if it is
+	 *         available.
+	 */
+	public boolean showLayer3() {
+		if ((_controlPanel == null) || (_controlPanel.getDisplayArray() == null)) {
+			return false;
+		}
+		return _controlPanel.getDisplayArray().showLayer3();
+	}
+	
+	/**
+	 * Convenience method to see it we show the layer 4 in urWT.
+	 *
+	 * @return <code>true</code> if we are to show the layer 4 hits, if it is
+	 *         available.
+	 */
+	public boolean showLayer4() {
+		if ((_controlPanel == null) || (_controlPanel.getDisplayArray() == null)) {
+			return false;
+		}
+		return _controlPanel.getDisplayArray().showLayer4();
+	}
+	
 	/**
 	 * Convenience method to see if u strips displayed
 	 *

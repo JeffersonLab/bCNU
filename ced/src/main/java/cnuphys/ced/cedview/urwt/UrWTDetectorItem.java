@@ -16,79 +16,54 @@ import cnuphys.ced.geometry.urwt.UrWTGeometry;
 public class UrWTDetectorItem extends PolygonItem {
 
 	//1-based sector
-	private int _sector;
+	public final int sector;
 
 	//1-based layer
-	private int _layer;
+	public final int layer;
+	
+	//layer colors
+	public static Color layerColors[] = {
+			X11Colors.getX11Color("Dark Blue"),
+			X11Colors.getX11Color("Web Green"),
+			X11Colors.getX11Color("Dark Red"),
+			X11Colors.getX11Color("coral"),
 
-	//chamber colors
-	private static Color _fillColors[] = {
-			X11Colors.getX11Color("Dark Blue", 10),
-			X11Colors.getX11Color("Dark Green", 10),
-			X11Colors.getX11Color("Dark Red", 10),
-			X11Colors.getX11Color("coral", 10),
+	};
+	
+	//layer colors
+	public static Color layerAlphaColors[] = {
+			X11Colors.getX11Color("Dark Blue", 30),
+			X11Colors.getX11Color("Web Green", 30),
+			X11Colors.getX11Color("Dark Red", 30),
+			X11Colors.getX11Color("coral", 30),
 
 	};
 
+
 	/**
 	 * Create a chamber outline
 	 *
 	 * @param itemList the item list
-	 * @param points   the points of the chamber
-	 * @param sector   the sector
-	 * @param chamber  the chamber
+	 * @param sector   the sector [1..6]
+	 * @param layer    the layer [1..4]
 	 */
-	public UrWTDetectorItem(ItemList itemList, Point2D.Double points[], int sector, int layer) {
-		super(itemList, points);
-		_sector = sector;
-		_layer = layer;
+	public UrWTDetectorItem(ItemList itemList, int sector, int layer) {
+		super(itemList, getPoints(sector, layer));
+		this.sector = sector;
+		this.layer = layer;
+		getStyle().setFillColor(layerAlphaColors[layer-1]);
 	}
-
-	/**
-	 * Create a chamber outline
-	 * @param itemList the item list
-	 * @param sector the sector [1..6]
-	 * @param layer the layer [1..4]
-	 * @return the layer outline item
-	 */
-	public static  UrWTDetectorItem createUrWELLChamberItem(ItemList itemList, int sector, int layer) {
-		Point2D.Double points[] = new Point2D.Double[4];
-
-		int layerm1 = layer-1;
-		points[0] = new Point2D.Double(UrWTGeometry.minX[layerm1], UrWTGeometry.maxY[layerm1]);
-		points[1] = new Point2D.Double(UrWTGeometry.maxX[layerm1], UrWTGeometry.maxY[layerm1]);
-		points[2] = new Point2D.Double(UrWTGeometry.maxX[layerm1], UrWTGeometry.minY[layerm1]);
-		points[3] = new Point2D.Double(UrWTGeometry.minX[layerm1], UrWTGeometry.minY[layerm1]);
-
-		//rotate if not sector 1
-
-		if (sector > 1) {
-			double midPhi = (Math.PI * (sector - 1)) / 3;
-			for (int i = 0; i < 4; i++) {
-				rotatePoint(points[i], midPhi);
-			}
-		}
-
-
-		UrWTDetectorItem item = new UrWTDetectorItem(itemList, points, sector, layer);
-		item.getStyle().setFillColor(_fillColors[layerm1]);
-		return item;
+	
+	// to get the polygon points for the super constructor
+	private static Point2D.Double[] getPoints(int sector, int layer) {
+		return UrWTGeometry.getDetectorData(sector, layer).getXYPoints();
 	}
-
-	/**
-	 * Rotate a point around the z axis
-	 *
-	 * @param wp  the point being rotated
-	 * @param phi rotation angle in radians
-	 */
-	private static void rotatePoint(Point2D.Double wp, double phi) {
-		double cosPhi = Math.cos(phi);
-		double sinPhi = Math.sin(phi);
-		double x = cosPhi * wp.x + -sinPhi * wp.y;
-		double y = sinPhi * wp.x + cosPhi * wp.y;
-		wp.setLocation(x, y);
+	
+	// helper to get the view
+	private UrWTXYView getView() {
+		return (UrWTXYView) getContainer().getView();
 	}
-
+	
 
 	/**
 	 * Custom drawer for the item.
@@ -98,20 +73,45 @@ public class UrWTDetectorItem extends PolygonItem {
 	 */
 	@Override
 	public void drawItem(Graphics g, IContainer container) {
-		if (ClasIoEventManager.getInstance().isAccumulating()) {
+		if (!showLayer() || ClasIoEventManager.getInstance().isAccumulating()) {
 			return;
 		}
-
 		super.drawItem(g, container);
-
+	}
+	
+	public void  frame(Graphics g, IContainer container) {
+		if (!showLayer() || ClasIoEventManager.getInstance().isAccumulating()) {
+			return;
+		}
+		if (_lastDrawnPolygon != null) {
+			g.setColor(Color.black);
+			g.drawPolygon(_lastDrawnPolygon);
+		}
+	}
+	
+	private boolean showLayer() {
+		
+		UrWTXYView view = getView();
+		
+		if (layer == 1) {
+			return view.showLayer1();
+		} else if (layer == 2) {
+			return view.showLayer2();
+		} else if (layer == 3) {
+			return view.showLayer3();
+		} else if (layer == 4) {
+			return view.showLayer4();
+		}
+		
+		return false;
 	}
 
 	@Override
 	public void getFeedbackStrings(IContainer container, Point pp, Point2D.Double wp, List<String> feedbackStrings) {
 
 		if (contains(container, pp)) {
-			String sectorStr = "$yellow$sector " + _sector;
-			String layerStr = "$yellow$layer " + _layer;
+			String sectorStr = "$yellow$sector " + sector;
+			String layerStr = "$yellow$layer " + layer;
 			feedbackStrings.add(sectorStr);
 			feedbackStrings.add(layerStr);
 		}

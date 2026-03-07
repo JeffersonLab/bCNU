@@ -21,6 +21,18 @@ import cnuphys.ced.cedview.CedView;
 
 @SuppressWarnings("serial")
 public class DisplayArray extends CheckBoxArray implements ItemListener {
+	
+	/** display label for urWT layer 1 */
+	public static final String LAYER_1_LABEL = "Layer 1";
+	
+	/** display label for urWT layer 2 */
+	public static final String LAYER_2_LABEL = "Layer 2";
+	
+	/** display label for urWT layer 3 */
+	public static final String LAYER_3_LABEL = "Layer 3";
+	
+	/** display label for urWT layer 4 */
+	public static final String LAYER_4_LABEL = "Layer 4";
 
 	/** property for inner outer */
 	public static final String SHOWINNER_PROPERTY = "DisplayInner";
@@ -155,6 +167,17 @@ public class DisplayArray extends CheckBoxArray implements ItemListener {
 	private static final String CVTP1_TRAJ_LABEL = "CVTP1 Traj";
 
 
+	// controls whether layer 1 of urWT is displayed
+	public AbstractButton _layer1Button;
+	
+	// controls whether layer 2 of urWT is displayed
+	public AbstractButton _layer2Button;
+	
+	// controls whether layer 3 of urWT is displayed
+	public AbstractButton _layer3Button;
+	
+	// controls whether layer 4 of urWT is displayed
+	public AbstractButton _layer4Button;
 
 	// controls whether any HB data displayed
 	private AbstractButton _showHBButton;
@@ -281,6 +304,14 @@ public class DisplayArray extends CheckBoxArray implements ItemListener {
 	public DisplayArray(CedView view, int bits, int nc, int hgap) {
 		super(nc, hgap, -2);
 		_view = view;
+		
+		//four layers of urwt?
+		if (Bits.checkBit(bits, DisplayBits.URWTLAYERS)) {
+			_layer1Button = add(LAYER_1_LABEL, true, true, this, _buttonColor).getCheckBox();
+			_layer2Button = add(LAYER_2_LABEL, true, true, this, _buttonColor).getCheckBox();
+			_layer3Button = add(LAYER_3_LABEL, true, true, this, _buttonColor).getCheckBox();
+			_layer4Button = add(LAYER_4_LABEL, true, true, this, _buttonColor).getCheckBox();
+		}
 
 		//tof panels?
 
@@ -505,6 +536,42 @@ public class DisplayArray extends CheckBoxArray implements ItemListener {
 	public boolean showScale() {
 		return true;
 //		return _showScaleButton == null ? false : _showScaleButton.isSelected();
+	}
+	
+	/**
+	 * Convenience method to see if layer 1 of urWT is displayed
+	 *
+	 * @return <code>true</code> if we are to display layer 1 of urWT
+	 */
+	public boolean showLayer1() {
+		return _layer1Button == null ? false : _layer1Button.isSelected();
+	}
+	
+	/**
+	 * Convenience method to see if layer 2 of urWT is displayed
+	 *
+	 * @return <code>true</code> if we are to display layer 2 of urWT
+	 */
+	public boolean showLayer2() {
+		return _layer2Button == null ? false : _layer2Button.isSelected();
+	}
+	
+	/**
+	 * Convenience method to see if layer 3 of urWT is displayed
+	 *
+	 * @return <code>true</code> if we are to display layer 3 of urWT
+	 */
+	public boolean showLayer3() {
+		return _layer3Button == null ? false : _layer3Button.isSelected();
+	}
+	
+	/**
+	 * Convenience method to see if layer 4 of urWT is displayed
+	 *
+	 * @return <code>true</code> if we are to display layer 4 of urWT
+	 */
+	public boolean showLayer4() {
+		return _layer4Button == null ? false : _layer4Button.isSelected();
 	}
 
 	/**
