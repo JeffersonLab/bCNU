@@ -24,6 +24,7 @@ import java.awt.Transparency;
 import java.awt.Window;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -1232,84 +1233,18 @@ public class GraphicsUtilities {
     }
 
 	/**
-	 * Returns <code>true</code> if the point is on the line, with an amount of slop
-	 * controlled by the class constant <code>SELECTRES</code>.
-	 *
-	 * @param px     the x coordinate of the point to test.
-	 * @param py     the y coordinate of the point to test.
-	 * @param startx the x coordinate of the start of the line.
-	 * @param starty the y coordinate of the start of the line.
-	 * @param endx   the x coordinate of the end of the line.
-	 * @param endy   the y coordinate of the end of the line.
-	 * @return <code>true</code> if the point is on the line.
-	 */
-	public static boolean pointOnLine(int px, int py, int startx, int starty, int endx, int endy) {
-
-		int delx = endx - startx;
-		int dely = endy - starty;
-
-		int fdelx = Math.abs(delx);
-		int fdely = Math.abs(dely);
-
-		if ((fdelx < 2) && (fdely < 2)) {
-			return false;
-		}
-
-		double x = px;
-		double y = py;
-
-		double x1 = startx;
-		double y1 = starty;
-
-		double t;
-		double dx = delx;
-		double dy = dely;
-
-		if (fdelx > fdely) {
-			t = (x - x1) / dx;
-			if ((t < 0.0) || (t > 1.0)) {
-				return false;
-			}
-
-			double yt = y1 + t * dy;
-
-			if (Math.abs(yt - y) < SELECTRES) {
-				return true;
-
-			}
-		} else {
-			t = (y - y1) / dy;
-			if ((t < 0.0) || (t > 1.0)) {
-				return false;
-			}
-
-			double xt = x1 + t * dx;
-
-			if (Math.abs(xt - x) < SELECTRES) {
-				return true;
-
-			}
-
-		}
-
-		return false;
-	}
-
-	/**
-	 * Returns <code>true</code> if the point is on the line, with an amount of slop
-	 * controlled by the class constant <code>SELECTRES</code>.
-	 *
-	 * @param p     the point to test.
-	 * @param start the start of the line.
-	 * @param end   the end of the line.
-	 * @return <code>true</code> if the point is on the line.
-	 */
-	public static boolean pointOnLine(Point p, Point start, Point end) {
-		if ((p == null) || (start == null) || (end == null)) {
-			return false;
-		}
-		return pointOnLine(p.x, p.y, start.x, start.y, end.x, end.y);
-	}
+     * Checks if a mouse point is within a certain distance of a line segment.
+     * * @param p0 Start point of the line
+     * @param p1 End point of the line
+     * @param mp The mouse point to test
+     * @param tolerance Precision in pixels (e.g., 2.0 or 5.0)
+     * @return true if the mouse is "hitting" the line
+     */
+    public static boolean isPointOnLine(Point p0, Point p1, Point mp, double tolerance) {
+        // Line2D.ptSegDist calculates the shortest distance from the point to the segment
+        double distance = Line2D.ptSegDist(p0.x, p0.y, p1.x, p1.y, mp.x, mp.y);
+        return distance <= tolerance;
+    }
 
 	/**
 	 * Draw a string by breaking it into snippets

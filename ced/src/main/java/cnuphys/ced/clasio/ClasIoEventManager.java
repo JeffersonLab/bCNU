@@ -19,7 +19,6 @@ import org.jlab.io.evio.EvioETSource;
 import org.jlab.io.evio.EvioSource;
 import org.jlab.io.hipo.HipoDataEvent;
 import org.jlab.io.hipo.HipoDataSource;
-import org.jlab.jnp.hipo4.data.Bank;
 import org.jlab.jnp.hipo4.data.Event;
 import org.jlab.jnp.hipo4.data.SchemaFactory;
 import org.jlab.utils.system.ClasUtilsFile;
@@ -39,9 +38,6 @@ import cnuphys.ced.event.ScanManager;
 import cnuphys.ced.frame.Ced;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
-import cnuphys.magfield.MagneticFields;
-import cnuphys.magfield.Solenoid;
-import cnuphys.magfield.Torus;
 import cnuphys.swim.Swimming;
 
 public class ClasIoEventManager {
@@ -351,6 +347,10 @@ public class ClasIoEventManager {
 		}
 
 		_currentHipoFile = file;
+		
+		if (_dataSource != null) {
+			_dataSource.close();
+		}
 
 		_dataSource = new HipoDataSource();
 		_dataSource.open(file.getPath());
@@ -399,6 +399,10 @@ public class ClasIoEventManager {
 		}
 
 		_currentEvioFile = file;
+		
+		if (_dataSource != null) {
+			_dataSource.close();
+		}
 
 		_dataSource = new EvioSource();
 		_dataSource.open(file.getPath());
@@ -429,6 +433,10 @@ public class ClasIoEventManager {
 		if (_etDialog.reason() == DialogUtilities.OK_RESPONSE) {
 
 			reset();
+			
+			if (_dataSource != null) {
+				_dataSource.close();
+			}
 
 			_dataSource = null;
 			_currentMachine = _etDialog.getMachine();
@@ -655,37 +663,13 @@ public class ClasIoEventManager {
 
 				String dir = ClasUtilsFile.getResourceDir("CLAS12DIR", "etc/bankdefs/hipo4");
 				_schemaFactory.initFromDirectory(dir);
-
 				_decoder = new CLASDecoder4();
-
 				DataWarehouse.getInstance().updateSchema(_schemaFactory);
-
 			}
-
-			Event decodedEvent = _decoder.getDataEvent();
-	//		Event decodedEvent = _decoder.getDataEvent(event);
-
-			Bank trigger = _decoder.createTriggerBank();
-
-			if (trigger != null) {
-				decodedEvent.write(trigger);
-			}
-
-			// best I can do since I don't have the actual
-			// values from the file
-
-			Torus torus = MagneticFields.getInstance().getTorus();
-			Solenoid solenoid = MagneticFields.getInstance().getSolenoid();
-
-			double tScale = (torus == null) ? -1 : torus.getScaleFactor();
-			double sScale = (solenoid == null) ? 1 : solenoid.getScaleFactor();
-
-//			Bank header = _decoder.createHeaderBank(-1, 0, (float) tScale, (float) sScale);
-//			if (header != null) {
-//				decodedEvent.write(header);
-//			}
-			_decoder.extractPulses(decodedEvent);
-			return new HipoDataEvent(decodedEvent, _schemaFactory);
+			_decoder.initEvent(event);
+			Event dump = _decoder.getDataEvent();
+			HipoDataEvent hipoEvent = new HipoDataEvent(dump, _decoder.getSchemaFactory());
+			return hipoEvent;
 		}
 
 		catch (Exception e) {
@@ -907,7 +891,6 @@ public class ClasIoEventManager {
 	//	Swimming.clearAllTrajectories();
 
 		if (_dataSource != null) {
-			_dataSource.close();
 			_currentEvent = null;
 			_currentEventIndex = 0;
 		}

@@ -168,7 +168,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private FTCalXYView _ftcalXyView;
 	private DCXYView _dcXyView;
 	private DCHexView _dcHexView;
-	private UrWTXYView _urwellXyView;
+	private UrWTXYView _urwtXyView;
 
 	private ECView _ecView;
 	private PCALView _pcalView;
@@ -305,7 +305,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		_virtualView.moveTo(_dcHexView, 6);
 
 //		_virtualView.moveTo(_rtpcView, 7);
-		_virtualView.moveTo(_urwellXyView, 7, VirtualView.BOTTOMLEFT);
+		_virtualView.moveTo(_urwtXyView, 7, VirtualView.BOTTOMLEFT);
 		_virtualView.moveTo(_ftofView, 8, VirtualView.UPPERRIGHT);
 		_virtualView.moveTo(_ftcalXyView, 9, VirtualView.CENTER);
 		_virtualView.moveTo(_dcXyView, 10);
@@ -451,8 +451,8 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		// add a ftcalxyYView
 		_ftcalXyView = FTCalXYView.createFTCalXYView();
 
-		//add a urwell xy view
-		_urwellXyView = UrWTXYView.createUrWELLView();
+		//add a urwt xy view
+		_urwtXyView = UrWTXYView.createUrWTView();
 
 
 		// add an RTPC vie

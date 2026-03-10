@@ -44,10 +44,10 @@ public class UrWTDetectorData {
 	public UrWTDetectorData(URWTStripFactory factory, int sector, int layer) {
 
 		if ((sector < 1) || (sector > 6)) {
-			System.err.println("Bad sector in UrWELL data: " + sector);
+			System.err.println("Bad sector in UrWT data: " + sector);
 			System.exit(0);
 		} else if ((layer < 1) || (layer > 4)) {
-			System.err.println("Bad layer in UrWELL data: " + layer);
+			System.err.println("Bad layer in UrWT data: " + layer);
 			System.exit(0);
 		}
 

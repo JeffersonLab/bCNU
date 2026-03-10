@@ -65,8 +65,8 @@ public class GeometryManager {
 		// get the CTOF geometry
 	//	CTOFGeometry.initialize();  (USING NEW CACHE SCHEME)
 
-		// get the uRwell geometry
-	//	UrWELLGeometry.initialize(); (USING NEW CACHE SCHEME)
+		// get the urwt geometry
+	//	UrWTGeometry.initialize(); (USING NEW CACHE SCHEME)
 
 		// get the alert geometry
 	//	AlertGeometry.initialize(); (USING NEW CACHE SCHEME)

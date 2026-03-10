@@ -54,7 +54,7 @@ public class UrWTXYView extends HexView {
 
 
 	// sector items
-	private UrWELLHexSectorItem _hexItems[];
+	private UrWTHexSectorItem _hexItems[];
 
 	// chamber outline items
 	private UrWTDetectorItem detectorItems[][];
@@ -80,7 +80,7 @@ public class UrWTXYView extends HexView {
 	private HighlightData _highlightData = new HighlightData();
 
 	//bank matches
-	private static String _defMatches[] = {"URWELL"};
+	private static String _defMatches[] = {"URWT"};
 
 
 	//size the world to be a bit larger than the hexagons
@@ -159,11 +159,11 @@ public class UrWTXYView extends HexView {
 	}
 
 	/**
-	 * Used to create a UrWELLView
+	 * Used to create a UrWTView
 	 *
 	 * @return the new view
 	 */
-	public static UrWTXYView createUrWELLView() {
+	public static UrWTXYView createUrWTView() {
 		String title = UrWTGeometry.NAME + "XY" + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
 
 		UrWTXYView view = new UrWTXYView(title);
@@ -175,11 +175,11 @@ public class UrWTXYView extends HexView {
 	protected void addItems() {
 		ItemList detectorLayer = getContainer().getItemList(_detectorLayerName);
 
-		_hexItems = new UrWELLHexSectorItem[6];
+		_hexItems = new UrWTHexSectorItem[6];
 
 		//hex items that form the outline of the sectors
 		for (int sector = 0; sector < 6; sector++) {
-			_hexItems[sector] = new UrWELLHexSectorItem(detectorLayer, this, sector + 1);
+			_hexItems[sector] = new UrWTHexSectorItem(detectorLayer, this, sector + 1);
 			_hexItems[sector].getStyle().setFillColor(Color.lightGray);
 		}
 
@@ -228,23 +228,19 @@ public class UrWTXYView extends HexView {
 					//draw hits
 					drawHits(g, container);
 
-					//draw clusters
-					drawClusters(g, container);
-
-					//draw crosses
-					drawCrosses(g, container);
-
-					//data selected highlight?
-					drawDataSelectedHighlight(g, container);
+//					//draw clusters
+//					drawClusters(g, container);
+//
+//					//draw crosses
+//					drawCrosses(g, container);
+//
+//					//data selected highlight?
+//					drawDataSelectedHighlight(g, container);
 
 					drawCoordinateSystem(g, container, null);
 					drawSectorNumbers(g, container, null, 145);
 				} // not acumulating
 				
-				
-				for (int layer = 3; layer <= 4; layer++) {
-					drawAllStrips(g, container, 3, layer);
-				}
 				
 				for (int sector = 1; sector <= 6; sector++) {
 					for (int layer = 1; layer <= 4; layer++) {
@@ -259,20 +255,6 @@ public class UrWTXYView extends HexView {
 		getContainer().setAfterDraw(afterDraw);
 	}
 
-	//just for testing, draw all the strips for a given sector and layer
-	private void drawAllStrips(Graphics g, IContainer container, int sector, int layer) {
-		UrWTDetectorData data = UrWTGeometry.getDetectorData(sector, layer);
-		g.setColor(Color.yellow);
-		for (int strip = 1; strip <= data.count; strip++) {
-			if (strip % 100 == 0) {
-				projectStrip(container, sector, layer, strip);
-			}
-			g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
-		}
-
-	}
-
-
 	//draw the crosses
 	private void drawCrosses(Graphics g, IContainer container) {
 		if (!showCrosses()) {
@@ -285,16 +267,16 @@ public class UrWTXYView extends HexView {
 				return;
 			}
 
-			byte sector[] = DataWarehouse.getInstance().getByte("URWELL::crosses", "sector");
+			byte sector[] = DataWarehouse.getInstance().getByte("URWT::crosses", "sector");
 
 			int count = (sector == null) ? 0 : sector.length;
 			if (count == 0) {
 				return;
 			}
 
-			float x[] = _dataWarehouse.getFloat("URWELL::crosses", "x");
-			float y[] = _dataWarehouse.getFloat("URWELL::crosses", "y");
-			float z[] = _dataWarehouse.getFloat("URWELL::crosses", "z");
+			float x[] = _dataWarehouse.getFloat("URWT::crosses", "x");
+			float y[] = _dataWarehouse.getFloat("URWT::crosses", "y");
+			float z[] = _dataWarehouse.getFloat("URWT::crosses", "z");
 
 
 			//public static void drawSphere(Graphics g, String color, int xc, int yc, int width, int height) {
@@ -321,19 +303,19 @@ public class UrWTXYView extends HexView {
 				return;
 			}
 
-			byte sector[] = _dataWarehouse.getByte("URWELL::clusters", "sector");
+			byte sector[] = _dataWarehouse.getByte("URWT::clusters", "sector");
 
 			int count = (sector == null) ? 0 : sector.length;
 			if (count == 0) {
 				return;
 			}
 
-			float xo[] = _dataWarehouse.getFloat("URWELL::clusters", "xo");
-			float yo[] = _dataWarehouse.getFloat("URWELL::clusters", "yo");
-			float zo[] = _dataWarehouse.getFloat("URWELL::clusters", "zo");
-			float xe[] = _dataWarehouse.getFloat("URWELL::clusters", "xe");
-			float ye[] = _dataWarehouse.getFloat("URWELL::clusters", "ye");
-			float ze[] = _dataWarehouse.getFloat("URWELL::clusters", "ze");
+			float xo[] = _dataWarehouse.getFloat("URWT::clusters", "xo");
+			float yo[] = _dataWarehouse.getFloat("URWT::clusters", "yo");
+			float zo[] = _dataWarehouse.getFloat("URWT::clusters", "zo");
+			float xe[] = _dataWarehouse.getFloat("URWT::clusters", "xe");
+			float ye[] = _dataWarehouse.getFloat("URWT::clusters", "ye");
+			float ze[] = _dataWarehouse.getFloat("URWT::clusters", "ze");
 
 			for (int i = 0; i < count; i++) {
 				projectLine(container, xo[i], yo[i], zo[i], xe[i], ye[i], ze[i]);
@@ -354,42 +336,42 @@ public class UrWTXYView extends HexView {
 //
 //		//indices are zero based
 //
-//		if (dataEvent.hasBank("URWELL::clusters") && (_highlightData.cluster >= 0) && showClusters()) {
+//		if (dataEvent.hasBank("URWT::clusters") && (_highlightData.cluster >= 0) && showClusters()) {
 //			int idx = _highlightData.cluster; //0 based
 //
-//			float xo = _dataWarehouse.getFloat("URWELL::clusters", "xo")[idx];
-//			float yo = _dataWarehouse.getFloat("URWELL::clusters", "yo")[idx];
-//			float zo = _dataWarehouse.getFloat("URWELL::clusters", "zo")[idx];
-//			float xe = _dataWarehouse.getFloat("URWELL::clusters", "xe")[idx];
-//			float ye = _dataWarehouse.getFloat("URWELL::clusters", "ye")[idx];
-//			float ze = _dataWarehouse.getFloat("URWELL::clusters", "ze")[idx];
+//			float xo = _dataWarehouse.getFloat("URWT::clusters", "xo")[idx];
+//			float yo = _dataWarehouse.getFloat("URWT::clusters", "yo")[idx];
+//			float zo = _dataWarehouse.getFloat("URWT::clusters", "zo")[idx];
+//			float xe = _dataWarehouse.getFloat("URWT::clusters", "xe")[idx];
+//			float ye = _dataWarehouse.getFloat("URWT::clusters", "ye")[idx];
+//			float ze = _dataWarehouse.getFloat("URWT::clusters", "ze")[idx];
 //
 //			projectLine(container, xo, yo, zo, xe, ye, ze);
 //			GraphicsUtilities.drawThickHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, Color.orange, Color.white);
 //
 //		}
 //
-//		if (dataEvent.hasBank("URWELL::crosses") && (_highlightData.cross >= 0) && showCrosses()) {
+//		if (dataEvent.hasBank("URWT::crosses") && (_highlightData.cross >= 0) && showCrosses()) {
 //			int idx = _highlightData.cross; //0 based
-//			float x = _dataWarehouse.getFloat("URWELL::crosses", "x")[idx];
-//			float y = _dataWarehouse.getFloat("URWELL::crosses", "y")[idx];
-//			float z = _dataWarehouse.getFloat("URWELL::crosses", "z")[idx];
+//			float x = _dataWarehouse.getFloat("URWT::crosses", "x")[idx];
+//			float y = _dataWarehouse.getFloat("URWT::crosses", "y")[idx];
+//			float z = _dataWarehouse.getFloat("URWT::crosses", "z")[idx];
 //			projectPoint(container, x, y, z);
 //			DataDrawSupport.drawBiggerCross(g, _pp1.x, _pp1.y, 5);
 //		}
 //
 //
-//		if (dataEvent.hasBank("URWELL::hits") && (_highlightData.hit >= 0)) {
+//		if (dataEvent.hasBank("URWT::hits") && (_highlightData.hit >= 0)) {
 //
 //			int idx = _highlightData.hit; //0 based
 //
-//			byte sector = _dataWarehouse.getByte("URWELL::hits", "sector")[idx];
-//			byte layer = _dataWarehouse.getByte("URWELL::hits", "layer")[idx];
-//			short strip = _dataWarehouse.getShort("URWELL::hits", "strip")[idx];
+//			byte sector = _dataWarehouse.getByte("URWT::hits", "sector")[idx];
+//			byte layer = _dataWarehouse.getByte("URWT::hits", "layer")[idx];
+//			short strip = _dataWarehouse.getShort("URWT::hits", "strip")[idx];
 //
 //			int data[];
 //
-//			data = UrWELLGeometry.chamberStrip(strip);
+//			data = UrWTGeometry.chamberStrip(strip);
 //			projectStrip(container, sector, data[0], layer, data[1]);
 //
 //			GraphicsUtilities.drawOval(g, _pp1.x, _pp1.y, 6, 6, Color.black, Color.cyan);
@@ -425,27 +407,35 @@ public class UrWTXYView extends HexView {
 			if (layer == null || strip == null) {
 				return;
 			}
+			
 
 			for (int i = 0; i < count; i++) {
-				UrWTDetectorItem item = detectorItems[sector[i] - 1][layer[i] - 1];
+				if (!showLayer(layer[i])) {
+					continue;
+				}
 				g.setColor(UrWTDetectorItem.layerColors[layer[i] - 1]);
-				projectStrip(container, sector[i], layer[i], strip[i]);
+				projectStrip(container, sector[i], layer[i], strip[i], _pp1, _pp2);
 				g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
 			}
-
-//			int data[];
-
-//			for (int i = 0; i < count; i++) {
-//				g.setColor(_layerColors[layer[i]-1]);
-//				data = UrWELLGeometry.chamberStrip(strip[i]);
-//				projectStrip(container, sector[i], data[0], layer[i], data[1]);
-//				g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
-//			}
 
 
 		} else {
 			drawAccumulatedHits(g, container);
 		}
+	}
+	
+	// helper to determine if a layer should be drawn
+	protected boolean showLayer(int layer) {
+		if (layer == 1) {
+			return showLayer1();
+		} else if (layer == 2) {
+			return showLayer2();
+		} else if (layer == 3) {
+			return showLayer3();
+		} else if (layer == 4) {
+			return showLayer4();
+		}
+		return false;
 	}
 
 	/**
@@ -455,7 +445,9 @@ public class UrWTXYView extends HexView {
 	 * @param layer 1-based layer [1..4]
 	 * @param strip 1-based strip
 	 */
-	private void projectStrip(IContainer container, int sector, int layer, int strip) {
+	protected void projectStrip(IContainer container, int sector, 
+			int layer, int strip,
+			Point p0, Point p1) {
 
 		UrWTDetectorData data = UrWTGeometry.getDetectorData(sector, layer);
 		Line3D line = data.getStrip(strip);
@@ -468,14 +460,14 @@ public class UrWTXYView extends HexView {
 //		projectClasToWorld(line.origin(), projectionPlane, _wp1);
 //		projectClasToWorld(line.end(), projectionPlane, _wp2);
 //
-//		container.worldToLocal(_pp1, _wp1);
-//		container.worldToLocal(_pp2, _wp2);
+//		container.worldToLocal(p0, _wp1);
+//		container.worldToLocal(p1, _wp2);
 		
 		_wp1.setLocation(line.origin().x(), line.origin().y());
 		_wp2.setLocation(line.end().x(), line.end().y());
 		
-		container.worldToLocal(_pp1, _wp1);
-		container.worldToLocal(_pp2, _wp2);
+		container.worldToLocal(p0, _wp1);
+		container.worldToLocal(p1, _wp2);
 	}
 
 	/**
@@ -550,6 +542,7 @@ public class UrWTXYView extends HexView {
 		container.worldToLocal(pp, wp);
 
 		super.getFeedbackStrings(container, pp, wp, feedbackStrings);
+		
 
 		//crosses feedback
 		crossesFeedback(container, pp, wp, feedbackStrings);
@@ -564,26 +557,26 @@ public class UrWTXYView extends HexView {
 				return;
 			}
 
-			byte sector[] = _dataWarehouse.getByte("URWELL::crosses", "sector");
+			byte sector[] = _dataWarehouse.getByte("URWT::crosses", "sector");
 
 			int count = (sector == null) ? 0 : sector.length;
 			if (count == 0) {
 				return;
 			}
 
-			float x[] = _dataWarehouse.getFloat("URWELL::crosses", "x");
-			float y[] = _dataWarehouse.getFloat("URWELL::crosses", "y");
-			float z[] = _dataWarehouse.getFloat("URWELL::crosses", "z");
+			float x[] = _dataWarehouse.getFloat("URWT::crosses", "x");
+			float y[] = _dataWarehouse.getFloat("URWT::crosses", "y");
+			float z[] = _dataWarehouse.getFloat("URWT::crosses", "z");
 
 			for (int i = 0; i < count; i++) {
 				projectPoint(container, x[i], y[i], z[i]);
 				_fbRect.setBounds(_pp1.x-5, _pp1.y-5, 10, 10);
 
 				if (_fbRect.contains(pp)) {
-					short id = _dataWarehouse.getShort("URWELL::crosses", "id")[i];
-					short cluster1 = _dataWarehouse.getShort("URWELL::crosses", "cluster1")[i];
-					short cluster2 = _dataWarehouse.getShort("URWELL::crosses", "cluster2")[i];
-					short status = _dataWarehouse.getShort("URWELL::crosses", "status")[i];
+					short id = _dataWarehouse.getShort("URWT::crosses", "id")[i];
+					short cluster1 = _dataWarehouse.getShort("URWT::crosses", "cluster1")[i];
+					short cluster2 = _dataWarehouse.getShort("URWT::crosses", "cluster2")[i];
+					short status = _dataWarehouse.getShort("URWT::crosses", "status")[i];
 
 					String fbs1 = String.format("$cyan$cross: %d  status: %d", id, status);
 					String fbs2 = String.format("$cyan$cross clusters: %d and %d", cluster1, cluster2);
@@ -642,7 +635,7 @@ public class UrWTXYView extends HexView {
 		vr.x += 40;
 		vr.y += 40;
 
-		UrWTXYView view = createUrWELLView();
+		UrWTXYView view = createUrWTView();
 		view.setBounds(vr);
 		return view;
 
@@ -657,13 +650,13 @@ public class UrWTXYView extends HexView {
 	@Override
 	public void dataSelected(String bankName, int index) {
 
-		if ("URWELL::hits".equals(bankName)) {
+		if ("URWT::hits".equals(bankName)) {
 			_highlightData.hit = index;
 		}
-		else if ("URWELL::clusters".equals(bankName)) {
+		else if ("URWT::clusters".equals(bankName)) {
 			_highlightData.cluster = index;
 		}
-		else if ("URWELL::crosses".equals(bankName)) {
+		else if ("URWT::crosses".equals(bankName)) {
 			_highlightData.cross = index;
 		}
 

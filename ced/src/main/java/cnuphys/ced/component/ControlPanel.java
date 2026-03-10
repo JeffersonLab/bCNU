@@ -179,7 +179,6 @@ public class ControlPanel extends JPanel implements ChangeListener {
 	}
 
 	public void addComponent(JComponent component) {
-		System.out.println("Adding northbox component");
 		_northBox.add(component);
 
 		// Adjust the preferred size to maintain the desired layout

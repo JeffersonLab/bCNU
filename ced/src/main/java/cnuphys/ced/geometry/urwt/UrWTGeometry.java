@@ -19,7 +19,7 @@ import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
 /**
- * Geometric data for the uRwell detector
+ * Geometric data for the UrWT detector
  * 
  * 3/5/26 BIG CHANGE Chamber concept gone, now a given sector and layer make "detector"
   * 

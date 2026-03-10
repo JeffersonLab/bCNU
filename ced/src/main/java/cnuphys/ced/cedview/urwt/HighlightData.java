@@ -1,7 +1,7 @@
 package cnuphys.ced.cedview.urwt;
 
 /**
- * This will hold the highlighted data from uRWell banks
+ * This will hold the highlighted data from uRWT banks
  * resulting from clicking on one of the bank rows
  * @author heddle
  *

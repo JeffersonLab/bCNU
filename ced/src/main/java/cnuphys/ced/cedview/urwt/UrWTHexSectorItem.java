@@ -11,7 +11,7 @@ import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.item.HexSectorItem;
 
-public class UrWELLHexSectorItem extends HexSectorItem {
+public class UrWTHexSectorItem extends HexSectorItem {
 
 	private UrWTXYView _view;
 
@@ -21,7 +21,7 @@ public class UrWELLHexSectorItem extends HexSectorItem {
 	 * @param itemList the item list
 	 * @param sector   the 1-based sector
 	 */
-	public UrWELLHexSectorItem(ItemList itemList, UrWTXYView view, int sector) {
+	public UrWTHexSectorItem(ItemList itemList, UrWTXYView view, int sector) {
 		super(itemList, view, sector);
 		_view = view;
 	}

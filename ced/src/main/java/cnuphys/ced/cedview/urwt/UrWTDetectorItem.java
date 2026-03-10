@@ -6,20 +6,35 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.List;
 
+import org.jlab.io.base.DataEvent;
+
+import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.bCNU.util.X11Colors;
+import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.geometry.urwt.UrWTGeometry;
 
 public class UrWTDetectorItem extends PolygonItem {
+	
+	// tolerance for hit testing in pixels
+	private static final double HIT_TEST_TOLERANCE = 4;
 
 	//1-based sector
 	public final int sector;
 
 	//1-based layer
 	public final int layer;
+	
+	//work space
+	private Point _pp1 = new Point();
+	private Point _pp2 = new Point();
+
+	//data warehouse
+	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
+
 	
 	//layer colors
 	public static Color layerColors[] = {
@@ -105,15 +120,49 @@ public class UrWTDetectorItem extends PolygonItem {
 		
 		return false;
 	}
+	
+	// helper to project a strip
+	private void projectStrip(IContainer container, int strip) {
+		UrWTXYView view = getView();
+        view.projectStrip(container, sector, layer,strip, _pp1, _pp2);
+	}
 
 	@Override
 	public void getFeedbackStrings(IContainer container, Point pp, Point2D.Double wp, List<String> feedbackStrings) {
 
 		if (contains(container, pp)) {
-			String sectorStr = "$yellow$sector " + sector;
-			String layerStr = "$yellow$layer " + layer;
-			feedbackStrings.add(sectorStr);
-			feedbackStrings.add(layerStr);
+			UrWTXYView view = getView();
+    		if (view.isSingleEventMode() && view.showLayer(layer)) {
+				DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
+				if (event == null) {
+					return;
+				}
+
+				byte sector[] = _dataWarehouse.getByte("URWT::hits", "sector");
+
+				int count = (sector == null) ? 0 : sector.length;
+				if (count == 0) {
+					return;
+				}
+
+				byte layer[] = _dataWarehouse.getByte("URWT::hits", "layer");
+				short strip[] = _dataWarehouse.getShort("URWT::hits","strip");
+				
+				if (layer == null || strip == null) {
+					return;
+				}
+				
+				for (int i = 0; i < count; i++) {
+					if (sector[i] == this.sector && layer[i] == this.layer) {
+						projectStrip(container, strip[i]);
+						boolean hit = GraphicsUtilities.isPointOnLine(_pp1, _pp2, pp, HIT_TEST_TOLERANCE);
+						if (hit) {
+							feedbackStrings.add(String.format("URWT hit: sector %d, layer %d, strip %d", sector[i],
+									layer[i], strip[i]));
+						}
+					}
+				}
+			}
 		}
 	}
 

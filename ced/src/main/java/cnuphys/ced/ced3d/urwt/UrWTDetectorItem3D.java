@@ -3,13 +3,18 @@ package cnuphys.ced.ced3d.urwt;
 import java.awt.Color;
 import java.util.List;
 
+import org.jlab.geom.prim.Line3D;
+import org.jlab.io.base.DataEvent;
+
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
+import bCNU3D.Support3D;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.ced3d.util.DrawSupport;
 import cnuphys.ced.ced3d.util.Point;
 import cnuphys.ced.cedview.urwt.UrWTDetectorItem;
+import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.geometry.urwt.UrWTDetectorData;
 import cnuphys.ced.geometry.urwt.UrWTGeometry;
 
@@ -30,6 +35,9 @@ public class UrWTDetectorItem3D extends DetectorItem3D {
 	 * database and geometry conventions. The layer is in the range [1..4].
 	 */
 	public final int layer;  // 1-based [1..4]
+	
+	// the color for this layer, used for drawing the detector shape and hits.
+	private final Color layerColor;
 
 	// the data for this detector, including the strip lines and the 
 	// precomputed convex hull of the strip endpoints, which is used for 
@@ -62,6 +70,8 @@ public class UrWTDetectorItem3D extends DetectorItem3D {
 
 		convexHull = detectorData.getConvexHull();
 		
+		layerColor = UrWTDetectorItem.layerColors[layer - 1];
+		
 		// get the OpenGL-friendly coordinates for the convex hull points
 		coords = new float[convexHull.size() * 3];
 		for (int i = 0; i < convexHull.size(); i++) {
@@ -76,14 +86,49 @@ public class UrWTDetectorItem3D extends DetectorItem3D {
 	public void drawShape(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 		DrawSupport.drawHull(gl, convexHull, 100.0f, 
-				UrWTDetectorItem.layerColors[layer - 1], 
+				layerColor, 
 				frameColor, getVolumeAlpha());
 	}
 
 	@Override
 	public void drawData(GLAutoDrawable drawable) {
-		// TODO Auto-generated method stub
+			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
+			if (event == null) {
+				return;
+			}
 
+			byte sector[] = _dataWarehouse.getByte("URWT::hits", "sector");
+
+			int count = (sector == null) ? 0 : sector.length;
+			if (count == 0) {
+				return;
+			}
+
+			byte layer[] = _dataWarehouse.getByte("URWT::hits", "layer");
+			short strip[] = _dataWarehouse.getShort("URWT::hits","strip");
+			
+			if (layer == null || strip == null) {
+				return;
+			}
+			
+			for (int i = 0; i < count; i++) {
+				if (!show()) {
+					continue;
+				}
+				
+				Line3D stripLine = UrWTGeometry.getStrip(sector[i], layer[i], strip[i]);
+				
+				float x1 = (float) stripLine.origin().x();
+				float y1 = (float) stripLine.origin().y();
+				float z1 = (float) stripLine.origin().z();
+				float x2 = (float) stripLine.end().x();
+				float y2 = (float) stripLine.end().y();
+				float z2 = (float) stripLine.end().z();		
+				
+				Support3D.drawLine(drawable, x1, y1, z1,
+						x2, y2, z2,
+						layerColor, 1f);
+			}
 	}
 
 	@Override
