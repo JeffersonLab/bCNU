@@ -32,10 +32,6 @@ public class UrWTDetectorItem extends PolygonItem {
 	private Point _pp1 = new Point();
 	private Point _pp2 = new Point();
 	
-	//transparent colors 
-	private static final Color transYellow = new Color(255, 255, 0, 48);
-	private static final Color transBlack = new Color(0, 0, 0, 48);
-
 	//data warehouse
 	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
 
@@ -58,6 +54,11 @@ public class UrWTDetectorItem extends PolygonItem {
 
 	};
 
+	//cluster colors 
+	private final Color clusterColor1;
+	private final Color clusterColor2;
+
+
 
 	/**
 	 * Create a chamber outline
@@ -71,6 +72,9 @@ public class UrWTDetectorItem extends PolygonItem {
 		this.sector = sector;
 		this.layer = layer;
 		getStyle().setFillColor(layerAlphaColors[layer-1]);
+		clusterColor1 = layerColors[layer-1].darker();
+		clusterColor2 = layerColors[layer-1].brighter();
+		
 	}
 	
 	// to get the polygon points for the super constructor
@@ -140,7 +144,7 @@ public class UrWTDetectorItem extends PolygonItem {
 
 		for (int i = 0; i < count; i++) {
 			view.projectLine(container, xo[i], yo[i], zo[i], xe[i], ye[i], ze[i], _pp1, _pp2);
-			GraphicsUtilities.drawHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, transBlack, transYellow);
+			GraphicsUtilities.drawHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, clusterColor1, clusterColor2);
 		}
 		
 	}
