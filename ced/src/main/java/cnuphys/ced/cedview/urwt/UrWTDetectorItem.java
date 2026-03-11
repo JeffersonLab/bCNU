@@ -31,6 +31,10 @@ public class UrWTDetectorItem extends PolygonItem {
 	//work space
 	private Point _pp1 = new Point();
 	private Point _pp2 = new Point();
+	
+	//transparent colors 
+	private static final Color transYellow = new Color(255, 255, 0, 48);
+	private static final Color transBlack = new Color(0, 0, 0, 48);
 
 	//data warehouse
 	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
@@ -94,6 +98,97 @@ public class UrWTDetectorItem extends PolygonItem {
 		super.drawItem(g, container);
 	}
 	
+	/**
+	 * Draw the hits for this layer. This is called by the view after all items have been drawn, so we can draw on top of the detector outlines.
+	 * @param g the graphics context
+	 * @param container the container being drawn
+	 */
+	protected void drawData(Graphics g, IContainer container) {
+		if (!showLayer() || ClasIoEventManager.getInstance().isAccumulating()) {
+			return;
+		}
+		
+
+		drawHits(g, container); //hits
+		drawClusters(g, container); //clusters
+	}
+	
+	//
+	private void drawClusters(Graphics g, IContainer container) {
+		UrWTXYView view = getView();
+		if (!view.showClusters()) {
+			return;
+		}
+		
+		DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
+		if (event == null) {
+			return;
+		}
+		byte sector[] = _dataWarehouse.getByte("URWT::clusters", "sector");
+
+		int count = (sector == null) ? 0 : sector.length;
+		if (count == 0) {
+			return;
+		}
+
+		float xo[] = _dataWarehouse.getFloat("URWT::clusters", "xo");
+		float yo[] = _dataWarehouse.getFloat("URWT::clusters", "yo");
+		float zo[] = _dataWarehouse.getFloat("URWT::clusters", "zo");
+		float xe[] = _dataWarehouse.getFloat("URWT::clusters", "xe");
+		float ye[] = _dataWarehouse.getFloat("URWT::clusters", "ye");
+		float ze[] = _dataWarehouse.getFloat("URWT::clusters", "ze");
+
+		for (int i = 0; i < count; i++) {
+			view.projectLine(container, xo[i], yo[i], zo[i], xe[i], ye[i], ze[i], _pp1, _pp2);
+			GraphicsUtilities.drawHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, transBlack, transYellow);
+		}
+		
+	}
+	
+	// helper to draw the hits
+	private void drawHits(Graphics g, IContainer container) {
+		DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
+		if (event == null) {
+			return;
+		}
+
+		byte sectors[] = _dataWarehouse.getByte("URWT::hits", "sector");
+
+		int count = (sectors == null) ? 0 : sectors.length;
+		if (count == 0) {
+			return;
+		}
+
+		byte layers[] = _dataWarehouse.getByte("URWT::hits", "layer");
+		short strips[] = _dataWarehouse.getShort("URWT::hits","strip");
+	
+		if (layers == null || strips == null) {
+			return;
+		}
+		
+		g.setColor(layerColors[layer-1]);
+		
+		for (int i = 0; i < count; i++) {
+			if (sectors[i] == this.sector && layers[i] == this.layer) {
+				projectStrip(container, strips[i]);
+				g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
+			}
+		}
+	}
+	
+	/**
+	 * Draw the accumulated hits for this layer. This is called by the view after all items have been drawn, so we can draw on top of the detector outlines.
+	 * @param g the graphics context
+	 * @param container the container being drawn
+	 */
+	protected void drawAccumulatedData(Graphics g, IContainer container) {
+		if (!showLayer()) {
+			return;
+		}
+		
+		//hits
+	}
+	
 	public void  frame(Graphics g, IContainer container) {
 		if (!showLayer() || ClasIoEventManager.getInstance().isAccumulating()) {
 			return;
@@ -104,6 +199,7 @@ public class UrWTDetectorItem extends PolygonItem {
 		}
 	}
 	
+	// helper to check if we should show this layer
 	private boolean showLayer() {
 		
 		UrWTXYView view = getView();
@@ -133,33 +229,84 @@ public class UrWTDetectorItem extends PolygonItem {
 		if (contains(container, pp)) {
 			UrWTXYView view = getView();
     		if (view.isSingleEventMode() && view.showLayer(layer)) {
-				DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-				if (event == null) {
-					return;
-				}
+    			hitFeedback(container, pp, feedbackStrings);
+    			clusterFeedback(container, pp, feedbackStrings);
+			}
+		}
+	}
 
-				byte sector[] = _dataWarehouse.getByte("URWT::hits", "sector");
+	private void clusterFeedback(IContainer container, Point pp, List<String> feedbackStrings) {
+		UrWTXYView view = getView();
+		if (view.isSingleEventMode() && view.showClusters()) {
+			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
+			if (event == null) {
+				return;
+			}
 
-				int count = (sector == null) ? 0 : sector.length;
-				if (count == 0) {
-					return;
-				}
+			byte sector[] = _dataWarehouse.getByte("URWT::clusters", "sector");
 
-				byte layer[] = _dataWarehouse.getByte("URWT::hits", "layer");
-				short strip[] = _dataWarehouse.getShort("URWT::hits","strip");
-				
-				if (layer == null || strip == null) {
-					return;
+			int count = (sector == null) ? 0 : sector.length;
+			if (count == 0) {
+				return;
+			}
+
+			byte layer[] = _dataWarehouse.getByte("URWT::clusters", "layer");
+			short strip[] = _dataWarehouse.getShort("URWT::clusters", "strip");
+
+			if (layer == null || strip == null) {
+				return;
+			}
+
+			float xo[] = _dataWarehouse.getFloat("URWT::clusters", "xo");
+			float yo[] = _dataWarehouse.getFloat("URWT::clusters", "yo");
+			float zo[] = _dataWarehouse.getFloat("URWT::clusters", "zo");
+			float xe[] = _dataWarehouse.getFloat("URWT::clusters", "xe");
+			float ye[] = _dataWarehouse.getFloat("URWT::clusters", "ye");
+			float ze[] = _dataWarehouse.getFloat("URWT::clusters", "ze");
+
+			for (int i = 0; i < count; i++) {
+				if (sector[i] == this.sector && layer[i] == this.layer) {
+					view.projectLine(container, xo[i], yo[i], zo[i], xe[i], ye[i], ze[i], _pp1, _pp2);
+					boolean hit = GraphicsUtilities.isPointOnLine(_pp1, _pp2, pp, HIT_TEST_TOLERANCE);
+					if (hit) {
+						feedbackStrings.add(String.format("cluster sector %d layer %d strip %d", sector[i],
+								layer[i], strip[i]));
+					}
 				}
-				
-				for (int i = 0; i < count; i++) {
-					if (sector[i] == this.sector && layer[i] == this.layer) {
-						projectStrip(container, strip[i]);
-						boolean hit = GraphicsUtilities.isPointOnLine(_pp1, _pp2, pp, HIT_TEST_TOLERANCE);
-						if (hit) {
-							feedbackStrings.add(String.format("URWT hit: sector %d, layer %d, strip %d", sector[i],
-									layer[i], strip[i]));
-						}
+			}
+		}
+	}
+
+	// helper to add hit feedback strings
+	private void hitFeedback(IContainer container, Point pp, List<String> feedbackStrings) {
+		UrWTXYView view = getView();
+		if (view.isSingleEventMode() && view.showLayer(layer)) {
+			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
+			if (event == null) {
+				return;
+			}
+
+			byte sector[] = _dataWarehouse.getByte("URWT::hits", "sector");
+
+			int count = (sector == null) ? 0 : sector.length;
+			if (count == 0) {
+				return;
+			}
+
+			byte layer[] = _dataWarehouse.getByte("URWT::hits", "layer");
+			short strip[] = _dataWarehouse.getShort("URWT::hits","strip");
+		
+			if (layer == null || strip == null) {
+				return;
+			}
+			
+			for (int i = 0; i < count; i++) {
+				if (sector[i] == this.sector && layer[i] == this.layer) {
+					projectStrip(container, strip[i]);
+					boolean hit = GraphicsUtilities.isPointOnLine(_pp1, _pp2, pp, HIT_TEST_TOLERANCE);
+					if (hit) {
+						feedbackStrings.add(String.format("hit sector %d layer %d strip %d", sector[i],
+								layer[i], strip[i]));
 					}
 				}
 			}

@@ -43,7 +43,7 @@ public class ControlPanel extends JPanel implements ChangeListener {
 	private static final int SLIDERWIDTH = 210;
 
 	// widths of some optional widgets
-	private static final int FULLWIDTH = 220;
+	private static final int FULLWIDTH = 270;
 
 	/** Bit used to create a display array */
 	public static final int DISPLAYARRAY = 01;

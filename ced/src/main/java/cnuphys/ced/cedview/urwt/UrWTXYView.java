@@ -223,13 +223,18 @@ public class UrWTXYView extends HexView {
 
 					// draw trajectories
 					_swimTrajectoryDrawer.draw(g, container);
+					
+					for (int sector = 1; sector <= 6; sector++) {
+						for (int layer = 1; layer <= 4; layer++) {
+							if (!showLayer(layer)) {
+								continue;
+							}
+							UrWTDetectorItem item = detectorItems[sector - 1][layer - 1];
+							item.drawData(g, container);
+						}
+					}
 
 
-					//draw hits
-					drawHits(g, container);
-
-//					//draw clusters
-//					drawClusters(g, container);
 //
 //					//draw crosses
 //					drawCrosses(g, container);
@@ -291,40 +296,6 @@ public class UrWTXYView extends HexView {
 	}
 
 
-	//draw the clusters
-	private void drawClusters(Graphics g, IContainer container) {
-		if (!showClusters()) {
-			return;
-		}
-
-		if (isSingleEventMode()) {
-			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-			if (event == null) {
-				return;
-			}
-
-			byte sector[] = _dataWarehouse.getByte("URWT::clusters", "sector");
-
-			int count = (sector == null) ? 0 : sector.length;
-			if (count == 0) {
-				return;
-			}
-
-			float xo[] = _dataWarehouse.getFloat("URWT::clusters", "xo");
-			float yo[] = _dataWarehouse.getFloat("URWT::clusters", "yo");
-			float zo[] = _dataWarehouse.getFloat("URWT::clusters", "zo");
-			float xe[] = _dataWarehouse.getFloat("URWT::clusters", "xe");
-			float ye[] = _dataWarehouse.getFloat("URWT::clusters", "ye");
-			float ze[] = _dataWarehouse.getFloat("URWT::clusters", "ze");
-
-			for (int i = 0; i < count; i++) {
-				projectLine(container, xo[i], yo[i], zo[i], xe[i], ye[i], ze[i]);
-				GraphicsUtilities.drawHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, Color.black, Color.yellow);
-			}
-
-		}
-	}
-
 
 	//draw data selected highlighted data
 	private void drawDataSelectedHighlight(Graphics g, IContainer container) {
@@ -384,45 +355,6 @@ public class UrWTXYView extends HexView {
 	}
 
 
-
-	//draw the hits
-	private void drawHits(Graphics g, IContainer container) {
-
-		if (isSingleEventMode()) {
-			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-			if (event == null) {
-				return;
-			}
-
-			byte sector[] = _dataWarehouse.getByte("URWT::hits", "sector");
-
-			int count = (sector == null) ? 0 : sector.length;
-			if (count == 0) {
-				return;
-			}
-
-			byte layer[] = _dataWarehouse.getByte("URWT::hits", "layer");
-			short strip[] = _dataWarehouse.getShort("URWT::hits","strip");
-			
-			if (layer == null || strip == null) {
-				return;
-			}
-			
-
-			for (int i = 0; i < count; i++) {
-				if (!showLayer(layer[i])) {
-					continue;
-				}
-				g.setColor(UrWTDetectorItem.layerColors[layer[i] - 1]);
-				projectStrip(container, sector[i], layer[i], strip[i], _pp1, _pp2);
-				g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
-			}
-
-
-		} else {
-			drawAccumulatedHits(g, container);
-		}
-	}
 	
 	// helper to determine if a layer should be drawn
 	protected boolean showLayer(int layer) {
@@ -457,30 +389,23 @@ public class UrWTXYView extends HexView {
 					sector, layer, strip));
 			return;
 		}
-//		projectClasToWorld(line.origin(), projectionPlane, _wp1);
-//		projectClasToWorld(line.end(), projectionPlane, _wp2);
-//
-//		container.worldToLocal(p0, _wp1);
-//		container.worldToLocal(p1, _wp2);
 		
-		_wp1.setLocation(line.origin().x(), line.origin().y());
-		_wp2.setLocation(line.end().x(), line.end().y());
-		
-		container.worldToLocal(p0, _wp1);
-		container.worldToLocal(p1, _wp2);
+		projectLine(container, (float) line.origin().x(), (float) line.origin().y(), (float) line.origin().z(),
+				(float) line.end().x(), (float) line.end().y(), (float) line.end().z(),
+				p0, p1);
 	}
 
 	/**
 	 *
 	 * @param container the container
-	 * @param x1
+	 * @param x1   
 	 * @param y1
 	 * @param z1
 	 * @param x2
 	 * @param y2
 	 * @param z2
 	 */
-	private void projectLine(IContainer container, float x1, float y1, float z1, float x2, float y2, float z2) {
+	protected void projectLine(IContainer container, float x1, float y1, float z1, float x2, float y2, float z2, Point p1, Point p2) {
 
 		_p3d1.set(x1, y1, z1);
 		_p3d2.set(x2, y2, z2);
@@ -488,8 +413,8 @@ public class UrWTXYView extends HexView {
 		projectClasToWorld(_p3d1, projectionPlane, _wp1);
 		projectClasToWorld(_p3d2, projectionPlane, _wp2);
 
-		container.worldToLocal(_pp1, _wp1);
-		container.worldToLocal(_pp2, _wp2);
+		container.worldToLocal(p1, _wp1);
+		container.worldToLocal(p2, _wp2);
 
 	}
 
