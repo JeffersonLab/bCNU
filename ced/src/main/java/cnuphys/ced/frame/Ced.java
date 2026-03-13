@@ -179,7 +179,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 	private SwimmingTestView3D _swimming3DView;
 	private CentralView3D _central3DView;
-	private FTCalView3D _ftCal3DView;
+//	private FTCalView3D _ftCal3DView;
 	private UrwtView3D _urwt3DView;
 
 	private FTOFView _ftofView;
@@ -316,7 +316,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 			_virtualView.moveTo(_alert3DView, 12, VirtualView.CENTER);
 			_virtualView.moveTo(_forward3DView, 13, VirtualView.CENTER);
 			_virtualView.moveTo(_central3DView, 14, VirtualView.BOTTOMLEFT);
-			_virtualView.moveTo(_ftCal3DView, 16, VirtualView.BOTTOMRIGHT);
+//			_virtualView.moveTo(_ftCal3DView, 16, VirtualView.BOTTOMRIGHT);
 			_virtualView.moveTo(_fmt3DView, 15, VirtualView.CENTER);
 			_virtualView.moveTo(_urwt3DView, 17, VirtualView.CENTER);
 
@@ -468,7 +468,11 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 			_central3DView = new CentralView3D();
 			_fmt3DView = new FMTView3D();
 			_forward3DView = new ForwardView3D();
-			_ftCal3DView = new FTCalView3D();
+//			_ftCal3DView = new FTCalView3D();
+			ViewManager.getInstance().addConfiguration(FTCalView3D.getConfiguration());
+			
+			
+			
 			_urwt3DView = new UrwtView3D();
 
 			if (_experimental) {
