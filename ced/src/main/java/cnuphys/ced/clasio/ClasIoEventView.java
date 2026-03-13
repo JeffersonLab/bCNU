@@ -21,10 +21,7 @@ public class ClasIoEventView extends BaseView {
 	 */
 	private ClasIoEventView() {
 
-		super(PropertySupport.TITLE, "Current Event", PropertySupport.ICONIFIABLE, true, PropertySupport.MAXIMIZABLE,
-				true, PropertySupport.CLOSABLE, true, PropertySupport.RESIZABLE, true, PropertySupport.WIDTH, 1100,
-				PropertySupport.HEIGHT, 750, PropertySupport.VISIBLE, true, PropertySupport.TOOLBAR, false,
-				PropertySupport.PROPNAME, "CUREVENT");
+		super(createArgs());
 
 		JPanel sPanel = new JPanel();
 		sPanel.setLayout(new BorderLayout(2, 2));
@@ -34,6 +31,20 @@ public class ClasIoEventView extends BaseView {
 		add(sPanel);
 	}
 
+	
+	// create the arguments for the base view constructor
+	private static Object[] createArgs() {
+		
+		double size[] = getSizeFromScreenFraction(0.8);
+		int width = (int) size[0];
+		int height = (int) (0.682*size[0]);
+
+		
+		return new Object[] { PropertySupport.TITLE, "Current Event", PropertySupport.ICONIFIABLE, true,
+				PropertySupport.MAXIMIZABLE, true, PropertySupport.CLOSABLE, true, PropertySupport.RESIZABLE, true,
+				PropertySupport.WIDTH, width, PropertySupport.HEIGHT, height, PropertySupport.VISIBLE, true,
+				PropertySupport.TOOLBAR, false, PropertySupport.PROPNAME, "CUREVENT" };
+	}
 
 	/**
 	 * Create the event view, or return the already created singleton.
