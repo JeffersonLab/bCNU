@@ -191,12 +191,12 @@ public class ECView extends HexView {
 
 		props.put(PropertySupport.PROPNAME, "ECAL");
 
-		// set to a fraction of screen
-		Dimension d = GraphicsUtilities.screenFraction(0.67);
+		double size[] = getSizeFromScreenFraction(0.68);
+
+		props.put(PropertySupport.WIDTH, (int) (0.866 * size[0]));
+		props.put(PropertySupport.HEIGHT, (int)size[1]);
 
 		props.put(PropertySupport.WORLDSYSTEM, _defaultWorld);
-		props.put(PropertySupport.WIDTH, (int) (0.866 * d.height));
-		props.put(PropertySupport.HEIGHT, d.height);
 
 		props.put(PropertySupport.TOOLBAR, true);
 		props.put(PropertySupport.TOOLBARBITS, CedView.TOOLBARBITS);

@@ -32,12 +32,14 @@ import javax.swing.WindowConstants;
 import cnuphys.bCNU.application.Desktop;
 import cnuphys.bCNU.component.MagnifyWindow;
 import cnuphys.bCNU.format.DoubleFormat;
+import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.BaseContainer;
 import cnuphys.bCNU.graphics.container.DrawingContainer;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.toolbar.BaseToolBar;
 import cnuphys.bCNU.graphics.toolbar.UserToolBarComponent;
 import cnuphys.bCNU.menu.ViewPopupMenu;
+import cnuphys.bCNU.util.Environment;
 import cnuphys.bCNU.util.PropertySupport;
 
 /**
@@ -278,6 +280,26 @@ public class BaseView extends JInternalFrame implements FocusListener, MouseList
 	public Insets getInsets() {
 		Insets def = super.getInsets();
 		return new Insets(def.top, def.left, 2, def.right);
+	}
+	
+	/**
+	 * Get a size for the view that is a fraction of the screen size. The size is
+	 * adjusted for hi-res displays.
+	 *
+	 * @param fract the fraction of the screen to use (e.g., 0.5 for half the
+	 *              screen)
+	 * @return a size for the view that is a fraction of the screen size.The width
+	 * is in the first element and the height is in the second element.
+	 */
+	public static double[] getSizeFromScreenFraction(double fract) {
+		// set to a fraction of screen
+		Dimension d = GraphicsUtilities.screenFraction(fract);
+		
+		//take scaling on hi-res displays into account
+		double scaleFactor = Environment.getDisplayScaleFactor();
+		double w = d.height / scaleFactor;
+		double h = d.height / scaleFactor;
+		return new double[] {w, h};
 	}
 
 	/**

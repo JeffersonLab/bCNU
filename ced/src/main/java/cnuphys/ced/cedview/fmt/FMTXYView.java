@@ -60,11 +60,12 @@ public class FMTXYView extends CedXYView  {
 	 */
 	public static FMTXYView createFMTXYView() {
 		// set to a fraction of screen
-		Dimension d = GraphicsUtilities.screenFraction(0.4);
+		// set to a fraction of screen
+		double size[] = getSizeFromScreenFraction(0.4);
 
 		// make it square
-		int width = d.width;
-		int height = width-100;
+		int width = (int) size[0];
+		int height = width - 100; // leave room for control panel
 
 		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
 

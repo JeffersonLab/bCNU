@@ -121,11 +121,14 @@ public class AllDCView extends CedView  {
 		AllDCView view = null;
 
 		// set to a fraction of screen
-		Dimension d = GraphicsUtilities.screenFraction(0.65);
+
+		double size[] = getSizeFromScreenFraction(0.7);
+		int w = (int) size[0];
+		int h = (int) size[1];
 
 		// create the view
-		view = new AllDCView(PropertySupport.WORLDSYSTEM, _defaultWorldRectangle, PropertySupport.WIDTH, d.width,
-				PropertySupport.HEIGHT, d.height, // container height, not total view width
+		view = new AllDCView(PropertySupport.WORLDSYSTEM, _defaultWorldRectangle, PropertySupport.WIDTH, w,
+				PropertySupport.HEIGHT, h, // container height, not total view width
 				PropertySupport.TOOLBAR, true, PropertySupport.TOOLBARBITS, CedView.TOOLBARBITS,
 				PropertySupport.VISIBLE, true, PropertySupport.TITLE, _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")")),
 				PropertySupport.PROPNAME, "ALLDC",

@@ -125,10 +125,10 @@ public class CentralZView extends CedView implements ChangeListener, ILabCoordin
 	public static CentralZView createCentralZView() {
 
 		// set to a fraction of screen
-		Dimension d = GraphicsUtilities.screenFraction(0.35);
+		double size[] = getSizeFromScreenFraction(0.5);
 
 		// make it square
-		int width = d.width;
+		int width = (int) size[0];
 		int height = width;
 
 		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));

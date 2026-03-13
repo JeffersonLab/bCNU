@@ -3,7 +3,6 @@ package cnuphys.ced.cedview.ft;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -13,7 +12,6 @@ import java.util.List;
 
 import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.drawable.IDrawable;
-import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.view.BaseView;
@@ -82,10 +80,10 @@ public class FTCalXYView extends CedXYView {
 		FTCalXYView view = null;
 
 		// set to a fraction of screen
-		Dimension d = GraphicsUtilities.screenFraction(0.35);
+		double size[] = getSizeFromScreenFraction(0.65);
 
 		// make it square
-		int width = d.width;
+		int width = (int) size[0];
 		int height = width;
 
 		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));

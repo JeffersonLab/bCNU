@@ -73,11 +73,16 @@ public class MagfieldView extends SliceView implements ChangeListener {
 		double wheight = 1000;
 		double wwidth = 900;
 
-		Dimension d = GraphicsUtilities.screenFraction(0.65);
+
+		double size[] = getSizeFromScreenFraction(0.7);
+		double h = size[1];
 
 		// give container same aspect ratio
-		int height = d.height;
-		int width = (int) ((wwidth * height) / wheight);
+		double w = (wwidth * h) / wheight;
+		
+		int width = (int)w;
+		int height = (int)h;
+		
 
 		String title = "Magnetic Field Testing View";
 		switch (displaySectors) {

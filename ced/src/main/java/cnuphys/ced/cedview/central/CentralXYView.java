@@ -160,10 +160,10 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 	public static CentralXYView createCentralXYView() {
 
 		// set to a fraction of screen
-		Dimension d = GraphicsUtilities.screenFraction(0.35);
+		double size[] = getSizeFromScreenFraction(0.5);
 
 		// make it square
-		int width = d.width;
+		int width = (int) size[0];
 		int height = width;
 
 		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));

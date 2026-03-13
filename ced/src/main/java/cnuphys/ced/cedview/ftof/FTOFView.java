@@ -250,11 +250,12 @@ public class FTOFView extends HexView {
 		props.put(PropertySupport.PROPNAME, "FTOF");
 
 		// set to a fraction of screen
-		Dimension d = GraphicsUtilities.screenFraction(0.8);
+		double size[] = getSizeFromScreenFraction(0.7);
+
+		props.put(PropertySupport.WIDTH, (int) (0.866 * size[0]));
+		props.put(PropertySupport.HEIGHT, (int)size[1]);
 
 		props.put(PropertySupport.WORLDSYSTEM, _defaultWorld);
-		props.put(PropertySupport.WIDTH, (int) (0.866 * d.height));
-		props.put(PropertySupport.HEIGHT, d.height);
 
 		props.put(PropertySupport.TOOLBAR, true);
 		props.put(PropertySupport.TOOLBARBITS, CedView.TOOLBARBITS);

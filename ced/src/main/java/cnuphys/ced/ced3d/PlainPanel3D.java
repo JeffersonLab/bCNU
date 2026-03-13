@@ -17,6 +17,7 @@ import cnuphys.bCNU.dialog.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.util.Fonts;
+import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.ced3d.view.PlainView3D;
@@ -220,9 +221,7 @@ public abstract class PlainPanel3D extends Panel3D {
 	public void display(GLAutoDrawable drawable) {
 		if (VirtualView.getInstance().isViewVisible(_view)) {
 			super.display(drawable);
-		} else {
-	 		System.err.println("SKIPPED");
-		}
+		} 
 	}
 
 	// add north panel
@@ -271,8 +270,10 @@ public abstract class PlainPanel3D extends Panel3D {
 
 	// a fixed fraction of the screen
 	private void fixSize() {
-		Dimension d = GraphicsUtilities.screenFraction(0.70);
-		d.width = d.height;
+
+		double size[] = _view.getSizeFromScreenFraction(0.7);
+
+		Dimension d = new Dimension((int) size[1], (int) size[1]);
 		gljpanel.setPreferredSize(d);
 	}
 

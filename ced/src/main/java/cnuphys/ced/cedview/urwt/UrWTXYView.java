@@ -2,7 +2,6 @@ package cnuphys.ced.cedview.urwt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -24,7 +23,6 @@ import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.drawable.IDrawable;
-import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.util.Fonts;
@@ -92,7 +90,7 @@ public class UrWTXYView extends HexView {
 
 	}
 
-	// 
+	//
 	private UrWTXYView(String title) {
 		super(getAttributes(title));
 
@@ -183,7 +181,7 @@ public class UrWTXYView extends HexView {
 			_hexItems[sector].getStyle().setFillColor(Color.lightGray);
 		}
 
-		//the detector items 
+		//the detector items
 		detectorItems = new UrWTDetectorItem[6][4];
 		for (int sector = 0; sector < 6; sector++) {
 			for (int layer = 3; layer >= 0; layer--) {
@@ -223,7 +221,7 @@ public class UrWTXYView extends HexView {
 
 					// draw trajectories
 					_swimTrajectoryDrawer.draw(g, container);
-					
+
 					for (int sector = 1; sector <= 6; sector++) {
 						for (int layer = 1; layer <= 4; layer++) {
 							if (!showLayer(layer)) {
@@ -245,8 +243,8 @@ public class UrWTXYView extends HexView {
 					drawCoordinateSystem(g, container, null);
 					drawSectorNumbers(g, container, null, 145);
 				} // not acumulating
-				
-				
+
+
 				for (int sector = 1; sector <= 6; sector++) {
 					for (int layer = 1; layer <= 4; layer++) {
 						UrWTDetectorItem item = detectorItems[sector - 1][layer - 1];
@@ -355,7 +353,7 @@ public class UrWTXYView extends HexView {
 	}
 
 
-	
+
 	// helper to determine if a layer should be drawn
 	protected boolean showLayer(int layer) {
 		if (layer == 1) {
@@ -377,19 +375,19 @@ public class UrWTXYView extends HexView {
 	 * @param layer 1-based layer [1..4]
 	 * @param strip 1-based strip
 	 */
-	protected void projectStrip(IContainer container, int sector, 
+	protected void projectStrip(IContainer container, int sector,
 			int layer, int strip,
 			Point p0, Point p1) {
 
 		UrWTDetectorData data = UrWTGeometry.getDetectorData(sector, layer);
 		Line3D line = data.getStrip(strip);
-		
+
 		if (line == null) {
 			System.err.println(String.format("null strip in UrWTXYView projectStrip for [sector, layer, chamberStrip] = [%d, %d, %d]",
 					sector, layer, strip));
 			return;
 		}
-		
+
 		projectLine(container, (float) line.origin().x(), (float) line.origin().y(), (float) line.origin().z(),
 				(float) line.end().x(), (float) line.end().y(), (float) line.end().z(),
 				p0, p1);
@@ -398,7 +396,7 @@ public class UrWTXYView extends HexView {
 	/**
 	 *
 	 * @param container the container
-	 * @param x1   
+	 * @param x1
 	 * @param y1
 	 * @param z1
 	 * @param x2
@@ -443,13 +441,12 @@ public class UrWTXYView extends HexView {
 		Properties props = new Properties();
 		props.put(PropertySupport.TITLE, title);
 		props.put(PropertySupport.PROPNAME, "URWTXY");
-
-		// set to a fraction of screen
-		Dimension d = GraphicsUtilities.screenFraction(0.65);
-
 		props.put(PropertySupport.WORLDSYSTEM, _defaultWorld);
-		props.put(PropertySupport.WIDTH, (int) (0.866 * d.height));
-		props.put(PropertySupport.HEIGHT, d.height);
+
+		double size[] = getSizeFromScreenFraction(0.7);
+
+		props.put(PropertySupport.WIDTH, (int) (0.866 * size[0]));
+		props.put(PropertySupport.HEIGHT, (int)size[1]);
 
 		props.put(PropertySupport.TOOLBAR, true);
 		props.put(PropertySupport.TOOLBARBITS, CedView.TOOLBARBITS);
@@ -467,7 +464,7 @@ public class UrWTXYView extends HexView {
 		container.worldToLocal(pp, wp);
 
 		super.getFeedbackStrings(container, pp, wp, feedbackStrings);
-		
+
 
 		//crosses feedback
 		crossesFeedback(container, pp, wp, feedbackStrings);

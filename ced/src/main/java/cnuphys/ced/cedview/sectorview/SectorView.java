@@ -150,11 +150,12 @@ public class SectorView extends SliceView implements ChangeListener {
 		double wheight = -2 * xo;
 		double wwidth = 840;
 
-		Dimension d = GraphicsUtilities.screenFraction(0.65);
+		double size[] = getSizeFromScreenFraction(0.72);
+// adjust the world width and height to match the aspect ratio of the screen fraction size
+		size[0] = (wwidth * size[1]) / wheight;
+		int width = (int) size[0];
+		int height = (int) size[1];
 
-		// give container same aspect ratio
-		int height = d.height;
-		int width = (int) ((wwidth * height) / wheight);
 
 		// give the view a title based on what sectors are displayed
 		String title = "Sectors ";

@@ -305,7 +305,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		_virtualView.moveTo(_dcHexView, 6);
 
 //		_virtualView.moveTo(_rtpcView, 7);
-		_virtualView.moveTo(_urwtXyView, 7, VirtualView.BOTTOMLEFT);
+		_virtualView.moveTo(_urwtXyView, 7, VirtualView.CENTER);
 		_virtualView.moveTo(_ftofView, 8, VirtualView.UPPERRIGHT);
 		_virtualView.moveTo(_ftcalXyView, 9, VirtualView.CENTER);
 		_virtualView.moveTo(_dcXyView, 10);

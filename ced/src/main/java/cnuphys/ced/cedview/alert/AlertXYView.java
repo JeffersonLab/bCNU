@@ -144,10 +144,12 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 	 */
 	public static AlertXYView createAlertXYView() {
 		// set to a fraction of screen
-		Dimension d = GraphicsUtilities.screenFraction(0.48);
+
+		double size[] = getSizeFromScreenFraction(0.7);
+
 
 		// make it square
-		int width = d.width;
+		int width = (int) size[0];
 		int height = width-100;
 
 		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
