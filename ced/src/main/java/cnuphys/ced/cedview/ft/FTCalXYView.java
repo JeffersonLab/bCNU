@@ -15,6 +15,8 @@ import cnuphys.bCNU.drawable.IDrawable;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.view.BaseView;
+import cnuphys.bCNU.view.ViewConfiguration;
+import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.datacontainer.ftcal.FTCalADCData;
 import cnuphys.ced.alldata.datacontainer.ftcal.FTCalHitData;
@@ -56,7 +58,7 @@ public class FTCalXYView extends CedXYView {
 	 * Create a FTCalXYView View
 	 *
 	 */
-	public FTCalXYView(Object... keyVals) {
+	private FTCalXYView(Object... keyVals) {
 		super(keyVals);
 
 		for (int i = 0; i < componentToIndex.length; i++) {
@@ -68,33 +70,16 @@ public class FTCalXYView extends CedXYView {
 			componentToIndex[id] = (short) i; // reverse mapping
 			ftCalPoly[i] = new FTCalXYPolygon(id);
 		}
-
 	}
-
+	
 	/**
-	 * Create a FTCalXYView view
+	 * Create a FTCalXYView view. This is used by lazy creation
 	 *
+	 * @param keyVals the key value pairs for the view properties
 	 * @return a FTCalXYView View
 	 */
-	public static FTCalXYView createFTCalXYView() {
-		FTCalXYView view = null;
-
-		// set to a fraction of screen
-		double size[] = getSizeFromScreenFraction(0.65);
-
-		// make it square
-		int width = (int) size[0];
-		int height = width;
-
-		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
-
-		// create the view
-		view = new FTCalXYView(PropertySupport.WORLDSYSTEM, _defaultWorldRectangle, PropertySupport.WIDTH, width,
-				PropertySupport.HEIGHT, height, PropertySupport.LEFTMARGIN, LMARGIN, PropertySupport.TOPMARGIN, TMARGIN,
-				PropertySupport.RIGHTMARGIN, RMARGIN, PropertySupport.BOTTOMMARGIN, BMARGIN, PropertySupport.TOOLBAR,
-				true, PropertySupport.TOOLBARBITS, CedView.TOOLBARBITS, PropertySupport.VISIBLE, true,
-				PropertySupport.TITLE, title, PropertySupport.PROPNAME, "FTCalXY",
-				PropertySupport.STANDARDVIEWDECORATIONS, true);
+	public static FTCalXYView construct(Object... keyVals) {
+		FTCalXYView view = new FTCalXYView(keyVals);
 
 		view._controlPanel = new ControlPanel(view,
 				ControlPanel.DISPLAYARRAY + ControlPanel.FEEDBACK + ControlPanel.MATCHINGBANKSPANEL + ControlPanel.ACCUMULATIONLEGEND,
@@ -108,9 +93,53 @@ public class FTCalXYView extends CedXYView {
 			view.setBankMatches(_defMatches);
 		}
 		view._controlPanel.getMatchedBankPanel().update();
-
-
+		
 		return view;
+	}
+
+	
+	/**
+	 * Get the view configuration for lazy creation
+	 *
+	 * @return the view configuration for lazy creation
+	 */
+	public static ViewConfiguration<FTCalXYView> getConfiguration() {
+		return new ViewConfiguration<>(FTCalXYView.class, true, 9, 0, 0, VirtualView.CENTER, getDefaultKeyVals());
+	}
+	
+	/**
+	 * Get the default key values for the view. This is used by lazy creation
+	 *
+	 * @return the default key values for the view
+	 */
+	public static Object[] getDefaultKeyVals() {
+		
+
+		// set to a fraction of screen
+		double size[] = getSizeFromScreenFraction(0.65);
+
+		// make it square
+		int width = (int) size[0];
+		int height = width;
+
+		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
+
+		
+		return new Object[] { PropertySupport.WORLDSYSTEM, _defaultWorldRectangle, PropertySupport.WIDTH, width,
+				PropertySupport.HEIGHT, height, PropertySupport.LEFTMARGIN, LMARGIN, PropertySupport.TOPMARGIN, TMARGIN,
+				PropertySupport.RIGHTMARGIN, RMARGIN, PropertySupport.BOTTOMMARGIN, BMARGIN, PropertySupport.TOOLBAR,
+				true, PropertySupport.TOOLBARBITS, CedView.TOOLBARBITS, PropertySupport.VISIBLE, true,
+				PropertySupport.TITLE, title, PropertySupport.PROPNAME, "FTCalXY",
+				PropertySupport.STANDARDVIEWDECORATIONS, true};
+	}
+
+	/**
+	 * Create a FTCalXYView view
+	 *
+	 * @return a FTCalXYView View
+	 */
+	public static FTCalXYView createFTCalXYView() {
+		return construct(getDefaultKeyVals());
 	}
 
 	/**

@@ -22,6 +22,9 @@ public class ViewManager extends Vector<BaseView> {
 
 	// singleton instance
 	private static ViewManager instance;
+	
+	// List of view configurations for lazy loading
+	private java.util.List<ViewConfiguration<?>> _configs = new java.util.ArrayList<>();
 
 	// the view menu
 	private JMenu _viewMenu;
@@ -115,6 +118,11 @@ public class ViewManager extends Vector<BaseView> {
 	}
 
 
+	/**
+	 * Make the view visible in the virtual world, if there is a virtual view.
+	 *
+	 * @param view the view to make visible in the virtual world.
+	 */
 	public void makeViewVisibleInVirtualWorld(BaseView view) {
 		if ((_virtualView != null) && (_virtualView != view)) {
 			_virtualView.activateViewCell(view);
@@ -196,5 +204,44 @@ public class ViewManager extends Vector<BaseView> {
 
 		_listenerList.remove(IViewListener.class, listener);
 	}
+	
+	public void addConfiguration(ViewConfiguration<?> config) {
+	    _configs.add(config);
+	    if (!config.lazily) {
+	        config.getView(); // Force immediate creation
+	    } else {
+	        addLazyMenuEntry(config);
+	    }
+	}
+	
+	// Add a menu entry for lazy loading of the view
+	private void addLazyMenuEntry(final ViewConfiguration<?> config) {
+	    // Extract title from keyVals
+	    String title = "Unknown View";
+	    for (int i = 0; i < config.keyVals.length; i += 2) {
+	        if (cnuphys.bCNU.util.PropertySupport.TITLE.equals(config.keyVals[i])) {
+	            title = (String) config.keyVals[i+1];
+	            break;
+	        }
+	    }
+
+	    final JMenuItem mi = new JMenuItem("Create " + title);
+	    mi.setFont(mi.getFont().deriveFont(java.awt.Font.ITALIC));
+	    
+	    mi.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	            BaseView view = config.getView(); // This calls realizeView()
+	            if (view != null) {
+	                _viewMenu.remove(mi); // Remove the "Create" item
+	                // The BaseView constructor calls ViewManager.getInstance().add(this),
+	                // so the standard menu item will be added automatically.
+	            }
+	        }
+	    });
+	    _viewMenu.add(mi);
+	    config.menuIndex = _viewMenu.getItemCount() - 1; // Store index for potential future use
+	}
+
 
 }
