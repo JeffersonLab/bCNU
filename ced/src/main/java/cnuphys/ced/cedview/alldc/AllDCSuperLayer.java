@@ -460,7 +460,6 @@ public class AllDCSuperLayer extends RectangleItem {
 				getCell(layer + 1, wire + 1, wr);
 
 				double fract = (maxHit == 0) ? 0 : (((double) hitCount) / maxHit);
-				AccumulationManager.getInstance();
 				Color color = AccumulationManager.getInstance().getColor(_view.getColorScaleModel(), fract);
 
 				WorldGraphicsUtilities.drawWorldRectangle(g, container, wr, color, color, 1, LineStyle.SOLID);

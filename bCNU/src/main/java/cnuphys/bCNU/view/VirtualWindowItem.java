@@ -139,6 +139,7 @@ public class VirtualWindowItem extends RectangleItem {
 		}
 	}
 
+	// helper to get the world rectangle for the base view
 	private static Rectangle2D.Double getWorldRect(BaseView bv) {
 		Rectangle b = bv.getBounds();
 		Rectangle2D.Double wr = new Rectangle2D.Double();
@@ -149,6 +150,9 @@ public class VirtualWindowItem extends RectangleItem {
 		return wr;
 	}
 
+	/**
+	 * Set the location of the item based on the location of the base view. This is called when the base view moves, such as when it is dragged.
+	 */
 	public void setLocation() {
 		Rectangle2D.Double world = _vview.getContainer().getWorldSystem();
 		Rectangle bvBounds = _baseView.getBounds();

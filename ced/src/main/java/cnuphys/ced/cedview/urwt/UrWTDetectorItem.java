@@ -13,8 +13,10 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.bCNU.util.X11Colors;
+import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.urwt.UrWTGeometry;
 
 public class UrWTDetectorItem extends PolygonItem {
@@ -115,9 +117,44 @@ public class UrWTDetectorItem extends PolygonItem {
 
 		drawHits(g, container); //hits
 		drawClusters(g, container); //clusters
+		drawCrosses(g, container); //crosses
 	}
 	
-	//
+	
+	// helper to draw the crosses
+	private void drawCrosses(Graphics g, IContainer container) {
+		UrWTXYView view = getView();
+		if (!view.showCrosses()) {
+			return;
+		}
+		
+		
+		DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
+		if (event == null) {
+			return;
+		}
+		byte sectors[] = _dataWarehouse.getByte("URWT::crosses", "sector");
+
+		int count = (sectors == null) ? 0 : sectors.length;
+		if (count == 0) {
+			return;
+		}
+		
+		float x[] = _dataWarehouse.getFloat("URWT::crosses", "x");
+		float y[] = _dataWarehouse.getFloat("URWT::crosses", "y");
+		float z[] = _dataWarehouse.getFloat("URWT::crosses", "z");
+
+		
+		for (int i = 0; i < count; i++) {
+			if (sectors[i] == this.sector) {
+				view.projectPoint(container, x[i], y[i], z[i], _pp1);
+				DataDrawSupport.drawCross(g, _pp1.x, _pp1.y, 4);
+			}
+		}
+
+	}
+	
+	// helper to draw the clusters
 	private void drawClusters(Graphics g, IContainer container) {
 		UrWTXYView view = getView();
 		if (!view.showClusters()) {
@@ -128,12 +165,14 @@ public class UrWTDetectorItem extends PolygonItem {
 		if (event == null) {
 			return;
 		}
-		byte sector[] = _dataWarehouse.getByte("URWT::clusters", "sector");
+		byte sectors[] = _dataWarehouse.getByte("URWT::clusters", "sector");
 
-		int count = (sector == null) ? 0 : sector.length;
+		int count = (sectors == null) ? 0 : sectors.length;
 		if (count == 0) {
 			return;
 		}
+		
+		byte layers[] = _dataWarehouse.getByte("URWT::clusters", "layer");
 
 		float xo[] = _dataWarehouse.getFloat("URWT::clusters", "xo");
 		float yo[] = _dataWarehouse.getFloat("URWT::clusters", "yo");
@@ -143,11 +182,16 @@ public class UrWTDetectorItem extends PolygonItem {
 		float ze[] = _dataWarehouse.getFloat("URWT::clusters", "ze");
 
 		for (int i = 0; i < count; i++) {
-			view.projectLine(container, xo[i], yo[i], zo[i], xe[i], ye[i], ze[i], _pp1, _pp2);
-			GraphicsUtilities.drawHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, clusterColor1, clusterColor2);
+			if (sectors[i] == this.sector && layers[i] == this.layer) {
+
+				view.projectLine(container, xo[i], yo[i], zo[i], xe[i], ye[i], ze[i], _pp1, _pp2);
+				GraphicsUtilities.drawHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, clusterColor1, clusterColor2);
+			}
 		}
 		
 	}
+	
+
 	
 	// helper to draw the hits
 	private void drawHits(Graphics g, IContainer container) {
@@ -190,7 +234,29 @@ public class UrWTDetectorItem extends PolygonItem {
 			return;
 		}
 		
-		//hits
+		int[][][] accumulatedHits = AccumulationManager.getInstance().getAccumulatedUrWTData();
+		if (accumulatedHits == null) {
+			return;
+		}
+		
+		//the number of strips in the layer
+		int stripCount = (layer < 3) ? 1465 : 1485;
+		
+		int maxHit = AccumulationManager.getInstance().getMaxUrWTCount();
+		if (maxHit == 0) {
+			return;
+		}
+		
+		for (int strip = 1; strip <= stripCount; strip++) {
+			int hitCount = accumulatedHits[sector-1][layer-1][strip-1];
+			double fract = (double) hitCount / maxHit;
+			Color color = AccumulationManager.getInstance().getAlphaColor(getView().getColorScaleModel(), fract, 28);
+			g.setColor(color);
+			projectStrip(container, strip);
+			g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
+		}
+		
+		
 	}
 	
 	public void  frame(Graphics g, IContainer container) {
@@ -222,9 +288,10 @@ public class UrWTDetectorItem extends PolygonItem {
 	}
 	
 	// helper to project a strip
+	// the strip number is 1-based
 	private void projectStrip(IContainer container, int strip) {
 		UrWTXYView view = getView();
-        view.projectStrip(container, sector, layer,strip, _pp1, _pp2);
+        view.projectStrip(container, sector, layer, strip, _pp1, _pp2);
 	}
 
 	@Override

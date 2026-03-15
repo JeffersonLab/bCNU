@@ -2,7 +2,6 @@ package cnuphys.ced.cedview.dchex;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -15,12 +14,13 @@ import javax.swing.JTabbedPane;
 
 import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.drawable.IDrawable;
-import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
+import cnuphys.bCNU.view.ViewConfiguration;
+import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.HexView;
@@ -29,6 +29,7 @@ import cnuphys.ced.component.ControlPanel;
 import cnuphys.ced.component.DisplayBits;
 import cnuphys.ced.geometry.DCGeometry;
 
+@SuppressWarnings("serial")
 public class DCHexView extends HexView {
 
 
@@ -58,6 +59,10 @@ public class DCHexView extends HexView {
 
 	//rollover panel for drawing clusters
 	private RollOverDCPanel _rollOverPanel;
+	
+	// the title, which includes the clone count if this is a clone
+	private static String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
+
 
 	protected static Rectangle2D.Double _defaultWorld;
 
@@ -74,14 +79,35 @@ public class DCHexView extends HexView {
 	 *
 	 * @param keyVals variable set of arguments.
 	 */
-	private DCHexView(String title) {
-		super(getAttributes(title));
+	private DCHexView(Object... keyVals) {
+		super(keyVals);
 
 		setBeforeDraw();
 		setAfterDraw();
 		getContainer().getComponent().setBackground(Color.gray);
 		_clusterDrawer = new DCHexClusterDrawer(this);
 	}
+	
+	/**
+	 * Create a DCHexView view. This is used by lazy creation
+	 *
+	 * @param keyVals the key value pairs for the view properties
+	 * @return a DCHexView View
+	 */
+	public static DCHexView construct(Object... keyVals) {
+		DCHexView view = new DCHexView(getDefaultKeyVals());
+		return view;
+	}
+	/**
+	 * Get the view configuration for lazy creation
+	 *
+	 * @return the view configuration for lazy creation
+	 */
+	public static ViewConfiguration<DCHexView> getConfiguration() {
+		return new ViewConfiguration<>(DCHexView.class, true, 
+				6, 0, 0, VirtualView.CENTER, getDefaultKeyVals());
+	}
+
 
 	// add the control panel
 	@Override
@@ -216,18 +242,6 @@ public class DCHexView extends HexView {
 
 					drawSectorNumbers(g, container, Color.cyan, 85);
 
-//					Point p0 = new Point();
-//					Point p1 = new Point();
-//
-//					for (int sect = 0; sect < 3; sect++) {
-//						Point2D.Double poly0[] = _superLayerItems[sect][0].getPolygon();
-//						Point2D.Double poly3[] = _superLayerItems[sect+3][0].getPolygon();
-//
-//						container.worldToLocal(p0, poly0[0]);
-//						container.worldToLocal(p1, poly3[0]);
-//						g.setColor(Color.cyan);
-//						g.drawLine(p0.x, p0.y, p1.x, p1.y);
-//					}
 				} // not accumulating
 			}
 		};
@@ -255,7 +269,7 @@ public class DCHexView extends HexView {
 
 
 	// get the attributes to pass to the super constructor
-	private static Object[] getAttributes(String title) {
+	private static Object[] getDefaultKeyVals() {
 
 		Properties props = new Properties();
 		props.put(PropertySupport.TITLE, title);

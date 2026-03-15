@@ -36,7 +36,16 @@ public class ViewConfiguration<T extends BaseView> {
 	public int menuIndex = -1; // index in the lazily created menu, if applicable
 	
 	
-	
+	/**
+	 * Create a view configuration. If lazily is true, the view will not be created until getView() is called. The keyVals are passed to the static construct method of the view class when the view is created.
+	 * @param clazz the class of the view to be created, needed for reflection to call the static construct method
+	 * @param lazily if true, the view will be created lazily. If false, the view will be created immediately.
+	 * @param column the virtual column in which the view should be placed.
+	 * @param dh the horizontal offset from the constraint placement (often 0)
+	 * @param dv the vertical offset from the constraint placement (often 0)
+	 * @param constraint the constraint for the view placement, such as VirtualView.CENTER.
+	 * @param keyVals the key-value pairs used to create the view, passed to the static construct method of the view class when the view is created.
+	 */
 	public ViewConfiguration(Class<T> clazz, boolean lazily, int column, int dh, int dv, int constraint,
 			Object... keyVals) {
 		this.clazz = clazz;
@@ -71,8 +80,11 @@ public class ViewConfiguration<T extends BaseView> {
 	        viewMenu.remove(index);
 	        viewMenu.insert(menuItem, menuIndex+1); // put it back in the correct place
 	        
-	        // If you don't have the Class object, you'll need to pass the view class 
-	        // type to the ViewConfiguration constructor.
+	        // After creating the view, we move to it on the virtual desktop
+	        VirtualView vv = VirtualView.getInstance();
+	        if (vv != null) {
+	        	vv.gotoColumn(column);
+	        }
 	        
 	    } catch (Exception e) {
 	        e.printStackTrace();

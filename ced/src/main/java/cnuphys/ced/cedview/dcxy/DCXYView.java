@@ -29,7 +29,8 @@ import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.bCNU.view.BaseView;
+import cnuphys.bCNU.view.ViewConfiguration;
+import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.HexView;
@@ -75,6 +76,8 @@ public class DCXYView extends HexView {
 			X11Colors.getX11Color("cadet blue"), X11Colors.getX11Color("dark blue"), X11Colors.getX11Color("olive"),
 			X11Colors.getX11Color("dark green") };
 
+	// the title, which includes the clone count if this is a clone
+	private static String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
 
 	private static Stroke stroke = GraphicsUtilities.getStroke(0.5f, LineStyle.SOLID);
 
@@ -90,14 +93,15 @@ public class DCXYView extends HexView {
 		_defaultWorld = new Rectangle2D.Double(_xsize, -_ysize, -2 * _xsize, 2 * _ysize);
 
 	}
+	
 
 	/**
 	 * Create an allDCView
 	 *
 	 * @param keyVals variable set of arguments.
 	 */
-	private DCXYView(String title) {
-		super(getAttributes(title));
+	private DCXYView(Object... keyVals) {
+		super(keyVals);
 
 		// projection plane
 		projectionPlane = GeometryManager.xyPlane(_zplane);
@@ -155,10 +159,31 @@ public class DCXYView extends HexView {
 		addQuickZoom("Central Region", qzlim, -qzlim, -qzlim, qzlim);
 
 	}
+	
+	/**
+	 * Create a DCXYView view. This is used by lazy creation
+	 *
+	 * @param keyVals the key value pairs for the view properties
+	 * @return a DCXYView View
+	 */
+	public static DCXYView construct(Object... keyVals) {
+		DCXYView view = new DCXYView(getDefaultKeyVals());
+		return view;
+	}
+	/**
+	 * Get the view configuration for lazy creation
+	 *
+	 * @return the view configuration for lazy creation
+	 */
+	public static ViewConfiguration<DCXYView> getConfiguration() {
+		return new ViewConfiguration<>(DCXYView.class, true, 
+				10, 0, 0, VirtualView.CENTER, getDefaultKeyVals());
+	}
 
 	// add the control panel
 	@Override
 	protected void addControls() {
+		System.out.println("DCXYView adding controls");
 
 		_controlPanel = new ControlPanel(this,
 				ControlPanel.DISPLAYARRAY + ControlPanel.FEEDBACK + ControlPanel.ACCUMULATIONLEGEND
@@ -181,17 +206,6 @@ public class DCXYView extends HexView {
 		pack();
 	}
 
-	/**
-	 * Used to create the DCXY view
-	 *
-	 * @return the view
-	 */
-	public static DCXYView createDCXYView() {
-		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
-		DCXYView view = new DCXYView(title);
-
-		return view;
-	}
 
 	// add items to the view
 	@Override
@@ -232,7 +246,7 @@ public class DCXYView extends HexView {
 
 				if (!_eventManager.isAccumulating()) {
 
-//					// draw trajectories
+					// draw trajectories
 					_swimTrajectoryDrawer.draw(g, container);
 
 					drawHits(g, container);
@@ -356,7 +370,7 @@ public class DCXYView extends HexView {
 	}
 
 	// get the attributes to pass to the super constructor
-	private static Object[] getAttributes(String title) {
+	public static Object[] getDefaultKeyVals() {
 
 		Properties props = new Properties();
 		props.put(PropertySupport.TITLE, title);
@@ -437,29 +451,5 @@ public class DCXYView extends HexView {
 		return _hexItems[sector - 1];
 	}
 
-	/**
-	 * Clone the view.
-	 *
-	 * @return the cloned view
-	 */
-	@Override
-	public BaseView cloneView() {
-		super.cloneView();
-		CLONE_COUNT++;
-
-		// limit
-		if (CLONE_COUNT > 2) {
-			return null;
-		}
-
-		Rectangle vr = getBounds();
-		vr.x += 40;
-		vr.y += 40;
-
-		DCXYView view = createDCXYView();
-		view.setBounds(vr);
-		return view;
-
-	}
 
 }

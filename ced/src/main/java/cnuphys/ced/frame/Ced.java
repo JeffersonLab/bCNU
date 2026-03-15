@@ -105,11 +105,11 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	// geometry variation
 	private static String _geoVariation = "default";
 
-	// ced release
-	public static final String release = "1.9.8.2";
+	// ced release1.9.8.
+	public static final String release = "1.9.9.0";
 
 	//minimum java major version
-	private static final int _minJavaVersion = 17;
+	private static final int _minJavaVersion = 21;
 
 	// used for one time inits
 	private int _firstTime = 0;
@@ -163,24 +163,12 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private CentralZView _centralZView;
 
 	private AlertXYView _alertXYView;
-
-//	private RTPCView _rtpcView;
-//	private FTCalXYView _ftcalXyView;
-	private DCXYView _dcXyView;
-	private DCHexView _dcHexView;
 	private UrWTXYView _urwtXyView;
 
 	private ECView _ecView;
 	private PCALView _pcalView;
-	private ForwardView3D _forward3DView;
-
-	private AlertView3D _alert3DView;
-	private FMTView3D _fmt3DView;
 
 	private SwimmingTestView3D _swimming3DView;
-	private CentralView3D _central3DView;
-//	private FTCalView3D _ftCal3DView;
-	private UrwtView3D _urwt3DView;
 
 	private FTOFView _ftofView;
 
@@ -301,25 +289,13 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		_virtualView.moveTo(_ecView, 4, VirtualView.CENTERLEFT);
 		_virtualView.moveTo(_eventView, 5, VirtualView.CENTER);
 
-		// note no constraint means "center"
-		_virtualView.moveTo(_dcHexView, 6);
 
-//		_virtualView.moveTo(_rtpcView, 7);
 		_virtualView.moveTo(_urwtXyView, 7, VirtualView.CENTER);
 		_virtualView.moveTo(_ftofView, 8, VirtualView.UPPERRIGHT);
-//		_virtualView.moveTo(_ftcalXyView, 9, VirtualView.CENTER);
-		_virtualView.moveTo(_dcXyView, 10);
 
 		_virtualView.moveTo(_alertXYView, 11, VirtualView.CENTER);
 
 		if (!_no3D) {
-			_virtualView.moveTo(_alert3DView, 12, VirtualView.CENTER);
-			_virtualView.moveTo(_forward3DView, 13, VirtualView.CENTER);
-			_virtualView.moveTo(_central3DView, 14, VirtualView.BOTTOMLEFT);
-//			_virtualView.moveTo(_ftCal3DView, 16, VirtualView.BOTTOMRIGHT);
-			_virtualView.moveTo(_fmt3DView, 15, VirtualView.CENTER);
-			_virtualView.moveTo(_urwt3DView, 17, VirtualView.CENTER);
-
 			if (_experimental) {
 				_virtualView.moveTo(_swimming3DView, 18, VirtualView.CENTER);
 			}
@@ -343,23 +319,19 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		}
 
 		String cpat = "coat-libs-";
-		String snap = "-SNAP";
+		String jar = ".jar";
 
 		String s = System.getProperty("java.class.path");
 
 		if (s.endsWith("ced.jar")) {
-
-			System.out.println("CP contains ced.jar");
-
 			s = Jar.getManifestAttribute(s, "Class-Path");
-//			System.out.println("cp from jar manifest: [" + s + "]");
 		}
 
 		int index = s.indexOf(cpat);
 		if (index >= 0) {
 			_coatjavaVersion = s.substring(index + cpat.length());
 
-			index = _coatjavaVersion.indexOf(snap);
+			index = _coatjavaVersion.indexOf(jar);
 
 			if (index > 0) {
 				_coatjavaVersion = _coatjavaVersion.substring(0, index);
@@ -420,11 +392,11 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		// add an alldc view
 		_allDCView = AllDCView.createAllDCView();
 
-		// add a DC XY View
-		_dcXyView = DCXYView.createDCXYView();
+		// add a DCXY lazily
+		ViewManager.getInstance().addConfiguration(DCXYView.getConfiguration());
 
-		// add a DC Hex View
-		_dcHexView = DCHexView.createDCHexView();
+		// add a DC Hex View lazily
+		ViewManager.getInstance().addConfiguration(DCHexView.getConfiguration());
 
 
 		ViewManager.getInstance().getViewMenu().addSeparator();
@@ -448,33 +420,25 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		//add and ALERT XY view
 		_alertXYView = AlertXYView.createAlertXYView();
 
-		// add a ftcalxyYView lazily
-		//_ftcalXyView = FTCalXYView.createFTCalXYView();
+		// add a FTCalXYView lazily
 		ViewManager.getInstance().addConfiguration(FTCalXYView.getConfiguration());
 
 		//add a urwt xy view
 		_urwtXyView = UrWTXYView.createUrWTView();
 
 
-		// add an RTPC vie
-		//_rtpcView = RTPCView.createRTPCView();
-
         //FTOF
 		_ftofView = FTOFView.createFTOFView();
 
+		//3D views all lazily created
 		if (!_no3D) {
 			ViewManager.getInstance().getViewMenu().addSeparator();
-			_alert3DView = new AlertView3D();
-			_central3DView = new CentralView3D();
-			_fmt3DView = new FMTView3D();
-			_forward3DView = new ForwardView3D();
-//			_ftCal3DView = new FTCalView3D();
+			ViewManager.getInstance().addConfiguration(ForwardView3D.getConfiguration());
+ 	   	    ViewManager.getInstance().addConfiguration(CentralView3D.getConfiguration());
+			ViewManager.getInstance().addConfiguration(AlertView3D.getConfiguration());
+			ViewManager.getInstance().addConfiguration(FMTView3D.getConfiguration());
 			ViewManager.getInstance().addConfiguration(FTCalView3D.getConfiguration());
-			
-			
-			
-			_urwt3DView = new UrwtView3D();
-
+			ViewManager.getInstance().addConfiguration(UrwtView3D.getConfiguration());
 			if (_experimental) {
 				_swimming3DView = new SwimmingTestView3D();
 			}

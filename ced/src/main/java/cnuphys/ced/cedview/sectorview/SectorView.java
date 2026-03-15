@@ -150,7 +150,7 @@ public class SectorView extends SliceView implements ChangeListener {
 		double wheight = -2 * xo;
 		double wwidth = 840;
 
-		double size[] = getSizeFromScreenFraction(0.72);
+		double size[] = getSizeFromScreenFraction(0.70);
 // adjust the world width and height to match the aspect ratio of the screen fraction size
 		size[0] = (wwidth * size[1]) / wheight;
 		int width = (int) size[0];

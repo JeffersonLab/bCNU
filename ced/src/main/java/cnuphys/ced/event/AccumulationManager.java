@@ -1,7 +1,6 @@
 package cnuphys.ced.event;
 
 import java.awt.Color;
-import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
@@ -68,6 +67,9 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 
 	// LTCC accumulated accumulated data indices are sector, half, ring
 	private int _LTCCAccumulatedData[][][];
+	
+	// uRTW accumulated accumulated data indices are sector, layer, strip
+	private int _UrWTAccumulatedData[][][];
 
 	// ftcc accumulated data
 	private int _FTCALAccumulatedData[];
@@ -167,7 +169,8 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 
 		// ltcc data NOTICE THE DIFFERENT ORDER FROM HTCC
 		_LTCCAccumulatedData = new int[GeoConstants.NUM_SECTOR][2][18];
-
+		
+	
 		// dc data
 		_DCAccumulatedData = new int[GeoConstants.NUM_SECTOR][GeoConstants.NUM_SUPERLAYER][GeoConstants.NUM_LAYER][GeoConstants.NUM_WIRE];
 
@@ -218,7 +221,9 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 		clear(_AlertDCSL2AccumulatedData);
 		clear(_AlertDCSL3AccumulatedData);
 		clear(_AlertDCSL4AccumulatedData);
-
+		
+		//clear urwt
+		clear(_UrWTAccumulatedData);
 
 		// clear alert tof data
 		clear(_AlertTOFSL0AccumulatedData);
@@ -329,7 +334,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 		notifyListeners(ACCUMULATION_CLEAR);
 	}
 
-	//clar an array
+	//clear an array
 	private void clear(int[][][] data) {
 		if (data != null) {
 			for (int i = 0; i < data.length; i++) {
@@ -352,6 +357,15 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 			instance = new AccumulationManager();
 		}
 		return instance;
+	}
+	
+	/**
+	 * Get the accumulated uRWT data
+	 *
+	 * @return the accumulated uRWT data
+	 */
+	public int[][][] getAccumulatedUrWTData() {
+		return _UrWTAccumulatedData;
 	}
 
 	/**
@@ -476,6 +490,15 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	 */
 	public int[][][][] getAccumulatedDCData() {
 		return _DCAccumulatedData;
+	}
+	
+	/**
+	 * Get the max counts in the uRWT data
+	 *
+	 * @return the max counts in the uRWT data
+	 */
+	public int getMaxUrWTCount() {
+		return getMax(_UrWTAccumulatedData);
 	}
 
 	/**
@@ -757,6 +780,9 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 		}
 
 		_eventCount++;
+		
+		// uRWT data
+		accumUrWT();
 
 		// Alert DC data
 		accumAlertDC();
@@ -795,6 +821,29 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 		// BST
 		accumBST();
 
+	}
+	
+	/**
+	 * Accumulate data for the uRWT. Note: this uses the new accumulation strategy using the data warehouse.
+	 */
+	private void accumUrWT() {
+		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
+
+		if (dataEvent.hasBank("URWT::hits")) {
+			
+			if (_UrWTAccumulatedData == null) {
+				// UrWT data
+				_UrWTAccumulatedData = new int[6][4][1485];
+			}
+			short strips[] = _dataWarehouse.getShort("URWT::hits", "strip");
+			byte sectors[] = _dataWarehouse.getByte("URWT::hits", "sector");
+			byte layers[] = _dataWarehouse.getByte("URWT::hits", "layer");
+	
+			int count = (strips == null) ? 0 :strips.length;
+			for (int i = 0; i < count; i++) {
+				_UrWTAccumulatedData[sectors[i]-1][layers[i]-1][strips[i]-1] += 1;
+			}
+		}
 	}
 
 	/**

@@ -149,8 +149,8 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 
 
 		// make it square
-		int width = (int) size[0];
-		int height = width-100;
+		int height = (int) size[1];
+		int width = height+50;
 
 		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
 

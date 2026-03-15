@@ -446,8 +446,7 @@ public class VirtualView extends BaseView
 		switch (mouseEvent.getButton()) {
 		case MouseEvent.BUTTON1:
 			if (mouseEvent.getClickCount() == 1) { // single click
-			} else { // double (or more) clicks
-				handleDoubleClick(mouseEvent);
+				handleClick(mouseEvent);
 			}
 			return;
 
@@ -455,9 +454,32 @@ public class VirtualView extends BaseView
 			return;
 		}
 	}
+	
+	/**
+	 * Go to a specific column, making it visible. This is used by the virtual window items when they are double clicked.
+	 *
+	 * @param col the column to go to
+	 */
+	public void gotoColumn(int col) {
+
+		if ((col == _currentCol) || (col < 0) || (col >= _numcol)) {
+			return;
+		}
+		
+		int dh = _offsets[_currentCol].x - _offsets[col].x;
+
+		// can't do dv because can't give internal frames -y
+		int dv = 0;
+
+		for (BaseView view : _views) {
+			view.offset(dh, dv);
+		}
+
+		_currentCol = col;
+	}
 
 	// handle a double click
-	private void handleDoubleClick(MouseEvent mouseEvent) {
+	private void handleClick(MouseEvent mouseEvent) {
 		Point rc = getRowCol(mouseEvent.getPoint());
 		int clickCol = rc.x;
 		if ((clickCol == _currentCol)) {
@@ -476,6 +498,7 @@ public class VirtualView extends BaseView
 		_currentCol = clickCol;
 	}
 
+	// get the rectangle for a column in local coordinates
 	private Rectangle getColRect(int col) {
 
 		Rectangle2D.Double world = getContainer().getWorldSystem();

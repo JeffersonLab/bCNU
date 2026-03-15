@@ -116,11 +116,11 @@ public class FTCalXYView extends CedXYView {
 		
 
 		// set to a fraction of screen
-		double size[] = getSizeFromScreenFraction(0.65);
+		double size[] = getSizeFromScreenFraction(0.67);
 
 		// make it square
 		int width = (int) size[0];
-		int height = width;
+		int height = width + 100;
 
 		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
 

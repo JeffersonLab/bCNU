@@ -79,6 +79,8 @@ public class UrWTGeometry extends ACachedGeometry {
 		for (int sector = 1; sector <= NUM_SECTORS; sector++) {
 			for (int layer = 1; layer <= NUM_LAYERS; layer++) {
 				detectorData[sector - 1][layer - 1] = new UrWTDetectorData(factory, sector, layer);
+				int stripcount = detectorData[sector - 1][layer - 1].strips.length;
+				System.out.println("Sector " + sector + " Layer " + layer + " strip count = " + stripcount);
 			}
 		} // sector loop
 

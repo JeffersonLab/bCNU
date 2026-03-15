@@ -28,35 +28,35 @@ import cnuphys.bCNU.util.Fonts;
 @SuppressWarnings("serial")
 public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMotionListener {
 
-	public static final int ELLIPSEBUTTON = 01;
-	public static final int TEXTBUTTON = 02;
-	public static final int RECTANGLEBUTTON = 04;
-	public static final int POLYGONBUTTON = 010;
-	public static final int LINEBUTTON = 020;
-	public static final int RANGEBUTTON = 040;
-	public static final int DELETEBUTTON = 0100;
-	public static final int TEXTFIELD = 0200;
-	public static final int USERCOMPONENT = 0400; // user (app) provides drawing
+	public static final int ELLIPSEBUTTON      = 01;
+	public static final int TEXTBUTTON         = 02;
+	public static final int RECTANGLEBUTTON    = 04;
+	public static final int POLYGONBUTTON      = 010;
+	public static final int LINEBUTTON         = 020;
+	public static final int RANGEBUTTON        = 040;
+	public static final int DELETEBUTTON       = 0100;
+	public static final int TEXTFIELD          = 0200;
+	public static final int USERCOMPONENT      = 0400; // user (app) provides drawing
 	public static final int CONTROLPANELBUTTON = 01000; // toggle control panel
-	public static final int RADARCBUTTON = 02000;
-	public static final int POLYLINEBUTTON = 04000;
-	public static final int MAGNIFYBUTTON = 010000;
+	public static final int RADARCBUTTON       = 02000;
+	public static final int POLYLINEBUTTON     = 04000;
+	public static final int MAGNIFYBUTTON      = 010000;
 
-	public static final int NOZOOM = 020000;
-	public static final int CLONEBUTTON = 040000;
+	public static final int NOZOOM             = 020000;
+	public static final int CLONEBUTTON        = 040000;
 
-	public static final int PANBUTTON = 0100000;
-	public static final int UNDOZOOMBUTTON = 0100000;
+	public static final int PANBUTTON          = 0100000;
+	public static final int UNDOZOOMBUTTON     = 0100000;
 
-	public static final int RECTGRIDBUTTON = 01000000;
+	public static final int RECTGRIDBUTTON     = 01000000;
 
 	// used to eliminate some basic buttons
-	public static final int CENTERBUTTON = 040000000;
+	public static final int CENTERBUTTON       = 040000000;
 
 	public static final int DRAWING = ELLIPSEBUTTON + TEXTBUTTON + RECTANGLEBUTTON + POLYGONBUTTON + LINEBUTTON
 			+ RADARCBUTTON + POLYLINEBUTTON;
 
-	public static final int EVERYTHING = 07777777777 & ~NOZOOM;
+	public static final int EVERYTHING = 07777777777 & ~NOZOOM & ~CLONEBUTTON & ~PANBUTTON & ~UNDOZOOMBUTTON & ~RECTGRIDBUTTON;
 	public static final int STANDARD = EVERYTHING & ~CONTROLPANELBUTTON & ~USERCOMPONENT & ~CLONEBUTTON;
 
 	public static final int NODRAWING = EVERYTHING & ~DRAWING;

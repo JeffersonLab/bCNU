@@ -14,6 +14,7 @@ import cnuphys.ced.properties.PropertiesManager;
 import cnuphys.lund.SwimTrajectoryListener;
 import cnuphys.swim.Swimming;
 
+@SuppressWarnings("serial")
 public abstract class CedView3D extends PlainView3D
 		implements IClasIoEventListener, SwimTrajectoryListener, IAccumulationListener, IBankMatching {
 

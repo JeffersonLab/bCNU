@@ -290,7 +290,7 @@ public class GeometryCache {
 		// now try to read from the cache
 		boolean readSuccess = readAllGeometries();
 		if (readSuccess) {
-			System.err.println("Successfully read geometry from cache.");
+			System.out.println("Successfully read geometry from cache.");
 			return;
 		}
 
@@ -302,7 +302,7 @@ public class GeometryCache {
 		// write to the cache
 		boolean writeSuccess = writeAllGeometries();
 		if (writeSuccess) {
-			System.err.println("Successfully wrote geometry to cache.");
+			System.out.println("Successfully wrote geometry to cache.");
 		} else {
 			System.err.println("Failed to write geometry to cache.");
 		}

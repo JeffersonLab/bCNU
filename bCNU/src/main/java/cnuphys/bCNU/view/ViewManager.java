@@ -10,6 +10,7 @@ import javax.swing.JMenuItem;
 import javax.swing.event.EventListenerList;
 
 import cnuphys.bCNU.log.Log;
+import cnuphys.bCNU.util.PropertySupport;
 
 /**
  * Manages all the views, or internal frames.
@@ -219,7 +220,7 @@ public class ViewManager extends Vector<BaseView> {
 	    // Extract title from keyVals
 	    String title = "Unknown View";
 	    for (int i = 0; i < config.keyVals.length; i += 2) {
-	        if (cnuphys.bCNU.util.PropertySupport.TITLE.equals(config.keyVals[i])) {
+	        if (PropertySupport.TITLE.equals(config.keyVals[i])) {
 	            title = (String) config.keyVals[i+1];
 	            break;
 	        }

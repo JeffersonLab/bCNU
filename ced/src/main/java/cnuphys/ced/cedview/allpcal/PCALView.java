@@ -17,6 +17,7 @@ import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.drawable.IDrawable;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
+import cnuphys.bCNU.graphics.toolbar.BaseToolBar;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.X11Colors;
@@ -186,7 +187,7 @@ public class PCALView extends HexView {
 		props.put(PropertySupport.PROPNAME, "PCAL");
 
 		// set to a fraction of screen
-		double size[] = getSizeFromScreenFraction(0.68);
+		double size[] = getSizeFromScreenFraction(0.62);
 
 		props.put(PropertySupport.WIDTH, (int) (0.866 * size[0]));
 		props.put(PropertySupport.HEIGHT, (int)size[1]);
@@ -194,7 +195,7 @@ public class PCALView extends HexView {
 		props.put(PropertySupport.WORLDSYSTEM, _defaultWorld);
 
 		props.put(PropertySupport.TOOLBAR, true);
-		props.put(PropertySupport.TOOLBARBITS, CedView.TOOLBARBITS);
+		props.put(PropertySupport.TOOLBARBITS, CedView.TOOLBARBITS | BaseToolBar.CLONEBUTTON);
 		props.put(PropertySupport.VISIBLE, true);
 		props.put(PropertySupport.BACKGROUND, X11Colors.getX11Color("Alice Blue"));
 		props.put(PropertySupport.STANDARDVIEWDECORATIONS, true);

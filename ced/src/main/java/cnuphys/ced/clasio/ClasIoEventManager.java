@@ -88,7 +88,6 @@ public class ClasIoEventManager {
 	// are notified first. Then those in index 1. Finally those in index 2. The
 	// Data containers should be in index 0. The trajectory and noise in index 1, and
 	// the regular views in index 2 (they are notified last)
-
 	private EventNotifier<Object> eventNotifier[] = new EventNotifier[3];
 
 	// someone who can swim all MC particles

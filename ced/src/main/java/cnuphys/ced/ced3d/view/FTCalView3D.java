@@ -1,10 +1,12 @@
 package cnuphys.ced.ced3d.view;
 
+import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.view.ViewConfiguration;
 import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.ftcal.FTCalPanel3D;
 
+@SuppressWarnings("serial")
 public class FTCalView3D extends CedView3D {
 
 	public static final float xdist = 0f;
@@ -40,10 +42,18 @@ public class FTCalView3D extends CedView3D {
 	 * for lazy construction.
 	 */
 	public static ViewConfiguration<FTCalView3D> getConfiguration() {
-		ViewConfiguration<FTCalView3D> configuration = new ViewConfiguration<>(FTCalView3D.class, true, 16, 0, 0, VirtualView.CENTER);
+		ViewConfiguration<FTCalView3D> configuration = new ViewConfiguration<>(FTCalView3D.class, true, 
+				16, 0, 0, VirtualView.CENTER, getDefaultKeyVals());
 		return configuration;
 	}
 	
-//	private static Object[] 
 
+	/**
+	 * Get the default key values for the view. This is used by lazy creation
+	 *
+	 * @return the default key values for the view
+	 */
+	public static Object[] getDefaultKeyVals() {
+		return new Object[] {PropertySupport.TITLE, TITLE};
+	}
 }

@@ -23,6 +23,7 @@ import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.drawable.IDrawable;
+import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.util.Fonts;
@@ -90,7 +91,7 @@ public class UrWTXYView extends HexView {
 
 	}
 
-	//
+	//create the view
 	private UrWTXYView(String title) {
 		super(getAttributes(title));
 
@@ -217,13 +218,18 @@ public class UrWTXYView extends HexView {
 			@Override
 			public void draw(Graphics g, IContainer container) {
 
-				if (!_eventManager.isAccumulating()) {
+				if (_eventManager.isAccumulating()) {
+					return;
+				}
+
+				
+				if (isSingleEventMode()) {
 
 					// draw trajectories
 					_swimTrajectoryDrawer.draw(g, container);
 
 					for (int sector = 1; sector <= 6; sector++) {
-						for (int layer = 1; layer <= 4; layer++) {
+						for (int layer = 4; layer >= 1; layer--) {
 							if (!showLayer(layer)) {
 								continue;
 							}
@@ -233,16 +239,15 @@ public class UrWTXYView extends HexView {
 					}
 
 
-//
-//					//draw crosses
-//					drawCrosses(g, container);
-//
 //					//data selected highlight?
-//					drawDataSelectedHighlight(g, container);
+					drawDataSelectedHighlight(g, container);
 
 					drawCoordinateSystem(g, container, null);
 					drawSectorNumbers(g, container, null, 145);
-				} // not acumulating
+				} // accumulation
+				else {
+					drawAccumulatedHits(g, container);
+				}
 
 
 				for (int sector = 1; sector <= 6; sector++) {
@@ -258,97 +263,70 @@ public class UrWTXYView extends HexView {
 		getContainer().setAfterDraw(afterDraw);
 	}
 
-	//draw the crosses
-	private void drawCrosses(Graphics g, IContainer container) {
-		if (!showCrosses()) {
-			return;
-		}
-
-		if (isSingleEventMode()) {
-			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-			if (event == null) {
-				return;
-			}
-
-			byte sector[] = DataWarehouse.getInstance().getByte("URWT::crosses", "sector");
-
-			int count = (sector == null) ? 0 : sector.length;
-			if (count == 0) {
-				return;
-			}
-
-			float x[] = _dataWarehouse.getFloat("URWT::crosses", "x");
-			float y[] = _dataWarehouse.getFloat("URWT::crosses", "y");
-			float z[] = _dataWarehouse.getFloat("URWT::crosses", "z");
-
-
-			//public static void drawSphere(Graphics g, String color, int xc, int yc, int width, int height) {
-
-			for (int i = 0; i < count; i++) {
-				projectPoint(container, x[i], y[i], z[i]);
-				DataDrawSupport.drawCross(g, _pp1.x, _pp1.y, 4);
-			}
-
-		}
-
-	}
-
-
 
 	//draw data selected highlighted data
 	private void drawDataSelectedHighlight(Graphics g, IContainer container) {
-//
-//		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-//		if (dataEvent == null) {
-//			return;
-//		}
-//
-//		//indices are zero based
-//
-//		if (dataEvent.hasBank("URWT::clusters") && (_highlightData.cluster >= 0) && showClusters()) {
-//			int idx = _highlightData.cluster; //0 based
-//
-//			float xo = _dataWarehouse.getFloat("URWT::clusters", "xo")[idx];
-//			float yo = _dataWarehouse.getFloat("URWT::clusters", "yo")[idx];
-//			float zo = _dataWarehouse.getFloat("URWT::clusters", "zo")[idx];
-//			float xe = _dataWarehouse.getFloat("URWT::clusters", "xe")[idx];
-//			float ye = _dataWarehouse.getFloat("URWT::clusters", "ye")[idx];
-//			float ze = _dataWarehouse.getFloat("URWT::clusters", "ze")[idx];
-//
-//			projectLine(container, xo, yo, zo, xe, ye, ze);
-//			GraphicsUtilities.drawThickHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, Color.orange, Color.white);
-//
-//		}
-//
-//		if (dataEvent.hasBank("URWT::crosses") && (_highlightData.cross >= 0) && showCrosses()) {
-//			int idx = _highlightData.cross; //0 based
-//			float x = _dataWarehouse.getFloat("URWT::crosses", "x")[idx];
-//			float y = _dataWarehouse.getFloat("URWT::crosses", "y")[idx];
-//			float z = _dataWarehouse.getFloat("URWT::crosses", "z")[idx];
-//			projectPoint(container, x, y, z);
-//			DataDrawSupport.drawBiggerCross(g, _pp1.x, _pp1.y, 5);
-//		}
-//
-//
-//		if (dataEvent.hasBank("URWT::hits") && (_highlightData.hit >= 0)) {
-//
-//			int idx = _highlightData.hit; //0 based
-//
-//			byte sector = _dataWarehouse.getByte("URWT::hits", "sector")[idx];
-//			byte layer = _dataWarehouse.getByte("URWT::hits", "layer")[idx];
-//			short strip = _dataWarehouse.getShort("URWT::hits", "strip")[idx];
-//
-//			int data[];
-//
-//			data = UrWTGeometry.chamberStrip(strip);
-//			projectStrip(container, sector, data[0], layer, data[1]);
-//
-//			GraphicsUtilities.drawOval(g, _pp1.x, _pp1.y, 6, 6, Color.black, Color.cyan);
-//			GraphicsUtilities.drawOval(g, _pp2.x, _pp2.y, 6, 6, Color.black, Color.cyan);
-//
-//		}
-//
-//
+
+		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
+		if (dataEvent == null) {
+			return;
+		}
+
+		//indices are zero based
+
+		if (dataEvent.hasBank("URWT::clusters") && (_highlightData.cluster >= 0) && showClusters()) {
+			int idx = _highlightData.cluster; // 0 based
+
+			byte layer = _dataWarehouse.getByte("URWT::clusters", "layer")[idx];
+
+			if (showLayer(layer)) {
+
+				float xo = _dataWarehouse.getFloat("URWT::clusters", "xo")[idx];
+				float yo = _dataWarehouse.getFloat("URWT::clusters", "yo")[idx];
+				float zo = _dataWarehouse.getFloat("URWT::clusters", "zo")[idx];
+				float xe = _dataWarehouse.getFloat("URWT::clusters", "xe")[idx];
+				float ye = _dataWarehouse.getFloat("URWT::clusters", "ye")[idx];
+				float ze = _dataWarehouse.getFloat("URWT::clusters", "ze")[idx];
+
+				projectLine(container, xo, yo, zo, xe, ye, ze, _pp1, _pp2);
+				GraphicsUtilities.drawThickHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, Color.orange,
+						Color.white);
+			}
+		}
+
+		if (dataEvent.hasBank("URWT::crosses") && (_highlightData.cross >= 0) && showCrosses()) {
+			int idx = _highlightData.cross; //0 based
+			float x = _dataWarehouse.getFloat("URWT::crosses", "x")[idx];
+			float y = _dataWarehouse.getFloat("URWT::crosses", "y")[idx];
+			float z = _dataWarehouse.getFloat("URWT::crosses", "z")[idx];
+			projectPoint(container, x, y, z, _pp1);
+			DataDrawSupport.drawBiggerCross(g, _pp1.x, _pp1.y, 5);
+		}
+
+
+		if (dataEvent.hasBank("URWT::hits") && (_highlightData.hit >= 0)) {
+
+			int idx = _highlightData.hit; // 0 based
+
+			byte sector = _dataWarehouse.getByte("URWT::hits", "sector")[idx];
+			byte layer = _dataWarehouse.getByte("URWT::hits", "layer")[idx];
+
+			// are we showing that layer?
+			if (showLayer(layer)) {
+
+				short strip = _dataWarehouse.getShort("URWT::hits", "strip")[idx];
+
+				UrWTDetectorData data = UrWTGeometry.getDetectorData(sector, layer);
+				Line3D line = data.getStrip(strip);
+
+				projectLine(container, (float) line.origin().x(), (float) line.origin().y(), (float) line.origin().z(),
+						(float) line.end().x(), (float) line.end().y(), (float) line.end().z(), _pp1, _pp2);
+
+				GraphicsUtilities.drawOval(g, _pp1.x, _pp1.y, 6, 6, Color.black, Color.cyan);
+				GraphicsUtilities.drawOval(g, _pp2.x, _pp2.y, 6, 6, Color.black, Color.cyan);
+
+			}
+		}
 
 	}
 
@@ -423,16 +401,25 @@ public class UrWTXYView extends HexView {
 	 * @param y
 	 * @param z
 	 */
-	private void projectPoint(IContainer container, float x, float y, float z) {
+	protected void projectPoint(IContainer container, float x, float y, float z,Point pp) {
 		_p3d1.set(x, y, z);
 		projectClasToWorld(_p3d1, projectionPlane, _wp1);
-		container.worldToLocal(_pp1, _wp1);
+		container.worldToLocal(pp, _wp1);
 	}
 
 
 
 	//draw accumulated hits
 	private void drawAccumulatedHits(Graphics g, IContainer container) {
+		for (int sector = 1; sector <= 6; sector++) {
+			for (int layer = 4; layer >= 1; layer--) {
+				if (!showLayer(layer)) {
+					continue;
+				}
+				UrWTDetectorItem item = detectorItems[sector - 1][layer - 1];
+				item.drawAccumulatedData(g, container);
+			}
+		}
 	}
 
 	// get the attributes to pass to the super constructor
@@ -491,7 +478,7 @@ public class UrWTXYView extends HexView {
 			float z[] = _dataWarehouse.getFloat("URWT::crosses", "z");
 
 			for (int i = 0; i < count; i++) {
-				projectPoint(container, x[i], y[i], z[i]);
+				projectPoint(container, x[i], y[i], z[i], _pp1);
 				_fbRect.setBounds(_pp1.x-5, _pp1.y-5, 10, 10);
 
 				if (_fbRect.contains(pp)) {
