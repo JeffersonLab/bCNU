@@ -85,8 +85,6 @@ import cnuphys.ced.trigger.TriggerMenuPanel;
 import cnuphys.lund.X11Colors;
 import cnuphys.magfield.MagneticFieldChangeListener;
 import cnuphys.magfield.MagneticFields;
-import cnuphys.simanneal.example.ising2D.Ising2DDialog;
-import cnuphys.simanneal.example.ts.TSDialog;
 import cnuphys.splot.example.MemoryUsageDialog;
 import cnuphys.swim.SwimMenu;
 import cnuphys.swim.Swimmer;
@@ -186,11 +184,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 			+ release + "<br><br>Developed by Christopher Newport University"
 			+ "<br><br>Email bug reports to david.heddle@cnu.edu";
 
-	// for the traveling salesperson dialog
-	private TSDialog _tsDialog;
-
-	// for the ising model 2D dialog
-	private Ising2DDialog _i2dDialog;
 
 	// set whether data banks are floating
 	private JCheckBoxMenuItem _floatingBankDisplayCB;
@@ -568,8 +561,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 		final JMenuItem wordleItem = new JMenuItem("Wordle...");
 		final JMenuItem fortuneItem = new JMenuItem("Fortune...");
-		final JMenuItem tsItem = new JMenuItem("Traveling Salesperson ...");
-		final JMenuItem i2dItem = new JMenuItem("2D Ising Model ...");
 
 		ActionListener al1 = new ActionListener() {
 			@Override
@@ -580,28 +571,14 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 					Wordle.getInstance().setVisible(true);
 				} else if (source == fortuneItem) {
 					FortuneManager.getInstance().showDialog();
-				} else if (source == tsItem) {
-					if (_tsDialog == null) {
-						_tsDialog = new TSDialog();
-					}
-					_tsDialog.setVisible(true);
-				} else if (source == i2dItem) {
-					if (_i2dDialog == null) {
-						_i2dDialog = new Ising2DDialog();
-					}
-					_i2dDialog.setVisible(true);
-				}
+				} 
 			}
 		};
 
 		wordleItem.addActionListener(al1);
 		fortuneItem.addActionListener(al1);
-		tsItem.addActionListener(al1);
-		i2dItem.addActionListener(al1);
 		_weirdMenu.add(wordleItem);
 		_weirdMenu.add(fortuneItem);
-		_weirdMenu.add(tsItem);
-		_weirdMenu.add(i2dItem);
 
 		menu.add(_weirdMenu, 0);
 
