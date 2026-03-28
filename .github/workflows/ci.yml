@@ -1,0 +1,67 @@
+
+name: ced-ci
+
+on:
+  pull_request:
+  push:
+    branches: [ development ]
+    tags: [ '*' ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+#env:
+#  CCDB_CONNECTION: 'sqlite:////cvmfs/oasis.opensciencegrid.org/jlab/hallb/clas12/sw/noarch/data/ccdb/ccdb_latest.sqlite'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        runner:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: zulu
+#      - name: install xrootd-client (linux)
+#        if: ${{ matrix.runner == 'ubuntu-latest' }}
+#        run: |
+#          sudo apt -y update
+#          sudo apt -y upgrade
+#          sudo apt -y install xrootd-client
+#      - name: install xrootd-client (macos)
+#        if: ${{ matrix.runner == 'macos-latest' }}
+#        run: brew install xrootd
+#      - name: setup cvmfs
+#        uses: cvmfs-contrib/github-action-cvmfs@v5
+#        with:
+#          cvmfs_repositories: 'oasis.opensciencegrid.org'
+#      - name: cvmfs
+#        run: ls /cvmfs/oasis.opensciencegrid.org/jlab/hallb/clas12/sw/noarch/data/ccdb/ccdb_latest.sqlite
+      - name: install-custom-coatjava
+        run: |
+          git clone -b Clas12swimtest-nabo https://github.com/jeffersonlab/coatjava coatjava2
+          cd coatjava2
+          ./build-coatjava.sh
+          cd -
+          ./util/mvn-install-coatjava.sh ./coatjava2/coatjava
+      - name: build
+        run: mvn install
+#      - name: tar # tarball to preserve permissions
+#        run: tar czvf coatjava.tar.gz coatjava
+#      - uses: actions/upload-artifact@v4
+#        with:
+#          name: build_${{ matrix.runner }}
+#          retention-days: 1
+#          path: coatjava.tar.gz
+
