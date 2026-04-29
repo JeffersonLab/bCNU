@@ -18,6 +18,7 @@ import cnuphys.ced.alldata.datacontainer.tof.CTOFADCData;
 import cnuphys.ced.alldata.datacontainer.tof.CTOFClusterData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.alert.AlertXYView;
+import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.BMTGeometry;
 import cnuphys.ced.geometry.BSTGeometry;
@@ -137,13 +138,15 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 	// only called in single event mode
 	@Override
 	protected void drawHitsSingleMode(Graphics g, IContainer container) {
-		drawBSTHitsSingleMode(g, container);
-		drawBMTHitsSingleMode(g, container);
-		drawCTOFSingleHitsMode(g, container);
-		drawCNDSingleHitsMode(g, container);
-		drawCVTRecKFTraj(g, container);
-		drawCVTP1Traj(g, container);
-		drawCVTRecTraj(g, container);
+		if (ClasIoEventManager.getInstance().hasCurrentEvent()) {
+			drawBSTHitsSingleMode(g, container);
+			drawBMTHitsSingleMode(g, container);
+			drawCTOFSingleHitsMode(g, container);
+			drawCNDSingleHitsMode(g, container);
+			drawCVTRecKFTraj(g, container);
+			drawCVTP1Traj(g, container);
+			drawCVTRecTraj(g, container);
+		}
 	}
 
 	// draw CTOF hits

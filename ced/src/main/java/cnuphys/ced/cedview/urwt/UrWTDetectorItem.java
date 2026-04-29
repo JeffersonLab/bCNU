@@ -105,19 +105,23 @@ public class UrWTDetectorItem extends PolygonItem {
 	}
 	
 	/**
-	 * Draw the hits for this layer. This is called by the view after all items have been drawn, so we can draw on top of the detector outlines.
-	 * @param g the graphics context
+	 * Draw the hits for this layer. This is called by the view after all items have
+	 * been drawn, so we can draw on top of the detector outlines.
+	 * 
+	 * @param g         the graphics context
 	 * @param container the container being drawn
 	 */
 	protected void drawData(Graphics g, IContainer container) {
 		if (!showLayer() || ClasIoEventManager.getInstance().isAccumulating()) {
 			return;
 		}
-		
 
-		drawHits(g, container); //hits
-		drawClusters(g, container); //clusters
-		drawCrosses(g, container); //crosses
+		if (ClasIoEventManager.getInstance().hasCurrentEvent()) {
+
+			drawHits(g, container); // hits
+			drawClusters(g, container); // clusters
+			drawCrosses(g, container); // crosses
+		}
 	}
 	
 	

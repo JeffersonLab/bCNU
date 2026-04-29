@@ -38,6 +38,7 @@ import cnuphys.bCNU.util.Environment;
 import cnuphys.bCNU.util.FileUtilities;
 import cnuphys.bCNU.util.Jar;
 import cnuphys.bCNU.util.PropertySupport;
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.PlotView;
 import cnuphys.bCNU.view.ViewManager;
@@ -82,7 +83,6 @@ import cnuphys.ced.swim.SwimAllRecon;
 import cnuphys.ced.trigger.TriggerDialog;
 import cnuphys.ced.trigger.TriggerManager;
 import cnuphys.ced.trigger.TriggerMenuPanel;
-import cnuphys.lund.X11Colors;
 import cnuphys.magfield.MagneticFieldChangeListener;
 import cnuphys.magfield.MagneticFields;
 import cnuphys.splot.example.MemoryUsageDialog;
@@ -104,7 +104,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private static String _geoVariation = "default";
 
 	// ced release1.9.8.
-	public static final String release = "1.9.9.0";
+	public static final String release = "1.9.9.1";
 
 	//minimum java major version
 	private static final int _minJavaVersion = 21;
@@ -890,16 +890,14 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	 */
 	private static Ced getInstance() {
 		if (_instance == null) {
-			_instance = new Ced(PropertySupport.TITLE, "ced " + versionString(), PropertySupport.BACKGROUNDIMAGE,
-					"images/cnu.png", PropertySupport.FRACTION, 0.9);
+			_instance = new Ced(PropertySupport.TITLE, "ced " + versionString(), 
+					PropertySupport.BACKGROUNDIMAGE, "images/cnu.png", 
+					PropertySupport.FRACTION, 0.9);
 
 			_instance.addInitialViews();
 			_instance.createMenus();
 			_instance.placeViewsOnVirtualDesktop();
-
-//			_instance.createBusyPanel();
 			_instance.createFilterLabel();
-
 			_instance.createTriggerPanel();
 
 			_instance.createEventNumberLabel();

@@ -5,12 +5,12 @@ import java.awt.Color;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.datacontainer.cal.ECalADCData;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.ced3d.PlainPanel3D;
 import cnuphys.ced.geometry.ECGeometry;
 import cnuphys.ced.geometry.PCALGeometry;
-import cnuphys.lund.X11Colors;
 
 public class ECViewPlane3D extends DetectorItem3D {
 

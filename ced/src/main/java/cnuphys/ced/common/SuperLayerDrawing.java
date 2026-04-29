@@ -107,8 +107,6 @@ public class SuperLayerDrawing {
 		}
 
 
-		Graphics2D g2 = (Graphics2D) g;
-
 		// are we really zoomed in?
 		boolean reallyClose = (WorldGraphicsUtilities
 				.getMeanPixelDensity(_view.getContainer()) > SuperLayerDrawing.closeupThreshold[_iSupl.superlayer()]);
@@ -145,8 +143,10 @@ public class SuperLayerDrawing {
 			}
 		}
 
-		// draw the hits
-		drawHits(g, container, reallyClose, segmentsOnly);
+		// draw the hits if have data
+		if (ClasIoEventManager.getInstance().hasCurrentEvent()) {
+			drawHits(g, container, reallyClose, segmentsOnly);
+		}
 
 		// draw outer boundary again.
 		g.setColor(_iSupl.item().getStyle().getLineColor());
@@ -199,29 +199,6 @@ public class SuperLayerDrawing {
 		} 				
 		g.fillRect(pp.x, pp.y , 1, 1);
 	}
-	
-	// draw a single wire
-	private void XdrawOneWire(Graphics g, IContainer container, int layer, int wire, boolean reallyClose, Point pp) {
-		g.setColor(CedColors.senseWireColor);
-		Point2D.Double wp = wire(_iSupl.superlayer(), layer, wire, _iSupl.isLowerSector());
-
-		if (wp != null) {
-			container.worldToLocal(pp, wp);
-			if (reallyClose) {
-				g.fillRect(pp.x - 1, pp.y - 1, 2, 2);
-				Polygon hexagon = getHexagon(container, layer, wire);
-				if (hexagon == null) {
-					return;
-				} else {
-					g.setColor(CedColors.hexColor);
-					g.drawPolygon(hexagon);
-				}
-			} else {
-				g.fillRect(pp.x, pp.y, 1, 1);
-			}
-		}
-	}
-
 
 	/**
 	 * Draw the masks showing the effect of the noise finding algorithm
@@ -342,30 +319,32 @@ public class SuperLayerDrawing {
 	 */
 	private void drawSingleModeHits(Graphics g, IContainer container, boolean reallyClose, boolean segmentsOnly) {
 
-		if (!segmentsOnly) {
+		if (ClasIoEventManager.getInstance().hasCurrentEvent()) {
 
-			Point pp = new Point();
+			if (!segmentsOnly) {
 
-			boolean useOrderColoring = Ced.useOrderColoring;
+				Point pp = new Point();
 
-			for (int i = 0; i < _dcData.count(); i++) {
-				if ((_dcData.sector[i] == _iSupl.sector()) && (_dcData.superlayer[i] == _iSupl.superlayer())) {
-					drawBasicDCHit(g, container, _dcData.layer6[i], _dcData.component[i], _dcData.noise[i], -1,
-							_dcData.order[i], useOrderColoring);
-					// just draw the wire again
-					drawOneWire(g, container, _dcData.layer6[i], _dcData.component[i], reallyClose, pp);
+				boolean useOrderColoring = Ced.useOrderColoring;
+
+				for (int i = 0; i < _dcData.count(); i++) {
+					if ((_dcData.sector[i] == _iSupl.sector()) && (_dcData.superlayer[i] == _iSupl.superlayer())) {
+						drawBasicDCHit(g, container, _dcData.layer6[i], _dcData.component[i], _dcData.noise[i], -1,
+								_dcData.order[i], useOrderColoring);
+						// just draw the wire again
+						drawOneWire(g, container, _dcData.layer6[i], _dcData.component[i], reallyClose, pp);
+					}
 				}
+
 			}
 
-
+			// draw track based hits (docas) and segments
+			drawHitBasedSegments(g, container);
+			// drawTimeBasedHits(g, container);
+			drawTimeBasedSegments(g, container);
+			drawAIHitBasedSegments(g, container);
+			drawAITimeBasedSegments(g, container);
 		}
-
-		// draw track based hits (docas) and segments
-		drawHitBasedSegments(g, container);
-		// drawTimeBasedHits(g, container);
-		drawTimeBasedSegments(g, container);
-		drawAIHitBasedSegments(g, container);
-		drawAITimeBasedSegments(g, container);
 
 	}
 
@@ -830,7 +809,7 @@ public class SuperLayerDrawing {
 	 * @param z the z coordinate
 	 * @return the projected space point
 	 */
-	public Point3D projectedPoint(double x, double y, double z, Point2D.Double wp) {
+	private Point3D projectedPoint(double x, double y, double z, Point2D.Double wp) {
 		return _view.projectedPoint(x, y, z, _iSupl.projectionPlane(), wp);
 	}
 
@@ -842,8 +821,15 @@ public class SuperLayerDrawing {
             for (int i = 0; i < count; i++) {
                 if ((segments.sector[i] == _iSupl.sector())
                         && (segments.superlayer[i] == _iSupl.superlayer())) {
+                	
                     projectedPoint(segments.x1[i], 0, segments.z1[i], wp1);
                     projectedPoint(segments.x2[i], 0, segments.z2[i], wp2);
+                    
+                 	//data is in sector coordinates, so check x values to determine if need to flip to lower sector
+                   if (_iSupl.isLowerSector()) {
+                    	wp1.y = -wp1.y;
+						wp2.y = -wp2.y;
+                    }
                     drawSegment(g, container, _view, wp1, wp2, lc, fc);
 
                 }

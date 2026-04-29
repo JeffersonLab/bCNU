@@ -3,11 +3,11 @@ package cnuphys.ced.ced3d.ftcal;
 import java.awt.Color;
 import java.awt.Font;
 
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.TrajectoryDrawer3D;
 import cnuphys.ced.ced3d.view.CedView3D;
 import cnuphys.ced.geometry.FTCALGeometry;
-import cnuphys.lund.X11Colors;
 import item3D.Axes3D;
 
 public class FTCalPanel3D extends CedPanel3D {

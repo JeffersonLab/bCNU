@@ -311,6 +311,15 @@ public class ClasIoEventManager {
 	public DataEvent getCurrentEvent() {
 		return _currentEvent;
 	}
+	
+	/**
+	 * Check whether there is a current event
+	 *
+	 * @return <code>true</code> if there is a current event
+	 */
+	public boolean hasCurrentEvent() {
+		return _currentEvent != null;
+	}
 
 	/**
 	 * Get a description of the current event source.

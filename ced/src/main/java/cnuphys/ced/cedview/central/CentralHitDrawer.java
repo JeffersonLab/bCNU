@@ -105,13 +105,15 @@ public abstract class CentralHitDrawer implements IDrawable {
 
 	//single event mode
 	protected void drawHitsSingleMode(Graphics g, IContainer container) {
-		drawBSTHitsSingleMode(g, container);
-		drawBMTHitsSingleMode(g, container);
-		drawCTOFSingleHitsMode(g, container);
-		drawCNDSingleHitsMode(g, container);
-		drawCVTP1Traj(g, container);
-		drawCVTRecKFTraj(g, container);
-		drawCVTRecTraj(g, container);
+		if (ClasIoEventManager.getInstance().hasCurrentEvent()) {
+			drawBSTHitsSingleMode(g, container);
+			drawBMTHitsSingleMode(g, container);
+			drawCTOFSingleHitsMode(g, container);
+			drawCNDSingleHitsMode(g, container);
+			drawCVTP1Traj(g, container);
+			drawCVTRecKFTraj(g, container);
+			drawCVTRecTraj(g, container);
+		}
 	}
 
 	protected void drawBSTHitsSingleMode(Graphics g, IContainer container) {

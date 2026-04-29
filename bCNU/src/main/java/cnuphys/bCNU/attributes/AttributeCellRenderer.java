@@ -9,7 +9,7 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import cnuphys.lund.X11Colors;
+import cnuphys.bCNU.util.X11Colors;
 
 public class AttributeCellRenderer extends DefaultTableCellRenderer {
 

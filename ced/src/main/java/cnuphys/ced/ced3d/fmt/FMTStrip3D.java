@@ -7,11 +7,11 @@ import org.jlab.io.base.DataEvent;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.geometry.fmt.FMTGeometry;
-import cnuphys.lund.X11Colors;
 
 public class FMTStrip3D extends DetectorItem3D {
 

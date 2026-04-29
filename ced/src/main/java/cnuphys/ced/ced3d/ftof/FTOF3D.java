@@ -4,9 +4,9 @@ import java.awt.Color;
 
 import com.jogamp.opengl.GLAutoDrawable;
 
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.ced3d.PlainPanel3D;
-import cnuphys.lund.X11Colors;
 
 public class FTOF3D extends DetectorItem3D {
 

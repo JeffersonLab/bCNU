@@ -5,9 +5,9 @@ import java.awt.Color;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.geometry.DCGeometry;
-import cnuphys.lund.X11Colors;
 
 public class DCSuperLayer3D extends DetectorItem3D {
 

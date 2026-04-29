@@ -2,7 +2,7 @@ package cnuphys.bCNU.wordle;
 
 import java.awt.Color;
 
-import cnuphys.lund.X11Colors;
+import cnuphys.bCNU.util.X11Colors;
 
 public class Colors {
 

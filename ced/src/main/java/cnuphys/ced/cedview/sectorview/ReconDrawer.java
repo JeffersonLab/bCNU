@@ -22,6 +22,7 @@ import cnuphys.ced.alldata.datacontainer.dc.HBTrkgHitData;
 import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAIHitData;
 import cnuphys.ced.alldata.datacontainer.dc.TBTrkgHitData;
 import cnuphys.ced.cedview.CedView;
+import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.frame.CedColors;
 import cnuphys.ced.geometry.ECGeometry;
 
@@ -53,6 +54,10 @@ public class ReconDrawer extends SectorViewDrawer {
 		_fbData.clear();
 
 		if (_eventManager.isAccumulating() || !_view.isSingleEventMode()) {
+			return;
+		}
+		
+		if (!ClasIoEventManager.getInstance().hasCurrentEvent()) {
 			return;
 		}
 

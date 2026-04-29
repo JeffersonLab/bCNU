@@ -3,11 +3,11 @@ package cnuphys.ced.ced3d;
 import java.awt.Color;
 import java.awt.Font;
 
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.ced3d.cnd.CND3D;
 import cnuphys.ced.ced3d.ctof.CTOF3D;
 import cnuphys.ced.ced3d.view.CedView3D;
 import cnuphys.ced.geometry.BSTGeometry;
-import cnuphys.lund.X11Colors;
 import item3D.Axes3D;
 
 public class CentralPanel3D extends CedPanel3D {

@@ -34,6 +34,7 @@ import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.util.Environment;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
@@ -56,7 +57,6 @@ import cnuphys.ced.geometry.BSTxyPanel;
 import cnuphys.ced.geometry.CNDGeometry;
 import cnuphys.ced.geometry.CTOFGeometry;
 import cnuphys.ced.geometry.bmt.BMTSectorItem;
-import cnuphys.lund.X11Colors;
 import cnuphys.swim.SwimTrajectory2D;
 
 @SuppressWarnings("serial")
@@ -164,6 +164,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 
 		// make it square
 		int width = (int) size[0];
+		width = Math.max(width, 500);
 		int height = width;
 
 		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));

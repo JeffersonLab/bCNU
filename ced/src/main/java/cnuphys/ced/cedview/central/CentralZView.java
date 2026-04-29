@@ -129,6 +129,7 @@ public class CentralZView extends CedView implements ChangeListener, ILabCoordin
 
 		// make it square
 		int width = (int) size[0];
+		width = Math.max(width, 500);
 		int height = width;
 
 		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));

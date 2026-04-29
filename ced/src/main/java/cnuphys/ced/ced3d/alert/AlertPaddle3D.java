@@ -7,12 +7,12 @@ import org.jlab.io.base.DataEvent;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.cedview.alert.AlertTOFGeometryNumbering;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.geometry.alert.AlertGeometry;
-import cnuphys.lund.X11Colors;
 
 public class AlertPaddle3D extends DetectorItem3D {
 

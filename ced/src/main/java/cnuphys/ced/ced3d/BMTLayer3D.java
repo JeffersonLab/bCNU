@@ -5,11 +5,11 @@ import java.awt.Color;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.datacontainer.bmt.BMTADCData;
 import cnuphys.ced.alldata.datacontainer.bmt.BMTCrossData;
 import cnuphys.ced.geometry.BMTGeometry;
 import cnuphys.ced.geometry.bmt.Constants;
-import cnuphys.lund.X11Colors;
 
 public class BMTLayer3D extends DetectorItem3D {
 

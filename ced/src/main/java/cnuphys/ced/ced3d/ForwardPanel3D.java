@@ -3,11 +3,11 @@ package cnuphys.ced.ced3d;
 import java.awt.Color;
 import java.awt.Font;
 
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.ced3d.cal.ECViewPlane3D;
 import cnuphys.ced.ced3d.cal.PCALViewPlane3D;
 import cnuphys.ced.ced3d.ftof.FTOF3D;
 import cnuphys.ced.ced3d.view.CedView3D;
-import cnuphys.lund.X11Colors;
 import cnuphys.magfield.MagneticFields;
 import item3D.Axes3D;
 

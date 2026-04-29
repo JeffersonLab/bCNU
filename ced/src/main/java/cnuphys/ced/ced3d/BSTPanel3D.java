@@ -5,11 +5,11 @@ import java.awt.Color;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTCrossData;
 import cnuphys.ced.alldata.datacontainer.cvt.CosmicData;
 import cnuphys.ced.geometry.BSTGeometry;
-import cnuphys.lund.X11Colors;
 
 public class BSTPanel3D extends DetectorItem3D {
 

@@ -4,12 +4,12 @@ package cnuphys.ced.ced3d.alert;
 import java.awt.Color;
 import java.awt.Font;
 
+import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.TrajectoryDrawer3D;
 import cnuphys.ced.ced3d.view.CedView3D;
 import cnuphys.ced.geometry.alert.AlertGeometry;
 import cnuphys.ced.geometry.alert.DCLayer;
-import cnuphys.lund.X11Colors;
 import item3D.Axes3D;
 
 
