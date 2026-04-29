@@ -13,6 +13,7 @@ import org.jlab.jnp.hipo4.data.Schema;
 import org.jlab.jnp.hipo4.data.SchemaFactory;
 
 import cnuphys.bCNU.threading.EventNotifier;
+import cnuphys.bCNU.util.Environment;
 import cnuphys.ced.alldata.datacontainer.IDataContainer;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
@@ -33,7 +34,10 @@ public class DataWarehouse implements IClasIoEventListener {
 
 	// private constructor for singleton
 	private DataWarehouse() {
+		String cpath = Environment.getInstance().getClassPath();
+		System.out.println("DataWarehouse classpath: " + cpath);
 		ClasIoEventManager.getInstance().addClasIoEventListener(this, 0);
+		System.out.println("DataWarehouse created and registered as a listener");
 	}
 
 	/** type is unknown */
