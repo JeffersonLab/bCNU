@@ -17,6 +17,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.geometry.cache.ACachedGeometry;
+import cnuphys.ced.geometry.cache.GeometryPrimitiveIO;
 
 /**
  * Central Neutron Detector
@@ -41,6 +42,7 @@ public class CNDGeometry extends ACachedGeometry {
 	// Explicit cache/runtime geometry data.
 	// Index order: [layer][paddle][corner][xyz].
 	private static double paddleCorners[][][][];
+
 	/**
 	 * Initialize the CND Geometry by loading all the wires
 	 */
@@ -74,13 +76,14 @@ public class CNDGeometry extends ACachedGeometry {
 
 			}
 		}
-		
+
 		cachePaddleCornersFromPaddles();
 
 	}
-	
+
 	/**
-	 * Copy the current JLab paddle geometry into an explicit primitive corner cache.
+	 * Copy the current JLab paddle geometry into an explicit primitive corner
+	 * cache.
 	 */
 	private static void cachePaddleCornersFromPaddles() {
 		paddleCorners = new double[LAYER_COUNT][PADDLE_COUNT][CORNER_COUNT][COORD_COUNT];
@@ -179,6 +182,7 @@ public class CNDGeometry extends ACachedGeometry {
 			coords[j + 2] = (float) corners[i][2];
 		}
 	}
+
 	/**
 	 * Obtain the paddle xy corners for 2D view
 	 *
@@ -198,6 +202,7 @@ public class CNDGeometry extends ACachedGeometry {
 			wp[i].y = corners[i][1];
 		}
 	}
+
 	/**
 	 * Obtain the paddle 3D corners. Order: <br>
 	 * 0: xmin, ymin, zmax <br>
@@ -224,7 +229,7 @@ public class CNDGeometry extends ACachedGeometry {
 			corners[i] = new Point3D(pcorners[i][0], pcorners[i][1], pcorners[i][2]);
 		}
 	}
-	
+
 	private static boolean validLayerAndPaddle(int layer, int paddle) {
 		return (layer >= 1) && (layer <= LAYER_COUNT) && (paddle >= 1) && (paddle <= PADDLE_COUNT)
 				&& (paddleCorners != null);
@@ -243,7 +248,7 @@ public class CNDGeometry extends ACachedGeometry {
 
 		return true;
 	}
-	
+
 	@Override
 	public boolean readGeometry(Kryo kryo, Input input) {
 		try {
@@ -264,26 +269,8 @@ public class CNDGeometry extends ACachedGeometry {
 				}
 
 				for (int paddle = 0; paddle < PADDLE_COUNT; paddle++) {
-					int numCorners = input.readInt();
-					if (numCorners != CORNER_COUNT) {
-						System.err.printf("CNDGeometry: expected %d corners for layer %d paddle %d, found %d in cache.%n",
-								CORNER_COUNT, layer + 1, paddle + 1, numCorners);
-						return false;
-					}
-
-					for (int corner = 0; corner < CORNER_COUNT; corner++) {
-						int numCoords = input.readInt();
-						if (numCoords != COORD_COUNT) {
-							System.err.printf(
-									"CNDGeometry: expected %d coordinates for layer %d paddle %d corner %d, found %d in cache.%n",
-									COORD_COUNT, layer + 1, paddle + 1, corner, numCoords);
-							return false;
-						}
-
-						for (int coord = 0; coord < COORD_COUNT; coord++) {
-							corners[layer][paddle][corner][coord] = input.readDouble();
-						}
-					}
+					corners[layer][paddle] = GeometryPrimitiveIO.readCorners(input, CORNER_COUNT, COORD_COUNT,
+							String.format("CNDGeometry layer %d paddle %d", layer + 1, paddle + 1));
 				}
 			}
 
@@ -299,8 +286,7 @@ public class CNDGeometry extends ACachedGeometry {
 			return false;
 		}
 	}
-	
-	
+
 	@Override
 	public boolean writeGeometry(Kryo kryo, Output output) {
 		try {
@@ -318,15 +304,7 @@ public class CNDGeometry extends ACachedGeometry {
 				output.writeInt(PADDLE_COUNT);
 
 				for (int paddle = 0; paddle < PADDLE_COUNT; paddle++) {
-					output.writeInt(CORNER_COUNT);
-
-					for (int corner = 0; corner < CORNER_COUNT; corner++) {
-						output.writeInt(COORD_COUNT);
-
-						for (int coord = 0; coord < COORD_COUNT; coord++) {
-							output.writeDouble(paddleCorners[layer][paddle][corner][coord]);
-						}
-					}
+					GeometryPrimitiveIO.writeCorners(output, paddleCorners[layer][paddle], CORNER_COUNT, COORD_COUNT);
 				}
 			}
 

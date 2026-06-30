@@ -20,6 +20,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.geometry.cache.ACachedGeometry;
+import cnuphys.ced.geometry.cache.GeometryPrimitiveIO;
 
 /**
  * Geometry support for the Forward Tagger Calorimeter (FTCAL).
@@ -529,28 +530,8 @@ public class FTCALGeometry extends ACachedGeometry {
 			for (int id = 0; id < cornerArrayLen; id++) {
 				boolean hasPaddle = input.readBoolean();
 				if (hasPaddle) {
-					int numCorners = input.readInt();
-					if (numCorners != CORNER_COUNT) {
-						System.err.printf("FTCALGeometry: expected %d corners for id %d, found %d in cache.%n",
-								CORNER_COUNT, id, numCorners);
-						return false;
-					}
-
-					corners[id] = new double[CORNER_COUNT][COORD_COUNT];
-
-					for (int corner = 0; corner < CORNER_COUNT; corner++) {
-						int numCoords = input.readInt();
-						if (numCoords != COORD_COUNT) {
-							System.err.printf(
-									"FTCALGeometry: expected %d coordinates for id %d corner %d, found %d in cache.%n",
-									COORD_COUNT, id, corner, numCoords);
-							return false;
-						}
-
-						for (int coord = 0; coord < COORD_COUNT; coord++) {
-							corners[id][corner][coord] = input.readDouble();
-						}
-					}
+					corners[id] = GeometryPrimitiveIO.readCorners(input, CORNER_COUNT, COORD_COUNT,
+							"FTCALGeometry id " + id);
 				}
 			}
 
@@ -575,12 +556,9 @@ public class FTCALGeometry extends ACachedGeometry {
 
 			Point xyIndices[] = new Point[indicesLen];
 			for (int i = 0; i < indicesLen; i++) {
-				boolean hasPoint = input.readBoolean();
-				if (hasPoint) {
-					xyIndices[i] = new Point(input.readInt(), input.readInt());
-				}
+				xyIndices[i] = GeometryPrimitiveIO.readPoint(input);
 			}
-
+			
 			Hashtable<Point, Integer> table = new Hashtable<>();
 			int tableSize = input.readInt();
 			for (int i = 0; i < tableSize; i++) {
@@ -638,15 +616,7 @@ public class FTCALGeometry extends ACachedGeometry {
 				output.writeBoolean(hasPaddle);
 
 				if (hasPaddle) {
-					output.writeInt(CORNER_COUNT);
-
-					for (int corner = 0; corner < CORNER_COUNT; corner++) {
-						output.writeInt(COORD_COUNT);
-
-						for (int coord = 0; coord < COORD_COUNT; coord++) {
-							output.writeDouble(paddleCorners[id][corner][coord]);
-						}
-					}
+					GeometryPrimitiveIO.writeCorners(output, paddleCorners[id], CORNER_COUNT, COORD_COUNT);
 				}
 			}
 
@@ -667,12 +637,7 @@ public class FTCALGeometry extends ACachedGeometry {
 
 			output.writeInt(paddleXYIndices.length);
 			for (Point pt : paddleXYIndices) {
-				boolean hasPoint = (pt != null);
-				output.writeBoolean(hasPoint);
-				if (hasPoint) {
-					output.writeInt(pt.x);
-					output.writeInt(pt.y);
-				}
+				GeometryPrimitiveIO.writePoint(output, pt);
 			}
 
 			output.writeInt(indicesToId.size());
@@ -681,7 +646,7 @@ public class FTCALGeometry extends ACachedGeometry {
 				output.writeInt(key.y);
 				output.writeInt(indicesToId.get(key));
 			}
-
+			
 			return true;
 		} catch (Exception e) {
 			System.err.println("FTCALGeometry: Error writing cached geometry: " + e.getMessage());
