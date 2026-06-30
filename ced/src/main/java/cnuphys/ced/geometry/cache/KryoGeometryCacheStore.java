@@ -23,7 +23,7 @@ import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
  * It is a transitional class. Once CED geometry caching is moved to a stable,
  * explicit format, this class can be replaced by another store implementation.
  */
-public class KryoGeometryCacheStore {
+public class KryoGeometryCacheStore implements GeometryCacheStore {
 
 	/**
 	 * Registers all complex classes and custom types used by the geometry cache
@@ -107,6 +107,7 @@ public class KryoGeometryCacheStore {
 	 * @param geometries the registered geometries
 	 * @return {@code true} if all geometries were read successfully
 	 */
+	@Override
 	public boolean readAll(File file, List<IGeometryCache> geometries) {
 		if (!file.exists()) {
 			System.err.println("Cache file does not exist: " + file.getAbsolutePath());
@@ -137,6 +138,7 @@ public class KryoGeometryCacheStore {
 	 * @param geometries the registered geometries
 	 * @return {@code true} if all geometries were written successfully
 	 */
+	@Override
 	public boolean writeAll(File file, List<IGeometryCache> geometries) {
 		if (!prepareCacheFile(file)) {
 			return false;

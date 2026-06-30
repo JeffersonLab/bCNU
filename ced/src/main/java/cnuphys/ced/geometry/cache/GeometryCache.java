@@ -28,8 +28,7 @@ public class GeometryCache {
 	private static final ArrayList<IGeometryCache> _geometries = new ArrayList<>();
 
 	// current cache store implementation
-	private static final KryoGeometryCacheStore _cacheStore = new KryoGeometryCacheStore();
-
+	private static final GeometryCacheStore _cacheStore = new KryoGeometryCacheStore();
 	/**
 	 * Add a geometry to the list of objects to cache.
 	 *
