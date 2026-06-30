@@ -27,7 +27,7 @@ public class KryoGeometryCacheStore implements GeometryCacheStore {
 	
 	// File-level cache header. This is separate from detector geometry versioning.
 	private static final String CACHE_MAGIC = "CED_GEOMETRY_CACHE";
-	private static final int CACHE_FORMAT_VERSION = 1;
+	private static final int CACHE_FORMAT_VERSION = 2;
 
 	/**
 	 * Registers all complex classes and custom types used by the geometry cache

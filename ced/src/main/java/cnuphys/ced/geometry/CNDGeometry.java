@@ -30,9 +30,17 @@ public class CNDGeometry extends ACachedGeometry {
 		super("CNDGeometry");
 	}
 
-	// there are 48 paddles per layer
+	private static final int LAYER_COUNT = 3;
+	private static final int PADDLE_COUNT = 48;
+	private static final int CORNER_COUNT = 8;
+	private static final int COORD_COUNT = 3;
+
+	// Runtime JLab geometry object graph. This is still used for now.
 	private static ScintillatorPaddle paddles[][];
 
+	// Explicit cache/runtime geometry data.
+	// Index order: [layer][paddle][corner][xyz].
+	private static double paddleCorners[][][][];
 	/**
 	 * Initialize the CND Geometry by loading all the wires
 	 */
@@ -66,7 +74,29 @@ public class CNDGeometry extends ACachedGeometry {
 
 			}
 		}
+		
+		cachePaddleCornersFromPaddles();
 
+	}
+	
+	/**
+	 * Copy the current JLab paddle geometry into an explicit primitive corner cache.
+	 */
+	private static void cachePaddleCornersFromPaddles() {
+		paddleCorners = new double[LAYER_COUNT][PADDLE_COUNT][CORNER_COUNT][COORD_COUNT];
+
+		for (int layer = 0; layer < LAYER_COUNT; layer++) {
+			for (int paddleId = 0; paddleId < PADDLE_COUNT; paddleId++) {
+				ScintillatorPaddle paddle = paddles[layer][paddleId];
+
+				for (int corner = 0; corner < CORNER_COUNT; corner++) {
+					Point3D point = paddle.getVolumePoint(corner);
+					paddleCorners[layer][paddleId][corner][0] = point.x();
+					paddleCorners[layer][paddleId][corner][1] = point.y();
+					paddleCorners[layer][paddleId][corner][2] = point.z();
+				}
+			}
+		}
 	}
 
 	/**
@@ -122,7 +152,7 @@ public class CNDGeometry extends ACachedGeometry {
 	 * @return the paddle
 	 */
 	public static ScintillatorPaddle getPaddle(int layer, int paddle) {
-		if ((layer < 1) || (layer > 3) || (paddle < 1) || (paddle > 48)) {
+		if ((layer < 1) || (layer > LAYER_COUNT) || (paddle < 1) || (paddle > PADDLE_COUNT) || (paddles == null)) {
 			return null;
 		}
 		return paddles[layer - 1][paddle - 1];
@@ -136,22 +166,19 @@ public class CNDGeometry extends ACachedGeometry {
 	 * @param coords   holds 8*3 = 24 values [x1, y1, z1, ..., x8, y8, z8]
 	 */
 	public static void paddleVertices(int layer, int paddleId, float[] coords) {
-
-		Point3D v[] = new Point3D[8];
-
-		ScintillatorPaddle paddle = getPaddle(layer, paddleId);
-		for (int i = 0; i < 8; i++) {
-			v[i] = new Point3D(paddle.getVolumePoint(i));
+		if (!validLayerAndPaddle(layer, paddleId) || (coords == null) || (coords.length < CORNER_COUNT * COORD_COUNT)) {
+			return;
 		}
 
-		for (int i = 0; i < 8; i++) {
-			int j = 3 * i;
-			coords[j] = (float) v[i].x();
-			coords[j + 1] = (float) v[i].y();
-			coords[j + 2] = (float) v[i].z();
+		double corners[][] = paddleCorners[layer - 1][paddleId - 1];
+
+		for (int i = 0; i < CORNER_COUNT; i++) {
+			int j = COORD_COUNT * i;
+			coords[j] = (float) corners[i][0];
+			coords[j + 1] = (float) corners[i][1];
+			coords[j + 2] = (float) corners[i][2];
 		}
 	}
-
 	/**
 	 * Obtain the paddle xy corners for 2D view
 	 *
@@ -160,18 +187,17 @@ public class CNDGeometry extends ACachedGeometry {
 	 * @param wp       the four XY corners (cm)
 	 */
 	public static void paddleXYCorners(int layer, int paddleId, Point2D.Double[] wp) {
-		ScintillatorPaddle paddle = getPaddle(layer, paddleId);
-		if (paddle == null) {
+		if (!validLayerAndPaddle(layer, paddleId) || !validXYArray(wp)) {
 			return;
 		}
 
+		double corners[][] = paddleCorners[layer - 1][paddleId - 1];
+
 		for (int i = 0; i < 4; i++) {
-			Point3D p3d = new Point3D(paddle.getVolumePoint(i));
-			wp[i].x = p3d.x();
-			wp[i].y = p3d.y();
+			wp[i].x = corners[i][0];
+			wp[i].y = corners[i][1];
 		}
 	}
-
 	/**
 	 * Obtain the paddle 3D corners. Order: <br>
 	 * 0: xmin, ymin, zmax <br>
@@ -188,70 +214,126 @@ public class CNDGeometry extends ACachedGeometry {
 	 * @param corners  the eight XYZ corners (cm)
 	 */
 	public static void paddle3DCorners(int layer, int paddleId, Point3D corners[]) {
-		ScintillatorPaddle paddle = getPaddle(layer, paddleId);
-		if (paddle == null) {
+		if (!validLayerAndPaddle(layer, paddleId) || (corners == null) || (corners.length < CORNER_COUNT)) {
 			return;
 		}
 
-		for (int i = 0; i < 8; i++) {
-			corners[i] = paddle.getVolumePoint(i);
-		}
+		double pcorners[][] = paddleCorners[layer - 1][paddleId - 1];
 
+		for (int i = 0; i < CORNER_COUNT; i++) {
+			corners[i] = new Point3D(pcorners[i][0], pcorners[i][1], pcorners[i][2]);
+		}
+	}
+	
+	private static boolean validLayerAndPaddle(int layer, int paddle) {
+		return (layer >= 1) && (layer <= LAYER_COUNT) && (paddle >= 1) && (paddle <= PADDLE_COUNT)
+				&& (paddleCorners != null);
 	}
 
+	private static boolean validXYArray(Point2D.Double[] wp) {
+		if ((wp == null) || (wp.length < 4)) {
+			return false;
+		}
+
+		for (int i = 0; i < 4; i++) {
+			if (wp[i] == null) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
 	@Override
 	public boolean readGeometry(Kryo kryo, Input input) {
 		try {
 			int numLayers = input.readInt();
-			if (numLayers == 0) {
-				paddles = null;
-			} else {
-				paddles = new ScintillatorPaddle[numLayers][];
-				// For each layer, read the number of paddles then each paddle
-				for (int i = 0; i < numLayers; i++) {
-					int numPaddles = input.readInt();
-					if (numPaddles == 0) {
-						paddles[i] = null;
-					} else {
-						paddles[i] = new ScintillatorPaddle[numPaddles];
-						for (int j = 0; j < numPaddles; j++) {
-							paddles[i][j] = kryo.readObjectOrNull(input, ScintillatorPaddle.class);
+			if (numLayers != LAYER_COUNT) {
+				System.err.printf("CNDGeometry: expected %d layers, found %d in cache.%n", LAYER_COUNT, numLayers);
+				return false;
+			}
+
+			double corners[][][][] = new double[LAYER_COUNT][PADDLE_COUNT][CORNER_COUNT][COORD_COUNT];
+
+			for (int layer = 0; layer < LAYER_COUNT; layer++) {
+				int numPaddles = input.readInt();
+				if (numPaddles != PADDLE_COUNT) {
+					System.err.printf("CNDGeometry: expected %d paddles for layer %d, found %d in cache.%n",
+							PADDLE_COUNT, layer + 1, numPaddles);
+					return false;
+				}
+
+				for (int paddle = 0; paddle < PADDLE_COUNT; paddle++) {
+					int numCorners = input.readInt();
+					if (numCorners != CORNER_COUNT) {
+						System.err.printf("CNDGeometry: expected %d corners for layer %d paddle %d, found %d in cache.%n",
+								CORNER_COUNT, layer + 1, paddle + 1, numCorners);
+						return false;
+					}
+
+					for (int corner = 0; corner < CORNER_COUNT; corner++) {
+						int numCoords = input.readInt();
+						if (numCoords != COORD_COUNT) {
+							System.err.printf(
+									"CNDGeometry: expected %d coordinates for layer %d paddle %d corner %d, found %d in cache.%n",
+									COORD_COUNT, layer + 1, paddle + 1, corner, numCoords);
+							return false;
+						}
+
+						for (int coord = 0; coord < COORD_COUNT; coord++) {
+							corners[layer][paddle][corner][coord] = input.readDouble();
 						}
 					}
 				}
 			}
+
+			paddleCorners = corners;
+
+			// The explicit cache provides the geometry used by drawing methods.
+			// Do not keep stale JLab geometry objects around after a cache read.
+			paddles = null;
+
 			return true;
 		} catch (Exception e) {
+			System.err.println("CNDGeometry: Error reading cached geometry: " + e.getMessage());
 			return false;
 		}
 	}
-
+	
+	
 	@Override
 	public boolean writeGeometry(Kryo kryo, Output output) {
 		try {
-			// Write number of layers (first dimension)
-			if (paddles == null) {
-				output.writeInt(0);
-			} else {
-				output.writeInt(paddles.length);
-				// Write each layer array
-				for (int i = 0; i < paddles.length; i++) {
-					ScintillatorPaddle[] layer = paddles[i];
-					if (layer == null) {
-						output.writeInt(0);
-					} else {
-						output.writeInt(layer.length);
-						// Write each paddle; may be null
-						for (ScintillatorPaddle sp : layer) {
-							kryo.writeObjectOrNull(output, sp, ScintillatorPaddle.class);
+			if (paddleCorners == null) {
+				if (paddles == null) {
+					System.err.println("CNDGeometry: no paddle geometry available to write.");
+					return false;
+				}
+				cachePaddleCornersFromPaddles();
+			}
+
+			output.writeInt(LAYER_COUNT);
+
+			for (int layer = 0; layer < LAYER_COUNT; layer++) {
+				output.writeInt(PADDLE_COUNT);
+
+				for (int paddle = 0; paddle < PADDLE_COUNT; paddle++) {
+					output.writeInt(CORNER_COUNT);
+
+					for (int corner = 0; corner < CORNER_COUNT; corner++) {
+						output.writeInt(COORD_COUNT);
+
+						for (int coord = 0; coord < COORD_COUNT; coord++) {
+							output.writeDouble(paddleCorners[layer][paddle][corner][coord]);
 						}
 					}
 				}
 			}
+
 			return true;
 		} catch (Exception e) {
+			System.err.println("CNDGeometry: Error writing cached geometry: " + e.getMessage());
 			return false;
 		}
 	}
-
 }
