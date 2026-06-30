@@ -24,6 +24,10 @@ import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
  * explicit format, this class can be replaced by another store implementation.
  */
 public class KryoGeometryCacheStore implements GeometryCacheStore {
+	
+	// File-level cache header. This is separate from detector geometry versioning.
+	private static final String CACHE_MAGIC = "CED_GEOMETRY_CACHE";
+	private static final int CACHE_FORMAT_VERSION = 1;
 
 	/**
 	 * Registers all complex classes and custom types used by the geometry cache
@@ -117,9 +121,20 @@ public class KryoGeometryCacheStore implements GeometryCacheStore {
 		Kryo kryo = getKryo();
 
 		try (FileInputStream fis = new FileInputStream(file); Input input = new Input(fis)) {
+			String magic = input.readString();
+			if (!CACHE_MAGIC.equals(magic)) {
+				System.err.println("Invalid geometry cache header: " + magic);
+				return false;
+			}
+
+			int cacheFormatVersion = input.readInt();
+			if (cacheFormatVersion != CACHE_FORMAT_VERSION) {
+				System.err.println("Unsupported geometry cache format version: " + cacheFormatVersion);
+				return false;
+			}
+
 			for (IGeometryCache geometry : geometries) {
-				boolean success = geometry.readGeometry(kryo, input);
-				if (!success) {
+				boolean success = geometry.readGeometry(kryo, input);				if (!success) {
 					System.err.println("Failed to read geometry from cache for " + geometry.getName());
 					return false;
 				}
@@ -147,9 +162,11 @@ public class KryoGeometryCacheStore implements GeometryCacheStore {
 		Kryo kryo = getKryo();
 
 		try (FileOutputStream fos = new FileOutputStream(file); Output output = new Output(fos)) {
+			output.writeString(CACHE_MAGIC);
+			output.writeInt(CACHE_FORMAT_VERSION);
+
 			for (IGeometryCache geometry : geometries) {
-				boolean success = geometry.writeGeometry(kryo, output);
-				if (!success) {
+				boolean success = geometry.writeGeometry(kryo, output);				if (!success) {
 					System.err.println("Failed to write geometry to cache for " + geometry.getName());
 					deleteCacheFile(file);
 					return false;
