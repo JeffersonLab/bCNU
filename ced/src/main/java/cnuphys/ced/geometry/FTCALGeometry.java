@@ -21,38 +21,115 @@ import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
+/**
+ * Geometry support for the Forward Tagger Calorimeter (FTCAL).
+ * <p>
+ * FTCAL component ids are not contiguous. There are 332 valid components, but
+ * the maximum component id is {@link #MAXID}. This class therefore keeps
+ * component-id-indexed arrays whose length is {@code MAXID + 1}.
+ * <p>
+ * The original cache stored the JLab {@link ScintillatorPaddle} object graph.
+ * The refactored cache stores explicit primitive corner coordinates instead:
+ *
+ * <pre>
+ * paddleCorners[componentId][corner][xyz]
+ * </pre>
+ *
+ * This makes the cached FTCAL geometry independent of the internal serialized
+ * form of the JLab geometry classes.
+ */
 public class FTCALGeometry extends ACachedGeometry {
 
-	// values of the gtid limits
-	private static final double gvals[] = { -16.7, -15.2, -13.7, -12.2, -10.7, -9.15, -7.6, -6.1, -4.6, -3.05, -1.5, 0.,
-			1.5, 3.05, 4.6, 6.1, 7.6, 9.15, 10.7, 12.2, 13.7, 15.2, 16.7 };
+	// values of the grid limits
+	private static final double gvals[] = { -16.7, -15.2, -13.7, -12.2, -10.7, -9.15, -7.6, -6.1, -4.6,
+			-3.05, -1.5, 0., 1.5, 3.05, 4.6, 6.1, 7.6, 9.15, 10.7, 12.2, 13.7, 15.2, 16.7 };
 
-	// max id, not all Id's are valid
+	/**
+	 * Maximum FTCAL component id. Not all ids in {@code 1..MAXID} are valid.
+	 */
 	public static final int MAXID = 475;
 
-	// z offset is a shift in z (cm) to place the 3d view at the origin
+	/**
+	 * Z offset in cm used to place the FTCAL 3D view at the origin.
+	 */
 	public static final float FTCAL_Z0 = 200f;
 
-	// used for 2D grid spacing
+	/**
+	 * Grid spacing used for 2D FTCAL drawing.
+	 */
 	public static final double FT_DEL = 2.5;
 
-	// there are 332 paddles but the IDs are not 1..332 they are 1..475
+	/**
+	 * Number of valid FTCAL component ids.
+	 */
+	private static final int GOOD_ID_COUNT = 332;
+
+	/**
+	 * Number of 3D volume corners for one paddle.
+	 */
+	private static final int CORNER_COUNT = 8;
+
+	/**
+	 * Number of coordinates per 3D corner.
+	 */
+	private static final int COORD_COUNT = 3;
+
+	/**
+	 * Number of XY corners used for 2D drawing.
+	 */
+	private static final int XY_CORNER_COUNT = 4;
+
+	/**
+	 * Runtime JLab geometry object graph.
+	 * <p>
+	 * This is only available after direct CCDB initialization. After cache
+	 * initialization, FTCAL uses {@link #paddleCorners} and this array is set to
+	 * {@code null}.
+	 */
 	private static ScintillatorPaddle paddles[];
+
+	/**
+	 * Explicit primitive geometry cache.
+	 * <p>
+	 * Index order:
+	 *
+	 * <pre>
+	 * paddleCorners[componentId][corner][xyz]
+	 * </pre>
+	 *
+	 * Invalid ids have {@code null} corner arrays.
+	 */
+	private static double paddleCorners[][][];
+
+	/**
+	 * Valid FTCAL component ids. There are {@link #GOOD_ID_COUNT} entries.
+	 */
 	private static short goodIds[];
 
-	// gives the xy grid indices of each paddle
+	/**
+	 * XY grid indices for each component id. Invalid ids have {@code null} entries.
+	 */
 	private static Point paddleXYIndices[];
+
+	/**
+	 * Reverse lookup from XY grid index to component id.
+	 */
 	private static Hashtable<Point, Integer> indicesToId = new Hashtable<>();
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 */
 	public FTCALGeometry() {
 		super("FTCALGeometry");
 	}
 
 	/**
-	 * Initialize the FTCAL Geometry
+	 * Initialize FTCAL geometry from the JLab geometry factory.
+	 * <p>
+	 * This path obtains the authoritative geometry from CCDB/JLab geometry
+	 * services, rotates each paddle to match the expected CED orientation, builds
+	 * the valid id list, builds XY grid lookup tables, and copies the JLab paddle
+	 * coordinates into the explicit primitive corner cache.
 	 */
 	@Override
 	public void initializeUsingCCDB() {
@@ -71,16 +148,14 @@ public class FTCALGeometry extends ACachedGeometry {
 		FTCALSuperlayer ftCalSuperlayer = ftCalSector.getSuperlayer(0);
 		FTCALLayer ftCalLayer = ftCalSuperlayer.getLayer(0);
 
-		// get the components. Some entries will be null
+		// get the components. Some entries will be null.
 		paddles = new ScintillatorPaddle[MAXID + 1];
+		paddleCorners = new double[MAXID + 1][][];
 		paddleXYIndices = new Point[MAXID + 1];
-		for (int i = 0; i < paddles.length; i++) {
-			paddles[i] = null;
-			paddleXYIndices[i] = null;
-		}
+		indicesToId.clear();
 
-		// there are 332 good ids, not sequential, first is 8, last is 475
-		goodIds = new short[332];
+		// there are 332 good ids, not sequential; first is 8, last is 475
+		goodIds = new short[GOOD_ID_COUNT];
 
 		int count = 0;
 		List<ScintillatorPaddle> padlist = ftCalLayer.getAllComponents();
@@ -89,12 +164,14 @@ public class FTCALGeometry extends ACachedGeometry {
 
 		for (ScintillatorPaddle sp : padlist) {
 
-			// rotate do to match actual geometry
+			// rotate to match actual geometry
 			sp.rotateZ(Math.PI);
 
 			int id = sp.getComponentId();
 			paddles[id] = sp;
 			goodIds[count] = (short) id;
+
+			cachePaddleCornersFromPaddle(id, sp);
 
 			Point p = new Point();
 			paddleXYCenter(id, wp);
@@ -103,18 +180,37 @@ public class FTCALGeometry extends ACachedGeometry {
 			p.y = valToIndex(wp.y);
 
 			paddleXYIndices[id] = p;
-
 			indicesToId.put(p, id);
 
 			count++;
 		}
-
 	}
 
 	/**
-	 * Convert the x y indices into a component id
+	 * Copy one JLab paddle into the explicit primitive corner cache.
 	 *
-	 * @param p the indices
+	 * @param componentId the FTCAL component id
+	 * @param paddle      the JLab scintillator paddle
+	 */
+	private static void cachePaddleCornersFromPaddle(int componentId, ScintillatorPaddle paddle) {
+		if (!validId(componentId) || (paddle == null)) {
+			return;
+		}
+
+		paddleCorners[componentId] = new double[CORNER_COUNT][COORD_COUNT];
+
+		for (int corner = 0; corner < CORNER_COUNT; corner++) {
+			Point3D point = paddle.getVolumePoint(corner);
+			paddleCorners[componentId][corner][0] = point.x();
+			paddleCorners[componentId][corner][1] = point.y();
+			paddleCorners[componentId][corner][2] = point.z();
+		}
+	}
+
+	/**
+	 * Convert XY grid indices into a component id.
+	 *
+	 * @param p the XY grid indices
 	 * @return the component id
 	 */
 	public static int xyIndicesToId(Point p) {
@@ -122,7 +218,7 @@ public class FTCALGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Convert the x y indices into a component id
+	 * Convert XY grid indices into a component id.
 	 *
 	 * @param x the x index
 	 * @param y the y index
@@ -134,80 +230,98 @@ public class FTCALGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Get a scintillator paddle
+	 * Get a scintillator paddle.
+	 * <p>
+	 * This returns a JLab geometry object only when FTCAL was initialized directly
+	 * from CCDB. After cache initialization, FTCAL uses explicit primitive corner
+	 * data and this method returns {@code null}.
 	 *
-	 * @param componentId the componentId
-	 * @return the paddle, might be null
+	 * @param componentId the component id
+	 * @return the paddle, or {@code null} if unavailable
 	 */
 	public static ScintillatorPaddle getPaddle(int componentId) {
+		if (!validId(componentId) || (paddles == null)) {
+			return null;
+		}
 		return paddles[componentId];
 	}
 
 	/**
-	 * Used by the 3D drawing
+	 * Used by 3D drawing.
 	 *
-	 * @param paddleId the 1-based paddle 1..332
+	 * @param paddleId the component id
 	 * @param coords   holds 8*3 = 24 values [x1, y1, z1, ..., x8, y8, z8]
 	 */
 	public static void paddleVertices(int paddleId, float[] coords) {
-
-		Point3D v[] = new Point3D[8];
-
-		ScintillatorPaddle paddle = getPaddle(paddleId);
-		for (int i = 0; i < 8; i++) {
-			v[i] = new Point3D(paddle.getVolumePoint(i));
-		}
-
-		for (int i = 0; i < 8; i++) {
-			int j = 3 * i;
-			coords[j] = (float) v[i].x();
-			coords[j + 1] = (float) v[i].y();
-
-			// note the offset!!!!
-			coords[j + 2] = (float) v[i].z() - FTCAL_Z0;
-		}
-	}
-
-	/**
-	 * Obtain the paddle xy corners for 2D view
-	 *
-	 * @param paddleId the paddle ID 1..48
-	 * @param wp       the four XY corners (cm)
-	 */
-	public static void paddleXYCorners(int paddleId, Point2D.Double[] wp) {
-		ScintillatorPaddle paddle = getPaddle(paddleId);
-		if (paddle == null) {
+		if (!validPaddleGeometry(paddleId) || (coords == null) || (coords.length < CORNER_COUNT * COORD_COUNT)) {
 			return;
 		}
 
-		for (int i = 0; i < 4; i++) {
-			Point3D p3d = new Point3D(paddle.getVolumePoint(i));
-			wp[i].x = p3d.x();
-			wp[i].y = p3d.y();
+		double corners[][] = paddleCorners[paddleId];
+
+		for (int i = 0; i < CORNER_COUNT; i++) {
+			int j = COORD_COUNT * i;
+			coords[j] = (float) corners[i][0];
+			coords[j + 1] = (float) corners[i][1];
+
+			// note the offset
+			coords[j + 2] = (float) corners[i][2] - FTCAL_Z0;
 		}
 	}
 
 	/**
-	 * Get the XY (for 2D) center of the paddle
+	 * Obtain the paddle XY corners for a 2D view.
 	 *
-	 * @param paddleId the padle id
-	 * @param center   the center, or NaNs
+	 * @param paddleId the component id
+	 * @param wp       the four XY corners in cm
+	 */
+	public static void paddleXYCorners(int paddleId, Point2D.Double[] wp) {
+		if (!validPaddleGeometry(paddleId) || !validXYArray(wp)) {
+			return;
+		}
+
+		double corners[][] = paddleCorners[paddleId];
+
+		for (int i = 0; i < XY_CORNER_COUNT; i++) {
+			wp[i].x = corners[i][0];
+			wp[i].y = corners[i][1];
+		}
+	}
+
+	/**
+	 * Get the XY center of a paddle.
+	 *
+	 * @param paddleId the component id
+	 * @param center   receives the center, or NaNs if the id is invalid
 	 */
 	public static void paddleXYCenter(int paddleId, Point2D.Double center) {
-		ScintillatorPaddle paddle = getPaddle(paddleId);
-		if (paddle == null) {
+		if (center == null) {
+			return;
+		}
+
+		if (!validPaddleGeometry(paddleId)) {
 			center.setLocation(Double.NaN, Double.NaN);
 			return;
 		}
-		Point3D p3d = paddle.getMidpoint();
-		center.setLocation(p3d.x(), p3d.y());
+
+		double corners[][] = paddleCorners[paddleId];
+
+		double xsum = 0.0;
+		double ysum = 0.0;
+
+		for (int i = 0; i < CORNER_COUNT; i++) {
+			xsum += corners[i][0];
+			ysum += corners[i][1];
+		}
+
+		center.setLocation(xsum / CORNER_COUNT, ysum / CORNER_COUNT);
 	}
 
 	/**
-	 * Get the indices from the id
+	 * Get the XY grid indices for a component id.
 	 *
-	 * @param id the id
-	 * @return the XY grid indices or null
+	 * @param id the component id
+	 * @return the XY grid indices, or {@code null}
 	 */
 	public static Point getXYIndices(int id) {
 		if ((id < 1) || (id > MAXID)) {
@@ -218,10 +332,13 @@ public class FTCALGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Get the indices from the padle
+	 * Get the XY grid indices for a paddle.
+	 * <p>
+	 * This method is a legacy convenience for code paths that still have a JLab
+	 * paddle object. After cache initialization, such objects are not retained.
 	 *
 	 * @param paddle the paddle
-	 * @return the XY grid indices or null
+	 * @return the XY grid indices, or {@code null}
 	 */
 	public static Point getXYIndices(ScintillatorPaddle paddle) {
 		if (paddle == null) {
@@ -231,12 +348,11 @@ public class FTCALGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Returns the grid index [-11, -10, ... -1, 1, .., 11] for the given value
+	 * Return the grid index [-11, -10, ... -1, 1, ..., 11] for a coordinate value.
 	 *
-	 * @param val an x or y value
+	 * @param val an x or y coordinate
 	 * @return the grid index, or 0 on error. Zero is not a possible value.
 	 */
-
 	public static int valToIndex(double val) {
 		int len = gvals.length;
 		int lm1 = len - 1;
@@ -261,7 +377,7 @@ public class FTCALGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Get the maximum absolute extent in x or y. Used for grid drawing
+	 * Get the maximum absolute extent in x or y. Used for grid drawing.
 	 *
 	 * @return the maximum absolute extent in x or y
 	 */
@@ -270,17 +386,17 @@ public class FTCALGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Take an index [-11, -10, ... -1, 1, .., 11] and get the coordinate limits
+	 * Convert an index [-11, -10, ... -1, 1, ..., 11] to coordinate limits.
 	 *
-	 * @param index the index
-	 * @param range the limits
+	 * @param index the grid index
+	 * @param range receives the coordinate limits
 	 */
 	public static void indexToRange(int index, double range[]) {
 		if ((index < -11) || (index > 11) || (index == 0)) {
 			range[0] = Double.NaN;
 			range[1] = Double.NaN;
 		} else {
-			// take into account 0 isn't valid
+			// take into account 0 is not valid
 			if (index > 1) {
 				index--;
 			}
@@ -303,121 +419,273 @@ public class FTCALGeometry extends ACachedGeometry {
 	 * 6: xmax, ymax, zmin <br>
 	 * 7: xmin, ymax, zmin <br>
 	 *
-	 * @param paddleId the paddle ID 1..48
-	 * @param corners  the eight XYZ corners (cm)
+	 * @param paddleId the component id
+	 * @param corners  receives the eight XYZ corners in cm, with z shifted by
+	 *                 {@link #FTCAL_Z0}
 	 */
 	public static void paddle3DCorners(int paddleId, Point3D corners[]) {
-		ScintillatorPaddle paddle = getPaddle(paddleId);
-		if (paddle == null) {
+		if (!validPaddleGeometry(paddleId) || (corners == null) || (corners.length < CORNER_COUNT)) {
 			return;
 		}
 
-		for (int i = 0; i < 8; i++) {
-			corners[i] = paddle.getVolumePoint(i);
+		double pcorners[][] = paddleCorners[paddleId];
 
-			// noye the offset
-			double zoff = corners[i].z() - FTCAL_Z0;
-			corners[i].setZ(zoff);
+		for (int i = 0; i < CORNER_COUNT; i++) {
+			corners[i] = new Point3D(pcorners[i][0], pcorners[i][1], pcorners[i][2] - FTCAL_Z0);
 		}
 	}
 
 	/**
-	 * Check whether the id is one of the good id
+	 * Check whether the id is one of the valid FTCAL component ids.
 	 *
-	 * @param id the 1-based id to check
-	 * @return true if it is a good id
+	 * @param id the component id to check
+	 * @return {@code true} if it is a good id
 	 */
 	public static boolean isGoodId(int id) {
-
-		if ((id < 1) || (id > MAXID)) {
-			return false;
-		}
-		return paddles[id] != null;
+		return validPaddleGeometry(id);
 	}
 
 	/**
-	 * Get all the good ids
+	 * Get all valid FTCAL component ids.
 	 *
-	 * @return all the good ids
+	 * @return all valid component ids
 	 */
 	public static short[] getGoodIds() {
 		return goodIds;
 	}
 
+	/**
+	 * Get a valid component id by good-id-array index.
+	 *
+	 * @param index the index into the good id array
+	 * @return the component id
+	 */
 	public static short getGoodId(int index) {
 		return goodIds[index];
 	}
 
+	/**
+	 * Check whether an FTCAL component id is in the legal array range.
+	 *
+	 * @param id the component id
+	 * @return {@code true} if the id is in range
+	 */
+	private static boolean validId(int id) {
+		return (id >= 1) && (id <= MAXID);
+	}
+
+	/**
+	 * Check whether explicit geometry exists for an FTCAL component id.
+	 *
+	 * @param id the component id
+	 * @return {@code true} if the id has cached/runtime corner geometry
+	 */
+	private static boolean validPaddleGeometry(int id) {
+		return validId(id) && (paddleCorners != null) && (paddleCorners[id] != null);
+	}
+
+	/**
+	 * Check whether the caller supplied a usable four-point XY array.
+	 *
+	 * @param wp the XY corner array
+	 * @return {@code true} if the array is usable
+	 */
+	private static boolean validXYArray(Point2D.Double[] wp) {
+		if ((wp == null) || (wp.length < XY_CORNER_COUNT)) {
+			return false;
+		}
+
+		for (int i = 0; i < XY_CORNER_COUNT; i++) {
+			if (wp[i] == null) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Read FTCAL geometry from the cache.
+	 * <p>
+	 * This reads explicit primitive corner data rather than JLab
+	 * {@link ScintillatorPaddle} objects.
+	 *
+	 * @param kryo  the Kryo instance, retained for interface compatibility
+	 * @param input the Kryo input stream
+	 * @return {@code true} if the geometry was read successfully
+	 */
 	@Override
 	public boolean readGeometry(Kryo kryo, Input input) {
 		try {
-			// Read paddles[] array.
-			int paddleLen = input.readInt();
-			paddles = new ScintillatorPaddle[paddleLen];
-			for (int i = 0; i < paddleLen; i++) {
-				paddles[i] = kryo.readObjectOrNull(input, ScintillatorPaddle.class);
+			int cornerArrayLen = input.readInt();
+			if (cornerArrayLen != (MAXID + 1)) {
+				System.err.printf("FTCALGeometry: expected corner array length %d, found %d in cache.%n",
+						MAXID + 1, cornerArrayLen);
+				return false;
 			}
 
-			// Read goodIds[] array.
+			double corners[][][] = new double[MAXID + 1][][];
+
+			for (int id = 0; id < cornerArrayLen; id++) {
+				boolean hasPaddle = input.readBoolean();
+				if (hasPaddle) {
+					int numCorners = input.readInt();
+					if (numCorners != CORNER_COUNT) {
+						System.err.printf("FTCALGeometry: expected %d corners for id %d, found %d in cache.%n",
+								CORNER_COUNT, id, numCorners);
+						return false;
+					}
+
+					corners[id] = new double[CORNER_COUNT][COORD_COUNT];
+
+					for (int corner = 0; corner < CORNER_COUNT; corner++) {
+						int numCoords = input.readInt();
+						if (numCoords != COORD_COUNT) {
+							System.err.printf(
+									"FTCALGeometry: expected %d coordinates for id %d corner %d, found %d in cache.%n",
+									COORD_COUNT, id, corner, numCoords);
+							return false;
+						}
+
+						for (int coord = 0; coord < COORD_COUNT; coord++) {
+							corners[id][corner][coord] = input.readDouble();
+						}
+					}
+				}
+			}
+
 			int goodIdsLen = input.readInt();
-			goodIds = new short[goodIdsLen];
+			if (goodIdsLen != GOOD_ID_COUNT) {
+				System.err.printf("FTCALGeometry: expected %d good ids, found %d in cache.%n", GOOD_ID_COUNT,
+						goodIdsLen);
+				return false;
+			}
+
+			short gids[] = new short[goodIdsLen];
 			for (int i = 0; i < goodIdsLen; i++) {
-				goodIds[i] = input.readShort();
+				gids[i] = input.readShort();
 			}
 
-			// Read paddleXYIndices[] array.
 			int indicesLen = input.readInt();
-			paddleXYIndices = new Point[indicesLen];
-			for (int i = 0; i < indicesLen; i++) {
-				paddleXYIndices[i] = kryo.readObjectOrNull(input, Point.class);
+			if (indicesLen != (MAXID + 1)) {
+				System.err.printf("FTCALGeometry: expected index array length %d, found %d in cache.%n",
+						MAXID + 1, indicesLen);
+				return false;
 			}
 
-			// Read indicesToId Hashtable.
-			int tableSize = input.readInt();
-			indicesToId = new Hashtable<Point, Integer>();
-			for (int i = 0; i < tableSize; i++) {
-				Point key = kryo.readObjectOrNull(input, Point.class);
-				int value = input.readInt();
-				indicesToId.put(key, value);
+			Point xyIndices[] = new Point[indicesLen];
+			for (int i = 0; i < indicesLen; i++) {
+				boolean hasPoint = input.readBoolean();
+				if (hasPoint) {
+					xyIndices[i] = new Point(input.readInt(), input.readInt());
+				}
 			}
+
+			Hashtable<Point, Integer> table = new Hashtable<>();
+			int tableSize = input.readInt();
+			for (int i = 0; i < tableSize; i++) {
+				Point key = new Point(input.readInt(), input.readInt());
+				int value = input.readInt();
+				table.put(key, value);
+			}
+
+			paddleCorners = corners;
+			goodIds = gids;
+			paddleXYIndices = xyIndices;
+			indicesToId = table;
+
+			// Do not keep stale JLab geometry objects after a cache read.
+			paddles = null;
+
 			return true;
 		} catch (Exception e) {
+			System.err.println("FTCALGeometry: Error reading cached geometry: " + e.getMessage());
 			return false;
 		}
 	}
 
+	/**
+	 * Write FTCAL geometry to the cache.
+	 * <p>
+	 * This writes explicit primitive corner data rather than JLab
+	 * {@link ScintillatorPaddle} objects.
+	 *
+	 * @param kryo   the Kryo instance, retained for interface compatibility
+	 * @param output the Kryo output stream
+	 * @return {@code true} if the geometry was written successfully
+	 */
 	@Override
 	public boolean writeGeometry(Kryo kryo, Output output) {
 		try {
-			// Write paddles[] array.
-			output.writeInt(paddles.length);
-			for (ScintillatorPaddle paddle : paddles) {
-				// Write paddle; it may be null.
-				kryo.writeObjectOrNull(output, paddle, ScintillatorPaddle.class);
+			if ((paddleCorners == null) && (paddles != null)) {
+				paddleCorners = new double[MAXID + 1][][];
+				for (int id = 1; id <= MAXID; id++) {
+					if (paddles[id] != null) {
+						cachePaddleCornersFromPaddle(id, paddles[id]);
+					}
+				}
 			}
 
-			// Write goodIds[] array.
+			if (paddleCorners == null) {
+				System.err.println("FTCALGeometry: no paddle corner geometry available to write.");
+				return false;
+			}
+
+			output.writeInt(MAXID + 1);
+
+			for (int id = 0; id <= MAXID; id++) {
+				boolean hasPaddle = (paddleCorners[id] != null);
+				output.writeBoolean(hasPaddle);
+
+				if (hasPaddle) {
+					output.writeInt(CORNER_COUNT);
+
+					for (int corner = 0; corner < CORNER_COUNT; corner++) {
+						output.writeInt(COORD_COUNT);
+
+						for (int coord = 0; coord < COORD_COUNT; coord++) {
+							output.writeDouble(paddleCorners[id][corner][coord]);
+						}
+					}
+				}
+			}
+
+			if ((goodIds == null) || (goodIds.length != GOOD_ID_COUNT)) {
+				System.err.println("FTCALGeometry: invalid good id array. Not writing cache.");
+				return false;
+			}
+
 			output.writeInt(goodIds.length);
 			for (short id : goodIds) {
 				output.writeShort(id);
 			}
 
-			// Write paddleXYIndices[] array.
-			output.writeInt(paddleXYIndices.length);
-			for (Point pt : paddleXYIndices) {
-				kryo.writeObjectOrNull(output, pt, Point.class);
+			if ((paddleXYIndices == null) || (paddleXYIndices.length != (MAXID + 1))) {
+				System.err.println("FTCALGeometry: invalid XY index array. Not writing cache.");
+				return false;
 			}
 
-			// Write indicesToId Hashtable.
+			output.writeInt(paddleXYIndices.length);
+			for (Point pt : paddleXYIndices) {
+				boolean hasPoint = (pt != null);
+				output.writeBoolean(hasPoint);
+				if (hasPoint) {
+					output.writeInt(pt.x);
+					output.writeInt(pt.y);
+				}
+			}
+
 			output.writeInt(indicesToId.size());
 			for (Point key : indicesToId.keySet()) {
-				kryo.writeObjectOrNull(output, key, Point.class);
+				output.writeInt(key.x);
+				output.writeInt(key.y);
 				output.writeInt(indicesToId.get(key));
 			}
+
 			return true;
 		} catch (Exception e) {
+			System.err.println("FTCALGeometry: Error writing cached geometry: " + e.getMessage());
 			return false;
 		}
 	}
-
 }
