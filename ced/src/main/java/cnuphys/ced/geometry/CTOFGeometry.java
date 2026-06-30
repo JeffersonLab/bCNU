@@ -1,13 +1,12 @@
 package cnuphys.ced.geometry;
 
-import cnuphys.ced.geometry.cache.ACachedGeometry;
-import cnuphys.ced.geometry.cache.GeometryCache;
-import cnuphys.ced.geometry.cache.IGeometryCache;
+import java.awt.geom.Point2D;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import java.awt.geom.Point2D;
+
+import cnuphys.ced.geometry.cache.ACachedGeometry;
 
 public class CTOFGeometry extends ACachedGeometry {
 
@@ -17,8 +16,10 @@ public class CTOFGeometry extends ACachedGeometry {
 	public static final double RINNER = 251.1; // mm
 	public static final double ROUTER = RINNER + 30.226; // mm
 	public static final int COUNT = 48;
-	private static Point2D.Double _quads[][];
+	private static final int QUAD_VERTEX_COUNT = 4;
 	
+	private static Point2D.Double _quads[][];
+
 	/**
      * Constructor
      */
@@ -26,6 +27,7 @@ public class CTOFGeometry extends ACachedGeometry {
 		super("CTOFGeometry");
 	}
 
+	@Override
 	public void initializeUsingCCDB() {
 		System.out.println("\n=====================================");
 		System.out.println("===  CTOF Geometry Initialization ===");
@@ -43,14 +45,14 @@ public class CTOFGeometry extends ACachedGeometry {
 			double theta2 = theta1 - DTHETA;
 			theta1 = Math.toRadians(theta1);
 			theta2 = Math.toRadians(theta2);
-			_quads[i] = new Point2D.Double[4];
+			_quads[i] = new Point2D.Double[QUAD_VERTEX_COUNT];
 			_quads[i][0] = new Point2D.Double(RINNER * Math.cos(theta1), RINNER * Math.sin(theta1));
 			_quads[i][1] = new Point2D.Double(ROUTER * Math.cos(theta1), ROUTER * Math.sin(theta1));
 			_quads[i][2] = new Point2D.Double(ROUTER * Math.cos(theta2), ROUTER * Math.sin(theta2));
 			_quads[i][3] = new Point2D.Double(RINNER * Math.cos(theta2), RINNER * Math.sin(theta2));
 		}
 	}
-	
+
 	/**
 	 * Get the quad for a paddle
 	 *
@@ -112,43 +114,82 @@ public class CTOFGeometry extends ACachedGeometry {
 	@Override
 	public boolean readGeometry(Kryo kryo, Input input) {
 		try {
-			// Read the outer array length
 			int outerLength = input.readInt();
-			_quads = new Point2D.Double[outerLength][];
-			// For each row, read its length and the points within it
+
+			if (outerLength != COUNT) {
+				System.err.printf("CTOFGeometry: expected %d quads, found %d in cache.%n", COUNT, outerLength);
+				return false;
+			}
+
+			Point2D.Double[][] quads = new Point2D.Double[outerLength][];
+
 			for (int i = 0; i < outerLength; i++) {
 				int innerLength = input.readInt();
-				_quads[i] = new Point2D.Double[innerLength];
+
+				if (innerLength != QUAD_VERTEX_COUNT) {
+					System.err.printf("CTOFGeometry: expected %d vertices for quad %d, found %d in cache.%n",
+							QUAD_VERTEX_COUNT, i, innerLength);
+					return false;
+				}
+
+				quads[i] = new Point2D.Double[innerLength];
+
 				for (int j = 0; j < innerLength; j++) {
 					double x = input.readDouble();
 					double y = input.readDouble();
-					_quads[i][j] = new Point2D.Double(x, y);
+					quads[i][j] = new Point2D.Double(x, y);
 				}
 			}
+
+			_quads = quads;
 			return true;
 		} catch (Exception e) {
 			System.err.println("CTOFGeometry: Error reading _quads from cache: " + e.getMessage());
 			return false;
 		}
 	}
-
+	
 	@Override
 	public boolean writeGeometry(Kryo kryo, Output output) {
 		if (_quads == null) {
 			System.err.println("CTOFGeometry: _quads is null. Nothing to write to cache.");
 			return false;
 		}
-		// Write the number of rows in _quads
+
+		if (_quads.length != COUNT) {
+			System.err.printf("CTOFGeometry: expected %d quads, found %d. Not writing cache.%n", COUNT, _quads.length);
+			return false;
+		}
+
 		output.writeInt(_quads.length);
-		// Write each quad (row) to the output
-		for (Point2D.Double[] quad : _quads) {
-			// Write the length of the row (should be 4)
+
+		for (int i = 0; i < _quads.length; i++) {
+			Point2D.Double[] quad = _quads[i];
+
+			if (quad == null) {
+				System.err.printf("CTOFGeometry: quad %d is null. Not writing cache.%n", i);
+				return false;
+			}
+
+			if (quad.length != QUAD_VERTEX_COUNT) {
+				System.err.printf("CTOFGeometry: expected %d vertices for quad %d, found %d. Not writing cache.%n",
+						QUAD_VERTEX_COUNT, i, quad.length);
+				return false;
+			}
+
 			output.writeInt(quad.length);
+
 			for (Point2D.Double point : quad) {
+				if (point == null) {
+					System.err.printf("CTOFGeometry: null point in quad %d. Not writing cache.%n", i);
+					return false;
+				}
+
 				output.writeDouble(point.x);
 				output.writeDouble(point.y);
 			}
 		}
+
 		return true;
 	}
 }
