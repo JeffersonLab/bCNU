@@ -25,7 +25,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-
 import cnuphys.bCNU.application.BaseMDIApplication;
 import cnuphys.bCNU.application.Desktop;
 import cnuphys.bCNU.component.MagnifyWindow;
@@ -107,7 +106,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	public static final String release = "1.9.9.1";
 
 	//minimum java major version
-	private static final int _minJavaVersion = 21;
+	private static final int _minJavaVersion = 17;
 
 	// used for one time inits
 	private int _firstTime = 0;
@@ -1227,6 +1226,9 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 				done = (i >= len);
 			} // !done
 		} // end command arg processing
+		
+		//FOR TEST
+		_experimental = true;
 
 		// initialize magnetic fields
 		MagneticFields.getInstance().initializeMagneticFields();
