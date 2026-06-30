@@ -11,6 +11,12 @@ import cnuphys.ced.geometry.cache.ACachedGeometry;
 public class LTCCGeometry extends ACachedGeometry {
 
 	// place holder hardwired simple geometry from Valery
+	
+	private static final int MIN_RING = 1;
+	private static final int MAX_RING = 18;
+	private static final int MIN_HALF = 1;
+	private static final int MAX_HALF = 2;
+	private static final int POLYGON_VERTEX_COUNT = 4;
 
 	private static final double _thick = 8.0; // cm
 	private static final double _ro = 670.0; // cm
@@ -53,7 +59,7 @@ public class LTCCGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Get the world polygon for the mirror in simple geometry
+	 * Get the world polygon for the mirror in simple geometry.
 	 *
 	 * @param ring     the ring 1..18
 	 * @param half     the half 1..2 (left/right)
@@ -62,7 +68,11 @@ public class LTCCGeometry extends ACachedGeometry {
 	 */
 	public static void getSimpleWorldPoly(int ring, int half, double localPhi, Point2D.Double wp[]) {
 
-		if ((ring > 0) && (ring < 19) && (half > 0) && (half < 3)) {
+		if (!validPolygonArray(wp)) {
+			throw new IllegalArgumentException("LTCCGeometry: wp must contain at least four non-null points.");
+		}
+
+		if (validRingAndHalf(ring, half)) {
 
 			double x0 = _xo + (ring - 1) * _delX;
 			double y0 = _yo + (ring - 1) * _delY;
@@ -94,21 +104,64 @@ public class LTCCGeometry extends ACachedGeometry {
 			wp[2].setLocation(x2, y2);
 			wp[3].setLocation(x3, y3);
 		} else {
-			for (int i = 0; i < 4; i++) {
-				wp[i].setLocation(Double.NaN, Double.NaN);
+			setNaNPolygon(wp);
+		}
+	}
+
+	/**
+	 * Check whether the supplied ring and half are in the supported simple-geometry
+	 * range.
+	 *
+	 * @param ring the ring
+	 * @param half the half
+	 * @return {@code true} if the ring and half are valid
+	 */
+	private static boolean validRingAndHalf(int ring, int half) {
+		return (ring >= MIN_RING) && (ring <= MAX_RING) && (half >= MIN_HALF) && (half <= MAX_HALF);
+	}
+
+	/**
+	 * Check whether the caller supplied a usable polygon array.
+	 *
+	 * @param wp the polygon array
+	 * @return {@code true} if the array is usable
+	 */
+	private static boolean validPolygonArray(Point2D.Double wp[]) {
+		if ((wp == null) || (wp.length < POLYGON_VERTEX_COUNT)) {
+			return false;
+		}
+
+		for (int i = 0; i < POLYGON_VERTEX_COUNT; i++) {
+			if (wp[i] == null) {
+				return false;
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Set the polygon to NaN coordinates.
+	 *
+	 * @param wp the polygon array
+	 */
+	private static void setNaNPolygon(Point2D.Double wp[]) {
+		for (int i = 0; i < POLYGON_VERTEX_COUNT; i++) {
+			wp[i].setLocation(Double.NaN, Double.NaN);
 		}
 	}
 
 	@Override
 	public boolean readGeometry(Kryo kryo, Input input) {
-		// At the moment, nothing to read
+		// LTCC currently uses hardwired simple geometry computed from constants.
+		// There is no external geometry state to read from the cache.
 		return true;
 	}
 
 	@Override
 	public boolean writeGeometry(Kryo kryo, Output output) {
-		// At the moment, nothing to write
+		// LTCC currently uses hardwired simple geometry computed from constants.
+		// There is no external geometry state to write to the cache.
 		return true;
 	}
 
