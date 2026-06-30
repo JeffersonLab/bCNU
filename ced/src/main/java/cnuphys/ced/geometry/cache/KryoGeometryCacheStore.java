@@ -36,6 +36,7 @@ public class KryoGeometryCacheStore implements GeometryCacheStore {
 	 * @param kryo the Kryo instance to configure
 	 */
 	private static void registerClasses(Kryo kryo) {
+		kryo.register(cnuphys.ced.geometry.cache.GeometryCacheMetadata.class);
 		kryo.register(cnuphys.ced.ced3d.util.Point.class);
 		kryo.register(cnuphys.ced.geometry.urwt.UrWTDetectorData.class);
 		kryo.register(org.jlab.geom.component.ScintillatorPaddle.class);
@@ -133,6 +134,9 @@ public class KryoGeometryCacheStore implements GeometryCacheStore {
 				return false;
 			}
 
+			GeometryCacheMetadata metadata = kryo.readObject(input, GeometryCacheMetadata.class);
+			System.out.println("Geometry cache metadata: " + metadata);
+
 			for (IGeometryCache geometry : geometries) {
 				boolean success = geometry.readGeometry(kryo, input);				if (!success) {
 					System.err.println("Failed to read geometry from cache for " + geometry.getName());
@@ -165,8 +169,12 @@ public class KryoGeometryCacheStore implements GeometryCacheStore {
 			output.writeString(CACHE_MAGIC);
 			output.writeInt(CACHE_FORMAT_VERSION);
 
+			GeometryCacheMetadata metadata = new GeometryCacheMetadata("kryo", CACHE_FORMAT_VERSION, "CED");
+			kryo.writeObject(output, metadata);
+
 			for (IGeometryCache geometry : geometries) {
-				boolean success = geometry.writeGeometry(kryo, output);				if (!success) {
+				boolean success = geometry.writeGeometry(kryo, output);
+				if (!success) {
 					System.err.println("Failed to write geometry to cache for " + geometry.getName());
 					deleteCacheFile(file);
 					return false;
