@@ -3,7 +3,7 @@ package cnuphys.ced.geometry.cache;
 /**
  * Higher-level geometry initialization contract.
  *
- * This interßface deliberately does not expose Kryo, SQLite, or any other
+ * This interface deliberately does not expose Kryo, SQLite, or any other
  * cache implementation detail. It represents the lifecycle of a geometry
  * object: try cache, initialize from the authoritative source, then save.
  */
