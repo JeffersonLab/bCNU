@@ -1,6 +1,5 @@
 package cnuphys.ced.geometry.bmt;
 
-import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
@@ -277,68 +276,242 @@ public class Constants {
 	public static synchronized void setCRCXPOS(double[] cRCXPOS) {
 		CRCXPOS = cRCXPOS;
 	}
-	
-	public static void writeConstants(Kryo kryo, Output output) {
-	    // Write the arrays for the Z detector characteristics
-	    kryo.writeObject(output, CRZRADIUS);
-	    kryo.writeObject(output, CRZNSTRIPS);
-	    kryo.writeObject(output, CRZSPACING);
-	    kryo.writeObject(output, CRZWIDTH);
-	    kryo.writeObject(output, CRZLENGTH);
-	    kryo.writeObject(output, CRZZMIN);
-	    kryo.writeObject(output, CRZZMAX);
-	    kryo.writeObject(output, CRZOFFSET);
-	    kryo.writeObject(output, CRZEDGE1);
-	    kryo.writeObject(output, CRZEDGE2);
-	    kryo.writeObject(output, CRZXPOS);
-	    
-	    // Write the arrays for the C detector characteristics
-	    kryo.writeObject(output, CRCRADIUS);
-	    kryo.writeObject(output, CRCNSTRIPS);
-	    kryo.writeObject(output, CRCSPACING);
-	    kryo.writeObject(output, CRCLENGTH);
-	    kryo.writeObject(output, CRCZMIN);
-	    kryo.writeObject(output, CRCZMAX);
-	    kryo.writeObject(output, CRCOFFSET);
-	    kryo.writeObject(output, CRCGROUP);
-	    kryo.writeObject(output, CRCWIDTH);
-	    kryo.writeObject(output, CRCEDGE1);
-	    kryo.writeObject(output, CRCEDGE2);
-	    kryo.writeObject(output, CRCXPOS);
-	    
-	    // Write the additional reconstruction constants
-	    output.writeDouble(ThetaL);
-	    output.writeBoolean(areConstantsLoaded);
+	/**
+	 * Write BMT constants to the cache as explicit primitive data.
+	 *
+	 * @param output the cache output stream
+	 */
+	public static synchronized void writeConstants(Output output) {
+		writeDoubleArray(output, CRZRADIUS);
+		writeIntArray(output, CRZNSTRIPS);
+		writeDoubleArray(output, CRZSPACING);
+		writeDoubleArray(output, CRZWIDTH);
+		writeDoubleArray(output, CRZLENGTH);
+		writeDoubleArray(output, CRZZMIN);
+		writeDoubleArray(output, CRZZMAX);
+		writeDoubleArray(output, CRZOFFSET);
+		writeDoubleArray2D(output, CRZEDGE1);
+		writeDoubleArray2D(output, CRZEDGE2);
+		writeDoubleArray(output, CRZXPOS);
+
+		writeDoubleArray(output, CRCRADIUS);
+		writeIntArray(output, CRCNSTRIPS);
+		writeDoubleArray(output, CRCSPACING);
+		writeDoubleArray(output, CRCLENGTH);
+		writeDoubleArray(output, CRCZMIN);
+		writeDoubleArray(output, CRCZMAX);
+		writeDoubleArray(output, CRCOFFSET);
+		writeIntArray2D(output, CRCGROUP);
+		writeDoubleArray2D(output, CRCWIDTH);
+		writeDoubleArray2D(output, CRCEDGE1);
+		writeDoubleArray2D(output, CRCEDGE2);
+		writeDoubleArray(output, CRCXPOS);
+
+		output.writeDouble(ThetaL);
+		output.writeBoolean(areConstantsLoaded);
 	}
 
-	public static void readConstants(Kryo kryo, Input input) {
-	    CRZRADIUS = kryo.readObject(input, double[].class);
-	    CRZNSTRIPS = kryo.readObject(input, int[].class);
-	    CRZSPACING = kryo.readObject(input, double[].class);
-	    CRZWIDTH = kryo.readObject(input, double[].class);
-	    CRZLENGTH = kryo.readObject(input, double[].class);
-	    CRZZMIN = kryo.readObject(input, double[].class);
-	    CRZZMAX = kryo.readObject(input, double[].class);
-	    CRZOFFSET = kryo.readObject(input, double[].class);
-	    CRZEDGE1 = kryo.readObject(input, double[][].class);
-	    CRZEDGE2 = kryo.readObject(input, double[][].class);
-	    CRZXPOS = kryo.readObject(input, double[].class);
-	    
-	    CRCRADIUS = kryo.readObject(input, double[].class);
-	    CRCNSTRIPS = kryo.readObject(input, int[].class);
-	    CRCSPACING = kryo.readObject(input, double[].class);
-	    CRCLENGTH = kryo.readObject(input, double[].class);
-	    CRCZMIN = kryo.readObject(input, double[].class);
-	    CRCZMAX = kryo.readObject(input, double[].class);
-	    CRCOFFSET = kryo.readObject(input, double[].class);
-	    CRCGROUP = kryo.readObject(input, int[][].class);
-	    CRCWIDTH = kryo.readObject(input, double[][].class);
-	    CRCEDGE1 = kryo.readObject(input, double[][].class);
-	    CRCEDGE2 = kryo.readObject(input, double[][].class);
-	    CRCXPOS = kryo.readObject(input, double[].class);
-	    
-	    ThetaL = input.readDouble();
-	    areConstantsLoaded = input.readBoolean();
+	/**
+	 * Read BMT constants from the cache.
+	 *
+	 * @param input the cache input stream
+	 */
+	public static synchronized void readConstants(Input input) {
+		CRZRADIUS = readDoubleArray(input, "CRZRADIUS");
+		CRZNSTRIPS = readIntArray(input, "CRZNSTRIPS");
+		CRZSPACING = readDoubleArray(input, "CRZSPACING");
+		CRZWIDTH = readDoubleArray(input, "CRZWIDTH");
+		CRZLENGTH = readDoubleArray(input, "CRZLENGTH");
+		CRZZMIN = readDoubleArray(input, "CRZZMIN");
+		CRZZMAX = readDoubleArray(input, "CRZZMAX");
+		CRZOFFSET = readDoubleArray(input, "CRZOFFSET");
+		CRZEDGE1 = readDoubleArray2D(input, "CRZEDGE1");
+		CRZEDGE2 = readDoubleArray2D(input, "CRZEDGE2");
+		CRZXPOS = readDoubleArray(input, "CRZXPOS");
+
+		CRCRADIUS = readDoubleArray(input, "CRCRADIUS");
+		CRCNSTRIPS = readIntArray(input, "CRCNSTRIPS");
+		CRCSPACING = readDoubleArray(input, "CRCSPACING");
+		CRCLENGTH = readDoubleArray(input, "CRCLENGTH");
+		CRCZMIN = readDoubleArray(input, "CRCZMIN");
+		CRCZMAX = readDoubleArray(input, "CRCZMAX");
+		CRCOFFSET = readDoubleArray(input, "CRCOFFSET");
+		CRCGROUP = readIntArray2D(input, "CRCGROUP");
+		CRCWIDTH = readDoubleArray2D(input, "CRCWIDTH");
+		CRCEDGE1 = readDoubleArray2D(input, "CRCEDGE1");
+		CRCEDGE2 = readDoubleArray2D(input, "CRCEDGE2");
+		CRCXPOS = readDoubleArray(input, "CRCXPOS");
+
+		ThetaL = input.readDouble();
+		areConstantsLoaded = input.readBoolean();
+	}
+
+	/**
+	 * Write a nullable double array.
+	 *
+	 * @param output the cache output stream
+	 * @param array  the array
+	 */
+	private static void writeDoubleArray(Output output, double array[]) {
+		if (array == null) {
+			output.writeInt(-1);
+			return;
+		}
+
+		output.writeInt(array.length);
+
+		for (double value : array) {
+			output.writeDouble(value);
+		}
+	}
+
+	/**
+	 * Read a nullable double array.
+	 *
+	 * @param input   the cache input stream
+	 * @param context diagnostic context
+	 * @return the array
+	 */
+	private static double[] readDoubleArray(Input input, String context) {
+		int length = input.readInt();
+
+		if (length < 0) {
+			return null;
+		}
+
+		double array[] = new double[length];
+
+		for (int i = 0; i < length; i++) {
+			array[i] = input.readDouble();
+		}
+
+		return array;
+	}
+
+	/**
+	 * Write a nullable int array.
+	 *
+	 * @param output the cache output stream
+	 * @param array  the array
+	 */
+	private static void writeIntArray(Output output, int array[]) {
+		if (array == null) {
+			output.writeInt(-1);
+			return;
+		}
+
+		output.writeInt(array.length);
+
+		for (int value : array) {
+			output.writeInt(value);
+		}
+	}
+
+	/**
+	 * Read a nullable int array.
+	 *
+	 * @param input   the cache input stream
+	 * @param context diagnostic context
+	 * @return the array
+	 */
+	private static int[] readIntArray(Input input, String context) {
+		int length = input.readInt();
+
+		if (length < 0) {
+			return null;
+		}
+
+		int array[] = new int[length];
+
+		for (int i = 0; i < length; i++) {
+			array[i] = input.readInt();
+		}
+
+		return array;
+	}
+
+	/**
+	 * Write a nullable 2D double array.
+	 *
+	 * @param output the cache output stream
+	 * @param array  the array
+	 */
+	private static void writeDoubleArray2D(Output output, double array[][]) {
+		if (array == null) {
+			output.writeInt(-1);
+			return;
+		}
+
+		output.writeInt(array.length);
+
+		for (double row[] : array) {
+			writeDoubleArray(output, row);
+		}
+	}
+
+	/**
+	 * Read a nullable 2D double array.
+	 *
+	 * @param input   the cache input stream
+	 * @param context diagnostic context
+	 * @return the array
+	 */
+	private static double[][] readDoubleArray2D(Input input, String context) {
+		int rows = input.readInt();
+
+		if (rows < 0) {
+			return null;
+		}
+
+		double array[][] = new double[rows][];
+
+		for (int row = 0; row < rows; row++) {
+			array[row] = readDoubleArray(input, context + "[" + row + "]");
+		}
+
+		return array;
+	}
+
+	/**
+	 * Write a nullable 2D int array.
+	 *
+	 * @param output the cache output stream
+	 * @param array  the array
+	 */
+	private static void writeIntArray2D(Output output, int array[][]) {
+		if (array == null) {
+			output.writeInt(-1);
+			return;
+		}
+
+		output.writeInt(array.length);
+
+		for (int row[] : array) {
+			writeIntArray(output, row);
+		}
+	}
+
+	/**
+	 * Read a nullable 2D int array.
+	 *
+	 * @param input   the cache input stream
+	 * @param context diagnostic context
+	 * @return the array
+	 */
+	private static int[][] readIntArray2D(Input input, String context) {
+		int rows = input.readInt();
+
+		if (rows < 0) {
+			return null;
+		}
+
+		int array[][] = new int[rows][];
+
+		for (int row = 0; row < rows; row++) {
+			array[row] = readIntArray(input, context + "[" + row + "]");
+		}
+
+		return array;
 	}
 
 }
