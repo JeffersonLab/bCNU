@@ -2,7 +2,6 @@ package cnuphys.ced.geometry;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.jlab.geom.abs.AbstractComponent;
 import org.jlab.geom.prim.Line3D;
@@ -11,10 +10,7 @@ import org.jlab.geom.prim.Plane3D;
 import org.jlab.geom.prim.Point3D;
 import org.jlab.geom.prim.Vector3D;
 
-import cnuphys.ced.geometry.alert.AlertGeometry;
 import cnuphys.ced.geometry.cache.GeometryCache;
-import cnuphys.ced.geometry.fmt.FMTGeometry;
-import cnuphys.ced.geometry.urwt.UrWTGeometry;
 import cnuphys.swim.SwimTrajectory;
 
 public class GeometryManager {
@@ -409,6 +405,146 @@ public class GeometryManager {
 
 		return true;
 	}
+	
+	/**
+	 * See if a projected primitive polygon intersects a plane.
+	 * <p>
+	 * This is the primitive-data equivalent of
+	 * {@link #doesProjectedPolyIntersect(AbstractComponent, Plane3D, int, int)}.
+	 * Each projected polygon edge is supplied directly as two 3D endpoints:
+	 *
+	 * <pre>
+	 * edgeLines[edge][endpoint][xyz]
+	 * </pre>
+	 *
+	 * @param edgeLines       the primitive edge lines, shaped [edge][2][3]
+	 * @param projectionPlane the projection plane
+	 * @return {@code true} if more than two edge intersections lie on their
+	 *         respective edge segments
+	 */
+	public static boolean doesProjectedPolyIntersect(double edgeLines[][][], Plane3D projectionPlane) {
+
+		if ((edgeLines == null) || (projectionPlane == null)) {
+			return false;
+		}
+
+		int isectsCount = 0;
+		Point3D intersection = new Point3D();
+
+		for (int i = 0; i < edgeLines.length; i++) {
+			Line3D line = primitiveLine(edgeLines[i]);
+
+			if (line == null) {
+				continue;
+			}
+
+			intersection = new Point3D();
+			projectionPlane.intersection(line, intersection);
+
+			if (lengthTest(line.length(), line.origin(), line.end(), intersection)) {
+				isectsCount++;
+			}
+		}
+
+		return isectsCount > 2;
+	}
+
+	/**
+	 * Get a world 2D polygon from primitive 3D edge-line data.
+	 * <p>
+	 * This is the primitive-data equivalent of
+	 * {@link #getProjectedPolygon(AbstractComponent, Plane3D, int, int, Point2D.Double[], Point2D.Double)}.
+	 *
+	 * @param edgeLines       the primitive edge lines, shaped [edge][2][3]
+	 * @param projectionPlane the projection plane
+	 * @param wp              receives the world 2D polygon
+	 * @param centroid        optionally receives the centroid
+	 * @return {@code true} if the polygon intersects the plane
+	 */
+	public static boolean getProjectedPolygon(double edgeLines[][][], Plane3D projectionPlane, Point2D.Double wp[],
+			Point2D.Double centroid) {
+		return getProjectedPolygon(edgeLines, projectionPlane, wp, centroid, true);
+	}
+
+	/**
+	 * Get a world 2D polygon from primitive 3D edge-line data.
+	 * <p>
+	 * The resulting world coordinates follow the same convention as the existing
+	 * object-based method:
+	 *
+	 * <pre>
+	 * wp[i].x = intersection.z()
+	 * wp[i].y = hypot(intersection.x(), intersection.y())
+	 * </pre>
+	 *
+	 * @param edgeLines       the primitive edge lines, shaped [edge][2][3]
+	 * @param projectionPlane the projection plane
+	 * @param wp              receives the world 2D polygon
+	 * @param centroid        optionally receives the centroid
+	 * @param checkIntersects if {@code true}, require the projected polygon to
+	 *                        intersect the plane
+	 * @return {@code true} if the polygon should be used
+	 */
+	public static boolean getProjectedPolygon(double edgeLines[][][], Plane3D projectionPlane, Point2D.Double wp[],
+			Point2D.Double centroid, boolean checkIntersects) {
+
+		if ((edgeLines == null) || (projectionPlane == null) || (wp == null) || (wp.length < edgeLines.length)) {
+			return false;
+		}
+
+		int count = edgeLines.length;
+
+		if (count > _workPoints.length) {
+			_workPoints = new Point3D[count];
+			for (int i = 0; i < count; i++) {
+				_workPoints[i] = new Point3D();
+			}
+		}
+
+		for (int i = 0; i < count; i++) {
+			Line3D line = primitiveLine(edgeLines[i]);
+
+			if (line == null) {
+				return false;
+			}
+
+			_workPoints[i] = new Point3D();
+			projectionPlane.intersection(line, _workPoints[i]);
+		}
+
+		for (int i = 0; i < count; i++) {
+			wp[i].x = _workPoints[i].z();
+			wp[i].y = Math.hypot(_workPoints[i].x(), _workPoints[i].y());
+		}
+
+		if (centroid != null) {
+			average(wp, centroid);
+		}
+
+		if (checkIntersects) {
+			return doesProjectedPolyIntersect(edgeLines, projectionPlane);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Convert a primitive endpoint array into a {@link Line3D}.
+	 *
+	 * @param endpoints the endpoint array, shaped [2][3]
+	 * @return the line, or {@code null} if the endpoint data is invalid
+	 */
+	private static Line3D primitiveLine(double endpoints[][]) {
+		if ((endpoints == null) || (endpoints.length < 2) || (endpoints[0] == null) || (endpoints[1] == null)
+				|| (endpoints[0].length < 3) || (endpoints[1].length < 3)) {
+			return null;
+		}
+
+		Point3D origin = new Point3D(endpoints[0][0], endpoints[0][1], endpoints[0][2]);
+		Point3D end = new Point3D(endpoints[1][0], endpoints[1][1], endpoints[1][2]);
+
+		return new Line3D(origin, end);
+	}
 
 	/**
 	 * See if the projected polygon intersects a plane
@@ -440,7 +576,7 @@ public class GeometryManager {
 
 		return isectsCount > 2;
 	}
-	
+
 	/**
 	 * Get a world 2D polygon from a clas geo object like a FTOF slab.
 	 *
@@ -502,9 +638,9 @@ public class GeometryManager {
 		if (centroid != null) {
 			average(wp, centroid);
 		}
-		
+
 		if (checkIntersects) {
-			return doesProjectedPolyIntersect(geoObj, projectionPlane, startIndex, count);	
+			return doesProjectedPolyIntersect(geoObj, projectionPlane, startIndex, count);
 		}
 
 		return true;
