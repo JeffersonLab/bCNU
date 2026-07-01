@@ -2,7 +2,6 @@ package cnuphys.ced.cedview.fmt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -16,9 +15,10 @@ import org.jlab.geom.prim.Point3D;
 
 import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.drawable.IDrawable;
-import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.util.PropertySupport;
+import cnuphys.bCNU.view.ViewConfiguration;
+import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
 import cnuphys.ced.component.ControlPanel;
@@ -28,6 +28,7 @@ import cnuphys.ced.component.GeoDisplayBits;
 import cnuphys.ced.geometry.GeometryManager;
 import cnuphys.ced.geometry.fmt.FMTGeometry;
 
+@SuppressWarnings("serial")
 public class FMTXYView extends CedXYView  {
 
 	// camera Z for projection
@@ -55,33 +56,13 @@ public class FMTXYView extends CedXYView  {
 	}
 
 	/**
-	 * Create a Alert detector XY view
-	 * @return a Alert detector XY view
+	 * Create a FMTXYView view. This is used by lazy creation
+	 *
+	 * @param keyVals the key value pairs for the view properties
+	 * @return a FMTXYView View
 	 */
-	public static FMTXYView createFMTXYView() {
-		// set to a fraction of screen
-		// set to a fraction of screen
-		double size[] = getSizeFromScreenFraction(0.4);
-
-		// make it square
-		int width = (int) size[0];
-		int height = width - 100; // leave room for control panel
-
-		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
-
-		final FMTXYView view = new FMTXYView(PropertySupport.WORLDSYSTEM, _defaultWorldRectangle,
-				PropertySupport.WIDTH, width,
-				PropertySupport.HEIGHT, height,
-				PropertySupport.LEFTMARGIN, LMARGIN,
-				PropertySupport.TOPMARGIN, TMARGIN,
-				PropertySupport.RIGHTMARGIN, RMARGIN,
-				PropertySupport.BOTTOMMARGIN, BMARGIN,
-				PropertySupport.TOOLBAR, true,
-				PropertySupport.TOOLBARBITS, CedView.TOOLBARBITS,
-				PropertySupport.VISIBLE, true,
-				PropertySupport.TITLE, title,
-				PropertySupport.PROPNAME, "AlertXY",
-				PropertySupport.STANDARDVIEWDECORATIONS, true);
+	public static FMTXYView construct(Object... keyVals) {
+		FMTXYView view = new FMTXYView(keyVals);
 
 		view._controlPanel = new ControlPanel(view,
 				ControlPanel.DISPLAYARRAY + ControlPanel.FEEDBACK + ControlPanel.ACCUMULATIONLEGEND +
@@ -104,11 +85,50 @@ public class FMTXYView extends CedXYView  {
 		view._geoDisplayArray = new GeoDisplayArray(view, GeoDisplayBits.FMT_REGIONS + GeoDisplayBits.FMT_LAYERS, 2, 50);
 		view._controlPanel.addComponent(view._geoDisplayArray);
 
-
-		//add dc projection panel
-//		view._dcPanel = view._controlPanel.getAlertDCPanel();
-
 		return view;
+
+	}
+
+	/**
+	 * Get the view configuration for lazy creation
+	 *
+	 * @return the view configuration for lazy creation
+	 */
+	public static ViewConfiguration<FMTXYView> getConfiguration() {
+		return new ViewConfiguration<>(FMTXYView.class, true, 9, 0, 0, VirtualView.BOTTOMLEFT, getDefaultKeyVals());
+	}
+
+	/**
+	 * Get the default key values for the view. This is used by lazy creation
+	 *
+	 * @return the default key values for the view
+	 */
+	public static Object[] getDefaultKeyVals() {
+
+		// set to a fraction of screen
+		// set to a fraction of screen
+		double size[] = getSizeFromScreenFraction(0.4);
+
+		// make it square
+		int width = (int) size[0];
+		int height = width - 100; // leave room for control panel
+
+		String title = _baseTitle + ((CLONE_COUNT == 0) ? "" : ("_(" + CLONE_COUNT + ")"));
+
+
+		return new Object[] { PropertySupport.WORLDSYSTEM, _defaultWorldRectangle,
+				PropertySupport.WIDTH, width,
+				PropertySupport.HEIGHT, height,
+				PropertySupport.LEFTMARGIN, LMARGIN,
+				PropertySupport.TOPMARGIN, TMARGIN,
+				PropertySupport.RIGHTMARGIN, RMARGIN,
+				PropertySupport.BOTTOMMARGIN, BMARGIN,
+				PropertySupport.TOOLBAR, true,
+				PropertySupport.TOOLBARBITS, CedView.TOOLBARBITS,
+				PropertySupport.VISIBLE, true,
+				PropertySupport.TITLE, title,
+				PropertySupport.PROPNAME, "FMTXY",
+				PropertySupport.STANDARDVIEWDECORATIONS, true};
 	}
 
 	@Override

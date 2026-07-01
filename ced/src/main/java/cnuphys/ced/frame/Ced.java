@@ -411,7 +411,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 		//add and ALERT XY view
 		_alertXYView = AlertXYView.createAlertXYView();
-
+		
 		// add a FTCalXYView lazily
 		ViewManager.getInstance().addConfiguration(FTCalXYView.getConfiguration());
 
