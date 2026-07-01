@@ -21,78 +21,165 @@ import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.cache.ACachedGeometry;
+import cnuphys.ced.geometry.cache.GeometryPrimitiveIO;
 
+/**
+ * Holds the drift chamber geometry used by the event display.
+ * <p>
+ * The old cache stored the full {@link DriftChamberWire} object graph. That is
+ * unnecessary after initialization. The display code needs only:
+ *
+ * <pre>
+ * sense wire line endpoints  [superlayer][layer][wire][endpoint][xyz]
+ * midpoints                  [superlayer][layer][wire][xyz]
+ * hexagon projection edges   [superlayer][layer][wire][edge][endpoint][xyz]
+ * min/max wire x
+ * </pre>
+ *
+ * The full {@link DriftChamberWire} objects are therefore used only while
+ * building the geometry from CCDB.
+ */
 public class DCGeometry extends ACachedGeometry {
+
+	/** Number of DC superlayers. */
+	private static final int SUPERLAYER_COUNT = 6;
+
+	/** Number of layers per superlayer. */
+	private static final int LAYER_COUNT = 6;
+
+	/** Number of wires per layer. */
+	private static final int WIRE_COUNT = 112;
+
+	/** Number of endpoints in a line. */
+	private static final int LINE_ENDPOINT_COUNT = 2;
+
+	/** Number of coordinates per point. */
+	private static final int COORD_COUNT = 3;
+
+	/**
+	 * Old DC display code projected six volume edges starting at edge 10. Preserve
+	 * that behavior.
+	 */
+	private static final int HEX_EDGE_START = 10;
+
+	/** Number of projected hexagon edges. */
+	private static final int HEX_EDGE_COUNT = 6;
 
 	private static double minWireX;
 	private static double maxWireX;
 
 	/**
-	 * These are the drift chamber wires from the geometry service. The indices are
-	 * 0-based: [superlayer 0:5][layer 0:5][wire 0:111] NOTE: a DriftChamberWire is
-	 * actually the full hexagonal volume. Its getLine method returns the line of
-	 * the sense wire.
+	 * Primitive sense-wire lines shaped
+	 * [superlayer][layer][wire][endpoint][xyz].
 	 */
-	private static DriftChamberWire wires[][][];
+	private static double wireLines[][][][][];
 
+	/**
+	 * Primitive wire midpoints shaped [superlayer][layer][wire][xyz].
+	 */
+	private static double wireMidpoints[][][][];
+
+	/**
+	 * Primitive hexagon projection edges shaped
+	 * [superlayer][layer][wire][edge][endpoint][xyz].
+	 */
+	private static double hexEdges[][][][][][];
+
+	/**
+	 * Constructor.
+	 */
 	public DCGeometry() {
 		super("DriftChamber");
 	}
 
 	/**
-	 * Initialize the DC Geometry by loading all the wires
+	 * Initialize the DC geometry by loading all wires from CCDB/JLab geometry and
+	 * converting the needed runtime data to primitive arrays.
 	 */
 	@Override
 	public void initializeUsingCCDB() {
-
 		int run = 4013;
 		String variation = Ced.getGeometryVariation();
 		ConstantProvider cp = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.DC, run, variation);
 
 		DCGeantFactory factory = new DCGeantFactory();
 
-		DCDetector _dcDetector = factory.createDetectorCLAS(cp);
-
-		DCSector sector0 = _dcDetector.getSector(0);
+		DCDetector dcDetector = factory.createDetectorCLAS(cp);
+		DCSector sector0 = dcDetector.getSector(0);
 
 		minWireX = Double.POSITIVE_INFINITY;
 		maxWireX = Double.NEGATIVE_INFINITY;
 
-		wires = new DriftChamberWire[6][6][112];
-		for (int suplay = 0; suplay < 6; suplay++) {
+		wireLines = new double[SUPERLAYER_COUNT][LAYER_COUNT][WIRE_COUNT][LINE_ENDPOINT_COUNT][COORD_COUNT];
+		wireMidpoints = new double[SUPERLAYER_COUNT][LAYER_COUNT][WIRE_COUNT][COORD_COUNT];
+		hexEdges = new double[SUPERLAYER_COUNT][LAYER_COUNT][WIRE_COUNT][HEX_EDGE_COUNT][LINE_ENDPOINT_COUNT][COORD_COUNT];
+
+		for (int suplay = 0; suplay < SUPERLAYER_COUNT; suplay++) {
 			DCSuperlayer sl = sector0.getSuperlayer(suplay);
 
-			for (int lay = 0; lay < 6; lay++) {
+			for (int lay = 0; lay < LAYER_COUNT; lay++) {
 				DCLayer dcLayer = sl.getLayer(lay);
 
-				for (int w = 0; w < 112; w++) {
+				for (int w = 0; w < WIRE_COUNT; w++) {
 					DriftChamberWire dcw = dcLayer.getComponent(w);
-
-					wires[suplay][lay][w] = dcw;
-
-					Line3D line = dcw.getLine();
-					double xx0 = line.origin().x();
-					double xx1 = line.end().x();
-
-					minWireX = Math.min(minWireX, xx0);
-					minWireX = Math.min(minWireX, xx1);
-					maxWireX = Math.max(maxWireX, xx0);
-					maxWireX = Math.max(maxWireX, xx1);
+					cacheWire(suplay, lay, w, dcw);
 				}
 			}
 		}
-
 	}
 
 	/**
-	 * Used by the 3D drawing
+	 * Cache one drift chamber wire as primitive data.
+	 *
+	 * @param suplay superlayer index
+	 * @param lay    layer index
+	 * @param w      wire index
+	 * @param dcw    drift chamber wire
+	 */
+	private static void cacheWire(int suplay, int lay, int w, DriftChamberWire dcw) {
+		Line3D line = dcw.getLine();
+
+		storePoint(wireLines[suplay][lay][w][0], line.origin());
+		storePoint(wireLines[suplay][lay][w][1], line.end());
+
+		Point3D midpoint = dcw.getMidpoint();
+		storePoint(wireMidpoints[suplay][lay][w], midpoint);
+
+		double xx0 = line.origin().x();
+		double xx1 = line.end().x();
+
+		minWireX = Math.min(minWireX, xx0);
+		minWireX = Math.min(minWireX, xx1);
+		maxWireX = Math.max(maxWireX, xx0);
+		maxWireX = Math.max(maxWireX, xx1);
+
+		for (int edge = 0; edge < HEX_EDGE_COUNT; edge++) {
+			Line3D edgeLine = dcw.getVolumeEdge(HEX_EDGE_START + edge);
+			storePoint(hexEdges[suplay][lay][w][edge][0], edgeLine.origin());
+			storePoint(hexEdges[suplay][lay][w][edge][1], edgeLine.end());
+		}
+	}
+
+	/**
+	 * Store a Point3D in a primitive coordinate array.
+	 *
+	 * @param target destination [x,y,z]
+	 * @param point  source point
+	 */
+	private static void storePoint(double target[], Point3D point) {
+		target[0] = point.x();
+		target[1] = point.y();
+		target[2] = point.z();
+	}
+
+	/**
+	 * Used by the 3D drawing.
 	 *
 	 * @param sector     the 1-based sector
-	 * @param superlayer 1 based superlayer [1..6]
-	 * @param coords     holds 6*3 = 18 values [x1, y1, z1, ..., x6, y6, z6]
+	 * @param superlayer 1-based superlayer [1..6]
+	 * @param coords     holds 6*3 = 18 values [x1,y1,z1,...]
 	 */
 	public static void superLayerVertices(int sector, int superlayer, float[] coords) {
-
 		Line3D wire1 = getWire(sector, superlayer, 1, 1);
 		Line3D wire2 = getWire(sector, superlayer, 1, 112);
 
@@ -103,7 +190,6 @@ public class DCGeometry extends ACachedGeometry {
 		Triangle3D triangle6 = new Triangle3D(wire3.midpoint(), wire4.origin(), wire4.end());
 
 		if (triangle1 != null) {
-
 			for (int i = 0; i < 3; i++) {
 				Point3D v1 = new Point3D(triangle1.point(i));
 				Point3D v6 = new Point3D(triangle6.point(i));
@@ -120,137 +206,138 @@ public class DCGeometry extends ACachedGeometry {
 				coords[k + 2] = (float) v6.z();
 			}
 		}
-
 	}
 
 	/**
 	 * Get the absolute value of the largest x coordinate of any wire.
 	 *
-	 * @return the absolute value of the largest x coordinate of any wire.
+	 * @return the absolute value of the largest x coordinate of any wire
 	 */
 	public static double getAbsMaxWireX() {
 		return Math.max(Math.abs(minWireX), maxWireX);
 	}
 
 	/**
-	 * Get the midpoint of the untransformed wire in sector 1 NOTE: the indices are
-	 * 1-based
+	 * Get the midpoint of the untransformed wire in sector 1.
 	 *
-	 * @param superlayer the superlayer [1..6]
-	 * @param layer      the layer [1..6]
-	 * @param wire       the wire [1..112]
-	 * @return the mid point of the wire in sector 1
+	 * @param superlayer superlayer [1..6]
+	 * @param layer      layer [1..6]
+	 * @param wire       wire [1..112]
+	 * @return midpoint
 	 */
 	public static Point3D getMidPoint(int superlayer, int layer, int wire) {
-		return wires[superlayer - 1][layer - 1][wire - 1].getMidpoint();
+		if (!validAddress(superlayer, layer, wire)) {
+			return null;
+		}
+
+		return pointFrom(wireMidpoints[superlayer - 1][layer - 1][wire - 1]);
 	}
 
 	/**
-	 * Get the wire in given sector NOTE: the indices are 1-based
+	 * Get the sense wire in a given sector.
 	 *
-	 * @param sector     the 1-based sector [1..6]
-	 * @param superlayer the superlayer [1..6]
-	 * @param layer      the layer [1..6]
-	 * @param wire       the wire [1..112]
-	 * @return the wire transformed to the given sector
+	 * @param sector     sector [1..6]
+	 * @param superlayer superlayer [1..6]
+	 * @param layer      layer [1..6]
+	 * @param wire       wire [1..112]
+	 * @return transformed sense-wire line
 	 */
 	public static Line3D getWire(int sector, int superlayer, int layer, int wire) {
-		DriftChamberWire dcwire = getWire(superlayer, layer, wire);
+		Line3D line = getWire(superlayer, layer, wire);
 
-		Line3D line = new Line3D(dcwire.getLine());
-		if (sector > 1) {
+		if ((line != null) && (sector > 1)) {
 			line.rotateZ(Math.toRadians(60 * (sector - 1)));
 		}
+
 		return line;
 	}
 
 	/**
-	 * Get the wire in sector 0 NOTE: the indices are 1-based
+	 * Get the untransformed sense wire in sector 1.
+	 * <p>
+	 * Historically this method returned a {@link DriftChamberWire}. No outside
+	 * callers use that return type, and after a cache read the full
+	 * DriftChamberWire object is intentionally not retained.
 	 *
-	 * @param superlayer the superlayer [1..6]
-	 * @param layer      the layer [1..6]
-	 * @param wire       the wire [1..112]
-	 * @return the untransformed wire in sector 0
+	 * @param superlayer superlayer [1..6]
+	 * @param layer      layer [1..6]
+	 * @param wire       wire [1..112]
+	 * @return untransformed sense-wire line
 	 */
-	public static DriftChamberWire getWire(int superlayer, int layer, int wire) {
-		if ((superlayer < 1) || (superlayer > 6)) {
-			System.err.println("BAD HIPO DATA DCGeometry.getWire superlayer must be [1..6], was " + superlayer);
+	public static Line3D getWire(int superlayer, int layer, int wire) {
+		if (!validAddress(superlayer, layer, wire)) {
 			return null;
 		}
-		if ((layer < 1) || (layer > 6)) {
-			System.err.println("BAD HIPO DATA DCGeometry.getWire layer must be [1..6], was " + layer);
-			return null;
-		}
-		if ((wire < 1) || (wire > 112)) {
-			System.err.println("BAD HIPO DATA DCGeometry.getWire wire must be [1..112], was " + wire);
-			return null;
-		}
-		return wires[superlayer - 1][layer - 1][wire - 1];
+
+		return lineFrom(wireLines[superlayer - 1][layer - 1][wire - 1]);
 	}
 
 	/**
-	 * Get the origin of the wire in sector 0 NOTE: the indices are 1-based
+	 * Get the origin of the wire in sector 1.
 	 *
-	 * @param superlayer the superlayer [1..6]
-	 * @param layer      the layer [1..6]
-	 * @param wire       the wire [1..112]
-	 * @return the origin (one end) of the wire in sector 0
+	 * @param superlayer superlayer [1..6]
+	 * @param layer      layer [1..6]
+	 * @param wire       wire [1..112]
+	 * @return origin
 	 */
 	public static Point3D getOrigin(int superlayer, int layer, int wire) {
-		return wires[superlayer - 1][layer - 1][wire - 1].getLine().origin();
+		if (!validAddress(superlayer, layer, wire)) {
+			return null;
+		}
+
+		return pointFrom(wireLines[superlayer - 1][layer - 1][wire - 1][0]);
 	}
 
 	/**
-	 * Get the end of the wire in sector 0 NOTE: the indices are 1-based
+	 * Get the end of the wire in sector 1.
 	 *
-	 * @param superlayer the superlayer [1..6]
-	 * @param layer      the layer [1..6]
-	 * @param wire       the wire [1..112]
-	 * @return the end (one end) of the wire in sector 0
+	 * @param superlayer superlayer [1..6]
+	 * @param layer      layer [1..6]
+	 * @param wire       wire [1..112]
+	 * @return end point
 	 */
 	public static Point3D getEnd(int superlayer, int layer, int wire) {
-		return wires[superlayer - 1][layer - 1][wire - 1].getLine().end();
+		if (!validAddress(superlayer, layer, wire)) {
+			return null;
+		}
+
+		return pointFrom(wireLines[superlayer - 1][layer - 1][wire - 1][1]);
 	}
 
 	/**
-	 * Get the intersections of a dcwire with a constant phi plane. If the wire does
-	 * not intersect (happens as phi grows) return null;
+	 * Get the projected hexagon of a wire on a constant-phi plane.
 	 *
-	 * NOTE: the indices are 1-based
-	 *
-	 * @param superlayer      the superlayer [1..6]
-	 * @param layer           the layer [1..6]
-	 * @param wire            the wire [1..112]
-	 * @param projectionPlane the projection plane
+	 * @param superlayer      superlayer [1..6]
+	 * @param layer           layer [1..6]
+	 * @param wire            wire [1..112]
+	 * @param projectionPlane projection plane
+	 * @param wp              projected polygon
+	 * @param centroid        optional centroid
+	 * @return true if projection succeeded
 	 */
 	public static boolean getHexagon(int superlayer, int layer, int wire, Plane3D projectionPlane, Point2D.Double wp[],
 			Point2D.Double centroid) {
-
-		DriftChamberWire dcw = DCGeometry.getWire(superlayer, layer, wire);
-		if (dcw == null) {
+		if (!validAddress(superlayer, layer, wire)) {
 			return false;
 		}
-		return GeometryManager.getProjectedPolygon(dcw, projectionPlane, 10, 6, wp, centroid, false);
+
+		return GeometryManager.getProjectedPolygon(hexEdges[superlayer - 1][layer - 1][wire - 1], projectionPlane, wp,
+				centroid, false);
 	}
 
 	/**
-	 * Get the approximate center of the projected hexagon
+	 * Get the approximate center of the projected hexagon.
 	 *
-	 * NOTE: the indices are 1-based
-	 *
-	 * @param superlayer  the superlayer [1..6]
-	 * @param layer       the layer [1..6]
-	 * @param wire        the wire [1..112]
-	 * @param transform3D the transformation to the constant phi
-	 * @return the approximate center of the projected hexagon
+	 * @param superlayer      superlayer [1..6]
+	 * @param layer           layer [1..6]
+	 * @param wire            wire [1..112]
+	 * @param projectionPlane projection plane
+	 * @return approximate center
 	 */
 	public static Point2D.Double getCenter(int superlayer, int layer, int wire, Plane3D projectionPlane) {
-
 		Point2D.Double centroid = new Point2D.Double();
-//		projectionPlane = GeometryManager.constantPhiPlane(0);
 
-		DriftChamberWire dcw = DCGeometry.getWire(superlayer, layer, wire);
-		Line3D l3D = dcw.getLine();
+		Line3D l3D = getWire(superlayer, layer, wire);
 		Point3D p3 = new Point3D();
 		projectionPlane.intersection(l3D, p3);
 
@@ -261,20 +348,14 @@ public class DCGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Get a point on either side of a layer
+	 * Get one point on either side of a layer.
 	 *
-	 * NOTE: the indices are 1-based
-	 *
-	 * @param superlayer  the superlayer [1..6]
-	 * @param layer       the layer [1..6]
-	 * @param wire        the wire [1..112]
-	 * @param transform3D the transformation to the constant phi
-	 * @param wp          on return will hold the two extended points. The 0 point
-	 *                    will be to the "right" of wire 0. The 1 point will be to
-	 *                    the left of wire 111.
+	 * @param superLayer      superlayer [1..6]
+	 * @param layer           layer [1..6]
+	 * @param projectionPlane projection plane
+	 * @param wp              returns two extended points
 	 */
 	public static void getLayerExtendedPoints(int superLayer, int layer, Plane3D projectionPlane, Point2D.Double wp[]) {
-
 		Point2D.Double hexagon[] = GeometryManager.allocate(6);
 
 		getHexagon(superLayer, layer, 1, projectionPlane, hexagon, null);
@@ -291,21 +372,17 @@ public class DCGeometry extends ACachedGeometry {
 
 		extPoint(first, second, wp[0]);
 		extPoint(last, nexttolast, wp[1]);
-
 	}
 
 	/**
-	 * Get the boundary of a layer
+	 * Get the boundary of a layer.
 	 *
-	 * NOTE: the indices are 1-based
-	 *
-	 * @param superlayer  the superlayer [1..6]
-	 * @param layer       the layer [1..6]
-	 * @param transform3D the transformation to the constant phi
-	 * @param wp          a four point layer boundary
+	 * @param superLayer superlayer [1..6]
+	 * @param layer      layer [1..6]
+	 * @param plane      projection plane
+	 * @param wp         layer boundary points
 	 */
 	public static void getLayerPolygon(int superLayer, int layer, Plane3D plane, Point2D.Double wp[]) {
-
 		Point2D.Double hex[] = GeometryManager.allocate(6);
 
 		int firstWire = 1;
@@ -316,8 +393,8 @@ public class DCGeometry extends ACachedGeometry {
 		getHexagon(superLayer, layer, 1, plane, hex, null);
 
 		/*
-		 * The mappings of the old geo hex indices to the new is 0 --> 5 1 --> 4 2 --> 3
-		 * 3 --> 2 4 --> 1 5 --> 0
+		 * The mappings of the old geo hex indices to the new is 0 --> 5 1 --> 4
+		 * 2 --> 3 3 --> 2 4 --> 1 5 --> 0
 		 */
 
 		assignFromHex(wp, 0, hex, 5);
@@ -352,17 +429,15 @@ public class DCGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Get the boundary of a super layer
+	 * Get the boundary of a superlayer.
 	 *
-	 * NOTE: the indices are 1-based
-	 *
-	 * @param superlayer  the superlayer [1..6]
-	 * @param transform3D the transformation to the constant phi
-	 * @param wp          a four point super layer boundary
+	 * @param superLayer      superlayer [1..6]
+	 * @param projectionPlane projection plane
+	 * @param wp              superlayer boundary points
 	 */
 	public static void getSuperLayerPolygon(int superLayer, Plane3D projectionPlane, Point2D.Double wp[]) {
-
 		Point2D.Double layBoundry[] = GeometryManager.allocate(14);
+
 		getLayerPolygon(superLayer, 1, projectionPlane, layBoundry);
 		wp[0].setLocation(layBoundry[12]);
 		wp[1].setLocation(layBoundry[13]);
@@ -408,19 +483,15 @@ public class DCGeometry extends ACachedGeometry {
 		wp[23].setLocation(layBoundry[11]);
 		wp[24].setLocation(layBoundry[12]);
 		wp[25].setLocation(layBoundry[13]);
-
 	}
 
 	private static void assignFromHex(Point2D.Double wp[], int wpIndex, Point2D.Double hex[], int hexIndex) {
-
 		hexIndex = hexIndex % 6;
 		Point2D.Double p = new Point2D.Double(hex[hexIndex].x, hex[hexIndex].y);
 		wp[wpIndex] = p;
 	}
 
-	// extend a point
 	private static void extPoint(Point2D.Double p0, Point2D.Double p1, Point2D.Double ext) {
-
 		if ((p0 == null) || (p1 == null) || (ext == null)) {
 			System.err.println("null point in DCGeometry.extPoint");
 			return;
@@ -430,27 +501,23 @@ public class DCGeometry extends ACachedGeometry {
 		ext.y = p0.y + (p0.y - p1.y);
 	}
 
+	/**
+	 * Read DC geometry as explicit primitive cache data.
+	 *
+	 * @param kryo  retained for interface compatibility
+	 * @param input cache input
+	 * @return true if successful
+	 */
 	@Override
 	public boolean readGeometry(Kryo kryo, Input input) {
 		try {
-			// Read the min and max wire x values.
 			minWireX = input.readDouble();
 			maxWireX = input.readDouble();
 
-			// Read the dimensions of the wires array.
-			int dim1 = input.readInt();
-			wires = new DriftChamberWire[dim1][][];
-			for (int i = 0; i < dim1; i++) {
-				int dim2 = input.readInt();
-				wires[i] = new DriftChamberWire[dim2][];
-				for (int j = 0; j < dim2; j++) {
-					int dim3 = input.readInt();
-					wires[i][j] = new DriftChamberWire[dim3];
-					for (int k = 0; k < dim3; k++) {
-						wires[i][j][k] = kryo.readObjectOrNull(input, DriftChamberWire.class);
-					}
-				}
-			}
+			wireLines = readWireLines(input);
+			wireMidpoints = readWireMidpoints(input);
+			hexEdges = readHexEdges(input);
+
 			return true;
 		} catch (Exception e) {
 			System.err.println("DCGeometry: Error reading geometry cache: " + e.getMessage());
@@ -459,27 +526,23 @@ public class DCGeometry extends ACachedGeometry {
 		}
 	}
 
+	/**
+	 * Write DC geometry as explicit primitive cache data.
+	 *
+	 * @param kryo   retained for interface compatibility
+	 * @param output cache output
+	 * @return true if successful
+	 */
 	@Override
 	public boolean writeGeometry(Kryo kryo, Output output) {
 		try {
-			// Write the min and max wire x values.
 			output.writeDouble(minWireX);
 			output.writeDouble(maxWireX);
 
-			// Write the dimensions of the wires 3D array.
-			int dim1 = (wires != null) ? wires.length : 0;
-			output.writeInt(dim1);
-			for (int i = 0; i < dim1; i++) {
-				int dim2 = (wires[i] != null) ? wires[i].length : 0;
-				output.writeInt(dim2);
-				for (int j = 0; j < dim2; j++) {
-					int dim3 = (wires[i][j] != null) ? wires[i][j].length : 0;
-					output.writeInt(dim3);
-					for (int k = 0; k < dim3; k++) {
-						kryo.writeObjectOrNull(output, wires[i][j][k], DriftChamberWire.class);
-					}
-				}
-			}
+			writeWireLines(output);
+			writeWireMidpoints(output);
+			writeHexEdges(output);
+
 			return true;
 		} catch (Exception e) {
 			System.err.println("DCGeometry: Error writing geometry cache: " + e.getMessage());
@@ -488,4 +551,239 @@ public class DCGeometry extends ACachedGeometry {
 		}
 	}
 
+	/**
+	 * Write sense-wire lines.
+	 *
+	 * @param output cache output
+	 */
+	private static void writeWireLines(Output output) {
+		output.writeInt(SUPERLAYER_COUNT);
+		output.writeInt(LAYER_COUNT);
+		output.writeInt(WIRE_COUNT);
+
+		for (int suplay = 0; suplay < SUPERLAYER_COUNT; suplay++) {
+			for (int lay = 0; lay < LAYER_COUNT; lay++) {
+				for (int w = 0; w < WIRE_COUNT; w++) {
+					GeometryPrimitiveIO.writeCorners(output, wireLines[suplay][lay][w], LINE_ENDPOINT_COUNT,
+							COORD_COUNT);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Read sense-wire lines.
+	 *
+	 * @param input cache input
+	 * @return wire lines
+	 */
+	private static double[][][][][] readWireLines(Input input) {
+		int superlayerCount = input.readInt();
+		int layerCount = input.readInt();
+		int wireCount = input.readInt();
+
+		require(superlayerCount == SUPERLAYER_COUNT, "DC wire line superlayer count mismatch.");
+		require(layerCount == LAYER_COUNT, "DC wire line layer count mismatch.");
+		require(wireCount == WIRE_COUNT, "DC wire line wire count mismatch.");
+
+		double data[][][][][] = new double[SUPERLAYER_COUNT][LAYER_COUNT][WIRE_COUNT][][];
+
+		for (int suplay = 0; suplay < SUPERLAYER_COUNT; suplay++) {
+			for (int lay = 0; lay < LAYER_COUNT; lay++) {
+				for (int w = 0; w < WIRE_COUNT; w++) {
+					data[suplay][lay][w] = GeometryPrimitiveIO.readCorners(input, LINE_ENDPOINT_COUNT, COORD_COUNT,
+							"DC wire line sl " + suplay + " layer " + lay + " wire " + w);
+				}
+			}
+		}
+
+		return data;
+	}
+
+	/**
+	 * Write wire midpoints.
+	 *
+	 * @param output cache output
+	 */
+	private static void writeWireMidpoints(Output output) {
+		output.writeInt(SUPERLAYER_COUNT);
+		output.writeInt(LAYER_COUNT);
+		output.writeInt(WIRE_COUNT);
+
+		for (int suplay = 0; suplay < SUPERLAYER_COUNT; suplay++) {
+			for (int lay = 0; lay < LAYER_COUNT; lay++) {
+				for (int w = 0; w < WIRE_COUNT; w++) {
+					writePoint(output, wireMidpoints[suplay][lay][w]);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Read wire midpoints.
+	 *
+	 * @param input cache input
+	 * @return wire midpoints
+	 */
+	private static double[][][][] readWireMidpoints(Input input) {
+		int superlayerCount = input.readInt();
+		int layerCount = input.readInt();
+		int wireCount = input.readInt();
+
+		require(superlayerCount == SUPERLAYER_COUNT, "DC midpoint superlayer count mismatch.");
+		require(layerCount == LAYER_COUNT, "DC midpoint layer count mismatch.");
+		require(wireCount == WIRE_COUNT, "DC midpoint wire count mismatch.");
+
+		double data[][][][] = new double[SUPERLAYER_COUNT][LAYER_COUNT][WIRE_COUNT][COORD_COUNT];
+
+		for (int suplay = 0; suplay < SUPERLAYER_COUNT; suplay++) {
+			for (int lay = 0; lay < LAYER_COUNT; lay++) {
+				for (int w = 0; w < WIRE_COUNT; w++) {
+					readPoint(input, data[suplay][lay][w]);
+				}
+			}
+		}
+
+		return data;
+	}
+
+	/**
+	 * Write hexagon projection edges.
+	 *
+	 * @param output cache output
+	 */
+	private static void writeHexEdges(Output output) {
+		output.writeInt(SUPERLAYER_COUNT);
+		output.writeInt(LAYER_COUNT);
+		output.writeInt(WIRE_COUNT);
+		output.writeInt(HEX_EDGE_COUNT);
+
+		for (int suplay = 0; suplay < SUPERLAYER_COUNT; suplay++) {
+			for (int lay = 0; lay < LAYER_COUNT; lay++) {
+				for (int w = 0; w < WIRE_COUNT; w++) {
+					for (int edge = 0; edge < HEX_EDGE_COUNT; edge++) {
+						GeometryPrimitiveIO.writeCorners(output, hexEdges[suplay][lay][w][edge],
+								LINE_ENDPOINT_COUNT, COORD_COUNT);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Read hexagon projection edges.
+	 *
+	 * @param input cache input
+	 * @return hexagon edge data
+	 */
+	private static double[][][][][][] readHexEdges(Input input) {
+		int superlayerCount = input.readInt();
+		int layerCount = input.readInt();
+		int wireCount = input.readInt();
+		int edgeCount = input.readInt();
+
+		require(superlayerCount == SUPERLAYER_COUNT, "DC hex edge superlayer count mismatch.");
+		require(layerCount == LAYER_COUNT, "DC hex edge layer count mismatch.");
+		require(wireCount == WIRE_COUNT, "DC hex edge wire count mismatch.");
+		require(edgeCount == HEX_EDGE_COUNT, "DC hex edge count mismatch.");
+
+		double data[][][][][][] = new double[SUPERLAYER_COUNT][LAYER_COUNT][WIRE_COUNT][HEX_EDGE_COUNT][][];
+
+		for (int suplay = 0; suplay < SUPERLAYER_COUNT; suplay++) {
+			for (int lay = 0; lay < LAYER_COUNT; lay++) {
+				for (int w = 0; w < WIRE_COUNT; w++) {
+					for (int edge = 0; edge < HEX_EDGE_COUNT; edge++) {
+						data[suplay][lay][w][edge] = GeometryPrimitiveIO.readCorners(input, LINE_ENDPOINT_COUNT,
+								COORD_COUNT,
+								"DC hex edge sl " + suplay + " layer " + lay + " wire " + w + " edge " + edge);
+					}
+				}
+			}
+		}
+
+		return data;
+	}
+
+	/**
+	 * Write a point.
+	 *
+	 * @param output cache output
+	 * @param point  point data [x,y,z]
+	 */
+	private static void writePoint(Output output, double point[]) {
+		output.writeDouble(point[0]);
+		output.writeDouble(point[1]);
+		output.writeDouble(point[2]);
+	}
+
+	/**
+	 * Read a point.
+	 *
+	 * @param input  cache input
+	 * @param target target [x,y,z]
+	 */
+	private static void readPoint(Input input, double target[]) {
+		target[0] = input.readDouble();
+		target[1] = input.readDouble();
+		target[2] = input.readDouble();
+	}
+
+	/**
+	 * Make a Point3D from primitive coordinates.
+	 *
+	 * @param coords [x,y,z]
+	 * @return point
+	 */
+	private static Point3D pointFrom(double coords[]) {
+		return new Point3D(coords[0], coords[1], coords[2]);
+	}
+
+	/**
+	 * Make a Line3D from primitive endpoints.
+	 *
+	 * @param endpoints [2][xyz]
+	 * @return line
+	 */
+	private static Line3D lineFrom(double endpoints[][]) {
+		return new Line3D(pointFrom(endpoints[0]), pointFrom(endpoints[1]));
+	}
+
+	/**
+	 * Validate a one-based DC address.
+	 *
+	 * @param superlayer superlayer [1..6]
+	 * @param layer      layer [1..6]
+	 * @param wire       wire [1..112]
+	 * @return true if valid
+	 */
+	private static boolean validAddress(int superlayer, int layer, int wire) {
+		if ((superlayer < 1) || (superlayer > SUPERLAYER_COUNT)) {
+			System.err.println("BAD HIPO DATA DCGeometry.getWire superlayer must be [1..6], was " + superlayer);
+			return false;
+		}
+
+		if ((layer < 1) || (layer > LAYER_COUNT)) {
+			System.err.println("BAD HIPO DATA DCGeometry.getWire layer must be [1..6], was " + layer);
+			return false;
+		}
+
+		if ((wire < 1) || (wire > WIRE_COUNT)) {
+			System.err.println("BAD HIPO DATA DCGeometry.getWire wire must be [1..112], was " + wire);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Require a condition.
+	 *
+	 * @param condition condition
+	 * @param message   error message
+	 */
+	private static void require(boolean condition, String message) {
+		if (!condition) {
+			throw new IllegalArgumentException(message);
+		}
+	}
 }
