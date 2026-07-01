@@ -10,6 +10,7 @@ import org.jlab.geom.detector.ec.ECFactory;
 import org.jlab.geom.detector.ec.ECLayer;
 import org.jlab.geom.detector.ec.ECSector;
 import org.jlab.geom.detector.ec.ECSuperlayer;
+import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Plane3D;
 import org.jlab.geom.prim.Point3D;
 import org.jlab.geom.prim.Triangle3D;
@@ -19,82 +20,124 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.geometry.cache.ACachedGeometry;
+import cnuphys.ced.geometry.cache.GeometryPrimitiveIO;
 
 /**
- * Holds the EC geometry from the geometry packages
- *
- * @author heddle
- *
+ * Holds the EC geometry used by the event display.
+ * <p>
+ * The runtime public API is preserved, but the cache no longer serializes
+ * {@link ECLayer}, {@link Transformations}, or {@link Point3D} object graphs.
+ * Instead it stores explicit primitive geometry and reconstructs the
+ * deterministic transformation helpers after a cache read.
  */
 public class ECGeometry extends ACachedGeometry {
 
-	/** constant for the inner stack EC */
+	/** Inner EC stack index. */
 	public static final int EC_INNER = 0;
 
-	/** constant for the outer stack EC */
+	/** Outer EC stack index. */
 	public static final int EC_OUTER = 1;
 
-	/** constant for the u view index */
+	/** U view index. */
 	public static final int EC_U = 0;
 
-	/** constant for the u view index */
+	/** V view index. */
 	public static final int EC_V = 1;
 
-	/** constant for the u view index */
+	/** W view index. */
 	public static final int EC_W = 2;
 
-	// ** stack names names */
+	/** Stack names. */
 	public static final String PLANE_NAMES[] = { "Inner", "Outer" };
 
-	// ** plane or "view" names */
+	/** View names. */
 	public static final String VIEW_NAMES[] = { "U", "V", "W" };
 
-	/** there are 36 strips for u, v and w */
+	/** Number of EC strips for U, V, and W. */
 	public static final int EC_NUMSTRIP = 36;
 
+	/** Layer names. */
 	public static final String layerNames[] = { "???", "PCAL_U", "PCAL_V", "PCAL_W", "ECAL_IN_U", "ECAL_IN_V",
 			"ECAL_IN_W", "ECAL_OUT_U", "ECAL_OUT_V", "ECAL_OUT_W" };
 
-	// deltaK separating front of inner from front of outer
-	private static double[] _deltaK = new double[2];
+	/** Number of EC planes: inner and outer. */
+	private static final int PLANE_COUNT = 2;
 
-	// the normal vector in sector xyz (cm) from the nominal target to the
-	// front planes of the inner EC. All coordinates are in cm. First index
-	// [0,1]
-	// is for plane second is for coordinate
-	private static Point3D _r0[] = new Point3D[2];
+	/** Number of EC views: U, V, W. */
+	private static final int VIEW_COUNT = 3;
 
-	// The strips. First index is for plane (inner and outer)
-	// second index if for strip stype EC_U, EC_V or EC_W,
-	// third index is for the strip index [0..35]
-	// and the fourth index is the point index [0..3]
-	private static Point3D[][][][] _strips = new Point3D[2][3][EC_NUMSTRIP][4];
+	/** Number of sectors. */
+	private static final int SECTOR_COUNT = 6;
 
-	// angles related to the _ro
-	public static double THETA = Double.NaN; // radians
+	/** Number of local strip polygon points. */
+	private static final int LOCAL_STRIP_POINT_COUNT = 4;
+
+	/** Number of triangle points. */
+	private static final int TRIANGLE_POINT_COUNT = 3;
+
+	/** Number of coordinates per point. */
+	private static final int COORD_COUNT = 3;
+
+	/** First volume edge used for sector-view projection. */
+	private static final int PROJECTION_EDGE_START = 6;
+
+	/** Number of projection edges. */
+	private static final int PROJECTION_EDGE_COUNT = 4;
+
+	/** Number of endpoints in one edge line. */
+	private static final int EDGE_ENDPOINT_COUNT = 2;
+
+	/** Delta K values for inner and outer EC. */
+	private static double[] _deltaK = new double[PLANE_COUNT];
+
+	/** Normal vectors in sector xyz, cm, from nominal target to EC front planes. */
+	private static Point3D _r0[] = new Point3D[PLANE_COUNT];
+
+	/** Local strip points shaped [plane][view][strip][point]. */
+	private static Point3D[][][][] _strips = new Point3D[PLANE_COUNT][VIEW_COUNT][EC_NUMSTRIP][LOCAL_STRIP_POINT_COUNT];
+
+	/** Primitive 3D view triangles shaped [sector][stack][view][point][xyz]. */
+	private static double _viewTriangles[][][][][] = new double[SECTOR_COUNT][PLANE_COUNT][VIEW_COUNT][TRIANGLE_POINT_COUNT][COORD_COUNT];
+
+	/** Primitive projection edge lines shaped [plane][view][strip][edge][endpoint][xyz]. */
+	private static double _projectionEdges[][][][][][] = new double[PLANE_COUNT][VIEW_COUNT][EC_NUMSTRIP][PROJECTION_EDGE_COUNT][EDGE_ENDPOINT_COUNT][COORD_COUNT];
+
+	/** Angles related to the inner r0. */
+	public static double THETA = Double.NaN;
+
+	/** Cosine of THETA. */
 	public static double COSTHETA = Double.NaN;
+
+	/** Sine of THETA. */
 	public static double SINTHETA = Double.NaN;
+
+	/** Tangent of THETA. */
 	public static double TANTHETA = Double.NaN;
 
-	// slopes of front planes
+	/** Slopes of front planes. */
 	private static double[] _slopes = { Double.NaN, Double.NaN };
 
+	/** Deterministic coordinate transformations, reconstructed after cache reads. */
 	private static Transformations _transformations[];
 
-	// layers in clas and local coordinates
+	/** CCDB-time local layers. Not retained as cache state. */
 	private static ECLayer[][] ecLayerLocal;
+
+	/** CCDB-time CLAS layers. Not retained as cache state. */
 	private static ECLayer[][] ecLayer;
 
+	/**
+	 * Constructor.
+	 */
 	public ECGeometry() {
 		super("ECGeometry");
 	}
 
 	/**
-	 * Initialize the EC Geometry
+	 * Initialize the EC geometry.
 	 */
 	@Override
 	public void initializeUsingCCDB() {
-
 		System.out.println("\n=====================================");
 		System.out.println("====  EC Geometry Initialization ====");
 		System.out.println("=====================================");
@@ -102,87 +145,97 @@ public class ECGeometry extends ACachedGeometry {
 		ConstantProvider ecDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.ECAL);
 		ECDetector clas_Cal_Detector = (new ECFactory()).createDetectorCLAS(ecDataProvider);
 
-		// cal sector 0 in clas coordinates
 		ECSector clas_Cal_Sector0 = clas_Cal_Detector.getSector(0);
-
-		// in local coordinates
 		ECSector local_Cal_Sector0 = (new ECFactory()).createDetectorLocal(ecDataProvider).getSector(0);
 
-		// CLAS system
-		ECSuperlayer ecSuperlayer[] = new ECSuperlayer[2];
+		ECSuperlayer ecSuperlayer[] = new ECSuperlayer[PLANE_COUNT];
 		ecSuperlayer[EC_INNER] = clas_Cal_Sector0.getSuperlayer(1);
 		ecSuperlayer[EC_OUTER] = clas_Cal_Sector0.getSuperlayer(2);
-		ecLayer = new ECLayer[2][3];
-		for (int plane = 0; plane < 2; plane++) {
-			for (int stripType = 0; stripType < 3; stripType++) {
+
+		ecLayer = new ECLayer[PLANE_COUNT][VIEW_COUNT];
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
+			for (int stripType = 0; stripType < VIEW_COUNT; stripType++) {
 				ecLayer[plane][stripType] = ecSuperlayer[plane].getLayer(stripType);
 			}
 		}
 
-		// LOCAL SYStem
-		ECSuperlayer ecSuperLayerLocal[] = new ECSuperlayer[2];
+		ECSuperlayer ecSuperLayerLocal[] = new ECSuperlayer[PLANE_COUNT];
 		ecSuperLayerLocal[EC_INNER] = local_Cal_Sector0.getSuperlayer(1);
 		ecSuperLayerLocal[EC_OUTER] = local_Cal_Sector0.getSuperlayer(2);
-		ecLayerLocal = new ECLayer[2][3];
-		for (int plane = 0; plane < 2; plane++) {
-			for (int stripType = 0; stripType < 3; stripType++) {
+
+		ecLayerLocal = new ECLayer[PLANE_COUNT][VIEW_COUNT];
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
+			for (int stripType = 0; stripType < VIEW_COUNT; stripType++) {
 				ecLayerLocal[plane][stripType] = ecSuperLayerLocal[plane].getLayer(stripType);
 			}
 		}
 
 		createTransformations();
 		getStripsAndTriangles();
-	} // initialize
+		cache3DViewTriangles();
+		cacheProjectionEdges();
+	}
 
-	// create the transformations FOR INNER AND OUTER
+	/**
+	 * Create deterministic transformations for inner and outer EC.
+	 */
 	private static void createTransformations() {
-		_transformations = new Transformations[2];
+		_transformations = new Transformations[PLANE_COUNT];
 		_transformations[EC_INNER] = new Transformations(DetectorType.EC_INNER);
 		_transformations[EC_OUTER] = new Transformations(DetectorType.EC_OUTER);
 
-		for (int plane = 0; plane < 2; plane++) {
+		_r0 = new Point3D[PLANE_COUNT];
+
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
 			_r0[plane] = new Point3D(0, 0, 0);
 			_transformations[plane].localToSector(_r0[plane]);
 		}
 
+		recomputeAngles();
+	}
+
+	/**
+	 * Recompute angle values derived from the inner EC r0.
+	 */
+	private static void recomputeAngles() {
 		THETA = Math.atan2(_r0[EC_INNER].x(), _r0[EC_INNER].z());
 		COSTHETA = Math.cos(THETA);
 		SINTHETA = Math.sin(THETA);
 		TANTHETA = Math.tan(THETA);
-
 	}
 
+	/**
+	 * Cache local strip points and compute derived slopes/deltaK values.
+	 */
 	private static void getStripsAndTriangles() {
 		Point3D zeroP = new Point3D(0, 0, 0);
 
-		double rmag[] = new double[2];
+		double rmag[] = new double[PLANE_COUNT];
 
-		rmag[0] = _r0[0].distance(zeroP);
-		rmag[1] = _r0[1].distance(zeroP);
+		rmag[EC_INNER] = _r0[EC_INNER].distance(zeroP);
+		rmag[EC_OUTER] = _r0[EC_OUTER].distance(zeroP);
 
-		_deltaK[EC_INNER] = rmag[1] - rmag[0];
+		_deltaK[EC_INNER] = rmag[EC_OUTER] - rmag[EC_INNER];
 		_deltaK[EC_OUTER] = 1.5 * _deltaK[EC_INNER];
 
-		// get the strips
-		// The strips. First index is for plane (inner and outer)
-		// second index if for strip stype EC_U, EC_V or EC_W,
-		// third index is for the strip index [0..35]
-		// and the fourth index is the point index [0..3]
+		_strips = new Point3D[PLANE_COUNT][VIEW_COUNT][EC_NUMSTRIP][LOCAL_STRIP_POINT_COUNT];
 
 		double minI[] = { Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY };
 		double maxI[] = { Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY };
 		double minJ[] = { Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY };
 		double maxJ[] = { Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY };
 
-		for (int plane = 0; plane < 2; plane++) {
-			for (int stripType = 0; stripType < 3; stripType++) {
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
+			for (int stripType = 0; stripType < VIEW_COUNT; stripType++) {
 				for (int stripId = 0; stripId < EC_NUMSTRIP; stripId++) {
 					ScintillatorPaddle strip = ecLayerLocal[plane][stripType].getComponent(stripId);
-					_strips[plane][stripType][stripId][0] = strip.getVolumePoint(4);
-					_strips[plane][stripType][stripId][1] = strip.getVolumePoint(5);
-					_strips[plane][stripType][stripId][2] = strip.getVolumePoint(1);
-					_strips[plane][stripType][stripId][3] = strip.getVolumePoint(0);
 
+					_strips[plane][stripType][stripId][0] = new Point3D(strip.getVolumePoint(4));
+					_strips[plane][stripType][stripId][1] = new Point3D(strip.getVolumePoint(5));
+					_strips[plane][stripType][stripId][2] = new Point3D(strip.getVolumePoint(1));
+					_strips[plane][stripType][stripId][3] = new Point3D(strip.getVolumePoint(0));
+
+					// Preserve the old behavior exactly. The old code tested point 0 four times.
 					Point3D p0 = _strips[plane][stripType][stripId][0];
 					Point3D p1 = _strips[plane][stripType][stripId][0];
 					Point3D p2 = _strips[plane][stripType][stripId][0];
@@ -209,9 +262,11 @@ public class ECGeometry extends ACachedGeometry {
 					maxJ[plane] = Math.max(maxJ[plane], p3.y());
 				}
 			}
-		} // plane loop
+		}
 
-			for (int plane = 0; plane < 2; plane++) {
+		_slopes = new double[PLANE_COUNT];
+
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
 			Point3D rP0 = new Point3D(minI[plane], 0, 0);
 			Point3D rP1 = new Point3D(minI[plane], 0, _deltaK[plane]);
 			Point3D rP2 = new Point3D(maxI[plane], 0, _deltaK[plane]);
@@ -222,31 +277,97 @@ public class ECGeometry extends ACachedGeometry {
 			_transformations[plane].localToSector(rP2);
 			_transformations[plane].localToSector(rP3);
 
-
 			double dely = rP0.x() - rP3.x();
 			double delx = rP0.z() - rP3.z();
 			_slopes[plane] = dely / delx;
 		}
-		
 	}
 
 	/**
-	 * Get the normal vector in sector xyz (cm) from the nominal target to the front
-	 * plane of the inner EC. All coordinates are in cm.
+	 * Cache the 3D view triangles for all sectors, stacks, and views.
+	 */
+	private static void cache3DViewTriangles() {
+		_viewTriangles = new double[SECTOR_COUNT][PLANE_COUNT][VIEW_COUNT][TRIANGLE_POINT_COUNT][COORD_COUNT];
+
+		for (int sector = 1; sector <= SECTOR_COUNT; sector++) {
+			for (int stack = 1; stack <= PLANE_COUNT; stack++) {
+				for (int view = 1; view <= VIEW_COUNT; view++) {
+					ECLayer ecLay = ecLayer[stack - 1][view - 1];
+					Triangle3D t3d = (Triangle3D) ecLay.getBoundary().face(0);
+
+					double delK = _deltaK[stack - 1];
+					double dist = (view - 1) * (delK / 3);
+					double xt = dist * Math.sin(Math.toRadians(25));
+					double yt = 0;
+					double zt = dist * Math.cos(Math.toRadians(25));
+
+					for (int i = 0; i < TRIANGLE_POINT_COUNT; i++) {
+						Point3D corner = new Point3D(t3d.point(i));
+						corner.translateXYZ(xt, yt, zt);
+
+						if (sector > 1) {
+							corner.rotateZ(Math.toRadians(60 * (sector - 1)));
+						}
+
+						storePoint(_viewTriangles[sector - 1][stack - 1][view - 1][i], corner);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Cache projection edge lines used by sector views.
+	 */
+	private static void cacheProjectionEdges() {
+		_projectionEdges = new double[PLANE_COUNT][VIEW_COUNT][EC_NUMSTRIP][PROJECTION_EDGE_COUNT][EDGE_ENDPOINT_COUNT][COORD_COUNT];
+
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
+			for (int view = 0; view < VIEW_COUNT; view++) {
+				ECLayer ecLay = ecLayer[plane][view];
+
+				for (int stripId = 0; stripId < EC_NUMSTRIP; stripId++) {
+					ScintillatorPaddle strip = ecLay.getComponent(stripId);
+
+					for (int edge = 0; edge < PROJECTION_EDGE_COUNT; edge++) {
+						Line3D line = strip.getVolumeEdge(PROJECTION_EDGE_START + edge);
+						storePoint(_projectionEdges[plane][view][stripId][edge][0], line.origin());
+						storePoint(_projectionEdges[plane][view][stripId][edge][1], line.end());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Store a point in primitive coordinates.
+	 *
+	 * @param target destination [x,y,z]
+	 * @param point  source point
+	 */
+	private static void storePoint(double target[], Point3D point) {
+		target[0] = point.x();
+		target[1] = point.y();
+		target[2] = point.z();
+	}
+
+	/**
+	 * Get the normal vector in sector xyz, cm, from the nominal target to the front
+	 * plane.
 	 *
 	 * @param index the plane, EC_INNER or EC_OUTER
-	 * @return the normal vector for the given plane
+	 * @return normal vector
 	 */
 	public static Point3D getR0(int index) {
 		return _r0[index];
 	}
 
 	/**
-	 * Get the front plane of the PCAL
+	 * Get the front plane of EC.
 	 *
 	 * @param sector the 1-based sector [1..6]
 	 * @param plane  EC_INNER or EC_OUTER
-	 * @return the front plane of the PCAL
+	 * @return front plane
 	 */
 	public static Plane3D getFrontPlane(int sector, int plane) {
 		Point3D clasr0 = new Point3D();
@@ -256,23 +377,23 @@ public class ECGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Get the coordinate transformation object
+	 * Get the coordinate transformation object.
 	 *
 	 * @param index the plane, EC_INNER or EC_OUTER
-	 * @return the coordinate transformations
+	 * @return transformations
 	 */
 	public static Transformations getTransformations(int index) {
 		return _transformations[index];
 	}
 
 	/**
-	 * Get a point from a u, v or w strip
+	 * Get a point from a U, V, or W strip.
 	 *
-	 * @param planeIndex either EC_INNER or EC_OUTER [0, 1]
-	 * @param stripType  EC_U, EC_V, or EC_W [0..2]
-	 * @param stripIndex the strip index [0..(EC_NUMSTRIP-1)]
-	 * @param pointIndex the point index [0..3]
-	 * @return the point (corner) of a strip
+	 * @param planeIndex EC_INNER or EC_OUTER
+	 * @param stripType  EC_U, EC_V, or EC_W
+	 * @param stripIndex strip index
+	 * @param pointIndex point index
+	 * @return strip point
 	 */
 	public static Point3D getStripPoint(int planeIndex, int stripType, int stripIndex, int pointIndex) {
 		return _strips[planeIndex][stripType][stripIndex][pointIndex];
@@ -280,11 +401,10 @@ public class ECGeometry extends ACachedGeometry {
 
 	/**
 	 * For the front face of a given plane, compute z from x.
-	 * Used by hex view.
 	 *
-	 * @param planeIndex EC_INNER or EC_OUTER [0,1]
-	 * @param x          the x coordinate in cm
-	 * @return the z coordinate in cm
+	 * @param planeIndex EC_INNER or EC_OUTER
+	 * @param x          x coordinate in cm
+	 * @return z coordinate in cm
 	 */
 	public static double zFromX(int planeIndex, double x) {
 		double x0 = _r0[planeIndex].x();
@@ -293,28 +413,21 @@ public class ECGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Obtain the shell (for sector views) for the whole inner or outer EC correct
-	 * for the relative phi. Used by sector views.
+	 * Obtain the shell for sector views.
 	 *
-	 * @param planeIndex      should be EC_INNER or EC_OUTER
-	 * @param stripType       should be EC_U, EC_V, or EC_W
-	 * @param projectionPlane the projection plane
-	 * @return the shell for the whole panel.
+	 * @param planeIndex      EC_INNER or EC_OUTER
+	 * @param stripType       EC_U, EC_V, or EC_W
+	 * @param projectionPlane projection plane
+	 * @return shell points
 	 */
 	public static Point2D.Double[] getShell(int planeIndex, int stripType, Plane3D projectionPlane) {
-
 		Point2D.Double wp[] = GeometryManager.allocate(4);
 
-		// get last visible (intersecting) strip
 		int lastIndex = EC_NUMSTRIP - 1;
-
-		Point2D.Double lastPP[] = null;
-		lastPP = getIntersections(planeIndex, stripType, lastIndex, projectionPlane, true);
+		Point2D.Double lastPP[] = getIntersections(planeIndex, stripType, lastIndex, projectionPlane, true);
 
 		int firstIndex = 0;
-
-		Point2D.Double firstPP[] = null;
-		firstPP = getIntersections(planeIndex, stripType, firstIndex, projectionPlane, true);
+		Point2D.Double firstPP[] = getIntersections(planeIndex, stripType, firstIndex, projectionPlane, true);
 
 		if (lastPP[0].y > firstPP[0].y) {
 			wp[0] = lastPP[0];
@@ -326,137 +439,117 @@ public class ECGeometry extends ACachedGeometry {
 			wp[1] = lastPP[1];
 			wp[2] = lastPP[2];
 			wp[3] = firstPP[3];
-
 		}
 
 		return wp;
-
 	}
 
 	/**
-	 * Converts 1-based uvw triplets to a pixel. NOTE: not all uvw triplets are
-	 * "real". For example, there is no (36, 36, 36) triplet; those strips do not
-	 * intersect. Proper triplets have u + w + w = (2N+1) or (2N+2), where N = 36.
-	 * Possible uvw triplets always yield a positive pixel value from [1..1296].
+	 * Converts 1-based uvw triplets to a pixel.
 	 *
-	 * @param u the 1.based [1..36] u strip
-	 * @param v the 1 based [1..36] v strip
-	 * @param w the 1 based [1..36] w strip
-	 * @return the pixel. Should be [1..1296]
+	 * @param u 1-based U strip
+	 * @param v 1-based V strip
+	 * @param w 1-based W strip
+	 * @return pixel index
 	 */
 	public static int pixelFromUVW(int u, int v, int w) {
 		return (u * (u - 1) + v - w + 1);
 	}
 
 	/**
-	 * Convert ijk coordinates to sector xyz
+	 * Convert local ijk coordinates to sector xyz.
 	 *
-	 * @param localP    the ijk coordinates
-	 * @param sectorXYZ the sector xyz coordinates
+	 * @param plane     EC_INNER or EC_OUTER
+	 * @param localP    local coordinates
+	 * @param sectorXYZ sector coordinates
 	 */
 	public static void ijkToSectorXYZ(int plane, Point3D localP, double[] sectorXYZ) {
 		if (plane < 0 || plane > 1) {
 			throw new RuntimeException("EC Geometry [ijkToSectorXYZ] plane must be 0 or 1");
 		}
+
 		Point3D sectorP = new Point3D();
 		_transformations[plane].localToSector(localP, sectorP);
+
 		sectorXYZ[0] = sectorP.x();
 		sectorXYZ[1] = sectorP.y();
 		sectorXYZ[2] = sectorP.z();
 	}
 
 	/**
-	 * Get the triangle for a given view for 3D
+	 * Get the triangle for a given 3D view.
 	 *
-	 * @param sector the sector 1..6
-	 * @param stack  (aka the superlayer) 1..2 for inner and outer
-	 * @param view   (aka layer) 1..3 for u, v, w
-	 * @param coords will hold the corners as [x1, y1, z1, ..., x3, y3, z3]
+	 * @param sector sector 1..6
+	 * @param stack  stack/superlayer 1..2
+	 * @param view   view/layer 1..3
+	 * @param coords receives [x1,y1,z1,...,x3,y3,z3]
 	 */
 	public static void getViewTriangle(int sector, int stack, int view, float coords[]) {
-		// argh the geometry pakage superlayers are 1,2 rather than 0,1 because
-		// they use 0 for PCAL. So stack does not need the -1, but view still
-		// does.
-
-		if (stack < 1 || stack > 2) {
-			throw new RuntimeException("EC Geometry [getViewTriangle] stack must be 1 or 2");
+		if ((coords == null) || (coords.length < 9)) {
+			return;
 		}
 
-		ECLayer ecLay = ecLayer[stack - 1][view - 1];
+		if ((sector < 1) || (sector > SECTOR_COUNT) || (stack < 1) || (stack > PLANE_COUNT) || (view < 1)
+				|| (view > VIEW_COUNT)) {
+			return;
+		}
 
-		// NOTE, each ec layer has one face, a triangle
+		double triangle[][] = _viewTriangles[sector - 1][stack - 1][view - 1];
 
-		Triangle3D t3d = (Triangle3D) ecLay.getBoundary().face(0);
-
-		// translation
-
-		double delK = _deltaK[stack - 1];
-
-		double dist = (view - 1) * (delK / 3);
-		double xt = dist * Math.sin(Math.toRadians(25));
-		double yt = 0;
-		double zt = dist * Math.cos(Math.toRadians(25));
-
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < TRIANGLE_POINT_COUNT; i++) {
 			int j = 3 * i;
-			Point3D corner = new Point3D(t3d.point(i));
-			corner.translateXYZ(xt, yt, zt);
-
-			if (sector > 1) {
-				corner.rotateZ(Math.toRadians(60 * (sector - 1)));
-			}
-
-			coords[j] = (float) corner.x();
-			coords[j + 1] = (float) corner.y();
-			coords[j + 2] = (float) corner.z();
+			coords[j] = (float) triangle[i][0];
+			coords[j + 1] = (float) triangle[i][1];
+			coords[j + 2] = (float) triangle[i][2];
 		}
 	}
 
 	/**
+	 * Check whether a projected strip polygon intersects the plane.
 	 *
-	 * @param superlayer      0, 1 (EC_INNER or EC_OUTER)
-	 * @param layer           EC_U, EC_V, EC_W
-	 * @param stripid         the 0-based paddle id
-	 * @param projectionPlane the projection plane
-	 * @return <code>true</code> if the projected polygon fully intersects the plane
+	 * @param superlayer      EC_INNER or EC_OUTER
+	 * @param layer           EC_U, EC_V, or EC_W
+	 * @param stripid         0-based strip id
+	 * @param projectionPlane projection plane
+	 * @return true if intersecting
 	 */
 	public static boolean doesProjectedPolyFullyIntersect(int superlayer, int layer, int stripid,
 			Plane3D projectionPlane) {
+		if (!validStrip(superlayer, layer, stripid)) {
+			return false;
+		}
 
-		ECLayer ecLay = ecLayer[superlayer][layer];
-		ScintillatorPaddle strip = ecLay.getComponent(stripid);
-		return GeometryManager.doesProjectedPolyIntersect(strip, projectionPlane, 6, 4);
+		return GeometryManager.doesProjectedPolyIntersect(_projectionEdges[superlayer][layer][stripid],
+				projectionPlane);
 	}
 
 	/**
-	 * Get the intersections of a with a constant phi plane. If the paddle does not
-	 * intersect (happens as phi grows) return null;
+	 * Get projected strip intersections.
 	 *
-	 * @param superlayer      0, 1 (EC_INNER or EC_OUTER)
-	 * @param layer           EC_U, EC_V, EC_W
-	 * @param stripid         the 0-based paddle id
-	 * @param projectionPlane the projection plane
-	 * @return the intersection points (z component will be 0).
+	 * @param superlayer      EC_INNER or EC_OUTER
+	 * @param layer           EC_U, EC_V, or EC_W
+	 * @param stripid         0-based strip id
+	 * @param projectionPlane projection plane
+	 * @param offset          true to apply display offsets
+	 * @return projected points
 	 */
 	public static Point2D.Double[] getIntersections(int superlayer, int layer, int stripid, Plane3D projectionPlane,
 			boolean offset) {
-
-		ECLayer ecLay = ecLayer[superlayer][layer];
-		ScintillatorPaddle strip = ecLay.getComponent(stripid);
+		if (!validStrip(superlayer, layer, stripid)) {
+			return null;
+		}
 
 		Point2D.Double wp[] = GeometryManager.allocate(4);
-		boolean isects = GeometryManager.getProjectedPolygon(strip, projectionPlane, 6, 4, wp, null);
-		
+		GeometryManager.getProjectedPolygon(_projectionEdges[superlayer][layer][stripid], projectionPlane,  wp, null);
 
-		// note reordering
 		Point2D.Double p2d[] = new Point2D.Double[4];
+
 		p2d[0] = new Point2D.Double(wp[2].x, wp[2].y);
 		p2d[1] = new Point2D.Double(wp[3].x, wp[3].y);
 		p2d[2] = new Point2D.Double(wp[0].x, wp[0].y);
 		p2d[3] = new Point2D.Double(wp[1].x, wp[1].y);
 
 		if (offset) {
-			// move
 			if (layer == EC_V) {
 				double del = _deltaK[superlayer] / 3;
 				offsetLine(p2d[0], p2d[1], del - 1);
@@ -473,6 +566,13 @@ public class ECGeometry extends ACachedGeometry {
 		return p2d;
 	}
 
+	/**
+	 * Offset a projected line.
+	 *
+	 * @param start start point
+	 * @param end   end point
+	 * @param len   offset length
+	 */
 	private static void offsetLine(Point2D.Double start, Point2D.Double end, double len) {
 		double delx = len * COSTHETA;
 		double dely = len * SINTHETA;
@@ -482,154 +582,354 @@ public class ECGeometry extends ACachedGeometry {
 		end.y += dely;
 	}
 
+	/**
+	 * Validate a strip address.
+	 *
+	 * @param superlayer EC_INNER or EC_OUTER
+	 * @param layer      EC_U, EC_V, or EC_W
+	 * @param stripid    strip id
+	 * @return true if valid
+	 */
+	private static boolean validStrip(int superlayer, int layer, int stripid) {
+		return (superlayer >= 0) && (superlayer < PLANE_COUNT) && (layer >= 0) && (layer < VIEW_COUNT)
+				&& (stripid >= 0) && (stripid < EC_NUMSTRIP);
+	}
+
+	/**
+	 * Read EC geometry from explicit primitive cache data.
+	 *
+	 * @param kryo  retained for interface compatibility
+	 * @param input cache input
+	 * @return true if successful
+	 */
 	@Override
 	public boolean readGeometry(Kryo kryo, Input input) {
 		try {
-			// Read ecLayer (2D array)
-			int outer = input.readInt();
-			ecLayer = new ECLayer[outer][];
-			for (int i = 0; i < outer; i++) {
-				int inner = input.readInt();
-				ecLayer[i] = new ECLayer[inner];
-				for (int j = 0; j < inner; j++) {
-					ecLayer[i][j] = kryo.readObjectOrNull(input, ECLayer.class);
-				}
-			}
+			readR0SlopesAndDeltaK(input);
 
-			// Read ecLayerLocal (2D array)
-			outer = input.readInt();
-			ecLayerLocal = new ECLayer[outer][];
-			for (int i = 0; i < outer; i++) {
-				int inner = input.readInt();
-				ecLayerLocal[i] = new ECLayer[inner];
-				for (int j = 0; j < inner; j++) {
-					ecLayerLocal[i][j] = kryo.readObjectOrNull(input, ECLayer.class);
-				}
-			}
+			_strips = readLocalStrips(input);
+			_viewTriangles = readViewTriangles(input);
+			_projectionEdges = readProjectionEdges(input);
 
-			// Read _strips (4D array)
-			outer = input.readInt(); // first dimension (should be 2)
-			_strips = new Point3D[outer][][][];
-			for (int i = 0; i < outer; i++) {
-				int dim2 = input.readInt(); // second dimension (should be 3)
-				_strips[i] = new Point3D[dim2][][];
-				for (int j = 0; j < dim2; j++) {
-					int dim3 = input.readInt(); // third dimension (should be EC_NUMSTRIP, 36)
-					_strips[i][j] = new Point3D[dim3][];
-					for (int k = 0; k < dim3; k++) {
-						int dim4 = input.readInt(); // fourth dimension (should be 4)
-						_strips[i][j][k] = new Point3D[dim4];
-						for (int l = 0; l < dim4; l++) {
-							_strips[i][j][k][l] = kryo.readObjectOrNull(input, Point3D.class);
-						}
-					}
-				}
-			}
+			_transformations = new Transformations[PLANE_COUNT];
+			_transformations[EC_INNER] = new Transformations(DetectorType.EC_INNER);
+			_transformations[EC_OUTER] = new Transformations(DetectorType.EC_OUTER);
 
-			// Read _transformations (array of Transformations)
-			int tLength = input.readInt();
-			_transformations = new Transformations[tLength];
-			for (int i = 0; i < tLength; i++) {
-				_transformations[i] = kryo.readObjectOrNull(input, Transformations.class);
-			}
+			ecLayer = null;
+			ecLayerLocal = null;
 
-			// Read _slopes (double array)
-			int dLength = input.readInt();
-			_slopes = new double[dLength];
-			for (int i = 0; i < dLength; i++) {
-				_slopes[i] = input.readDouble();
-			}
-
-			// Read _r0 (Point3D array)
-			dLength = input.readInt();
-			_r0 = new Point3D[dLength];
-			for (int i = 0; i < dLength; i++) {
-				_r0[i] = kryo.readObjectOrNull(input, Point3D.class);
-			}
-
-			// Read _deltaK (double array)
-			dLength = input.readInt();
-			_deltaK = new double[dLength];
-			for (int i = 0; i < dLength; i++) {
-				_deltaK[i] = input.readDouble();
-			}
-
-			// Recompute dependent transformation parameters (if needed)
-			THETA = Math.atan2(_r0[EC_INNER].x(), _r0[EC_INNER].z());
-			COSTHETA = Math.cos(THETA);
-			SINTHETA = Math.sin(THETA);
-			TANTHETA = Math.tan(THETA);
+			recomputeAngles();
 
 			return true;
 		} catch (Exception e) {
+			System.err.println("ECGeometry: Error reading geometry cache: " + e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 	}
 
+	/**
+	 * Write EC geometry as explicit primitive cache data.
+	 *
+	 * @param kryo   retained for interface compatibility
+	 * @param output cache output
+	 * @return true if successful
+	 */
 	@Override
 	public boolean writeGeometry(Kryo kryo, Output output) {
 		try {
-			// Write ecLayer (2D array: [2][3])
-			output.writeInt(ecLayer.length); // outer dimension (should be 2)
-			for (int i = 0; i < ecLayer.length; i++) {
-				output.writeInt(ecLayer[i].length); // inner dimension (should be 3)
-				for (int j = 0; j < ecLayer[i].length; j++) {
-					kryo.writeObjectOrNull(output, ecLayer[i][j], ECLayer.class);
-				}
-			}
-
-			// Write ecLayerLocal (2D array: [2][3])
-			output.writeInt(ecLayerLocal.length);
-			for (int i = 0; i < ecLayerLocal.length; i++) {
-				output.writeInt(ecLayerLocal[i].length);
-				for (int j = 0; j < ecLayerLocal[i].length; j++) {
-					kryo.writeObjectOrNull(output, ecLayerLocal[i][j], ECLayer.class);
-				}
-			}
-
-			// Write _strips (4D array: [2][3][EC_NUMSTRIP][4])
-			output.writeInt(_strips.length); // outer dimension (should be 2)
-			for (int i = 0; i < _strips.length; i++) {
-				output.writeInt(_strips[i].length); // should be 3
-				for (int j = 0; j < _strips[i].length; j++) {
-					output.writeInt(_strips[i][j].length); // should be EC_NUMSTRIP (36)
-					for (int k = 0; k < _strips[i][j].length; k++) {
-						output.writeInt(_strips[i][j][k].length); // should be 4
-						for (int l = 0; l < _strips[i][j][k].length; l++) {
-							kryo.writeObjectOrNull(output, _strips[i][j][k][l], Point3D.class);
-						}
-					}
-				}
-			}
-
-			// Write _transformations (array of Transformations, length 2)
-			output.writeInt(_transformations.length);
-			for (int i = 0; i < _transformations.length; i++) {
-				kryo.writeObjectOrNull(output, _transformations[i], Transformations.class);
-			}
-
-			// Write _slopes (double array, length 2)
-			output.writeInt(_slopes.length);
-			for (int i = 0; i < _slopes.length; i++) {
-				output.writeDouble(_slopes[i]);
-			}
-
-			// Write _r0 (Point3D array, length 2)
-			output.writeInt(_r0.length);
-			for (int i = 0; i < _r0.length; i++) {
-				kryo.writeObjectOrNull(output, _r0[i], Point3D.class);
-			}
-
-			// Write _deltaK (double array, length 2)
-			output.writeInt(_deltaK.length);
-			for (int i = 0; i < _deltaK.length; i++) {
-				output.writeDouble(_deltaK[i]);
-			}
+			writeR0SlopesAndDeltaK(output);
+			writeLocalStrips(output);
+			writeViewTriangles(output);
+			writeProjectionEdges(output);
 
 			return true;
 		} catch (Exception e) {
+			System.err.println("ECGeometry: Error writing geometry cache: " + e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 	}
 
+	/**
+	 * Write r0, slopes, and deltaK.
+	 *
+	 * @param output cache output
+	 */
+	private static void writeR0SlopesAndDeltaK(Output output) {
+		output.writeInt(PLANE_COUNT);
+
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
+			writePoint(output, _r0[plane]);
+			output.writeDouble(_slopes[plane]);
+			output.writeDouble(_deltaK[plane]);
+		}
+	}
+
+	/**
+	 * Read r0, slopes, and deltaK.
+	 *
+	 * @param input cache input
+	 */
+	private static void readR0SlopesAndDeltaK(Input input) {
+		int planeCount = input.readInt();
+		require(planeCount == PLANE_COUNT, "ECGeometry: plane count mismatch.");
+
+		_r0 = new Point3D[PLANE_COUNT];
+		_slopes = new double[PLANE_COUNT];
+		_deltaK = new double[PLANE_COUNT];
+
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
+			_r0[plane] = readPoint(input, "EC r0 plane " + plane);
+			_slopes[plane] = input.readDouble();
+			_deltaK[plane] = input.readDouble();
+		}
+	}
+
+	/**
+	 * Write local strip points.
+	 *
+	 * @param output cache output
+	 */
+	private static void writeLocalStrips(Output output) {
+		output.writeInt(PLANE_COUNT);
+		output.writeInt(VIEW_COUNT);
+
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
+			for (int view = 0; view < VIEW_COUNT; view++) {
+				output.writeInt(EC_NUMSTRIP);
+
+				for (int strip = 0; strip < EC_NUMSTRIP; strip++) {
+					writePointBlock(output, _strips[plane][view][strip], LOCAL_STRIP_POINT_COUNT,
+							"EC local strip plane " + plane + " view " + view + " strip " + strip);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Read local strip points.
+	 *
+	 * @param input cache input
+	 * @return local strips
+	 */
+	private static Point3D[][][][] readLocalStrips(Input input) {
+		int planeCount = input.readInt();
+		int viewCount = input.readInt();
+
+		require(planeCount == PLANE_COUNT, "EC local strip plane count mismatch.");
+		require(viewCount == VIEW_COUNT, "EC local strip view count mismatch.");
+
+		Point3D strips[][][][] = new Point3D[PLANE_COUNT][VIEW_COUNT][EC_NUMSTRIP][LOCAL_STRIP_POINT_COUNT];
+
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
+			for (int view = 0; view < VIEW_COUNT; view++) {
+				int stripCount = input.readInt();
+				require(stripCount == EC_NUMSTRIP, "EC local strip count mismatch.");
+
+				for (int strip = 0; strip < stripCount; strip++) {
+					strips[plane][view][strip] = readPointBlock(input, LOCAL_STRIP_POINT_COUNT,
+							"EC local strip plane " + plane + " view " + view + " strip " + strip);
+				}
+			}
+		}
+
+		return strips;
+	}
+
+	/**
+	 * Write 3D view triangles.
+	 *
+	 * @param output cache output
+	 */
+	private static void writeViewTriangles(Output output) {
+		output.writeInt(SECTOR_COUNT);
+		output.writeInt(PLANE_COUNT);
+		output.writeInt(VIEW_COUNT);
+
+		for (int sector = 0; sector < SECTOR_COUNT; sector++) {
+			for (int stack = 0; stack < PLANE_COUNT; stack++) {
+				for (int view = 0; view < VIEW_COUNT; view++) {
+					GeometryPrimitiveIO.writeCorners(output, _viewTriangles[sector][stack][view],
+							TRIANGLE_POINT_COUNT, COORD_COUNT);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Read 3D view triangles.
+	 *
+	 * @param input cache input
+	 * @return view triangles
+	 */
+	private static double[][][][][] readViewTriangles(Input input) {
+		int sectorCount = input.readInt();
+		int stackCount = input.readInt();
+		int viewCount = input.readInt();
+
+		require(sectorCount == SECTOR_COUNT, "EC view triangle sector count mismatch.");
+		require(stackCount == PLANE_COUNT, "EC view triangle stack count mismatch.");
+		require(viewCount == VIEW_COUNT, "EC view triangle view count mismatch.");
+
+		double data[][][][][] = new double[SECTOR_COUNT][PLANE_COUNT][VIEW_COUNT][][];
+
+		for (int sector = 0; sector < SECTOR_COUNT; sector++) {
+			for (int stack = 0; stack < PLANE_COUNT; stack++) {
+				for (int view = 0; view < VIEW_COUNT; view++) {
+					data[sector][stack][view] = GeometryPrimitiveIO.readCorners(input, TRIANGLE_POINT_COUNT,
+							COORD_COUNT, "EC view triangle sector " + sector + " stack " + stack + " view " + view);
+				}
+			}
+		}
+
+		return data;
+	}
+
+	/**
+	 * Write projection edges.
+	 *
+	 * @param output cache output
+	 */
+	private static void writeProjectionEdges(Output output) {
+		output.writeInt(PLANE_COUNT);
+		output.writeInt(VIEW_COUNT);
+
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
+			for (int view = 0; view < VIEW_COUNT; view++) {
+				output.writeInt(EC_NUMSTRIP);
+
+				for (int strip = 0; strip < EC_NUMSTRIP; strip++) {
+					output.writeInt(PROJECTION_EDGE_COUNT);
+
+					for (int edge = 0; edge < PROJECTION_EDGE_COUNT; edge++) {
+						GeometryPrimitiveIO.writeCorners(output, _projectionEdges[plane][view][strip][edge],
+								EDGE_ENDPOINT_COUNT, COORD_COUNT);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Read projection edges.
+	 *
+	 * @param input cache input
+	 * @return projection edges
+	 */
+	private static double[][][][][][] readProjectionEdges(Input input) {
+		int planeCount = input.readInt();
+		int viewCount = input.readInt();
+
+		require(planeCount == PLANE_COUNT, "EC projection edge plane count mismatch.");
+		require(viewCount == VIEW_COUNT, "EC projection edge view count mismatch.");
+
+		double data[][][][][][] = new double[PLANE_COUNT][VIEW_COUNT][EC_NUMSTRIP][][][];
+
+		for (int plane = 0; plane < PLANE_COUNT; plane++) {
+			for (int view = 0; view < VIEW_COUNT; view++) {
+				int stripCount = input.readInt();
+				require(stripCount == EC_NUMSTRIP,
+						"EC projection edge strip count mismatch for plane " + plane + " view " + view);
+
+				for (int strip = 0; strip < stripCount; strip++) {
+					int edgeCount = input.readInt();
+					require(edgeCount == PROJECTION_EDGE_COUNT,
+							"EC projection edge count mismatch for plane " + plane + " view " + view + " strip "
+									+ strip);
+
+					data[plane][view][strip] = new double[PROJECTION_EDGE_COUNT][][];
+
+					for (int edge = 0; edge < PROJECTION_EDGE_COUNT; edge++) {
+						data[plane][view][strip][edge] = GeometryPrimitiveIO.readCorners(input, EDGE_ENDPOINT_COUNT,
+								COORD_COUNT,
+								"EC projection edge plane " + plane + " view " + view + " strip " + strip + " edge "
+										+ edge);
+					}
+				}
+			}
+		}
+
+		return data;
+	}
+
+	/**
+	 * Write a Point3D.
+	 *
+	 * @param output cache output
+	 * @param point  point
+	 */
+	private static void writePoint(Output output, Point3D point) {
+		if (point == null) {
+			throw new IllegalArgumentException("ECGeometry: cannot write null point.");
+		}
+
+		output.writeDouble(point.x());
+		output.writeDouble(point.y());
+		output.writeDouble(point.z());
+	}
+
+	/**
+	 * Read a Point3D.
+	 *
+	 * @param input   cache input
+	 * @param context diagnostic context
+	 * @return point
+	 */
+	private static Point3D readPoint(Input input, String context) {
+		return new Point3D(input.readDouble(), input.readDouble(), input.readDouble());
+	}
+
+	/**
+	 * Write a block of Point3D values.
+	 *
+	 * @param output  cache output
+	 * @param points  points
+	 * @param count   expected count
+	 * @param context diagnostic context
+	 */
+	private static void writePointBlock(Output output, Point3D points[], int count, String context) {
+		if ((points == null) || (points.length != count)) {
+			throw new IllegalArgumentException(context + ": invalid point count.");
+		}
+
+		output.writeInt(count);
+
+		for (int i = 0; i < count; i++) {
+			writePoint(output, points[i]);
+		}
+	}
+
+	/**
+	 * Read a block of Point3D values.
+	 *
+	 * @param input   cache input
+	 * @param count   expected count
+	 * @param context diagnostic context
+	 * @return points
+	 */
+	private static Point3D[] readPointBlock(Input input, int count, String context) {
+		int actualCount = input.readInt();
+		require(actualCount == count, context + ": point count mismatch.");
+
+		Point3D points[] = new Point3D[count];
+
+		for (int i = 0; i < count; i++) {
+			points[i] = readPoint(input, context + " point " + i);
+		}
+
+		return points;
+	}
+
+	/**
+	 * Require a condition.
+	 *
+	 * @param condition condition
+	 * @param message   error message
+	 */
+	private static void require(boolean condition, String message) {
+		if (!condition) {
+			throw new IllegalArgumentException(message);
+		}
+	}
 }
