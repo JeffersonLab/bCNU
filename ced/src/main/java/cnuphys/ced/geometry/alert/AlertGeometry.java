@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jlab.detector.calib.utils.DatabaseConstantProvider;
-import org.jlab.geom.abs.AbstractComponent;
 import org.jlab.geom.component.ScintillatorPaddle;
 import org.jlab.geom.detector.alert.AHDC.AlertDCDetector;
 import org.jlab.geom.detector.alert.AHDC.AlertDCFactory;
@@ -31,32 +30,43 @@ import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.GeometryManager;
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
+/**
+ * Geometry manager for the ALERT detector.
+ * <p>
+ * ALERT keeps CED-owned {@link DCLayer} and {@link TOFLayer} runtime objects so
+ * the existing views can continue to use the same public API. The cache format,
+ * however, is explicit primitive data written and read by those layer classes,
+ * rather than Kryo-serialized layer maps.
+ */
 public class AlertGeometry extends ACachedGeometry {
 
-	// for debugging
+	/** Debug flag. */
 	private static boolean _debug = false;
 
-	// the name of the detector
+	/** Detector name. */
 	public static String NAME = "ALERT";
 
-	// the layer objects used for DC drawing
+	/** Layer objects used for DC drawing, keyed by sector|superlayer|layer. */
 	private static HashMap<String, DCLayer> _dcLayers = new HashMap<>();
 
-	// the layer objects used for TOF drawing
+	/** Layer objects used for TOF drawing, keyed by sector|superlayer|layer. */
 	private static HashMap<String, TOFLayer> _tofLayers = new HashMap<>();
 
-	// sector boundaries for XY view
-	// there are 1 sectors
+	/** Sector boundaries for XY view. */
 	public static Point2D.Double tofSectorXY[][] = new Point2D.Double[15][16];
 
+	/** Constant provider used during CCDB initialization. */
+	private static DatabaseConstantProvider constantProvider;
+
+	/**
+	 * Constructor.
+	 */
 	public AlertGeometry() {
 		super(NAME);
 	}
 
-	private static DatabaseConstantProvider constantProvider;
-
 	/**
-	 * Init the Alert geometry
+	 * Initialize ALERT geometry from CCDB/JLab geometry services.
 	 */
 	@Override
 	public void initializeUsingCCDB() {
@@ -67,12 +77,19 @@ public class AlertGeometry extends ACachedGeometry {
 		String variationName = Ced.getGeometryVariation();
 		constantProvider = new DatabaseConstantProvider(11, variationName);
 
+		_dcLayers = new HashMap<>();
+		_tofLayers = new HashMap<>();
+
 		initializeDC(constantProvider);
 		initializeTOF(constantProvider);
-
 	}
 
-	// print a debug message
+	/**
+	 * Print a debug message.
+	 *
+	 * @param s      message
+	 * @param option debug option
+	 */
 	private static void debugPrint(String s, int option) {
 		if (_debug) {
 			if (option == 0) {
@@ -85,13 +102,16 @@ public class AlertGeometry extends ACachedGeometry {
 		}
 	}
 
-	// init the drift chambers
+	/**
+	 * Initialize the drift-chamber geometry.
+	 *
+	 * @param cp constant provider
+	 */
 	private static void initializeDC(DatabaseConstantProvider cp) {
 		AlertDCFactory dcFactory = new AlertDCFactory();
 		AlertDCDetector dcCLASDetector = dcFactory.createDetectorCLAS(cp);
 
 		int numsect = dcCLASDetector.getNumSectors();
-
 		debugPrint(String.format("numsect: %d", numsect), 0);
 
 		for (int sect = 0; sect < numsect; sect++) {
@@ -99,10 +119,11 @@ public class AlertGeometry extends ACachedGeometry {
 			debugPrint(String.format("  for sect: %d", sect), 0);
 
 			int numsupl = dcFactory.createSector(cp, sect).getNumSuperlayers();
-
 			debugPrint(String.format("  numsuperlayer: %d", numsupl), 0);
+
 			for (int superlayer = 0; superlayer < numsupl; superlayer++) {
 				debugPrint(String.format("    for superlayer: %d", superlayer), 0);
+
 				int numlay = dcFactory.createSuperlayer(cp, sect, superlayer).getNumLayers();
 				debugPrint(String.format("    numlayer: %d", numlay), 0);
 
@@ -114,23 +135,26 @@ public class AlertGeometry extends ACachedGeometry {
 				}
 			}
 		}
-		debugPrint("", 2);
 
+		debugPrint("", 2);
 	}
 
-	// init the time of flight
+	/**
+	 * Initialize the time-of-flight geometry.
+	 *
+	 * @param cp constant provider
+	 */
 	private static void initializeTOF(DatabaseConstantProvider cp) {
-
 		AlertTOFFactory tofFactory = new AlertTOFFactory();
 		AlertTOFDetector tofCLASDetector = tofFactory.createDetectorCLAS(cp);
 
 		int numsect = tofCLASDetector.getNumSectors();
-
 		debugPrint(String.format("numsect: %d", numsect), 1);
 
 		for (int sect = 0; sect < numsect; sect++) {
 			debugPrint("", 2);
 			debugPrint(String.format("  for sect: %d", sect + 1), 1);
+
 			int numsupl = tofFactory.createSector(cp, sect).getNumSuperlayers();
 			debugPrint(String.format("  numsuperlayer: %d", numsupl), 1);
 
@@ -144,14 +168,13 @@ public class AlertGeometry extends ACachedGeometry {
 					debugPrint(String.format("      for layer: %d", layer + 1), 1);
 
 					AlertTOFLayer alertTOFLayer = tofFactory.createLayer(cp, sect, superlayer, layer);
-					TOFLayer tofLayer = new TOFLayer(tofFactory.createLayer(cp, sect, superlayer, layer));
+					TOFLayer tofLayer = new TOFLayer(alertTOFLayer);
 
 					int numpaddle = alertTOFLayer.getNumComponents();
 					debugPrint(String.format("      numpaddle: %d", numpaddle), 1);
 
 					if (_debug) {
 						List<ScintillatorPaddle> paddles = alertTOFLayer.getAllComponents();
-						// System.out.print(" numpaddle: " + numpaddle + " with ids: ");
 
 						if ((sect == 0) || (sect == 14)) {
 							for (int i = 0; i < numpaddle; i++) {
@@ -181,139 +204,197 @@ public class AlertGeometry extends ACachedGeometry {
 			}
 		}
 
-		// get the sector boundries
-		// and tofSectorLabelPoint
+		createTOFSectorXY();
+	}
+
+	/**
+	 * Create the ALERT TOF sector-boundary points used in the XY view.
+	 */
+	private static void createTOFSectorXY() {
+		tofSectorXY = new Point2D.Double[15][16];
 
 		for (int sect = 0; sect < 15; sect++) {
-			ScintillatorPaddle p0 = getPaddle(sect, 0, 0, 0);
-			ScintillatorPaddle p1 = getPaddle(sect, 0, 1, 0);
-			ScintillatorPaddle p2 = getPaddle(sect, 0, 2, 0);
-			ScintillatorPaddle p3 = getPaddle(sect, 0, 3, 0);
-			ScintillatorPaddle p4 = getPaddle(sect, 1, 3, 0);
-			ScintillatorPaddle p5 = getPaddle(sect, 1, 2, 0);
-			ScintillatorPaddle p6 = getPaddle(sect, 1, 3, 0);
-			ScintillatorPaddle p7 = getPaddle(sect, 1, 0, 0);
-
-			tofSectorXY[sect][0] = getCorner(p0, 0);
-			tofSectorXY[sect][1] = getCorner(p0, 3);
-			tofSectorXY[sect][2] = getCorner(p1, 0);
-			tofSectorXY[sect][3] = getCorner(p1, 3);
-			tofSectorXY[sect][4] = getCorner(p2, 0);
-			tofSectorXY[sect][5] = getCorner(p2, 3);
-			tofSectorXY[sect][6] = getCorner(p3, 0);
-			tofSectorXY[sect][7] = getCorner(p3, 3);
-			tofSectorXY[sect][8] = getCorner(p4, 2);
-			tofSectorXY[sect][9] = getCorner(p4, 1);
-			tofSectorXY[sect][10] = getCorner(p5, 2);
-			tofSectorXY[sect][11] = getCorner(p5, 1);
-			tofSectorXY[sect][12] = getCorner(p6, 2);
-			tofSectorXY[sect][13] = getCorner(p6, 1);
-			tofSectorXY[sect][14] = getCorner(p7, 2);
-			tofSectorXY[sect][15] = getCorner(p7, 1);
+			tofSectorXY[sect][0] = getCorner(sect, 0, 0, 0, 0);
+			tofSectorXY[sect][1] = getCorner(sect, 0, 0, 0, 3);
+			tofSectorXY[sect][2] = getCorner(sect, 0, 1, 0, 0);
+			tofSectorXY[sect][3] = getCorner(sect, 0, 1, 0, 3);
+			tofSectorXY[sect][4] = getCorner(sect, 0, 2, 0, 0);
+			tofSectorXY[sect][5] = getCorner(sect, 0, 2, 0, 3);
+			tofSectorXY[sect][6] = getCorner(sect, 0, 3, 0, 0);
+			tofSectorXY[sect][7] = getCorner(sect, 0, 3, 0, 3);
+			tofSectorXY[sect][8] = getCorner(sect, 1, 3, 0, 2);
+			tofSectorXY[sect][9] = getCorner(sect, 1, 3, 0, 1);
+			tofSectorXY[sect][10] = getCorner(sect, 1, 2, 0, 2);
+			tofSectorXY[sect][11] = getCorner(sect, 1, 2, 0, 1);
+			tofSectorXY[sect][12] = getCorner(sect, 1, 3, 0, 2);
+			tofSectorXY[sect][13] = getCorner(sect, 1, 3, 0, 1);
+			tofSectorXY[sect][14] = getCorner(sect, 1, 0, 0, 2);
+			tofSectorXY[sect][15] = getCorner(sect, 1, 0, 0, 1);
 		}
-
 	}
 
 	/**
-	 * Get the scintillator paddle
-	 * 
-	 * @param sector     0 based
-	 * @param superlayer 0 based
-	 * @param layer      0 based
-	 * @param paddle     0 based
-	 * @return the scintillator paddle
+	 * Get a scintillator paddle.
+	 * <p>
+	 * This is a legacy CCDB-only convenience method. After cache reads, the live
+	 * paddle objects are not retained and this method returns {@code null}.
+	 *
+	 * @param sector     0-based sector
+	 * @param superlayer 0-based superlayer
+	 * @param layer      0-based layer
+	 * @param paddle     0-based paddle
+	 * @return the live paddle, or {@code null}
 	 */
 	public static ScintillatorPaddle getPaddle(int sector, int superlayer, int layer, int paddle) {
-		TOFLayer tof = _tofLayers.get(hash(sector, superlayer, layer));
-
-		if (tof == null) {
-			return null;
-		}
-
-		return tof.getPaddle(paddle);
+		TOFLayer tof = getTOFLayer(sector, superlayer, layer);
+		return (tof == null) ? null : tof.getPaddle(paddle);
 	}
 
 	/**
-	 * @param sector          0-based sector 0..14
-	 * @param superlayer      0, 1
-	 * @param layer           0, 0..9
-	 * @param paddleid        the 0-based paddle id 0..3
-	 * @param projectionPlane the projection plane
-	 * @return <code>true</code> if the projected polygon fully intersects the plane
+	 * Check whether a projected paddle polygon intersects the projection plane.
+	 *
+	 * @param sector          0-based sector
+	 * @param superlayer      0-based superlayer
+	 * @param layer           0-based layer
+	 * @param paddleId        0-based paddle id
+	 * @param projectionPlane projection plane
+	 * @return {@code true} if the paddle intersects
 	 */
 	public static boolean doesProjectedPolyFullyIntersect(int sector, int superlayer, int layer, int paddleId,
 			Plane3D projectionPlane) {
-		ScintillatorPaddle paddle = getPaddle(sector, superlayer, layer, paddleId);
-		return doesProjectedPolyFullyIntersect(sector, superlayer, layer, paddle, projectionPlane);
-	}
+		TOFLayer tof = getTOFLayer(sector, superlayer, layer);
 
-	/**
-	 * Get the intersections of a with a constant z plane. If the paddle does not
-	 * intersect return null;
-	 *
-	 * @param superlayer      0, 1
-	 * @param layer           0, 0..9
-	 * @param paddleId        the 0-based paddle id
-	 * @param projectionPlane the projection plane
-	 * @return the intersection points (z component will be 0).
-	 */
-	public static Point2D.Double[] getIntersections(int sector, int superlayer, int layer, int paddleId,
-			Plane3D projectionPlane, boolean offset) {
-
-		ScintillatorPaddle paddle = getPaddle(sector, superlayer, layer, paddleId);
-		return getIntersections(sector, superlayer, layer, paddle, projectionPlane, offset);
-	}
-
-	/**
-	 * Get the intersections of a with a constant z plane. If the paddle does not
-	 * intersect return null;
-	 *
-	 * @param superlayer      0, 1
-	 * @param layer           0, 0..9
-	 * @param paddle          the paddle object from the geometry service
-	 * @param projectionPlane the projection plane
-	 * @return the intersection points (z component will be 0).
-	 */
-	public static Point2D.Double[] getIntersections(int sector, int superlayer, int layer, ScintillatorPaddle paddle,
-			Plane3D projectionPlane, boolean offset) {
-		Point2D.Double wp[] = GeometryManager.allocate(4);
-		getProjectedPolygon(paddle, projectionPlane, wp);
-		return wp;
-	}
-
-	public static void getProjectedPolygon(AbstractComponent geoObj, Plane3D projectionPlane, Point2D.Double wp[]) {
-
-		Point3D p3d = new Point3D();
-		for (int i = 0; i < 4; i++) {
-			Line3D l3d = geoObj.getVolumeEdge(6 + i);
-			projectionPlane.intersection(l3d, p3d);
-			wp[i].x = p3d.x();
-			wp[i].y = p3d.y();
+		if ((tof == null) || (projectionPlane == null)) {
+			return false;
 		}
 
+		return GeometryManager.doesProjectedPolyIntersect(tof.getProjectionEdges(paddleId), projectionPlane);
 	}
 
 	/**
-	 * @param sector          0-based sector 0..14
-	 * @param superlayer      0, 1
-	 * @param layer           0, 0..9
-	 * @param paddle          the paddle object
-	 * @param projectionPlane the projection plane
-	 * @return <code>true</code> if the projected polygon fully intersects the plane
+	 * Legacy intersection check using a live paddle.
+	 *
+	 * @param sector          0-based sector
+	 * @param superlayer      0-based superlayer
+	 * @param layer           0-based layer
+	 * @param paddle          live paddle
+	 * @param projectionPlane projection plane
+	 * @return {@code true} if the paddle intersects
 	 */
 	public static boolean doesProjectedPolyFullyIntersect(int sector, int superlayer, int layer,
 			ScintillatorPaddle paddle, Plane3D projectionPlane) {
-		return GeometryManager.doesProjectedPolyIntersect(paddle, projectionPlane, 6, 4);
+		TOFLayer tof = getTOFLayer(sector, superlayer, layer);
+
+		if ((tof == null) || (paddle == null)) {
+			return false;
+		}
+
+		return doesProjectedPolyFullyIntersect(sector, superlayer, layer, paddle.getComponentId(), projectionPlane);
 	}
 
 	/**
-	 * Draw the TOF sector numbers
-	 * 
+	 * Get projected paddle intersections in ordinary XY world coordinates.
+	 *
+	 * @param sector          0-based sector
+	 * @param superlayer      0-based superlayer
+	 * @param layer           0-based layer
+	 * @param paddleId        0-based paddle id
+	 * @param projectionPlane projection plane
+	 * @param offset          retained for API compatibility
+	 * @return the four projected points, or {@code null}
+	 */
+	public static Point2D.Double[] getIntersections(int sector, int superlayer, int layer, int paddleId,
+			Plane3D projectionPlane, boolean offset) {
+		TOFLayer tof = getTOFLayer(sector, superlayer, layer);
+
+		if ((tof == null) || (projectionPlane == null)) {
+			return null;
+		}
+
+		double edges[][][] = tof.getProjectionEdges(paddleId);
+
+		if (edges == null) {
+			return null;
+		}
+
+		Point2D.Double wp[] = GeometryManager.allocate(4);
+		getProjectedPolygon(edges, projectionPlane, wp);
+
+		return wp;
+	}
+
+	/**
+	 * Legacy projected intersection method using a live paddle.
+	 *
+	 * @param sector          0-based sector
+	 * @param superlayer      0-based superlayer
+	 * @param layer           0-based layer
+	 * @param paddle          live paddle
+	 * @param projectionPlane projection plane
+	 * @param offset          retained for API compatibility
+	 * @return the projected points, or {@code null}
+	 */
+	public static Point2D.Double[] getIntersections(int sector, int superlayer, int layer, ScintillatorPaddle paddle,
+			Plane3D projectionPlane, boolean offset) {
+		if (paddle == null) {
+			return null;
+		}
+
+		return getIntersections(sector, superlayer, layer, paddle.getComponentId(), projectionPlane, offset);
+	}
+
+	/**
+	 * Project primitive edge intersections into ordinary XY world coordinates.
+	 *
+	 * @param edgeLines       edge data shaped [edge][endpoint][xyz]
+	 * @param projectionPlane projection plane
+	 * @param wp              receives the projected polygon
+	 */
+	public static void getProjectedPolygon(double edgeLines[][][], Plane3D projectionPlane, Point2D.Double wp[]) {
+		if ((edgeLines == null) || (projectionPlane == null) || (wp == null)) {
+			return;
+		}
+
+		for (int i = 0; i < Math.min(edgeLines.length, wp.length); i++) {
+			Line3D line = primitiveLine(edgeLines[i]);
+
+			if (line == null) {
+				continue;
+			}
+
+			Point3D p3d = new Point3D();
+			projectionPlane.intersection(line, p3d);
+
+			wp[i].x = p3d.x();
+			wp[i].y = p3d.y();
+		}
+	}
+
+	/**
+	 * Convert primitive endpoint data to a line.
+	 *
+	 * @param endpoints endpoint data shaped [2][3]
+	 * @return the line, or {@code null}
+	 */
+	private static Line3D primitiveLine(double endpoints[][]) {
+		if ((endpoints == null) || (endpoints.length < 2) || (endpoints[0] == null) || (endpoints[1] == null)
+				|| (endpoints[0].length < 3) || (endpoints[1].length < 3)) {
+			return null;
+		}
+
+		Point3D origin = new Point3D(endpoints[0][0], endpoints[0][1], endpoints[0][2]);
+		Point3D end = new Point3D(endpoints[1][0], endpoints[1][1], endpoints[1][2]);
+
+		return new Line3D(origin, end);
+	}
+
+	/**
+	 * Draw the ALERT TOF sector numbers.
+	 *
 	 * @param g         the graphics context
-	 * @param container the container
+	 * @param container the drawing container
 	 */
 	public static void drawAlertTOFSectorNumbers(Graphics g, IContainer container) {
-
 		Point[] anchorPP = new Point[15];
 
 		for (int sect = 0; sect < 15; sect++) {
@@ -322,7 +403,6 @@ public class AlertGeometry extends ACachedGeometry {
 			container.worldToLocal(anchorPP[sect], anchor);
 		}
 
-		// draw the sector numbers
 		g.setColor(Color.red);
 		for (int sect = 0; sect < 15; sect++) {
 			int oppSect = (sect + 7) % 15;
@@ -330,14 +410,39 @@ public class AlertGeometry extends ACachedGeometry {
 			Point pp1 = anchorPP[oppSect];
 			GraphicsUtilities.drawNumberAtEnd(g, sect, pp1, pp0, 16, Fonts.hugeFont, Color.black);
 		}
-
 	}
 
 	/**
-	 * Get the corner of a paddle
-	 * 
-	 * @param paddle the paddle
-	 * @param corner the corner 0..3
+	 * Get a paddle corner in ordinary XY coordinates.
+	 *
+	 * @param sector     0-based sector
+	 * @param superlayer 0-based superlayer
+	 * @param layer      0-based layer
+	 * @param paddle     0-based paddle
+	 * @param corner     corner index
+	 * @return the XY corner
+	 */
+	public static Point2D.Double getCorner(int sector, int superlayer, int layer, int paddle, int corner) {
+		TOFLayer tof = getTOFLayer(sector, superlayer, layer);
+
+		if (tof == null) {
+			return new Point2D.Double(Double.NaN, Double.NaN);
+		}
+
+		double c[] = tof.getCorner(paddle, corner);
+
+		if (c == null) {
+			return new Point2D.Double(Double.NaN, Double.NaN);
+		}
+
+		return new Point2D.Double(c[0], c[1]);
+	}
+
+	/**
+	 * Legacy get-corner method using a live paddle.
+	 *
+	 * @param paddle live paddle
+	 * @param corner corner index
 	 * @return the corner
 	 */
 	public static Point2D.Double getCorner(ScintillatorPaddle paddle, int corner) {
@@ -346,60 +451,71 @@ public class AlertGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Get all the DC layers
-	 * 
-	 * @return the collection of DC layers
+	 * Get all DC layers.
+	 *
+	 * @return all DC layers
 	 */
 	public static Collection<DCLayer> getAllDCLayers() {
 		return _dcLayers.values();
 	}
 
 	/**
-	 * Get all the TOF layers
-	 * 
-	 * @return the collection of TOF layers
+	 * Get all TOF layers.
+	 *
+	 * @return all TOF layers
 	 */
 	public static Collection<TOFLayer> getAllTOFLayers() {
 		return _tofLayers.values();
 	}
 
 	/**
-	 * Used by the 3D drawing
-	 * 
-	 * @param sector     the 0-based sector 0..14
-	 * @param superlayer the 0-based layer 0..1
-	 * @param layer      the 0-based layer 0, 0..9
-	 * @param paddleId   the 0-based paddle 0..3
-	 * @param coords     holds 8*3 = 24 values [x1, y1, z1, ..., x8, y8, z8]
+	 * Used by 3D drawing.
+	 *
+	 * @param sector     0-based sector
+	 * @param superlayer 0-based superlayer
+	 * @param layer      0-based layer
+	 * @param paddleId   0-based paddle id
+	 * @param coords     receives 8*3 = 24 values
 	 */
 	public static void paddleVertices(int sector, int superlayer, int layer, int paddleId, float[] coords) {
+		TOFLayer tof = getTOFLayer(sector, superlayer, layer);
 
-		Point3D v[] = new Point3D[8];
-
-		ScintillatorPaddle paddle = getPaddle(sector, superlayer, layer, paddleId);
-		for (int i = 0; i < 8; i++) {
-			v[i] = new Point3D(paddle.getVolumePoint(i));
+		if ((tof == null) || (coords == null) || (coords.length < 24)) {
+			return;
 		}
 
 		for (int i = 0; i < 8; i++) {
+			double c[] = tof.getCorner(paddleId, i);
+
+			if (c == null) {
+				return;
+			}
+
 			int j = 3 * i;
-			coords[j] = (float) v[i].x();
-			coords[j + 1] = (float) v[i].y();
-			coords[j + 2] = (float) v[i].z();
+			coords[j] = (float) c[0];
+			coords[j + 1] = (float) c[1];
+			coords[j + 2] = (float) c[2];
 		}
 	}
 
-	// all 0 based
+	/**
+	 * Build a layer hash key.
+	 *
+	 * @param sector     0-based sector
+	 * @param superlayer 0-based superlayer
+	 * @param layer      0-based layer
+	 * @return the key
+	 */
 	private static String hash(int sector, int superlayer, int layer) {
 		return String.format("%d|%d|%d", sector, superlayer, layer);
 	}
 
 	/**
-	 * Get the DC layer
-	 * 
-	 * @param sector     0 based
-	 * @param superlayer 0 based
-	 * @param layer      0 based
+	 * Get a DC layer.
+	 *
+	 * @param sector     0-based sector
+	 * @param superlayer 0-based superlayer
+	 * @param layer      0-based layer
 	 * @return the DC layer
 	 */
 	public static DCLayer getDCLayer(int sector, int superlayer, int layer) {
@@ -407,53 +523,164 @@ public class AlertGeometry extends ACachedGeometry {
 	}
 
 	/**
-	 * Get the TOF layer
-	 * 
-	 * @param sector     0 based
-	 * @param superlayer 0 based
-	 * @param layer      0 based
-	 * @return the DC layer
+	 * Get a TOF layer.
+	 *
+	 * @param sector     0-based sector
+	 * @param superlayer 0-based superlayer
+	 * @param layer      0-based layer
+	 * @return the TOF layer
 	 */
 	public static TOFLayer getTOFLayer(int sector, int superlayer, int layer) {
 		return _tofLayers.get(hash(sector, superlayer, layer));
 	}
 
+	/**
+	 * Read ALERT geometry from the cache using explicit primitive layer data.
+	 *
+	 * @param kryo  retained for interface compatibility
+	 * @param input the cache input stream
+	 * @return {@code true} if successful
+	 */
 	@Override
 	public boolean readGeometry(Kryo kryo, Input input) {
 		try {
-			// Read the DC layers Hashtable.
-			_dcLayers = kryo.readObjectOrNull(input, HashMap.class);
+			HashMap<String, DCLayer> dcLayers = new HashMap<>();
+			HashMap<String, TOFLayer> tofLayers = new HashMap<>();
 
-			// Read the TOF layers Hashtable.
-			_tofLayers = kryo.readObjectOrNull(input, HashMap.class);
+			int dcCount = input.readInt();
+			if (dcCount < 0) {
+				System.err.println("AlertGeometry: negative DC layer count in cache.");
+				return false;
+			}
 
-			// Read the tofSectorXY 2D array.
-			tofSectorXY = kryo.readObjectOrNull(input, Point2D.Double[][].class);
+			for (int i = 0; i < dcCount; i++) {
+				DCLayer layer = DCLayer.readFromCache(input);
+				dcLayers.put(hash(layer.sector, layer.superlayer, layer.layer), layer);
+			}
+
+			int tofCount = input.readInt();
+			if (tofCount < 0) {
+				System.err.println("AlertGeometry: negative TOF layer count in cache.");
+				return false;
+			}
+
+			for (int i = 0; i < tofCount; i++) {
+				TOFLayer layer = TOFLayer.readFromCache(input);
+				tofLayers.put(hash(layer.sector, layer.superlayer, layer.layer), layer);
+			}
+
+			Point2D.Double xy[][] = readPointArray(input);
+
+			_dcLayers = dcLayers;
+			_tofLayers = tofLayers;
+			tofSectorXY = xy;
+
+			constantProvider = null;
 
 			return true;
 		} catch (Exception e) {
+			System.err.println("AlertGeometry: Error reading geometry cache: " + e.getMessage());
 			e.printStackTrace();
 			return false;
 		}
 	}
 
+	/**
+	 * Write ALERT geometry to the cache using explicit primitive layer data.
+	 *
+	 * @param kryo   retained for interface compatibility
+	 * @param output the cache output stream
+	 * @return {@code true} if successful
+	 */
 	@Override
 	public boolean writeGeometry(Kryo kryo, Output output) {
 		try {
-			// Write the DC layers HashMap.
-			kryo.writeObjectOrNull(output, _dcLayers, HashMap.class);
+			output.writeInt(_dcLayers.size());
+			for (DCLayer layer : _dcLayers.values()) {
+				layer.writeToCache(output);
+			}
 
-			// Write the TOF layers HashMap.
-			kryo.writeObjectOrNull(output, _tofLayers, HashMap.class);
+			output.writeInt(_tofLayers.size());
+			for (TOFLayer layer : _tofLayers.values()) {
+				layer.writeToCache(output);
+			}
 
-			// Write the tofSectorXY 2D array.
-			kryo.writeObjectOrNull(output, tofSectorXY, Point2D.Double[][].class);
+			writePointArray(output, tofSectorXY);
 
 			return true;
 		} catch (Exception e) {
+			System.err.println("AlertGeometry: Error writing geometry cache: " + e.getMessage());
 			e.printStackTrace();
 			return false;
 		}
 	}
 
+	/**
+	 * Write a nullable rectangular-ish 2D point array.
+	 *
+	 * @param output the cache output stream
+	 * @param array  the point array
+	 */
+	private static void writePointArray(Output output, Point2D.Double array[][]) {
+		if (array == null) {
+			output.writeInt(0);
+			return;
+		}
+
+		output.writeInt(array.length);
+
+		for (Point2D.Double row[] : array) {
+			if (row == null) {
+				output.writeInt(0);
+			} else {
+				output.writeInt(row.length);
+
+				for (Point2D.Double point : row) {
+					boolean hasPoint = point != null;
+					output.writeBoolean(hasPoint);
+
+					if (hasPoint) {
+						output.writeDouble(point.x);
+						output.writeDouble(point.y);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Read a nullable rectangular-ish 2D point array.
+	 *
+	 * @param input the cache input stream
+	 * @return the point array
+	 */
+	private static Point2D.Double[][] readPointArray(Input input) {
+		int rows = input.readInt();
+
+		if (rows < 0) {
+			throw new IllegalArgumentException("AlertGeometry: negative point-array row count.");
+		}
+
+		Point2D.Double array[][] = new Point2D.Double[rows][];
+
+		for (int row = 0; row < rows; row++) {
+			int cols = input.readInt();
+
+			if (cols < 0) {
+				throw new IllegalArgumentException("AlertGeometry: negative point-array column count.");
+			}
+
+			array[row] = new Point2D.Double[cols];
+
+			for (int col = 0; col < cols; col++) {
+				boolean hasPoint = input.readBoolean();
+
+				if (hasPoint) {
+					array[row][col] = new Point2D.Double(input.readDouble(), input.readDouble());
+				}
+			}
+		}
+
+		return array;
+	}
 }
