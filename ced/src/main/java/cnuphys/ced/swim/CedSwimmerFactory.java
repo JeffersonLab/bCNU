@@ -1,6 +1,6 @@
 package cnuphys.ced.swim;
 
-import cnuphys.CLAS12Swim.CommonsMathCLAS12Swimmer;
+import cnuphys.CLAS12Swim.CLAS12Swimmer;
 import cnuphys.CLAS12Swim.ICLAS12Swimmer;
 
 /**
@@ -17,6 +17,6 @@ public final class CedSwimmerFactory {
 	 * @return the supported CED swimmer
 	 */
 	public static ICLAS12Swimmer create() {
-		return new CommonsMathCLAS12Swimmer();
+		return new CLAS12Swimmer();
 	}
 }
