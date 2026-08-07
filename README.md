@@ -6,6 +6,10 @@ with Java 21; application architecture and behavior have not been changed.
 JOGL and GlueGen are resolved by Maven; their platform binaries are no longer
 stored in this repository.
 
+Maven is the authoritative build system for CED. The former CED Ant scripts
+were removed because they depended on deleted binary projects and historical
+Eclipse output directories.
+
 ## Prerequisite
 
 The coatjava aggregate JAR is intentionally not published to Maven Central.
