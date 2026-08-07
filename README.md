@@ -59,6 +59,12 @@ From this repository's root:
 mvn clean install -DskipTests
 ```
 
+Run the characterization tests with:
+
+```bash
+mvn test
+```
+
 The self-contained CED distribution is written to `ced/target`: the application
 `ced.jar` and its Maven-managed dependencies in `lib/`. Keep those together
 and use the launch scripts below when copying or distributing the application.
