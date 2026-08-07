@@ -56,7 +56,7 @@ mvn install:install-file \
 From this repository's root:
 
 ```bash
-mvn clean install -DskipTests
+mvn clean install
 ```
 
 Run the characterization tests with:
