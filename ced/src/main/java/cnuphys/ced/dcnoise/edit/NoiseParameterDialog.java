@@ -51,10 +51,10 @@ public class NoiseParameterDialog extends JDialog {
 	private MiniChamber _miniChamber;
 
 	// for specifying which superlayer is being edited
-	private JComboBox _superLayerComboBox;
+	private JComboBox<String> _superLayerComboBox;
 
 	// for specifying number of missing layers
-	private JComboBox _missingLayerComboBox;
+	private JComboBox<String> _missingLayerComboBox;
 
 	// copies used for editing
 	private NoiseReductionParameters _clonedParameters[];
@@ -148,7 +148,7 @@ public class NoiseParameterDialog extends JDialog {
 	// which superlayer selector
 	private void createSuperLayerComboBox() {
 
-		_superLayerComboBox = new JComboBox(slStrings);
+		_superLayerComboBox = new JComboBox<>(slStrings);
 		_superLayerComboBox.setSelectedIndex(_hotIndex);
 
 		ActionListener al = new ActionListener() {
@@ -169,7 +169,7 @@ public class NoiseParameterDialog extends JDialog {
 		String[] slStrings = { "Allow no missing layers", "Allow 1 missing layer", "Allow 2 missing layers",
 				"Allow 3 missing layers", "Allow 4 missing layers" };
 
-		_missingLayerComboBox = new JComboBox(slStrings);
+		_missingLayerComboBox = new JComboBox<>(slStrings);
 		_missingLayerComboBox.setSelectedIndex(2);
 
 		ActionListener al = new ActionListener() {

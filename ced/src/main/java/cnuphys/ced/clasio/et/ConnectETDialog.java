@@ -144,7 +144,7 @@ public class ConnectETDialog extends SimpleDialog {
 
 		// Create the combo box, select item at index 4.
 		// Indices start at 0, so 4 specifies the pig.
-		_machineCombo = new JComboBox(machineStrings);
+		_machineCombo = new JComboBox<>(machineStrings);
 		_machineCombo.setSelectedIndex(5);
 		npanel.add(_machineCombo);
 
