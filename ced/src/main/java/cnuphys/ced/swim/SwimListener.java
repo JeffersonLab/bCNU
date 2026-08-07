@@ -2,12 +2,12 @@ package cnuphys.ced.swim;
 
 import cnuphys.CLAS12Swim.CLAS12SwimResult;
 import cnuphys.CLAS12Swim.CLAS12Values;
-import cnuphys.adaptiveSwim.SwimType;
 import cnuphys.bCNU.threading.IEventListener;
 import cnuphys.lund.GeneratedParticleRecord;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
+import cnuphys.lund.TrajectoryType;
 import cnuphys.swim.Swimming;
 
 public class SwimListener implements IEventListener<Object> {
@@ -41,12 +41,12 @@ public class SwimListener implements IEventListener<Object> {
 				result.getTrajectory().setGeneratedParticleRecord(genPart);
 			}
 
-			if (trd.getSwimType() == SwimType.MCSWIM) {
+			if (trd.getTrajectoryType() == TrajectoryType.MC) {
 				Swimming.addMCTrajectory(result.getTrajectory());
-			} else if (trd.getSwimType() == SwimType.RECONSWIM) {
+			} else if (trd.getTrajectoryType() == TrajectoryType.RECON) {
 				Swimming.addReconTrajectory(result.getTrajectory());
 			} else {
-				System.err.println("Unknown swim type in SwimThread: " + trd.getSwimType());
+				System.err.println("Unknown trajectory type in SwimListener: " + trd.getTrajectoryType());
 			}
 		} catch (Exception e) {
 			System.err.println("SwimListener.newEvent() exception: " + e.getMessage());

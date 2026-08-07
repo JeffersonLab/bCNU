@@ -86,7 +86,6 @@ import cnuphys.magfield.MagneticFieldChangeListener;
 import cnuphys.magfield.MagneticFields;
 import cnuphys.splot.example.MemoryUsageDialog;
 import cnuphys.swim.SwimMenu;
-import cnuphys.swim.Swimmer;
 
 @SuppressWarnings("serial")
 public class Ced extends BaseMDIApplication implements MagneticFieldChangeListener {
@@ -998,7 +997,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		}
 		
 
-		title += "] [Swimmer " + Swimmer.getVersion() + "]";
+		title += "] [Swimmer Commons Math]";
 
 		title += " [Coatjava " + getCoatJavaVersion() + "] [JAVA runtime " + Environment.getJavaMajorVersion() + "]";
 

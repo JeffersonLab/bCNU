@@ -8,7 +8,7 @@ import javax.swing.AbstractButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import cnuphys.adaptiveSwim.geometry.Plane;
+import cnuphys.CLAS12Swim.geometry.Plane;
 import cnuphys.ced.ced3d.view.PlainView3D;
 import cnuphys.ced.ced3d.view.SwimmingTestView3D;
 import item3D.Cylinder;
