@@ -23,37 +23,23 @@ checks both versions and stops with a clear error before compilation when the
 wrong toolchain is active.
 
 The coatjava aggregate JAR is intentionally not published to Maven Central.
-Install the repository's copy under the coordinates used by CED before the
-first build:
+The cnuphys libraries also come from the coatjava source checkout. Install all
+of these prerequisites before the first build with:
 
 ```bash
-mvn install:install-file \
-  -Dfile=coatjava/lib/clas/coat-libs-13.7.1.jar \
-  -DgroupId=org.jlab.clas \
-  -DartifactId=coat-libs \
-  -Dversion=13.7.1 \
-  -Dpackaging=jar \
-  -DgeneratePom=true
+./scripts/bootstrap-maven-dependencies.sh
 ```
 
-The current code also uses the cnuphys libraries built by the adjacent
-coatjava checkout. Install those artifacts before the first build. This
-prerequisite will disappear as the legacy libraries are replaced by MDI.
+The script expects the coatjava source checkout beside this repository. Set
+`COATJAVA_HOME` when it is elsewhere:
 
 ```bash
-cd /Users/davidheddle/coatjava/common-tools/cnuphys
-mvn install -DskipTests
+COATJAVA_HOME=/path/to/coatjava ./scripts/bootstrap-maven-dependencies.sh
 ```
 
-At present, coatjava's `swimmer` module compiles but its strict dependency
-analysis reports an existing POM error. Until that POM is corrected, install
-the resulting JAR directly if the command above stops at `swimmer`:
-
-```bash
-mvn install:install-file \
-  -Dfile=swimmer/target/swimmer-13.7.1-SNAPSHOT.jar \
-  -DpomFile=swimmer/pom.xml
-```
+It also handles the current swimmer dependency-analysis failure by installing
+the successfully produced swimmer artifact directly. This bootstrap will
+disappear as the legacy libraries are replaced by MDI.
 
 ## Build
 
