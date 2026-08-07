@@ -4,7 +4,6 @@
 package cnuphys.bCNU.attributes;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JComponent;
 import javax.swing.JSlider;
@@ -46,10 +45,10 @@ public abstract class AttributeEditor<T extends JComponent> {
 	 * @param attribute      the attribute
 	 * @return the appropriate editor
 	 */
-	public static AttributeEditor AttributeEditorFactory(AttributeTable attributeTable, Attribute attribute,
+	public static AttributeEditor<?> AttributeEditorFactory(AttributeTable attributeTable, Attribute attribute,
 			Object value) {
 
-		AttributeEditor editor = null;
+		AttributeEditor<?> editor = null;
 
 		if (attribute != null) {
 
@@ -58,23 +57,13 @@ public abstract class AttributeEditor<T extends JComponent> {
 				valueObj = "" + ((JSlider) valueObj).getValue();
 			}
 			AttributeType type = attribute.getType();
-			Class claz = type.getEditorClass();
+			Class<? extends AttributeEditor<?>> claz = type.getEditorClass();
 			try {
-				Constructor cons = claz.getConstructor(AttributeTable.class, Attribute.class);
-				try {
-					editor = (AttributeEditor) cons.newInstance(attributeTable, attribute);
-					editor.renderValue(value);
-
-				} catch (InstantiationException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-				}
-			} catch (NoSuchMethodException e) {
+				Constructor<? extends AttributeEditor<?>> constructor =
+						claz.getConstructor(AttributeTable.class, Attribute.class);
+				editor = constructor.newInstance(attributeTable, attribute);
+				editor.renderValue(value);
+			} catch (ReflectiveOperationException | IllegalArgumentException e) {
 				e.printStackTrace();
 			} catch (SecurityException e) {
 				e.printStackTrace();

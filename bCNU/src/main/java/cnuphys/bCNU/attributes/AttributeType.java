@@ -38,7 +38,8 @@ public enum AttributeType {
 	/**
 	 * A map for the editors for the types
 	 */
-	public static EnumMap<AttributeType, Class> editorClasses = new EnumMap<>(AttributeType.class);
+	public static EnumMap<AttributeType, Class<? extends AttributeEditor<?>>> editorClasses =
+			new EnumMap<>(AttributeType.class);
 
 	static {
 		editorClasses.put(BOOLEAN, AttributeBooleanEditor.class);
@@ -93,7 +94,7 @@ public enum AttributeType {
 	 *
 	 * @return the class for creating an editor
 	 */
-	public Class<?> getEditorClass() {
+	public Class<? extends AttributeEditor<?>> getEditorClass() {
 		return editorClasses.get(this);
 	}
 

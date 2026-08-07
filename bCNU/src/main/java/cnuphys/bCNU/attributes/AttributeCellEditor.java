@@ -43,7 +43,7 @@ public class AttributeCellEditor implements TableCellEditor {
 		}
 
 		Attribute attribute = _attributeTable.getAttribute(row);
-		AttributeEditor editor = AttributeEditor.AttributeEditorFactory(_attributeTable, attribute, value);
+		AttributeEditor<?> editor = AttributeEditor.AttributeEditorFactory(_attributeTable, attribute, value);
 
 		Component component = (editor != null) ? editor.component : null;
 

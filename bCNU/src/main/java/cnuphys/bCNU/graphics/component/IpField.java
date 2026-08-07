@@ -44,7 +44,7 @@ public class IpField extends JFormattedTextField implements DocumentListener {
 
 		setInputVerifier(new InputVerifier() {
 			@Override
-			public boolean shouldYieldFocus(JComponent input) {
+			public boolean shouldYieldFocus(JComponent input, JComponent target) {
 				boolean inputOK = verify(input);
 				if (inputOK) {
 					return true;

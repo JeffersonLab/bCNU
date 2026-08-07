@@ -31,7 +31,7 @@ public class AttributeCellRenderer extends DefaultTableCellRenderer {
 			int row, int column) {
 
 		Attribute attribute = _attributeTable.getAttribute(row);
-		AttributeEditor editor = AttributeEditor.AttributeEditorFactory(_attributeTable, attribute, value);
+		AttributeEditor<?> editor = AttributeEditor.AttributeEditorFactory(_attributeTable, attribute, value);
 		Component component = (editor != null) ? editor.component : null;
 
 		if (component != null) {
