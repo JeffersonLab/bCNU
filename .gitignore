@@ -28,4 +28,6 @@ hs_err_pid*
 *.evio 
 
 export.sh
-**/src/main/java/cnuphys/bin/cnuphys/
+
+# Legacy Eclipse projects wrote compiled output into the source tree.
+**/src/main/java/cnuphys/bin/

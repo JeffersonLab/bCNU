@@ -15,5 +15,5 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="output" path="cnuphys/bin"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

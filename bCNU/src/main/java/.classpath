@@ -10,5 +10,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/bcnuimages.jar"/>
-	<classpathentry kind="output" path="cnuphys/bin"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>
