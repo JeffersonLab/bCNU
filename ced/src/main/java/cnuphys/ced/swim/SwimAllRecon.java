@@ -2,14 +2,10 @@ package cnuphys.ced.swim;
 
 import java.util.Vector;
 
-import cnuphys.CLAS12Swim.CLAS12SwimResult;
-import cnuphys.CLAS12Swim.CLAS12Values;
-import cnuphys.adaptiveSwim.SwimType;
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
 import cnuphys.bCNU.threading.EventNotifier;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoReconEventView;
-import cnuphys.lund.GeneratedParticleRecord;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
@@ -75,7 +71,6 @@ public class SwimAllRecon implements ISwimAll {
 					System.err.println("SwimAllRecon Invalid swim data for " + lid.getName());
 					continue;
 				}
-//				swim(swimData); // do the swim)
 				swimNotifier.addListener(new SwimListener(swimData));
 
 			}
@@ -87,50 +82,6 @@ public class SwimAllRecon implements ISwimAll {
 		} catch (InterruptedException | java.util.concurrent.ExecutionException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void swim(SwimData data) {
-		try {
-			System.err.println("\nENTER SwimAllRecon.swim()");
-			LundId lid = LundSupport.getInstance().get(data.trd.getId());
-
-			CLAS12SwimResult result = null;
-			TrajectoryRowData trd = data.trd;
-
-			// have to convert trd momentum to GeV
-			double p = trd.getMomentum() / 1000;
-
-			System.err.println("A");
-			System.err.println("SwimAllRecon: " + lid.getName() + " " + " charge: " + lid.getCharge() + " "
-					+ trd.getXo() + " " + trd.getYo() + " "
-					+ trd.getZo() + " " + p + " " + trd.getTheta() + " " + trd.getPhi());
-			result = data.swimmer.swim(lid.getCharge(), trd.getXo(), trd.getYo(), trd.getZo(), p, trd.getTheta(),
-					trd.getPhi(), data.sMax, data.h, data.tolerance);
-			System.err.println("B");
-			result.getTrajectory().setLundId(lid);
-			result.getTrajectory().setSource(trd.getSource());
-
-			if (result.getTrajectory().getGeneratedParticleRecord() == null) {
-				CLAS12Values iv = result.getInitialValues();
-				GeneratedParticleRecord genPart = new GeneratedParticleRecord(iv.q, iv.x, iv.y, iv.z, iv.p, iv.theta,
-						iv.phi);
-				result.getTrajectory().setGeneratedParticleRecord(genPart);
-			}
-
-			System.err.println("C");
-			if (trd.getSwimType() == SwimType.MCSWIM) {
-				Swimming.addMCTrajectory(result.getTrajectory());
-			} else if (trd.getSwimType() == SwimType.RECONSWIM) {
-				Swimming.addReconTrajectory(result.getTrajectory());
-			} else {
-				System.err.println("Unknown swim type in SwimThread: " + trd.getSwimType());
-			}
-			System.err.println("EXIT SwimAllRecon.swim()");
-		} catch (Exception e) {
-			System.err.println("SwimAllRecon exception: " + e.getMessage());
-			e.printStackTrace();
-		}
-
 	}
 
 }

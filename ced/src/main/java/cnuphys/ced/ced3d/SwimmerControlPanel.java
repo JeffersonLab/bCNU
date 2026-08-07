@@ -20,7 +20,6 @@ import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 
 import cnuphys.CLAS12Swim.CLAS12SwimResult;
-import cnuphys.CLAS12Swim.CLAS12Swimmer;
 import cnuphys.CLAS12Swim.ICLAS12Swimmer;
 import cnuphys.CLAS12Swim.geometry.Plane;
 import cnuphys.bCNU.component.LabeledTextField;
@@ -436,7 +435,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 		}
 
 
-		boolean swimFailed = result.getStatus() == CLAS12Swimmer.SWIM_TARGET_MISSED;
+		boolean swimFailed = !result.isSuccess();
 
 		if ((!swimFailed && (_show == SHOW.SUCCESSES)) || (swimFailed && (_show == SHOW.FAILURES))) {
 			return true;
