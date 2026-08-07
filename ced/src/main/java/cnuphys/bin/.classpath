@@ -9,10 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/magfield"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/bCNU"/>
 	<classpathentry kind="lib" path="/bCNU/lib/bcnuimages.jar"/>
-	<classpathentry kind="lib" path="/kryo/lib/kryo-5.6.2.jar"/>
-	<classpathentry kind="lib" path="/kryo/lib/minlog-1.2.jar"/>
-	<classpathentry kind="lib" path="/kryo/lib/objenesis-3.4.jar"/>
-	<classpathentry kind="lib" path="/kryo/lib/reflectasm-1.11.9.jar"/>
 	<classpathentry kind="lib" path="/coatjava/lib/clas/coat-libs-13.7.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>

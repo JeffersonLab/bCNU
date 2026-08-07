@@ -1,17 +1,9 @@
 package cnuphys.ced.geometry.cache;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-
+/** A detector geometry that can initialize itself from its authoritative source. */
 public interface IGeometryCache {
-	
-	public boolean readGeometry(Kryo kryo, Input input);
-	
-	public boolean writeGeometry(Kryo kryo, Output output);
-	
-	public String getName();
-	
-	public void initializeUsingCCDB();
 
+	String getName();
+
+	void initializeUsingCCDB();
 }

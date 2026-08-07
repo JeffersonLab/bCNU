@@ -13,9 +13,6 @@ import org.jlab.geom.detector.fmt.FMTSector;
 import org.jlab.geom.detector.fmt.FMTSuperlayer;
 import org.jlab.geom.prim.Point3D;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.cache.ACachedGeometry;
@@ -147,30 +144,6 @@ public class FMTGeometry extends ACachedGeometry {
 		}
 
 		return region;
-	}
-
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		try {
-			_fmtLayers = kryo.readObjectOrNull(input, HashMap.class);
-			return true;
-		} catch (Exception e) {
-			System.err.println("FMTGeometry: Error reading geometry cache: " + e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		try {
-			kryo.writeObjectOrNull(output, _fmtLayers, HashMap.class);
-			return true;
-		} catch (Exception e) {
-			System.err.println("FMTGeometry: Error writing geometry cache: " + e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
 	}
 
 }

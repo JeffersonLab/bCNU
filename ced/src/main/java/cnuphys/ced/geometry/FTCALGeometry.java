@@ -15,9 +15,6 @@ import org.jlab.geom.detector.ft.FTCALSector;
 import org.jlab.geom.detector.ft.FTCALSuperlayer;
 import org.jlab.geom.prim.Point3D;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
@@ -346,78 +343,6 @@ public class FTCALGeometry extends ACachedGeometry {
 
 	public static short getGoodId(int index) {
 		return goodIds[index];
-	}
-
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		try {
-			// Read paddles[] array.
-			int paddleLen = input.readInt();
-			paddles = new ScintillatorPaddle[paddleLen];
-			for (int i = 0; i < paddleLen; i++) {
-				paddles[i] = kryo.readObjectOrNull(input, ScintillatorPaddle.class);
-			}
-
-			// Read goodIds[] array.
-			int goodIdsLen = input.readInt();
-			goodIds = new short[goodIdsLen];
-			for (int i = 0; i < goodIdsLen; i++) {
-				goodIds[i] = input.readShort();
-			}
-
-			// Read paddleXYIndices[] array.
-			int indicesLen = input.readInt();
-			paddleXYIndices = new Point[indicesLen];
-			for (int i = 0; i < indicesLen; i++) {
-				paddleXYIndices[i] = kryo.readObjectOrNull(input, Point.class);
-			}
-
-			// Read indicesToId Hashtable.
-			int tableSize = input.readInt();
-			indicesToId = new Hashtable<Point, Integer>();
-			for (int i = 0; i < tableSize; i++) {
-				Point key = kryo.readObjectOrNull(input, Point.class);
-				int value = input.readInt();
-				indicesToId.put(key, value);
-			}
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		try {
-			// Write paddles[] array.
-			output.writeInt(paddles.length);
-			for (ScintillatorPaddle paddle : paddles) {
-				// Write paddle; it may be null.
-				kryo.writeObjectOrNull(output, paddle, ScintillatorPaddle.class);
-			}
-
-			// Write goodIds[] array.
-			output.writeInt(goodIds.length);
-			for (short id : goodIds) {
-				output.writeShort(id);
-			}
-
-			// Write paddleXYIndices[] array.
-			output.writeInt(paddleXYIndices.length);
-			for (Point pt : paddleXYIndices) {
-				kryo.writeObjectOrNull(output, pt, Point.class);
-			}
-
-			// Write indicesToId Hashtable.
-			output.writeInt(indicesToId.size());
-			for (Point key : indicesToId.keySet()) {
-				kryo.writeObjectOrNull(output, key, Point.class);
-				output.writeInt(indicesToId.get(key));
-			}
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
 	}
 
 }

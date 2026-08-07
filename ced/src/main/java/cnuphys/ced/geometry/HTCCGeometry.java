@@ -2,9 +2,6 @@ package cnuphys.ced.geometry;
 
 import java.awt.geom.Point2D;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
@@ -65,18 +62,5 @@ public class HTCCGeometry extends ACachedGeometry {
 			}
 		}
 	}
-
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		// At the moment, nothing to read
-		return true;
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		// At the moment, nothing to write
-		return true;
-	}
-
 
 }

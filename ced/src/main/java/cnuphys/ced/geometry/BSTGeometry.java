@@ -9,9 +9,6 @@ import org.jlab.detector.calib.utils.DatabaseConstantProvider;
 import org.jlab.detector.geant4.v2.SVT.SVTStripFactory;
 import org.jlab.geometry.prim.Line3d;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.frame.Ced;
@@ -332,29 +329,4 @@ public class BSTGeometry extends ACachedGeometry {
 	}
 
 
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-	    try {
-	        // Read the BSTxy panels list.
-	        _bstXYpanelsLayers = kryo.readObjectOrNull(input, ArrayList.class);
-	        // Read the _strips map.
-	        _strips = kryo.readObjectOrNull(input, HashMap.class);
-	        return true;
-	    } catch (Exception e) {
-	        return false;
-	    }
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-	    try {
-	        // Write the BSTxy panels list.
-	        kryo.writeObjectOrNull(output, _bstXYpanelsLayers, ArrayList.class);
-	        // Write the _strips map.
-	        kryo.writeObjectOrNull(output, _strips, HashMap.class);
-	        return true;
-	    } catch (Exception e) {
-	        return false;
-	    }
-	}
 }

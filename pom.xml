@@ -23,7 +23,6 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.version>3.14.1</maven.compiler.version>
         <jogl.version>2.6.0</jogl.version>
-        <kryo.version>5.6.2</kryo.version>
     </properties>
 
     <build>

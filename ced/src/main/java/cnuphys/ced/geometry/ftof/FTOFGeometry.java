@@ -14,9 +14,6 @@ import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Plane3D;
 import org.jlab.geom.prim.Point3D;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.bCNU.geometry.Plane;
 import cnuphys.bCNU.geometry.Point;
@@ -366,89 +363,6 @@ public class FTOFGeometry extends ACachedGeometry {
 			return "???";
 		} else {
 			return panelNames[panelType];
-		}
-	}
-
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		try {
-			// Read ftofSuperlayers.
-			int numSectors = input.readInt();
-			ftofSuperlayers = new FTOFSuperlayer[numSectors][];
-			for (int i = 0; i < numSectors; i++) {
-				int numPanels = input.readInt();
-				if (numPanels == 0) {
-					ftofSuperlayers[i] = null;
-				} else {
-					ftofSuperlayers[i] = new FTOFSuperlayer[numPanels];
-					for (int j = 0; j < numPanels; j++) {
-						ftofSuperlayers[i][j] = kryo.readObjectOrNull(input, FTOFSuperlayer.class);
-					}
-				}
-			}
-
-			// Read ftofLayers.
-			int numSectors2 = input.readInt();
-			ftofLayers = new FTOFLayer[numSectors2][];
-			for (int i = 0; i < numSectors2; i++) {
-				int numPanels = input.readInt();
-				if (numPanels == 0) {
-					ftofLayers[i] = null;
-				} else {
-					ftofLayers[i] = new FTOFLayer[numPanels];
-					for (int j = 0; j < numPanels; j++) {
-						ftofLayers[i][j] = kryo.readObjectOrNull(input, FTOFLayer.class);
-					}
-				}
-			}
-			
-			createPanels();
-			createFacePlanes();
-
-			return true;
-		} catch (Exception e) {
-			System.err.println("FTOFGeometry: Error reading geometry cache: " + e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		try {
-			// Write the ftofSuperlayers 2D array.
-			// Write outer array length (number of sectors)
-			output.writeInt(ftofSuperlayers.length);
-			for (int i = 0; i < ftofSuperlayers.length; i++) {
-				FTOFSuperlayer[] sector = ftofSuperlayers[i];
-				if (sector == null) {
-					output.writeInt(0);
-				} else {
-					// Write inner array length (number of panel types)
-					output.writeInt(sector.length);
-					for (int j = 0; j < sector.length; j++) {
-						kryo.writeObjectOrNull(output, sector[j], FTOFSuperlayer.class);
-					}
-				}
-			}
-
-			// Write the ftofLayers 2D array.
-			output.writeInt(ftofLayers.length);
-			for (int i = 0; i < ftofLayers.length; i++) {
-				FTOFLayer[] sector = ftofLayers[i];
-				if (sector == null) {
-					output.writeInt(0);
-				} else {
-					output.writeInt(sector.length);
-					for (int j = 0; j < sector.length; j++) {
-						kryo.writeObjectOrNull(output, sector[j], FTOFLayer.class);
-					}
-				}
-			}
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
 		}
 	}
 

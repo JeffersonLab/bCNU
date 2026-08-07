@@ -6,9 +6,6 @@ import java.util.List;
 import org.jlab.detector.geant4.v2.MPGD.URWT.URWTStripFactory;
 import org.jlab.geom.prim.Line3D;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.ced.ced3d.util.BoundingBox3D;
@@ -104,57 +101,6 @@ public class UrWTGeometry extends ACachedGeometry {
 		return detectorData[sector - 1][layer - 1].strips[strip - 1];
 	}
 
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		try {
-
-			// Read the number of sectors and layers
-			int numSectors = input.readInt();
-			int numLayers = input.readInt();
-
-			if (numSectors != NUM_SECTORS || numLayers != NUM_LAYERS) {
-				System.err.println("Cache geometry sector/layer count mismatch: expected " + NUM_SECTORS + " sectors and " + NUM_LAYERS + " layers, but got " + numSectors + " sectors and " + numLayers + " layers");
-				return false;
-			}
-
-			// Read the detector data for each sector and layer
-			for (int sector = 1; sector <= NUM_SECTORS; sector++) {
-				for (int layer = 1; layer <= NUM_LAYERS; layer++) {
-					detectorData[sector - 1][layer - 1] = kryo.readObjectOrNull(input, UrWTDetectorData.class);
-				}
-			}
-
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		
-		try {
-
-			// Write the number of sectors and layers
-			output.writeInt(NUM_SECTORS);
-			output.writeInt(NUM_LAYERS);
-
-			// Write the detector data for each sector and layer
-			for (int sector = 1; sector <= NUM_SECTORS; sector++) {
-				for (int layer = 1; layer <= NUM_LAYERS; layer++) {
-					UrWTDetectorData data = detectorData[sector - 1][layer - 1];
-					kryo.writeObjectOrNull(output, data, UrWTDetectorData.class);
-				}
-			}
-
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-	}
 
 	public static void main(String args[]) {
 		UrWTGeometry geometry = new UrWTGeometry();

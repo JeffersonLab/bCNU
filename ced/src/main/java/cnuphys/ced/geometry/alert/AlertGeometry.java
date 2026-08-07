@@ -20,9 +20,6 @@ import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Plane3D;
 import org.jlab.geom.prim.Point3D;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
@@ -416,44 +413,6 @@ public class AlertGeometry extends ACachedGeometry {
 	 */
 	public static TOFLayer getTOFLayer(int sector, int superlayer, int layer) {
 		return _tofLayers.get(hash(sector, superlayer, layer));
-	}
-
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		try {
-			// Read the DC layers Hashtable.
-			_dcLayers = kryo.readObjectOrNull(input, HashMap.class);
-
-			// Read the TOF layers Hashtable.
-			_tofLayers = kryo.readObjectOrNull(input, HashMap.class);
-
-			// Read the tofSectorXY 2D array.
-			tofSectorXY = kryo.readObjectOrNull(input, Point2D.Double[][].class);
-
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		try {
-			// Write the DC layers HashMap.
-			kryo.writeObjectOrNull(output, _dcLayers, HashMap.class);
-
-			// Write the TOF layers HashMap.
-			kryo.writeObjectOrNull(output, _tofLayers, HashMap.class);
-
-			// Write the tofSectorXY 2D array.
-			kryo.writeObjectOrNull(output, tofSectorXY, Point2D.Double[][].class);
-
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
 	}
 
 }

@@ -35,11 +35,6 @@
             <artifactId>coat-libs</artifactId>
             <version>13.7.1</version>
         </dependency>
-        <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo</artifactId>
-            <version>${kryo.version}</version>
-        </dependency>
     </dependencies>
 
     <build>

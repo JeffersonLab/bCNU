@@ -15,9 +15,6 @@ import org.jlab.geom.prim.Plane3D;
 import org.jlab.geom.prim.Point3D;
 import org.jlab.geom.prim.Triangle3D;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.cache.ACachedGeometry;
@@ -428,64 +425,6 @@ public class DCGeometry extends ACachedGeometry {
 
 		ext.x = p0.x + (p0.x - p1.x);
 		ext.y = p0.y + (p0.y - p1.y);
-	}
-
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		try {
-			// Read the min and max wire x values.
-			minWireX = input.readDouble();
-			maxWireX = input.readDouble();
-
-			// Read the dimensions of the wires array.
-			int dim1 = input.readInt();
-			wires = new DriftChamberWire[dim1][][];
-			for (int i = 0; i < dim1; i++) {
-				int dim2 = input.readInt();
-				wires[i] = new DriftChamberWire[dim2][];
-				for (int j = 0; j < dim2; j++) {
-					int dim3 = input.readInt();
-					wires[i][j] = new DriftChamberWire[dim3];
-					for (int k = 0; k < dim3; k++) {
-						wires[i][j][k] = kryo.readObjectOrNull(input, DriftChamberWire.class);
-					}
-				}
-			}
-			return true;
-		} catch (Exception e) {
-			System.err.println("DCGeometry: Error reading geometry cache: " + e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		try {
-			// Write the min and max wire x values.
-			output.writeDouble(minWireX);
-			output.writeDouble(maxWireX);
-
-			// Write the dimensions of the wires 3D array.
-			int dim1 = (wires != null) ? wires.length : 0;
-			output.writeInt(dim1);
-			for (int i = 0; i < dim1; i++) {
-				int dim2 = (wires[i] != null) ? wires[i].length : 0;
-				output.writeInt(dim2);
-				for (int j = 0; j < dim2; j++) {
-					int dim3 = (wires[i][j] != null) ? wires[i][j].length : 0;
-					output.writeInt(dim3);
-					for (int k = 0; k < dim3; k++) {
-						kryo.writeObjectOrNull(output, wires[i][j][k], DriftChamberWire.class);
-					}
-				}
-			}
-			return true;
-		} catch (Exception e) {
-			System.err.println("DCGeometry: Error writing geometry cache: " + e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
 	}
 
 }

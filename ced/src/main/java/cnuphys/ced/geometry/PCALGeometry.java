@@ -14,9 +14,6 @@ import org.jlab.geom.prim.Plane3D;
 import org.jlab.geom.prim.Point3D;
 import org.jlab.geom.prim.Triangle3D;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
@@ -453,101 +450,6 @@ public class PCALGeometry extends ACachedGeometry {
 		start.y += dely;
 		end.x += delx;
 		end.y += dely;
-	}
-
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		try {
-			// Read ecLayer array.
-			int len = input.readInt();
-			ecLayer = new ECLayer[len];
-			for (int i = 0; i < len; i++) {
-				ecLayer[i] = kryo.readObjectOrNull(input, ECLayer.class);
-			}
-
-			// Read ecLayerLocal array.
-			int lenLocal = input.readInt();
-			ecLayerLocal = new ECLayer[lenLocal];
-			for (int i = 0; i < lenLocal; i++) {
-				ecLayerLocal[i] = kryo.readObjectOrNull(input, ECLayer.class);
-			}
-
-
-			// Read _strips 3D array.
-			int firstDim = input.readInt(); // should be 3
-			_strips = new Point3D[firstDim][][];
-			for (int i = 0; i < firstDim; i++) {
-				int stripCount = input.readInt(); // number of strips for this plane
-				_strips[i] = new Point3D[stripCount][];
-				for (int j = 0; j < stripCount; j++) {
-					int thirdDim = input.readInt(); // should be 4
-					_strips[i][j] = new Point3D[thirdDim];
-					for (int k = 0; k < thirdDim; k++) {
-						_strips[i][j][k] = kryo.readObjectOrNull(input, Point3D.class);
-					}
-				}
-			}
-
-			// Read _transformations.
-			_transformations = kryo.readObjectOrNull(input, Transformations.class);
-			// Read _r0.
-			_r0 = kryo.readObjectOrNull(input, Point3D.class);
-			// Read _slope.
-			_slope = input.readDouble();
-
-			// Recompute dependent transformation parameters.
-			double theta = Math.atan2(_r0.x(), _r0.z());
-			COSTHETA = Math.cos(theta);
-			SINTHETA = Math.sin(theta);
-
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		try {
-			// Write ecLayer array.
-			output.writeInt(ecLayer.length);
-			for (int i = 0; i < ecLayer.length; i++) {
-				kryo.writeObjectOrNull(output, ecLayer[i], ECLayer.class);
-			}
-
-			// Write ecLayerLocal array.
-			output.writeInt(ecLayerLocal.length);
-			for (int i = 0; i < ecLayerLocal.length; i++) {
-				kryo.writeObjectOrNull(output, ecLayerLocal[i], ECLayer.class);
-			}
-
-			// Write _strips 3D array.
-			// First dimension: number of strip types (should be 3)
-			output.writeInt(_strips.length);
-			for (int i = 0; i < _strips.length; i++) {
-				// For each plane, use the constant to determine how many strips are valid.
-				int stripCount = PCAL_NUMSTRIP[i];
-				output.writeInt(stripCount);
-				for (int j = 0; j < stripCount; j++) {
-					// Third dimension: number of points per strip (should be 4)
-					output.writeInt(_strips[i][j].length);
-					for (int k = 0; k < _strips[i][j].length; k++) {
-						kryo.writeObjectOrNull(output, _strips[i][j][k], Point3D.class);
-					}
-				}
-			}
-
-			// Write _transformations.
-			kryo.writeObjectOrNull(output, _transformations, Transformations.class);
-			// Write _r0.
-			kryo.writeObjectOrNull(output, _r0, Point3D.class);
-			// Write _slope.
-			output.writeDouble(_slope);
-
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
 	}
 
 }

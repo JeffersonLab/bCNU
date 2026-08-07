@@ -7,9 +7,6 @@ import cnuphys.ced.geometry.bmt.ConstantsLoaderVZ;
 import cnuphys.ced.geometry.bmt.Geometry;
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 public class BMTGeometry extends ACachedGeometry {
 
@@ -39,30 +36,6 @@ public class BMTGeometry extends ACachedGeometry {
 
 	public static Geometry getGeometry() {
 		return _geometry;
-	}
-
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		try {
-			_geometry = kryo.readObjectOrNull(input, Geometry.class);
-			// Restore the Constants state.
-			Constants.readConstants(kryo, input);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		try {
-			kryo.writeObjectOrNull(output, _geometry, Geometry.class);
-			// Save the loaded state of Constants.
-			Constants.writeConstants(kryo, output);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
 	}
 
 }

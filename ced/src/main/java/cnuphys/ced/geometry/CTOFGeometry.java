@@ -4,9 +4,6 @@ import cnuphys.ced.geometry.cache.ACachedGeometry;
 import cnuphys.ced.geometry.cache.GeometryCache;
 import cnuphys.ced.geometry.cache.IGeometryCache;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 import java.awt.geom.Point2D;
 
 public class CTOFGeometry extends ACachedGeometry {
@@ -109,46 +106,4 @@ public class CTOFGeometry extends ACachedGeometry {
 		coords[i + 2] = z;
 	}
 
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		try {
-			// Read the outer array length
-			int outerLength = input.readInt();
-			_quads = new Point2D.Double[outerLength][];
-			// For each row, read its length and the points within it
-			for (int i = 0; i < outerLength; i++) {
-				int innerLength = input.readInt();
-				_quads[i] = new Point2D.Double[innerLength];
-				for (int j = 0; j < innerLength; j++) {
-					double x = input.readDouble();
-					double y = input.readDouble();
-					_quads[i][j] = new Point2D.Double(x, y);
-				}
-			}
-			return true;
-		} catch (Exception e) {
-			System.err.println("CTOFGeometry: Error reading _quads from cache: " + e.getMessage());
-			return false;
-		}
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		if (_quads == null) {
-			System.err.println("CTOFGeometry: _quads is null. Nothing to write to cache.");
-			return false;
-		}
-		// Write the number of rows in _quads
-		output.writeInt(_quads.length);
-		// Write each quad (row) to the output
-		for (Point2D.Double[] quad : _quads) {
-			// Write the length of the row (should be 4)
-			output.writeInt(quad.length);
-			for (Point2D.Double point : quad) {
-				output.writeDouble(point.x);
-				output.writeDouble(point.y);
-			}
-		}
-		return true;
-	}
 }

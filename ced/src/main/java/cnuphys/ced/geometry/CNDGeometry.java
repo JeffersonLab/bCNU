@@ -12,9 +12,6 @@ import org.jlab.geom.detector.cnd.CNDSector;
 import org.jlab.geom.detector.cnd.CNDSuperlayer;
 import org.jlab.geom.prim.Point3D;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
@@ -197,61 +194,6 @@ public class CNDGeometry extends ACachedGeometry {
 			corners[i] = paddle.getVolumePoint(i);
 		}
 
-	}
-
-	@Override
-	public boolean readGeometry(Kryo kryo, Input input) {
-		try {
-			int numLayers = input.readInt();
-			if (numLayers == 0) {
-				paddles = null;
-			} else {
-				paddles = new ScintillatorPaddle[numLayers][];
-				// For each layer, read the number of paddles then each paddle
-				for (int i = 0; i < numLayers; i++) {
-					int numPaddles = input.readInt();
-					if (numPaddles == 0) {
-						paddles[i] = null;
-					} else {
-						paddles[i] = new ScintillatorPaddle[numPaddles];
-						for (int j = 0; j < numPaddles; j++) {
-							paddles[i][j] = kryo.readObjectOrNull(input, ScintillatorPaddle.class);
-						}
-					}
-				}
-			}
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean writeGeometry(Kryo kryo, Output output) {
-		try {
-			// Write number of layers (first dimension)
-			if (paddles == null) {
-				output.writeInt(0);
-			} else {
-				output.writeInt(paddles.length);
-				// Write each layer array
-				for (int i = 0; i < paddles.length; i++) {
-					ScintillatorPaddle[] layer = paddles[i];
-					if (layer == null) {
-						output.writeInt(0);
-					} else {
-						output.writeInt(layer.length);
-						// Write each paddle; may be null
-						for (ScintillatorPaddle sp : layer) {
-							kryo.writeObjectOrNull(output, sp, ScintillatorPaddle.class);
-						}
-					}
-				}
-			}
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
 	}
 
 }
