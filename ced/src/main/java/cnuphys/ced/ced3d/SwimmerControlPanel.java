@@ -21,6 +21,7 @@ import javax.swing.SwingConstants;
 
 import cnuphys.CLAS12Swim.CLAS12SwimResult;
 import cnuphys.CLAS12Swim.CLAS12Swimmer;
+import cnuphys.CLAS12Swim.ICLAS12Swimmer;
 import cnuphys.CLAS12Swim.geometry.Plane;
 import cnuphys.bCNU.component.LabeledTextField;
 import cnuphys.bCNU.component.VariableRange;
@@ -29,6 +30,7 @@ import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.ced.ced3d.view.SwimmingTestView3D;
+import cnuphys.ced.swim.CedSwimmerFactory;
 import cnuphys.magfield.MagneticFieldChangeListener;
 import cnuphys.magfield.MagneticFields;
 
@@ -657,7 +659,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	    double h = 5e-4; //step size
 		double tolerance = 1.0e-8;
 
-		CLAS12Swimmer swimmer = new CLAS12Swimmer();
+		ICLAS12Swimmer swimmer = CedSwimmerFactory.create();
 
 
 		for (int i = 0; i < getSwimCount(); i++) {

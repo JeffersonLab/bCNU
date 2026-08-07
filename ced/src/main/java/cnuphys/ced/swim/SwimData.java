@@ -1,6 +1,6 @@
 package cnuphys.ced.swim;
 
-import cnuphys.CLAS12Swim.CLAS12Swimmer;
+import cnuphys.CLAS12Swim.ICLAS12Swimmer;
 import cnuphys.lund.TrajectoryRowData;
 
 public class SwimData {
@@ -8,7 +8,7 @@ public class SwimData {
 	public final TrajectoryRowData trd;
 
 	//the swimmer
-	public final CLAS12Swimmer swimmer;
+	public final ICLAS12Swimmer swimmer;
 
 	//the max path length
 	public final double sMax;
@@ -24,7 +24,7 @@ public class SwimData {
 	 * @param tolerance the tolerance
 	 */
 	public SwimData(TrajectoryRowData trd, double sMax, double h, double tolerance) {
-		swimmer = new CLAS12Swimmer();
+		swimmer = CedSwimmerFactory.create();
 		this.trd = trd;
 		this.sMax = sMax;
 		this.h = h;
