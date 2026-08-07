@@ -54,12 +54,12 @@ public class LabelDialog extends JDialog implements ListSelectionListener, ItemL
 	/**
 	 * The font family name list
 	 */
-	private JList fontFamilyList;
+	private JList<String> fontFamilyList;
 
 	/**
 	 * The font size list
 	 */
-	private JList fontSizeList;
+	private JList<String> fontSizeList;
 
 	/**
 	 * The return font.
@@ -179,7 +179,7 @@ public class LabelDialog extends JDialog implements ListSelectionListener, ItemL
 		fontFamilyList.addListSelectionListener(this);
 
 		// /create the list of sizes
-		fontSizeList = new JList(fontSizes);
+		fontSizeList = new JList<>(fontSizes);
 		fontSizeList.setVisibleRowCount(8);
 		JScrollPane scrollPane2 = new JScrollPane(fontSizeList);
 		fontSizeList.setSelectedValue(" " + inputFont.getSize() + " ", true);
@@ -269,11 +269,11 @@ public class LabelDialog extends JDialog implements ListSelectionListener, ItemL
 	 *
 	 * @return the font family selection list.
 	 */
-	private JList createFontList() {
+	private JList<String> createFontList() {
 
 		String[] fontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 
-		JList list = new JList(fontList);
+		JList<String> list = new JList<>(fontList);
 
 		list.setVisibleRowCount(8);
 		return list;
@@ -284,8 +284,8 @@ public class LabelDialog extends JDialog implements ListSelectionListener, ItemL
 	 * it.
 	 */
 	protected void previewFont() {
-		String resultName = (String) (fontFamilyList.getSelectedValue());
-		String resultSizeName = (String) (fontSizeList.getSelectedValue());
+		String resultName = fontFamilyList.getSelectedValue();
+		String resultSizeName = fontSizeList.getSelectedValue();
 		int resultSize = Integer.parseInt(resultSizeName.trim());
 
 		boolean isBold = boldCb.isSelected();
