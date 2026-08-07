@@ -266,8 +266,11 @@ public class GeometryCache {
 	}
 
 	/**
-	 * Initialize all geometries. This will first try to read from the cache. If
-	 * that fails, it will initialize using CCDB and then write to the cache.
+	 * Initialize all geometries from their authoritative CCDB sources.
+	 *
+	 * <p>The former Kryo cache is deliberately bypassed during modernization.
+	 * SQLite caching can be introduced later without coupling geometry classes to
+	 * a serialization framework.</p>
 	 */
 	public static void initializeAllGeometry() {
 		// first create all the geometries
@@ -287,24 +290,9 @@ public class GeometryCache {
 		new BMTGeometry();
 		new FMTGeometry();
 
-		// now try to read from the cache
-		boolean readSuccess = readAllGeometries();
-		if (readSuccess) {
-			System.out.println("Successfully read geometry from cache.");
-			return;
-		}
-
-		// failed so initialize using CCDB
+		System.out.println("Initializing geometry from CCDB (cache disabled).");
 		for (IGeometryCache geometry : _geometries) {
 			geometry.initializeUsingCCDB();
-		}
-
-		// write to the cache
-		boolean writeSuccess = writeAllGeometries();
-		if (writeSuccess) {
-			System.out.println("Successfully wrote geometry to cache.");
-		} else {
-			System.err.println("Failed to write geometry to cache.");
 		}
 	}
 

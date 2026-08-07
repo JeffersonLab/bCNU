@@ -10,6 +10,9 @@ Maven is the authoritative build system for CED. The former CED Ant scripts
 were removed because they depended on deleted binary projects and historical
 Eclipse output directories.
 
+Geometry startup currently uses the authoritative CCDB initializers directly;
+the legacy Kryo cache is disabled pending replacement with SQLite.
+
 ## Prerequisite
 
 The coatjava aggregate JAR is intentionally not published to Maven Central.
