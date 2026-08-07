@@ -244,9 +244,7 @@ public class TriggerPanel extends JPanel implements KeyListener {
 	 * @return the trigger word represented by the bit display
 	 */
 	public int getBits() {
-		Long trigL = new Long(_trigger);
-
-		return trigL.intValue();
+		return (int) _trigger;
 	}
 
 	private static boolean checkBit(long x, int k) {
@@ -264,9 +262,9 @@ public class TriggerPanel extends JPanel implements KeyListener {
 	// some simple tests
 	public static void main(String arg[]) {
 		long x = Integer.MAX_VALUE;
-		System.out.println("long " + x + "   int " + (new Long(x)).intValue());
+		System.out.println("long " + x + "   int " + (int) x);
 		x += 1;
-		System.out.println("long " + x + "   int " + (new Long(x)).intValue());
+		System.out.println("long " + x + "   int " + (int) x);
 
 	}
 
@@ -288,7 +286,7 @@ public class TriggerPanel extends JPanel implements KeyListener {
 						repaint();
 						_decimalTF.setText(" " + _trigger);
 
-						int intTrig = (new Long(_trigger)).intValue();
+						int intTrig = (int) _trigger;
 						TriggerManager.getInstance().getTriggerFilter().setBits(intTrig);
 
 					}
@@ -354,8 +352,8 @@ public class TriggerPanel extends JPanel implements KeyListener {
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			try {
-				Long lval = Long.parseLong(_decimalTF.getText().trim());
-				int intTrig = (new Long(lval)).intValue();
+				long lval = Long.parseLong(_decimalTF.getText().trim());
+				int intTrig = (int) lval;
 				setBits(-1, intTrig);
 				TriggerManager.getInstance().getTriggerFilter().setBits(intTrig);
 				_decimalTF.getParent().requestFocus();
