@@ -66,13 +66,11 @@ public class ViewConfiguration<T extends BaseView> {
 	    try {
 	        // T is the specific subclass of BaseView
 	        // We expect a static method: public static T construct(Object... keyVals)
-	        java.lang.reflect.Method method = null;
-	        
 	        // Search for the construct method in the class hierarchy
 	        // This assumes the class 'T' has been provided or inferred
 	        // Assuming you add a 'Class<T> clazz' field to ViewConfiguration:
-	        method = clazz.getDeclaredMethod("construct", Object[].class);
-	        view = (T) method.invoke(null, (Object) keyVals);
+	        java.lang.reflect.Method method = clazz.getDeclaredMethod("construct", Object[].class);
+	        view = clazz.cast(method.invoke(null, (Object) keyVals));
 	        
 	        JMenu viewMenu = ViewManager.getInstance().getViewMenu();
 	        int index = viewMenu.getItemCount()-1; // add to end of menu

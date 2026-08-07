@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
@@ -88,7 +89,8 @@ public class ClasIoEventManager {
 	// are notified first. Then those in index 1. Finally those in index 2. The
 	// Data containers should be in index 0. The trajectory and noise in index 1, and
 	// the regular views in index 2 (they are notified last)
-	private EventNotifier<Object> eventNotifier[] = new EventNotifier[3];
+	private final List<EventNotifier<Object>> eventNotifiers = List.of(
+			new EventNotifier<>(), new EventNotifier<>(), new EventNotifier<>());
 
 	// someone who can swim all MC particles
 	private ISwimAll _allMCSwimmer;
@@ -123,9 +125,6 @@ public class ClasIoEventManager {
 
 	// private constructor for singleton
 	private ClasIoEventManager() {
-		for (int index = 0; index < 3; index++) {
-			eventNotifier[index] = new EventNotifier<>();
-		}
 	}
 
 	/**
@@ -906,9 +905,9 @@ public class ClasIoEventManager {
 		Swimming.setNotifyOn(false); // prevent refreshes
 		Swimming.clearAllTrajectories();
 		Swimming.setNotifyOn(true); // prevent refreshes
-		for (int index = 0; index < 3; index++) {
+		for (int index = 0; index < eventNotifiers.size(); index++) {
 			try {
-				eventNotifier[index].nonThreadedTriggerEvent(source);
+				eventNotifiers.get(index).nonThreadedTriggerEvent(source);
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
@@ -923,9 +922,9 @@ public class ClasIoEventManager {
 		Swimming.setNotifyOn(false); // prevent refreshes
 		Swimming.clearAllTrajectories();
 		Swimming.setNotifyOn(true); // prevent refreshes
-		for (int index = 0; index < 3; index++) {
+		for (int index = 0; index < eventNotifiers.size(); index++) {
 			try {
-				eventNotifier[index].nonThreadedTriggerEvent(file.getAbsolutePath());
+				eventNotifiers.get(index).nonThreadedTriggerEvent(file.getAbsolutePath());
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
@@ -954,9 +953,9 @@ public class ClasIoEventManager {
 		Ced.getCed().setEventFilteringLabel(FilterManager.getInstance().isFilteringOn());
 
 		Swimming.clearAllTrajectories();
-		for (int index = 0; index < 3; index++) {
+		for (int index = 0; index < eventNotifiers.size(); index++) {
 			try {
-				eventNotifier[index].nonThreadedTriggerEvent(_currentEvent);
+				eventNotifiers.get(index).nonThreadedTriggerEvent(_currentEvent);
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
@@ -1015,8 +1014,8 @@ public class ClasIoEventManager {
 	 * @param listener the IClasIoEventListener listener to remove.
 	 */
 	public void removeClasIoEventListener(IClasIoEventListener listener) {
-		for (int i = 0; i < 3; i++) {
-			eventNotifier[i].removeListener(listener);
+		for (int i = 0; i < eventNotifiers.size(); i++) {
+			eventNotifiers.get(i).removeListener(listener);
 		}
 	}
 
@@ -1032,11 +1031,9 @@ public class ClasIoEventManager {
 	 *                 are notified last)
 	 */
 	public void addClasIoEventListener(IClasIoEventListener listener, int index) {
-		eventNotifier[index].addListener(listener);
+		eventNotifiers.get(index).addListener(listener);
 	}
 
 
 
 }
-
-
