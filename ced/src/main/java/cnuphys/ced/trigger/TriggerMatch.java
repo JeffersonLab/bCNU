@@ -47,6 +47,21 @@ public enum TriggerMatch {
 	}
 
 	/**
+	 * Test a trigger word against a bit pattern using this match type.
+	 *
+	 * @param pattern the configured filter pattern
+	 * @param triggerWord the trigger word from the event
+	 * @return whether the trigger word matches the pattern
+	 */
+	public boolean matches(int pattern, int triggerWord) {
+		return switch (this) {
+		case EXACT -> pattern == triggerWord;
+		case ANY -> (pattern & triggerWord) != 0;
+		case ALL -> (pattern & triggerWord) == pattern;
+		};
+	}
+
+	/**
 	 * Obtain a combo box of choices.
 	 *
 	 * @param defaultChoice

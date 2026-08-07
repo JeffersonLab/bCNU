@@ -37,19 +37,7 @@ public class TriggerFilter extends AEventFilter {
 
 		int triggerWord = triggerData[0];
 
-		switch (_type) {
-
-		case EXACT:
-			return (_bits == triggerWord);
-
-		case ANY:
-			return (_bits & triggerWord) != 0;
-
-		case ALL:
-			return ((_bits & triggerWord) == _bits);
-		}
-
-		return true;
+		return _type.matches(_bits, triggerWord);
 	}
 
 	@Override
