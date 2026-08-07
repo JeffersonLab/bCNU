@@ -8,7 +8,9 @@ stored in this repository.
 
 Maven is the authoritative build system for CED. The former CED Ant scripts
 were removed because they depended on deleted binary projects and historical
-Eclipse output directories.
+Eclipse output directories. The reactor modules no longer carry Ant build
+files or nested Eclipse project metadata; import the root Maven reactor into
+an IDE instead.
 
 Geometry startup uses the authoritative CCDB initializers directly. The legacy
 Kryo cache and its checked-in binary artifacts have been removed pending a

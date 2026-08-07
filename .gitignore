@@ -22,6 +22,9 @@ hs_err_pid*
 # ide stuff:
 *.iml
 .idea
+.classpath
+.project
+.settings/
 
 # no log files:
 *.log
