@@ -9,7 +9,7 @@ import java.util.Set;
 import javax.swing.JComboBox;
 
 @SuppressWarnings("serial")
-public class EnumComboBox extends JComboBox {
+public class EnumComboBox extends JComboBox<String> {
 
 	// reverse hash which takes a string and gives the enum
 	protected Hashtable<String, Enum<?>> reverseHash;

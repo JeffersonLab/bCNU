@@ -78,20 +78,16 @@ public class IconTableCellRenderer extends DefaultTableCellRenderer {
 			try {
 				String className = cce.getMessage();
 				className = className.substring(className.lastIndexOf(" ") + 1);
-				Class clazz = Class.forName(className);
-				createIcon(icon, (JComponent) clazz.newInstance());
-			} catch (InstantiationException ie) {
+				Class<?> clazz = Class.forName(className);
+				createIcon(icon, (JComponent) clazz.getDeclaredConstructor().newInstance());
+			} catch (ReflectiveOperationException | ClassCastException reflectiveFailure) {
 				// OceanTheme.IFIcon#paintIcon casts the component to
 				// AbstractButton
 				try {
 					createIcon(icon, button);
 				} catch (ClassCastException cce2) {
-				} catch (InstantiationException ie2) {
 				}
-			} catch (IllegalAccessException iae) {
-			} catch (ClassNotFoundException cnfe) {
 			}
-		} catch (InstantiationException ie3) {
 		}
 		if (getIcon() == null) {
 			try {
@@ -114,9 +110,8 @@ public class IconTableCellRenderer extends DefaultTableCellRenderer {
 	 * @param icon      the icon to be painted
 	 * @param component the component it represents
 	 * @throws java.lang.ClassCastException may originate in paintIcon
-	 * @throws java.lang.InstantiationException for a default abstract class
 	 */
-	private void createIcon(Icon icon, JComponent component) throws ClassCastException, InstantiationException {
+	private void createIcon(Icon icon, JComponent component) throws ClassCastException {
 		BufferedImage image = new BufferedImage(icon.getIconWidth() + 2, icon.getIconHeight() + 2,
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics g = image.createGraphics();
