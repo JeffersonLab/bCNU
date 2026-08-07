@@ -18,6 +18,10 @@ maintainable SQLite replacement.
 
 ## Prerequisite
 
+Build CED with Java 21 and Maven 3.9 or newer. The Maven validation phase
+checks both versions and stops with a clear error before compilation when the
+wrong toolchain is active.
+
 The coatjava aggregate JAR is intentionally not published to Maven Central.
 Install the repository's copy under the coordinates used by CED before the
 first build:
