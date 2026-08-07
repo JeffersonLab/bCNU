@@ -3,6 +3,8 @@
 This reactor is the behavior-preserving Maven foundation for the CLAS12 event
 display. It currently builds the existing `bCNU`, `bCNU3D`, and `ced` sources
 with Java 21; application architecture and behavior have not been changed.
+JOGL and GlueGen are resolved by Maven; their platform binaries are no longer
+stored in this repository.
 
 ## Prerequisite
 
