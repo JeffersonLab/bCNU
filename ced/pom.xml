@@ -34,8 +34,6 @@
             <groupId>org.jlab.clas</groupId>
             <artifactId>coat-libs</artifactId>
             <version>13.7.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../coatjava/lib/clas/coat-libs-13.7.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.esotericsoftware</groupId>
@@ -57,7 +55,6 @@
                 <version>3.5.1</version>
                 <configuration>
                     <mainClass>cnuphys.ced.frame.Ced</mainClass>
-                    <classpathScope>compile</classpathScope>
                     <systemProperties>
                         <systemProperty>
                             <key>CLAS12DIR</key>

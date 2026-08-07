@@ -6,10 +6,23 @@ with Java 21; application architecture and behavior have not been changed.
 
 ## Prerequisite
 
-The current code still uses the cnuphys libraries built by the adjacent
-coatjava checkout. Install those artifacts from that checkout before the first
-build. This prerequisite will disappear as the legacy libraries are replaced
-by MDI.
+The coatjava aggregate JAR is intentionally not published to Maven Central.
+Install the repository's copy under the coordinates used by CED before the
+first build:
+
+```bash
+mvn install:install-file \
+  -Dfile=coatjava/lib/clas/coat-libs-13.7.1.jar \
+  -DgroupId=org.jlab.clas \
+  -DartifactId=coat-libs \
+  -Dversion=13.7.1 \
+  -Dpackaging=jar \
+  -DgeneratePom=true
+```
+
+The current code also uses the cnuphys libraries built by the adjacent
+coatjava checkout. Install those artifacts before the first build. This
+prerequisite will disappear as the legacy libraries are replaced by MDI.
 
 ```bash
 cd /Users/davidheddle/coatjava/common-tools/cnuphys
