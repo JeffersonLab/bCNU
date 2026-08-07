@@ -315,8 +315,11 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 		String s = System.getProperty("java.class.path");
 
-		if (s.endsWith("ced.jar")) {
+		if ((s != null) && s.endsWith("ced.jar")) {
 			s = Jar.getManifestAttribute(s, "Class-Path");
+		}
+		if (s == null) {
+			return "???";
 		}
 
 		int index = s.indexOf(cpat);

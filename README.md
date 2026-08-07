@@ -57,21 +57,26 @@ From this repository's root:
 mvn clean install -DskipTests
 ```
 
-The CED artifact is written to `ced/target/ced-1.0.0-SNAPSHOT.jar`.
+The self-contained CED distribution is written to `ced/target`: the application
+`ced.jar` and its Maven-managed dependencies in `lib/`. Keep those together
+and use the launch scripts below when copying or distributing the application.
 
 ## Run during migration
 
-Run without 3D views:
+After packaging, run without 3D views:
 
 ```bash
-mvn -pl ced exec:java -Dexec.args=NO3D
+./ced/cedNO3D.sh
 ```
 
 Run with 3D views and Maven-managed JOGL 2.6.0:
 
 ```bash
-mvn -pl ced exec:java -Dexec.args=YES3D
+./ced/ced.sh
 ```
 
-The generated CED JAR is currently a thin Maven artifact. Use the Maven launch
-command above until application distribution packaging is added.
+For development, the existing Maven launch form remains available:
+
+```bash
+mvn -pl ced exec:java -Dexec.args=NO3D
+```

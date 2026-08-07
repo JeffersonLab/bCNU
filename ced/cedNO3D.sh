@@ -1,11 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-echo Script location: $SCRIPT_DIR
-JARNAME=$SCRIPT_DIR/ced.jar
-MAIN=cnuphys.ced.frame.Ced
-VARGS="-Dsun.java2d.pmoffscreen=false -Xmx1024M -Xss512k"
-CLAS12DIR=$SCRIPT_DIR/coatjava
-echo CLAS12DIR used by ced: $CLAS12DIR
-cd $SCRIPT_DIR
-java $VARGS -DCLAS12DIR="$CLAS12DIR" -jar $JARNAME $MAIN NO3D
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+JARNAME="$SCRIPT_DIR/target/ced.jar"
+CLAS12_DIR="$SCRIPT_DIR/../coatjava"
+
+echo "CED jar: $JARNAME"
+echo "CLAS12DIR used by CED: $CLAS12_DIR"
+exec java -Dsun.java2d.pmoffscreen=false -Xmx1024M -Xss512k \
+  -DCLAS12DIR="$CLAS12_DIR" -cp "$JARNAME:$SCRIPT_DIR/target/lib/*" \
+  cnuphys.ced.frame.Ced NO3D
