@@ -33,7 +33,7 @@
         <dependency>
             <groupId>cnuphys</groupId>
             <artifactId>swimmer</artifactId>
-            <version>13.7.1-SNAPSHOT</version>
+            <version>14.1.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.jlab.clas</groupId>

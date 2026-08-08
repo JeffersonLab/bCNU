@@ -66,7 +66,7 @@ public class SwimAllRecon implements ISwimAll {
 				if ((source != null) && (source.contains("CVT"))) {
 					sf = 150; //shorter max path for cvt tracks
 				}
-				SwimData swimData = new SwimData(trd, sf, stepSize, tolerance);
+				SwimData swimData = new SwimData(trd, SwimData.TrajectoryType.RECON, sf, stepSize, tolerance);
 				if (!swimData.isValid()) {
 					System.err.println("SwimAllRecon Invalid swim data for " + lid.getName());
 					continue;

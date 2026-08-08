@@ -7,7 +7,6 @@ import cnuphys.lund.GeneratedParticleRecord;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
-import cnuphys.lund.TrajectoryType;
 import cnuphys.swim.Swimming;
 
 public class SwimListener implements IEventListener<Object> {
@@ -41,12 +40,12 @@ public class SwimListener implements IEventListener<Object> {
 				result.getTrajectory().setGeneratedParticleRecord(genPart);
 			}
 
-			if (trd.getTrajectoryType() == TrajectoryType.MC) {
+			if (data.trajectoryType == SwimData.TrajectoryType.MC) {
 				Swimming.addMCTrajectory(result.getTrajectory());
-			} else if (trd.getTrajectoryType() == TrajectoryType.RECON) {
+			} else if (data.trajectoryType == SwimData.TrajectoryType.RECON) {
 				Swimming.addReconTrajectory(result.getTrajectory());
 			} else {
-				System.err.println("Unknown trajectory type in SwimListener: " + trd.getTrajectoryType());
+				System.err.println("Unknown trajectory type in SwimListener: " + data.trajectoryType);
 			}
 		} catch (Exception e) {
 			System.err.println("SwimListener.newEvent() exception: " + e.getMessage());

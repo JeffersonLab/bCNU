@@ -8,7 +8,6 @@ import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
-import cnuphys.lund.TrajectoryType;
 import cnuphys.lund.TrajectoryTableModel;
 
 @SuppressWarnings("serial")
@@ -112,7 +111,7 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 
 					// note conversions to degrees and MeV
 					TrajectoryRowData row = new TrajectoryRowData(i, lid, xo, yo, zo, 1000 * p,
-							Math.toDegrees(theta), Math.toDegrees(phi), 0, bankName, TrajectoryType.MC);
+							Math.toDegrees(theta), Math.toDegrees(phi), 0, bankName);
 					data.add(row);
 
 				}

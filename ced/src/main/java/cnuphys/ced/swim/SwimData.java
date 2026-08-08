@@ -4,8 +4,14 @@ import cnuphys.CLAS12Swim.ICLAS12Swimmer;
 import cnuphys.lund.TrajectoryRowData;
 
 public class SwimData {
+	public enum TrajectoryType {
+		MC, RECON
+	}
+
 	//holds the trajectory info
 	public final TrajectoryRowData trd;
+
+	public final TrajectoryType trajectoryType;
 
 	//the swimmer
 	public final ICLAS12Swimmer swimmer;
@@ -23,9 +29,10 @@ public class SwimData {
 	 * @param h the initial step size
 	 * @param tolerance the tolerance
 	 */
-	public SwimData(TrajectoryRowData trd, double sMax, double h, double tolerance) {
+	public SwimData(TrajectoryRowData trd, TrajectoryType trajectoryType, double sMax, double h, double tolerance) {
 		swimmer = CedSwimmerFactory.create();
 		this.trd = trd;
+		this.trajectoryType = trajectoryType;
 		this.sMax = sMax;
 		this.h = h;
 		this.tolerance = tolerance;

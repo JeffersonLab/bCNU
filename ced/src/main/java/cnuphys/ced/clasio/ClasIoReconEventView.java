@@ -8,7 +8,6 @@ import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
-import cnuphys.lund.TrajectoryType;
 import cnuphys.lund.TrajectoryTableModel;
 
 public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
@@ -118,7 +117,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 
 					// note conversions to degrees and MeV
 					TrajectoryRowData row = new TrajectoryRowData(id[i], lid, xo, yo, zo, 1000 * p,
-							Math.toDegrees(theta), Math.toDegrees(phi), status[i], bankName, TrajectoryType.RECON);
+							Math.toDegrees(theta), Math.toDegrees(phi), status[i], bankName);
 					data.add(row);
 
 				}
@@ -178,7 +177,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 
 					// note conversions to degrees and MeV
 					TrajectoryRowData row = new TrajectoryRowData(0, lid, xo, yo, zo, 1000 * p, Math.toDegrees(theta),
-							Math.toDegrees(phi), status[i], bankName, TrajectoryType.RECON);
+							Math.toDegrees(phi), status[i], bankName);
 					data.add(row);
 
 				}
@@ -219,7 +218,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 					double p = Math.sqrt(pxo * pxo + pyo * pyo + pzo * pzo);
 					double theta = Math.acos(pzo / p);
 					TrajectoryRowData row = new TrajectoryRowData(id[i], lid, xo, yo, zo, 1000 * p,
-							Math.toDegrees(theta), Math.toDegrees(phi0[i]), 0, bankName, TrajectoryType.RECON);
+							Math.toDegrees(theta), Math.toDegrees(phi0[i]), 0, bankName);
 					data.add(row);
 				}
 			}

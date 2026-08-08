@@ -77,7 +77,7 @@ public class SwimAllMC implements ISwimAll {
 
 					swam.add(summaryStr);
 
-					SwimData swimData = new SwimData(trd, PATHMAX, stepSize, tolerance);
+					SwimData swimData = new SwimData(trd, SwimData.TrajectoryType.MC, PATHMAX, stepSize, tolerance);
 					if (!swimData.isValid()) {
 						System.err.println("SwimAllMC Invalid swim data for " + lid.getName());
 						continue;
