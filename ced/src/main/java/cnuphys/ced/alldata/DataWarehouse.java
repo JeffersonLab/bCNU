@@ -251,7 +251,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 */
 	public byte[] getByte(String bankName, String columnName) {
 		DataBank bank = getBank(bankName);
-		if (bank != null) {
+		if (hasColumn(bank, columnName)) {
 			return bank.getByte(columnName);
 		}
 		return null;
@@ -266,7 +266,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 */
 	public float[] getFloat(String bankName, String columnName) {
 		DataBank bank = getBank(bankName);
-		if (bank != null) {
+		if (hasColumn(bank, columnName)) {
 			return bank.getFloat(columnName);
 		}
 		return null;
@@ -280,7 +280,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 */
 	public short[] getShort(String bankName, String columnName) {
 		DataBank bank = getBank(bankName);
-		if (bank != null) {
+		if (hasColumn(bank, columnName)) {
 			return bank.getShort(columnName);
 		}
 		return null;
@@ -294,7 +294,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 */
 	public int[] getInt(String bankName, String columnName) {
 		DataBank bank = getBank(bankName);
-		if (bank != null) {
+		if (hasColumn(bank, columnName)) {
 			return bank.getInt(columnName);
 		}
 		return null;
@@ -309,7 +309,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 */
 	public long[] getLong(String bankName, String columnName) {
 		DataBank bank = getBank(bankName);
-		if (bank != null) {
+		if (hasColumn(bank, columnName)) {
 			return bank.getLong(columnName);
 		}
 		return null;
@@ -324,7 +324,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 */
 	public double[] getDouble(String bankName, String columnName) {
 		DataBank bank = getBank(bankName);
-		if (bank != null) {
+		if (hasColumn(bank, columnName)) {
 			return bank.getDouble(columnName);
 		}
 		return null;
@@ -355,11 +355,17 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return <code>true</code> if the current event has the bank and column
      */
 	public boolean bankContainsColumn(String bankName, String columnName) {
-		DataBank bank = getBank(bankName);
-		if (bank != null && columnName != null) {
-			String columnNames[] = bank.getColumnList();
+		return hasColumn(getBank(bankName), columnName);
+	}
+
+	static boolean hasColumn(DataBank bank, String columnName) {
+		if (bank == null || columnName == null) {
+			return false;
+		}
+		String[] columnNames = bank.getColumnList();
+		if (columnNames != null) {
 			for (String name : columnNames) {
-				if (name.equals(columnName)) {
+				if (columnName.equals(name)) {
 					return true;
 				}
 			}
