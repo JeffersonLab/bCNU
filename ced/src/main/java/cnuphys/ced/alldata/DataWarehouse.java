@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
@@ -340,12 +339,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 *
 	 */
 	public void notifyListeners(DataEvent event) {
-
-		try {
-			eventNotifier.nonThreadedTriggerEvent(event);
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
+		eventNotifier.nonThreadedTriggerEvent(event);
 	}
 
 	/**
@@ -353,12 +347,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 *
 	 */
 	public void notifyListeners() {
-
-		try {
-			eventNotifier.nonThreadedTriggerEvent(null);
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
+		eventNotifier.nonThreadedTriggerEvent(null);
 	}
 
 	/**

@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
@@ -913,16 +912,7 @@ public class ClasIoEventManager {
 		Swimming.clearAllTrajectories();
 		Swimming.setNotifyOn(true); // prevent refreshes
 		for (int index = 0; index < eventNotifiers.size(); index++) {
-			try {
-				eventNotifiers.get(index).nonThreadedTriggerEvent(source);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				Log.getInstance().warning("Event-source notification interrupted");
-				return;
-			} catch (ExecutionException e) {
-				Log.getInstance().error("Event-source notification failed");
-				Log.getInstance().exception(e);
-			}
+			eventNotifiers.get(index).nonThreadedTriggerEvent(source);
 		}
 
 		Ced.getCed().fixTitle();
@@ -935,16 +925,7 @@ public class ClasIoEventManager {
 		Swimming.clearAllTrajectories();
 		Swimming.setNotifyOn(true); // prevent refreshes
 		for (int index = 0; index < eventNotifiers.size(); index++) {
-			try {
-				eventNotifiers.get(index).nonThreadedTriggerEvent(file.getAbsolutePath());
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				Log.getInstance().warning("Event-file notification interrupted");
-				return;
-			} catch (ExecutionException e) {
-				Log.getInstance().error("Event-file notification failed");
-				Log.getInstance().exception(e);
-			}
+			eventNotifiers.get(index).nonThreadedTriggerEvent(file.getAbsolutePath());
 		}
 
 		Ced.getCed().fixTitle();
@@ -971,16 +952,7 @@ public class ClasIoEventManager {
 
 		Swimming.clearAllTrajectories();
 		for (int index = 0; index < eventNotifiers.size(); index++) {
-			try {
-				eventNotifiers.get(index).nonThreadedTriggerEvent(_currentEvent);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				Log.getInstance().warning("Event notification interrupted");
-				return;
-			} catch (ExecutionException e) {
-				Log.getInstance().error("Event notification failed");
-				Log.getInstance().exception(e);
-			}
+			eventNotifiers.get(index).nonThreadedTriggerEvent(_currentEvent);
 		}
 		finalSteps();
 

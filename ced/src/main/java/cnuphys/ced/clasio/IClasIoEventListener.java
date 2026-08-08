@@ -4,6 +4,7 @@ import java.util.EventListener;
 
 import org.jlab.io.base.DataEvent;
 
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.threading.IEventListener;
 
 public interface IClasIoEventListener extends EventListener, IEventListener<Object> {
@@ -38,7 +39,7 @@ public interface IClasIoEventListener extends EventListener, IEventListener<Obje
 		} else if (data instanceof ClasIoEventManager.EventSourceType) {
 			changedEventSource((ClasIoEventManager.EventSourceType) data);
 		} else {
-			System.err.println("Unknown event type: " + data);
+			Log.getInstance().warning("Unknown event notification type: " + data);
 		}
 	}
 
