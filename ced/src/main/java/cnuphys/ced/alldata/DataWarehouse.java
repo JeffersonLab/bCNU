@@ -12,7 +12,6 @@ import org.jlab.jnp.hipo4.data.Schema;
 import org.jlab.jnp.hipo4.data.SchemaFactory;
 
 import cnuphys.bCNU.threading.EventNotifier;
-import cnuphys.bCNU.util.Environment;
 import cnuphys.ced.alldata.datacontainer.IDataContainer;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventListenerPhase;
@@ -34,10 +33,7 @@ public class DataWarehouse implements IClasIoEventListener {
 
 	// private constructor for singleton
 	private DataWarehouse() {
-		String cpath = Environment.getInstance().getClassPath();
-		System.out.println("DataWarehouse classpath: " + cpath);
 		ClasIoEventManager.getInstance().addClasIoEventListener(this, ClasIoEventListenerPhase.DATA);
-		System.out.println("DataWarehouse created and registered as a listener");
 	}
 
 	/** type is unknown */
@@ -86,7 +82,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	private ArrayList<ColumnData> _columnData = new ArrayList<>();
 
 	//for notifying about new data
-	private EventNotifier<Object> eventNotifier = new EventNotifier<>();
+	private final EventNotifier<DataContainerNotification> eventNotifier = new EventNotifier<>();
 
 	/**
 	 * Public access to the singleton
@@ -340,7 +336,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 *
 	 */
 	public void notifyListeners(DataEvent event) {
-		eventNotifier.nonThreadedTriggerEvent(event);
+		eventNotifier.nonThreadedTriggerEvent(new DataContainerNotification.Update(event));
 	}
 
 	/**
@@ -348,7 +344,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 *
 	 */
 	public void notifyListeners() {
-		eventNotifier.nonThreadedTriggerEvent(null);
+		eventNotifier.nonThreadedTriggerEvent(DataContainerNotification.Clear.INSTANCE);
 	}
 
 	/**
