@@ -5,7 +5,6 @@ import java.util.Vector;
 
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
 import cnuphys.bCNU.log.Log;
-import cnuphys.bCNU.threading.EventNotifier;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoMonteCarloView;
 import cnuphys.lund.LundId;
@@ -58,8 +57,6 @@ public class SwimAllMC implements ISwimAll {
 		//used to avoid swimming duplicates
 		ArrayList<String> swam = new ArrayList<>();
 
-		EventNotifier<Object> swimNotifier = new EventNotifier<>();
-
 		for (TrajectoryRowData trd : data) {
 			LundId lid = LundSupport.getInstance().get(trd.getId());
 
@@ -79,20 +76,11 @@ public class SwimAllMC implements ISwimAll {
 						Log.getInstance().warning("SwimAllMC invalid swim data for " + lid.getName());
 						continue;
 					}
-					swimNotifier.addListener(new SwimListener(swimData));
+					new SwimListener(swimData).newEvent(null);
 
 			}
 
 		} //for trd
-
-		try {
-			swimNotifier.nonThreadedTriggerEvent(null);
-			swimNotifier.shutdown();
-		} catch (InterruptedException | java.util.concurrent.ExecutionException e) {
-			Log.getInstance().error("Failed while swimming Monte Carlo tracks");
-			Log.getInstance().exception(e);
-		}
-
 
 	}
 

@@ -4,7 +4,6 @@ import java.util.Vector;
 
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
 import cnuphys.bCNU.log.Log;
-import cnuphys.bCNU.threading.EventNotifier;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoReconEventView;
 import cnuphys.lund.LundId;
@@ -52,8 +51,6 @@ public class SwimAllRecon implements ISwimAll {
 		double stepSize = 1.0e-3;
 		double tolerance = 1.0e-6;
 
-		EventNotifier<Object> swimNotifier = new EventNotifier<>();
-
 		for (TrajectoryRowData trd : data) {
 			LundId lid = LundSupport.getInstance().get(trd.getId());
 
@@ -64,18 +61,11 @@ public class SwimAllRecon implements ISwimAll {
 					Log.getInstance().warning("SwimAllRecon invalid swim data for " + lid.getName());
 					continue;
 				}
-				swimNotifier.addListener(new SwimListener(swimData));
+				new SwimListener(swimData).newEvent(null);
 
 			}
 		} //for trd
 
-		try {
-			swimNotifier.nonThreadedTriggerEvent(null);
-			swimNotifier.shutdown();
-		} catch (InterruptedException | java.util.concurrent.ExecutionException e) {
-			Log.getInstance().error("Failed while swimming reconstructed tracks");
-			Log.getInstance().exception(e);
-		}
 	}
 
 }
