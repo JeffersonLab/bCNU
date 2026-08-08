@@ -7,8 +7,8 @@ import java.util.Hashtable;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DataDrawSupport;
+import cnuphys.ced.alldata.FTOFHits;
 import cnuphys.ced.alldata.datacontainer.tof.FTOFClusterData;
-import cnuphys.ced.alldata.datacontainer.tof.FTOFHitData;
 
 public class FTOFHighlightHandler {
 
@@ -23,7 +23,7 @@ public class FTOFHighlightHandler {
 	private FTOFClusterData _clusterData = FTOFClusterData.getInstance();
 
 	//hit data
-	private FTOFHitData _hitData = FTOFHitData.getInstance();
+	private FTOFHits _hitData = FTOFHits.getInstance();
 
 
 	private Hashtable<String, Integer> highlights = new Hashtable<>();
@@ -42,10 +42,10 @@ public class FTOFHighlightHandler {
 
 		if ((index != null) && index.intValue() >= 0) {
 			int row = index.intValue();
-			byte layer = _hitData.layer[row];
+			byte layer = _hitData.layer(row);
 			if (_view.displayPanel() == (layer-1)) {
-				double x = _hitData.x[row];
-				double y = _hitData.y[row];
+				double x = _hitData.x(row);
+				double y = _hitData.y(row);
 				_wp.setLocation(x, y);
 				container.worldToLocal(_pp, _wp);
 				DataDrawSupport.drawReconHitHighlight(g, _pp);

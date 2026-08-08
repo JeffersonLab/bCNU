@@ -13,9 +13,9 @@ import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.ced.alldata.DataDrawSupport;
+import cnuphys.ced.alldata.FTOFHits;
 import cnuphys.ced.alldata.datacontainer.tof.FTOFADCData;
 import cnuphys.ced.alldata.datacontainer.tof.FTOFClusterData;
-import cnuphys.ced.alldata.datacontainer.tof.FTOFHitData;
 import cnuphys.ced.cedview.sectorview.SectorView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
@@ -39,7 +39,7 @@ public class FTOFPanelItem extends PolygonItem {
 	//data containers
 	private FTOFADCData _adcData = FTOFADCData.getInstance();
 	private FTOFClusterData _clusterData = FTOFClusterData.getInstance();
-	private FTOFHitData _hitData = FTOFHitData.getInstance();
+	private FTOFHits _hitData = FTOFHits.getInstance();
 
 	/**
 	 * Create a FTOFPanelItem
@@ -221,8 +221,8 @@ public class FTOFPanelItem extends PolygonItem {
 			Point pp = new Point();
 
 			for (int i = 0; i < count; i++) {
-				if ((_hitData.sector[i] == sect) && (_hitData.layer[i] == layer)) {
-					_view.projectClasToWorld(_hitData.x[i], _hitData.y[i], _hitData.z[i], _view.getProjectionPlane(),
+				if ((_hitData.sector(i) == sect) && (_hitData.layer(i) == layer)) {
+					_view.projectClasToWorld(_hitData.x(i), _hitData.y(i), _hitData.z(i), _view.getProjectionPlane(),
 							wp);
 					container.worldToLocal(pp, wp);
 					DataDrawSupport.drawReconHit(g, pp);
@@ -364,9 +364,9 @@ public class FTOFPanelItem extends PolygonItem {
 				byte layer = (byte) (_ftofPanel.getPanelType() + 1); // 1-based
 
 				for (int i = 0; i < count; i++) {
-					if ((_hitData.sector[i] == sect) && (_hitData.layer[i] == layer)) {
+					if ((_hitData.sector(i) == sect) && (_hitData.layer(i) == layer)) {
 						if (_hitData.contains(i, screenPoint)) {
-							_hitData.hitFeedback("FTOF", i, feedbackStrings);
+							_hitData.addFeedback(i, feedbackStrings);
 							break;
 						}
 					}

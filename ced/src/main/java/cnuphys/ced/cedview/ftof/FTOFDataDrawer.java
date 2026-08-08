@@ -7,7 +7,7 @@ import java.util.List;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.datacontainer.tof.FTOFHitData;
+import cnuphys.ced.alldata.FTOFHits;
 import cnuphys.ced.cedview.SwimTrajectoryDrawerXY;
 
 /**
@@ -38,7 +38,7 @@ public class FTOFDataDrawer {
 
 
 	// hits data
-	FTOFHitData _hitData = FTOFHitData.getInstance();
+	FTOFHits _hitData = FTOFHits.getInstance();
 
 	/**
 	 * This object handles drawing and feedback for FTOF banks for the FTOF view
@@ -91,9 +91,9 @@ public class FTOFDataDrawer {
 		Point2D.Double wp = new Point2D.Double();
 
 		for (int i = 0; i < _hitData.count(); i++) {
-			int panel = _hitData.layer[i] - 1;
+			int panel = _hitData.layer(i) - 1;
 			if (panel == _view.displayPanel()) {
-				 wp.setLocation(_hitData.x[i], _hitData.y[i]);
+				 wp.setLocation(_hitData.x(i), _hitData.y(i));
 				 container.worldToLocal(pp, wp);
 				 DataDrawSupport.drawReconHit(g, pp);
 				_hitData.setLocation(i, pp);
@@ -127,9 +127,9 @@ public class FTOFDataDrawer {
 
 			if (_view.showReconHits()) {
 				for (int i = 0; i < _hitData.count(); i++) {
-					if ((sect == _hitData.sector[i]) && (panel == (_hitData.layer[i] - 1))) {
+					if ((sect == _hitData.sector(i)) && (panel == (_hitData.layer(i) - 1))) {
 						if (_hitData.contains(i, pp)) {
-							_hitData.hitFeedback("FTOF", i, feedbackStrings);
+							_hitData.addFeedback(i, feedbackStrings);
 							break;
 						}
 					}
