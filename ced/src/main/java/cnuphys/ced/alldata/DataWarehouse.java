@@ -76,7 +76,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	public static final int BRANCH = 12;
 
 	/** type names */
-	public static String[] typeNames = { "Unknown", "byte", "short", "int", "float", "double", "string", "group", "long", "vector3f", "composite", "table", "branch"};
+	private static final String[] TYPE_NAMES = { "Unknown", "byte", "short", "int", "float", "double", "string", "group", "long", "vector3f", "composite", "table", "branch"};
 
 	/** the column data used by the node panel */
 	private ArrayList<ColumnData> _columnData = new ArrayList<>();
@@ -146,6 +146,9 @@ public class DataWarehouse implements IClasIoEventListener {
 
 		_schemaFactory = schemaFactory;
 		_knownBanks.clear();
+		if (schemaFactory == null) {
+			return;
+		}
 
 		//schemas are banks
 		List<Schema> schemas = schemaFactory.getSchemaList();
@@ -172,8 +175,20 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return the data type of the column, or UNKNOWN if not found
 	 */
 	public int getType(String bankName, String columnName) {
-		Schema schema = _schemaFactory.getSchema(bankName);
-		return (schema == null) ? UNKNOWN : schema.getType(columnName);
+		return columnType(_schemaFactory, bankName, columnName);
+	}
+
+	static int columnType(SchemaFactory schemaFactory, String bankName, String columnName) {
+		Schema schema = findSchema(schemaFactory, bankName);
+		return (schema == null || columnName == null || !schema.hasEntry(columnName))
+				? UNKNOWN : schema.getType(columnName);
+	}
+
+	static Schema findSchema(SchemaFactory schemaFactory, String bankName) {
+		if (schemaFactory == null || bankName == null || !schemaFactory.hasSchema(bankName)) {
+			return null;
+		}
+		return schemaFactory.getSchema(bankName);
 	}
 
 	/**
@@ -183,8 +198,11 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return the data type name of the column, or "Unknown" if not found
 	 */
 	public String getTypeName(String bankName, String columnName) {
-		int type = getType(bankName, columnName);
-		return typeNames[type];
+		return typeName(getType(bankName, columnName));
+	}
+
+	static String typeName(int type) {
+		return (type < 0 || type >= TYPE_NAMES.length) ? TYPE_NAMES[UNKNOWN] : TYPE_NAMES[type];
 	}
 
 	/**
@@ -194,8 +212,9 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return the list of column names
 	 */
 	public String[] getColumnNames(String bankName) {
-		if (_knownBanks.contains(bankName)) {
-			List<String> list = _schemaFactory.getSchema(bankName).getEntryList();
+		Schema schema = findSchema(_schemaFactory, bankName);
+		if (schema != null) {
+			List<String> list = schema.getEntryList();
 			String[] array = new String[list.size()];
 			list.toArray(array);
 			Arrays.sort(array);

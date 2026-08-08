@@ -1,8 +1,9 @@
 package cnuphys.ced.alldata;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Proxy;
@@ -10,6 +11,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
+import org.jlab.jnp.hipo4.data.Schema;
+import org.jlab.jnp.hipo4.data.SchemaFactory;
 import org.junit.jupiter.api.Test;
 
 class DataWarehouseTest {
@@ -47,6 +50,22 @@ class DataWarehouseTest {
         assertFalse(DataWarehouse.hasColumn(bank, null));
         assertFalse(DataWarehouse.hasColumn(bank, "charge"));
         assertTrue(DataWarehouse.hasColumn(bank, "pid"));
+    }
+
+    @Test
+    void handlesMissingSchemasAndColumnsAsUnknown() {
+        SchemaFactory schemas = new SchemaFactory();
+        Schema particle = new Schema("REC::Particle", 1, 1);
+        schemas.addSchema(particle);
+
+        assertNull(DataWarehouse.findSchema(null, "REC::Particle"));
+        assertNull(DataWarehouse.findSchema(schemas, null));
+        assertNull(DataWarehouse.findSchema(schemas, "MISSING::Bank"));
+        assertSame(particle, DataWarehouse.findSchema(schemas, "REC::Particle"));
+        assertEquals(DataWarehouse.UNKNOWN, DataWarehouse.columnType(schemas, "REC::Particle", "missing"));
+        assertEquals("Unknown", DataWarehouse.typeName(-1));
+        assertEquals("Unknown", DataWarehouse.typeName(100));
+        assertEquals("int", DataWarehouse.typeName(DataWarehouse.INT32));
     }
 
     @SuppressWarnings("unchecked")
