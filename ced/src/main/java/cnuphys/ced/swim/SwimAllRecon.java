@@ -7,7 +7,6 @@ import cnuphys.bCNU.log.Log;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoReconEventView;
 import cnuphys.lund.LundId;
-import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
 import cnuphys.swim.Swimming;
 
@@ -52,7 +51,7 @@ public class SwimAllRecon implements ISwimAll {
 		double tolerance = 1.0e-6;
 
 		for (TrajectoryRowData trd : data) {
-			LundId lid = LundSupport.getInstance().get(trd.getId());
+			LundId lid = trd.getLundId();
 
 			if (lid != null) {
 				double sf = SwimRequestPolicy.maxPathForRecon(trd.getSource());

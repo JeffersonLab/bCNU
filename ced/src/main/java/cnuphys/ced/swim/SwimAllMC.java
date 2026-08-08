@@ -9,7 +9,6 @@ import cnuphys.bCNU.log.Log;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoMonteCarloView;
 import cnuphys.lund.LundId;
-import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
 import cnuphys.swim.Swimming;
 
@@ -59,7 +58,7 @@ public class SwimAllMC implements ISwimAll {
 		Set<String> swam = new HashSet<>();
 
 		for (TrajectoryRowData trd : data) {
-			LundId lid = LundSupport.getInstance().get(trd.getId());
+			LundId lid = trd.getLundId();
 
 			if (lid != null) {
 

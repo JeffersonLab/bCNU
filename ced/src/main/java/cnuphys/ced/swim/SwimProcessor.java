@@ -5,7 +5,6 @@ import cnuphys.CLAS12Swim.CLAS12Values;
 import cnuphys.bCNU.log.Log;
 import cnuphys.lund.GeneratedParticleRecord;
 import cnuphys.lund.LundId;
-import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
 import cnuphys.swim.Swimming;
 
@@ -19,10 +18,9 @@ public class SwimProcessor {
 
 	public void process() {
 		try {
-			LundId lid = LundSupport.getInstance().get(data.trd.getId());
-
 			CLAS12SwimResult result = null;
 			TrajectoryRowData trd = data.trd;
+			LundId lid = trd.getLundId();
 
 			// have to convert trd momentum to GeV
 			double p = trd.getMomentum() / 1000;
