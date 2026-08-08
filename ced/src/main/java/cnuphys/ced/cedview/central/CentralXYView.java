@@ -43,7 +43,7 @@ import cnuphys.ced.alldata.datacontainer.bmt.BMTRecHitData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
 import cnuphys.ced.alldata.datacontainer.cvt.CosmicData;
-import cnuphys.ced.alldata.datacontainer.tof.CTOFADCData;
+import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.datacontainer.tof.CTOFClusterData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
@@ -91,7 +91,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 	private HighlightData _bmtHighlightData = new HighlightData();
 
 	// data containers
-	private CTOFADCData _ctofADCData = CTOFADCData.getInstance();
+	private CTOFAdc _ctofADCData = CTOFAdc.getInstance();
 	private CTOFClusterData _clusterCTOFData = CTOFClusterData.getInstance();
 	private BSTADCData _bstADCData = BSTADCData.getInstance();
 	private BMTADCData _bmtADCData = BMTADCData.getInstance();
@@ -615,8 +615,8 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 						feedbackStrings.add("$cyan$CTOF paddle: " + paddle);
 
 						for (int i = 0; i < _ctofADCData.count(); i++) {
-							if (_ctofADCData.component[i] == paddle) {
-								_ctofADCData.adcFeedback("CTOF", i, feedbackStrings);
+							if (_ctofADCData.component(i) == paddle) {
+								_ctofADCData.addFeedback(i, feedbackStrings);
 							}
 						}
 

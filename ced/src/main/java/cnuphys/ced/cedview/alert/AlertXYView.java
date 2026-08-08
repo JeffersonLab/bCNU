@@ -25,7 +25,7 @@ import cnuphys.bCNU.item.YouAreHereItem;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.bCNU.view.BaseView;
-import cnuphys.ced.alldata.datacontainer.tof.CTOFADCData;
+import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.datacontainer.tof.CTOFClusterData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
@@ -96,7 +96,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 //	private int _maxADCThisEvent = -1;
 	
 	// data containers
-	private CTOFADCData _ctofADCData = CTOFADCData.getInstance();
+	private CTOFAdc _ctofADCData = CTOFAdc.getInstance();
 	private CTOFClusterData _clusterCTOFData = CTOFClusterData.getInstance();
 	
 	// draws hits
@@ -522,8 +522,8 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 					feedbackStrings.add("$cyan$CTOF paddle: " + paddle);
 
 					for (int i = 0; i < _ctofADCData.count(); i++) {
-						if (_ctofADCData.component[i] == paddle) {
-							_ctofADCData.adcFeedback("CTOF", i, feedbackStrings);
+						if (_ctofADCData.component(i) == paddle) {
+							_ctofADCData.addFeedback(i, feedbackStrings);
 						}
 					}
 

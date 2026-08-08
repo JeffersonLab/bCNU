@@ -14,7 +14,7 @@ import cnuphys.ced.alldata.datacontainer.bmt.BMTRecHitData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
 import cnuphys.ced.alldata.datacontainer.cnd.CNDADCData;
-import cnuphys.ced.alldata.datacontainer.tof.CTOFADCData;
+import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.datacontainer.tof.CTOFClusterData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.alert.AlertXYView;
@@ -37,7 +37,7 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 
 	// data containers
 	private CNDADCData adcCNDData = CNDADCData.getInstance();
-	private CTOFADCData adcCTOFData = CTOFADCData.getInstance();
+	private CTOFAdc adcCTOFData = CTOFAdc.getInstance();
 	private CTOFClusterData clusterCTOFData = CTOFClusterData.getInstance();
 	private BSTADCData adcBSTData = BSTADCData.getInstance();
 	private BMTADCData adcBMTData = BMTADCData.getInstance();
@@ -178,11 +178,11 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 
 		// draw based on adc data
 		for (int i = 0; i < adcCTOFData.count(); i++) {
-			CTOFXYPolygon poly = _iCentralView.getCTOFPolygon(adcCTOFData.component[i]);
+			CTOFXYPolygon poly = _iCentralView.getCTOFPolygon(adcCTOFData.component(i));
 			if (poly != null) {
-				Color color = adcCTOFData.getColor(adcCTOFData.sector[i], adcCTOFData.layer[i],
-						adcCTOFData.component[i], adcCTOFData.order[i]);
-				poly.draw(g, container, adcCTOFData.component[i], color);
+				Color color = adcCTOFData.componentColor(adcCTOFData.sector(i), adcCTOFData.layer(i),
+						adcCTOFData.component(i), adcCTOFData.order(i));
+				poly.draw(g, container, adcCTOFData.component(i), color);
 			}
 		}
 

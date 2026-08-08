@@ -14,7 +14,7 @@ import cnuphys.ced.alldata.datacontainer.cal.PCalADCData;
 import cnuphys.ced.alldata.datacontainer.cnd.CNDADCData;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.alldata.datacontainer.ftcal.FTCalADCData;
-import cnuphys.ced.alldata.datacontainer.tof.CTOFADCData;
+import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.FTOFAdc;
 import cnuphys.ced.cedview.alert.AlertDCGeometryNumbering;
 import cnuphys.ced.cedview.central.CentralXYView;
@@ -143,7 +143,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private ECalADCData ecADCData = ECalADCData.getInstance();
 	private PCalADCData pcADCData = PCalADCData.getInstance();
 	private FTOFAdc ftofADCData = FTOFAdc.getInstance();
-	private CTOFADCData ctofADCData = CTOFADCData.getInstance();
+	private CTOFAdc ctofADCData = CTOFAdc.getInstance();
 	private FTCalADCData ftcalADCData = FTCalADCData.getInstance();
 	private BSTADCData bstADCData = BSTADCData.getInstance();
 	private DCTDCandDOCAData dcTDCData = DCTDCandDOCAData.getInstance();
@@ -1138,7 +1138,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private void accumCTOF() {
 
 		for (int i = 0; i < ctofADCData.count(); i++) {
-			_CTOFAccumulatedData[ctofADCData.component[i] - 1] += 1;
+			_CTOFAccumulatedData[ctofADCData.component(i) - 1] += 1;
 		}
 	}
 

@@ -5,7 +5,7 @@ import java.awt.Color;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.ced.alldata.datacontainer.tof.CTOFADCData;
+import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.DetectorItem3D;
 
@@ -15,7 +15,7 @@ public class CTOF3D extends DetectorItem3D {
 	private CTOFPaddle3D _paddles[];
 
 	//data containers
-	private CTOFADCData _adcData = CTOFADCData.getInstance();
+	private CTOFAdc _adcData = CTOFAdc.getInstance();
 
 	/**
 	 * The 3D CND
@@ -41,9 +41,9 @@ public class CTOF3D extends DetectorItem3D {
 		}
 
 		for (int i = 0; i < _adcData.count(); i++) {
-			short paddleId = _adcData.component[i];
-			byte order = _adcData.order[i];
-			Color fc = _adcData.getColor((byte)1, (byte)1, paddleId, order);
+			short paddleId = _adcData.component(i);
+			byte order = _adcData.order(i);
+			Color fc = _adcData.componentColor((byte)1, (byte)1, paddleId, order);
 			_paddles[paddleId-1].drawPaddle(drawable, fc);
 		}
 	}
