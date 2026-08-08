@@ -135,9 +135,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return <code>true</code> if the current event has the bank
 	 */
 	public boolean hasBank(String bankName) {
-		DataEvent event = getCurrentEvent();
-
-		return (event != null) ? event.hasBank(bankName) : false;
+		return getBank(bankName) != null;
 	}
 
 	/**
@@ -234,11 +232,14 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return the bank or null
 	 */
 	public DataBank getBank(String bankName) {
-		DataEvent event = getCurrentEvent();
-		if (event != null) {
-			return event.getBank(bankName);
+		return findBank(getCurrentEvent(), bankName);
+	}
+
+	static DataBank findBank(DataEvent event, String bankName) {
+		if (event == null || bankName == null || !event.hasBank(bankName)) {
+			return null;
 		}
-		return null;
+		return event.getBank(bankName);
 	}
 
 	/**
@@ -354,15 +355,12 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return <code>true</code> if the current event has the bank and column
      */
 	public boolean bankContainsColumn(String bankName, String columnName) {
-		DataEvent event = getCurrentEvent();
-		if (event != null) {
-			DataBank bank = event.getBank(bankName);
-			if (bank != null) {
-		  	    String columnNames[] = bank.getColumnList();
-				for (String name : columnNames) {
-					if (name.equals(columnName)) {
-						return true;
-					}
+		DataBank bank = getBank(bankName);
+		if (bank != null && columnName != null) {
+			String columnNames[] = bank.getColumnList();
+			for (String name : columnNames) {
+				if (name.equals(columnName)) {
+					return true;
 				}
 			}
 		}
@@ -376,14 +374,8 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return the number of rows in the bank, or 0 if the bank is not found.
 	 */
 	public int rows(String bankName) {
-		DataEvent event = getCurrentEvent();
-		if (event != null) {
-			DataBank bank = event.getBank(bankName);
-			if (bank != null) {
-				return bank.rows();
-			}
-		}
-		return 0;
+		DataBank bank = getBank(bankName);
+		return (bank == null) ? 0 : bank.rows();
 	}
 
 
