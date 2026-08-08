@@ -30,7 +30,12 @@ public class SwimData {
 	 * @param tolerance the tolerance
 	 */
 	public SwimData(TrajectoryRowData trd, TrajectoryType trajectoryType, double sMax, double h, double tolerance) {
-		swimmer = CedSwimmerFactory.create();
+		this(trd, trajectoryType, sMax, h, tolerance, CedSwimmerFactory.create());
+	}
+
+	SwimData(TrajectoryRowData trd, TrajectoryType trajectoryType, double sMax, double h, double tolerance,
+			ICLAS12Swimmer swimmer) {
+		this.swimmer = swimmer;
 		this.trd = trd;
 		this.trajectoryType = trajectoryType;
 		this.sMax = sMax;
@@ -39,7 +44,7 @@ public class SwimData {
 	}
 	
 	public boolean isValid() {
-		return (trd != null && swimmer != null && sMax > 0 && h > 0 && tolerance > 0
+		return (trd != null && trajectoryType != null && swimmer != null && sMax > 0 && h > 0 && tolerance > 0
 				&& Math.abs(trd.getXo()) < 1.0e15 && Math.abs(trd.getYo()) < 1.0e15 
 				&& Math.abs(trd.getZo()) < 1.0e15 && Math.abs(trd.getTheta()) < 1.0e15
 				&& Math.abs(trd.getPhi()) < 1.0e15 && Math.abs(trd.getMomentum()) < 1.0e15
