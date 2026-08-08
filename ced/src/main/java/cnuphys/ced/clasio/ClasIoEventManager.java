@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
@@ -85,12 +86,19 @@ public class ClasIoEventManager {
 
 
 
-	// list of event listeners. There are actually three lists. Those in index 0
-	// are notified first. Then those in index 1. Finally those in index 2. The
-	// Data containers should be in index 0. The trajectory and noise in index 1, and
-	// the regular views in index 2 (they are notified last)
-	private final List<EventNotifier<ClasIoEventNotification>> eventNotifiers = List.of(
-			new EventNotifier<>(), new EventNotifier<>(), new EventNotifier<>());
+	// Listener phases are traversed in enum declaration order: authoritative data,
+	// derived processing, then views.
+	private final Map<ClasIoEventListenerPhase, EventNotifier<ClasIoEventNotification>> eventNotifiers =
+			createEventNotifiers();
+
+	private static Map<ClasIoEventListenerPhase, EventNotifier<ClasIoEventNotification>> createEventNotifiers() {
+		Map<ClasIoEventListenerPhase, EventNotifier<ClasIoEventNotification>> notifiers =
+				new EnumMap<>(ClasIoEventListenerPhase.class);
+		for (ClasIoEventListenerPhase phase : ClasIoEventListenerPhase.values()) {
+			notifiers.put(phase, new EventNotifier<>());
+		}
+		return notifiers;
+	}
 
 	// someone who can swim all MC particles
 	private ISwimAll _allMCSwimmer;
@@ -911,8 +919,8 @@ public class ClasIoEventManager {
 		Swimming.setNotifyOn(false); // prevent refreshes
 		Swimming.clearAllTrajectories();
 		Swimming.setNotifyOn(true); // prevent refreshes
-		for (int index = 0; index < eventNotifiers.size(); index++) {
-			eventNotifiers.get(index).nonThreadedTriggerEvent(new ClasIoEventNotification.SourceChanged(source));
+		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
+			notifier.nonThreadedTriggerEvent(new ClasIoEventNotification.SourceChanged(source));
 		}
 
 		Ced.getCed().fixTitle();
@@ -924,8 +932,8 @@ public class ClasIoEventManager {
 		Swimming.setNotifyOn(false); // prevent refreshes
 		Swimming.clearAllTrajectories();
 		Swimming.setNotifyOn(true); // prevent refreshes
-		for (int index = 0; index < eventNotifiers.size(); index++) {
-			eventNotifiers.get(index).nonThreadedTriggerEvent(
+		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
+			notifier.nonThreadedTriggerEvent(
 					new ClasIoEventNotification.OpenedFile(file.getAbsolutePath()));
 		}
 
@@ -952,8 +960,8 @@ public class ClasIoEventManager {
 		Ced.getCed().setEventFilteringLabel(FilterManager.getInstance().isFilteringOn());
 
 		Swimming.clearAllTrajectories();
-		for (int index = 0; index < eventNotifiers.size(); index++) {
-			eventNotifiers.get(index).nonThreadedTriggerEvent(new ClasIoEventNotification.NewEvent(_currentEvent));
+		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
+			notifier.nonThreadedTriggerEvent(new ClasIoEventNotification.NewEvent(_currentEvent));
 		}
 		finalSteps();
 
@@ -1009,8 +1017,8 @@ public class ClasIoEventManager {
 	 * @param listener the IClasIoEventListener listener to remove.
 	 */
 	public void removeClasIoEventListener(IClasIoEventListener listener) {
-		for (int i = 0; i < eventNotifiers.size(); i++) {
-			eventNotifiers.get(i).removeListener(listener);
+		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
+			notifier.removeListener(listener);
 		}
 	}
 
@@ -1023,7 +1031,7 @@ public class ClasIoEventManager {
 	 *              second, and views last
 	 */
 	public void addClasIoEventListener(IClasIoEventListener listener, ClasIoEventListenerPhase phase) {
-		eventNotifiers.get(phase.ordinal()).addListener(listener);
+		eventNotifiers.get(phase).addListener(listener);
 	}
 
 	/**
