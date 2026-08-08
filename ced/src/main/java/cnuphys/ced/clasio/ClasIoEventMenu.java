@@ -8,6 +8,9 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -16,6 +19,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -286,13 +290,16 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 		Vector<String> recentFiles = Environment.getInstance().getPreferenceList(_recentFileKey);
 
 		if (recentFiles != null) {
+			Vector<String> validFiles = new Vector<>(recentFiles.size());
 			for (String fn : recentFiles) {
-
-				// make sure the file still exists
 				File file = new File(fn);
-				if (file.exists()) {
+				if (canOpenEventFile(file)) {
 					addMenu(fn, false);
+					validFiles.add(fn);
 				}
+			}
+			if (validFiles.size() != recentFiles.size()) {
+				saveRecentFiles(validFiles);
 			}
 		}
 
@@ -316,25 +323,22 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-				try {
-					String fn = ae.getActionCommand();
-					File file = new File(fn);
+				String fn = ae.getActionCommand();
+				File file = new File(fn);
+				if (!canOpenEventFile(file)) {
+					removeRecentFile(fn);
+					showOpenError(file, "The file no longer exists or is not readable.");
+					return;
+				}
 
-					if (file.exists()) {
-						try {
-							if (_hipoEventFileFilter.accept(file)) {
-								ClasIoEventManager.getInstance().openHipoEventFile(file);
-							} else if (_evioEventFileFilter.accept(file)) {
-								ClasIoEventManager.getInstance().openEvioEventFile(file);
-							}
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+				try {
+					if (_hipoEventFileFilter.accept(file)) {
+						ClasIoEventManager.getInstance().openHipoEventFile(file);
+					} else if (_evioEventFileFilter.accept(file)) {
+						ClasIoEventManager.getInstance().openEvioEventFile(file);
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
+				} catch (IOException | RuntimeException e) {
+					showOpenError(file, e.getMessage());
 				}
 			}
 
@@ -348,6 +352,44 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 			_recentMenu.add(item);
 		}
 
+	}
+
+	static boolean canOpenEventFile(File file) {
+		if (file == null || !file.isFile() || !file.canRead()) {
+			return false;
+		}
+		try (SeekableByteChannel ignored = Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
+			return true;
+		} catch (IOException | SecurityException e) {
+			return false;
+		}
+	}
+
+	private static void removeRecentFile(String path) {
+		JMenuItem item = (_menuItems == null) ? null : _menuItems.remove(path);
+		if (item != null && _recentMenu != null) {
+			_recentMenu.remove(item);
+		}
+		Vector<String> recentFiles = Environment.getInstance().getPreferenceList(_recentFileKey);
+		if (recentFiles != null && recentFiles.remove(path)) {
+			saveRecentFiles(recentFiles);
+		}
+	}
+
+	private static void saveRecentFiles(Vector<String> recentFiles) {
+		if (recentFiles == null || recentFiles.isEmpty()) {
+			Environment.getInstance().savePreference(_recentFileKey, "");
+		} else {
+			Environment.getInstance().savePreferenceList(_recentFileKey, recentFiles);
+		}
+	}
+
+	private static void showOpenError(File file, String detail) {
+		String message = "Could not open event file:\n" + file.getPath();
+		if (detail != null && !detail.isBlank()) {
+			message += "\n\n" + detail;
+		}
+		JOptionPane.showMessageDialog(Ced.getFrame(), message, "Event File Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	/**
