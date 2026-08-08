@@ -15,7 +15,7 @@ import cnuphys.ced.alldata.datacontainer.cnd.CNDADCData;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.alldata.datacontainer.ftcal.FTCalADCData;
 import cnuphys.ced.alldata.datacontainer.tof.CTOFADCData;
-import cnuphys.ced.alldata.datacontainer.tof.FTOFADCData;
+import cnuphys.ced.alldata.FTOFAdc;
 import cnuphys.ced.cedview.alert.AlertDCGeometryNumbering;
 import cnuphys.ced.cedview.central.CentralXYView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -142,7 +142,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private CNDADCData cndADCData = CNDADCData.getInstance();
 	private ECalADCData ecADCData = ECalADCData.getInstance();
 	private PCalADCData pcADCData = PCalADCData.getInstance();
-	private FTOFADCData ftofADCData = FTOFADCData.getInstance();
+	private FTOFAdc ftofADCData = FTOFAdc.getInstance();
 	private CTOFADCData ctofADCData = CTOFADCData.getInstance();
 	private FTCalADCData ftcalADCData = FTCalADCData.getInstance();
 	private BSTADCData bstADCData = BSTADCData.getInstance();
@@ -1146,17 +1146,17 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private void accumFTOF() {
 
 		for (int i = 0; i < ftofADCData.count(); i++) {
-			int sect0 = ftofADCData.sector[i] - 1;
-			int paddle0 = ftofADCData.component[i] - 1;
+			int sect0 = ftofADCData.sector(i) - 1;
+			int paddle0 = ftofADCData.component(i) - 1;
 
-			if (ftofADCData.layer[i] == 1) {
+			if (ftofADCData.layer(i) == 1) {
 				_FTOF1AAccumulatedData[sect0][paddle0] += 1;
-			} else if (ftofADCData.layer[i] == 2) {
+			} else if (ftofADCData.layer(i) == 2) {
 				_FTOF1BAccumulatedData[sect0][paddle0] += 1;
-			} else if (ftofADCData.layer[i] == 3) {
+			} else if (ftofADCData.layer(i) == 3) {
 				_FTOF2AccumulatedData[sect0][paddle0] += 1;
 			} else {
-				System.out.println("ERROR:  accumFTOF layer out of bounds: " + ftofADCData.layer[i]);
+				System.out.println("ERROR:  accumFTOF layer out of bounds: " + ftofADCData.layer(i));
 			}
 		}
 

@@ -10,7 +10,7 @@ import java.awt.geom.Point2D;
 import java.util.List;
 
 import cnuphys.bCNU.graphics.container.IContainer;
-import cnuphys.ced.alldata.datacontainer.tof.FTOFADCData;
+import cnuphys.ced.alldata.FTOFAdc;
 
 /**
  * Handles drawing and feedback for the adc (and tdc) bank
@@ -24,7 +24,7 @@ public class FTOFAdcHandler {
 	private FTOFView _view;
 
 	//data containers
-	private FTOFADCData _adcData = FTOFADCData.getInstance();
+	private FTOFAdc _adcData = FTOFAdc.getInstance();
 
 	public FTOFAdcHandler(FTOFView view) {
 		_view = view;
@@ -42,12 +42,12 @@ public class FTOFAdcHandler {
 
 			Polygon poly = new Polygon();
 			for (int i = 0; i < count; i++) {
-				int panel = _adcData.layer[i] - 1; // nasty -- this is zero based
+				int panel = _adcData.layer(i) - 1; // nasty -- this is zero based
 				if (panel == _view.displayPanel()) {
 
-					_view.getPaddlePolygon(container, _adcData.sector[i], panel, _adcData.component[i], poly);
-					Color colorL = _adcData.getColor(_adcData.sector[i], _adcData.layer[i], _adcData.component[i], (byte) 0);
-					Color colorR = _adcData.getColor(_adcData.sector[i], _adcData.layer[i], _adcData.component[i], (byte) 1);
+					_view.getPaddlePolygon(container, _adcData.sector(i), panel, _adcData.component(i), poly);
+					Color colorL = _adcData.componentColor(_adcData.sector(i), _adcData.layer(i), _adcData.component(i), (byte) 0);
+					Color colorR = _adcData.componentColor(_adcData.sector(i), _adcData.layer(i), _adcData.component(i), (byte) 1);
 
 					if (colorL == null) {
 						colorL = Color.white;
@@ -85,8 +85,8 @@ public class FTOFAdcHandler {
 			List<String> feedbackStrings) {
 
 		for (int i = 0; i < _adcData.count(); i++) {
-			if ((_adcData.sector[i] == sect) && (_adcData.layer[i] == layer) && (_adcData.component[i] == paddleId)) {
-				_adcData.adcFeedback("FTOF", i, feedbackStrings);
+			if ((_adcData.sector(i) == sect) && (_adcData.layer(i) == layer) && (_adcData.component(i) == paddleId)) {
+				_adcData.addFeedback(i, feedbackStrings);
 			}
 		}
 	}

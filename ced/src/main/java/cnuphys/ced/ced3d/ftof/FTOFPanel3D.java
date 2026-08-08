@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import com.jogamp.opengl.GLAutoDrawable;
 
-import cnuphys.ced.alldata.datacontainer.tof.FTOFADCData;
+import cnuphys.ced.alldata.FTOFAdc;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.ced3d.PlainPanel3D;
 import cnuphys.ced.geometry.ftof.FTOFGeometry;
@@ -21,7 +21,7 @@ public class FTOFPanel3D extends DetectorItem3D {
 	private final int _panelId;
 
 	//data containers
-	private FTOFADCData _adcData = FTOFADCData.getInstance();
+	private FTOFAdc _adcData = FTOFAdc.getInstance();
 
 
 	/**
@@ -70,10 +70,10 @@ public class FTOFPanel3D extends DetectorItem3D {
 		// draw based on ADC data
 		byte layer = (byte) (_panelId + 1);
 		for (int i = 0; i < _adcData.count(); i++) {
-			if ((_adcData.sector[i] == _sector) && (_adcData.layer[i] == layer)) {
-				Color fc = _adcData.getColor(_adcData.sector[i], _adcData.layer[i], _adcData.component[i],
-						_adcData.order[i]);
-				getPaddle(_adcData.component[i]).drawPaddle(drawable, fc);
+			if ((_adcData.sector(i) == _sector) && (_adcData.layer(i) == layer)) {
+				Color fc = _adcData.componentColor(_adcData.sector(i), _adcData.layer(i), _adcData.component(i),
+						_adcData.order(i));
+				getPaddle(_adcData.component(i)).drawPaddle(drawable, fc);
 			}
 		} //end has data
 	}

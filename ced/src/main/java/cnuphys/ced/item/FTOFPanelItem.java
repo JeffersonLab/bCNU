@@ -13,9 +13,9 @@ import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.ced.alldata.DataDrawSupport;
+import cnuphys.ced.alldata.FTOFAdc;
 import cnuphys.ced.alldata.FTOFClusters;
 import cnuphys.ced.alldata.FTOFHits;
-import cnuphys.ced.alldata.datacontainer.tof.FTOFADCData;
 import cnuphys.ced.cedview.sectorview.SectorView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
@@ -37,7 +37,7 @@ public class FTOFPanelItem extends PolygonItem {
 	private ClasIoEventManager _eventManager = ClasIoEventManager.getInstance();
 
 	//data containers
-	private FTOFADCData _adcData = FTOFADCData.getInstance();
+	private FTOFAdc _adcData = FTOFAdc.getInstance();
 	private FTOFClusters _clusterData = FTOFClusters.getInstance();
 	private FTOFHits _hitData = FTOFHits.getInstance();
 
@@ -165,11 +165,11 @@ public class FTOFPanelItem extends PolygonItem {
 		byte layer = (byte) (_ftofPanel.getPanelType() + 1); //(now) 1-based
 
 		for (int i = 0; i < _adcData.count(); i++) {
-			if ((_adcData.sector[i] == sect) && (_adcData.layer[i] == layer)) {
-				Point2D.Double wp[] = getPaddle(_view, _adcData.component[i] - 1, _ftofPanel, _sector);
+			if ((_adcData.sector(i) == sect) && (_adcData.layer(i) == layer)) {
+				Point2D.Double wp[] = getPaddle(_view, _adcData.component(i) - 1, _ftofPanel, _sector);
 
 				if (wp != null) {
-					Color fc = _adcData.getADCColor(i);
+					Color fc = _adcData.adcColor(i);
 					Path2D.Double path = WorldGraphicsUtilities.worldPolygonToPath(wp);
 					WorldGraphicsUtilities.drawPath2D(g, container, path, fc, _style.getLineColor(), 0, LineStyle.SOLID,
 							true);
@@ -337,9 +337,9 @@ public class FTOFPanelItem extends PolygonItem {
 							+ FTOFGeometry.getLength(_ftofPanel.getPanelType(), index) + " cm");
 
 					for (int i = 0; i < _adcData.count(); i++) {
-						if ((_adcData.sector[i] == sect) && (_adcData.layer[i] == layer)
-								&& (_adcData.component[i] == paddle)) {
-							_adcData.adcFeedback("FTOF", i, feedbackStrings);
+						if ((_adcData.sector(i) == sect) && (_adcData.layer(i) == layer)
+								&& (_adcData.component(i) == paddle)) {
+							_adcData.addFeedback(i, feedbackStrings);
 							break;
 						}
 					}
