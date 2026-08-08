@@ -908,17 +908,12 @@ public class ClasIoEventManager {
 	 * @param path the path to the new file
 	 */
 	private void notifyEventListeners(EventSourceType source) {
-
-	//	Swimming.clearAllTrajectories();
-
 		if (_dataSource != null) {
 			_currentEvent = null;
 			_currentEventIndex = 0;
 		}
 
-		Swimming.setNotifyOn(false); // prevent refreshes
-		Swimming.clearAllTrajectories();
-		Swimming.setNotifyOn(true); // prevent refreshes
+		clearTrajectoriesWithoutNotification();
 		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
 			notifier.nonThreadedTriggerEvent(new ClasIoEventNotification.SourceChanged(source));
 		}
@@ -929,9 +924,7 @@ public class ClasIoEventManager {
 	// new event file notification
 	private void notifyEventListeners(File file) {
 
-		Swimming.setNotifyOn(false); // prevent refreshes
-		Swimming.clearAllTrajectories();
-		Swimming.setNotifyOn(true); // prevent refreshes
+		clearTrajectoriesWithoutNotification();
 		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
 			notifier.nonThreadedTriggerEvent(
 					new ClasIoEventNotification.OpenedFile(file.getAbsolutePath()));
@@ -952,19 +945,25 @@ public class ClasIoEventManager {
 			return;
 		}
 
-		Swimming.setNotifyOn(false); // prevent refreshes
-		Swimming.clearAllTrajectories();
-		Swimming.setNotifyOn(true); // prevent refreshes
+		clearTrajectoriesWithoutNotification();
 
 		_uniqueLundIds = null;
 		Ced.getCed().setEventFilteringLabel(FilterManager.getInstance().isFilteringOn());
 
-		Swimming.clearAllTrajectories();
 		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
 			notifier.nonThreadedTriggerEvent(new ClasIoEventNotification.NewEvent(_currentEvent));
 		}
 		finalSteps();
 
+	}
+
+	private static void clearTrajectoriesWithoutNotification() {
+		Swimming.setNotifyOn(false);
+		try {
+			Swimming.clearAllTrajectories();
+		} finally {
+			Swimming.setNotifyOn(true);
+		}
 	}
 
 
