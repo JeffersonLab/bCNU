@@ -1,6 +1,10 @@
 name: Maven verification
 
 on:
+  push:
+    branches:
+      - develop
+      - ced-commons-math-swimmer
   pull_request:
   workflow_dispatch:
 
