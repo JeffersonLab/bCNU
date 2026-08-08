@@ -30,16 +30,30 @@ of these prerequisites before the first build with:
 ./scripts/bootstrap-maven-dependencies.sh
 ```
 
-The script expects the coatjava source checkout beside this repository. Set
-`COATJAVA_HOME` when it is elsewhere:
+CED currently keeps its established coatjava 13.7.1-compatible swimmer while
+loading the experimental Commons Math swimmer from a separate Maven artifact.
+The script therefore expects two coatjava checkouts beside this repository.
+Pin the legacy worktree to the last CED-compatible baseline; the upstream
+13.7.1 tag does not contain the trajectory-drawing API used by this CED tree:
 
 ```bash
-COATJAVA_HOME=/path/to/coatjava ./scripts/bootstrap-maven-dependencies.sh
+git -C ../coatjava worktree add --detach ../coatjava-13.7.1 7a073f9a4
+./scripts/bootstrap-maven-dependencies.sh
 ```
 
-It also handles the current swimmer dependency-analysis failure by installing
-the successfully produced swimmer artifact directly. This bootstrap will
-disappear as the legacy libraries are replaced by MDI.
+By default, `../coatjava-13.7.1` supplies the production cnuphys artifacts and
+`../coatjava` supplies `cnuphys:clas12-swimmer` from the
+`CLAS12Swim-commons-math` branch. Override those locations when necessary:
+
+```bash
+COATJAVA_LEGACY_HOME=/path/to/coatjava-13.7.1 \
+COATJAVA_EXPERIMENTAL_HOME=/path/to/coatjava-experimental \
+./scripts/bootstrap-maven-dependencies.sh
+```
+
+The experimental artifact is additive; it does not replace the production
+`cnuphys:swimmer` dependency. This bootstrap will disappear as the legacy
+libraries are replaced by MDI.
 
 ## Build
 
