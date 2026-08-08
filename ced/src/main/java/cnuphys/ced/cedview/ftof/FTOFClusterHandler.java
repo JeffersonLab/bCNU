@@ -9,7 +9,7 @@ import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.datacontainer.tof.FTOFClusterData;
+import cnuphys.ced.alldata.FTOFClusters;
 import cnuphys.ced.clasio.ClasIoEventManager;
 
 public class FTOFClusterHandler {
@@ -23,7 +23,7 @@ public class FTOFClusterHandler {
 	private FTOFView _view;
 
 	// cluster data
-	private FTOFClusterData _clusterData = FTOFClusterData.getInstance();
+	private FTOFClusters _clusterData = FTOFClusters.getInstance();
 
 	public FTOFClusterHandler(FTOFView view) {
 		_view = view;
@@ -38,9 +38,9 @@ public class FTOFClusterHandler {
 			}
 
 			for (int i = 0; i < _clusterData.count(); i++) {
-				int panel = _clusterData.layer[i] - 1;
+				int panel = _clusterData.layer(i) - 1;
 				if (panel == _view.displayPanel()) {
-					_wp.setLocation(_clusterData.x[i], _clusterData.y[i]);
+					_wp.setLocation(_clusterData.x(i), _clusterData.y(i));
 					container.worldToLocal(_pp, _wp);
 					DataDrawSupport.drawCluster(g, _pp);
 					_clusterData.setLocation(i, _pp);
@@ -69,13 +69,13 @@ public class FTOFClusterHandler {
 		if (_view.isSingleEventMode() && _view.showClusters()) {
 
 			for (int i = 0; i < _clusterData.count(); i++) {
-			if ((sect == _clusterData.sector[i]) && (panel == (_clusterData.layer[i] - 1))) {
-				_wp.setLocation(_clusterData.x[i], _clusterData.y[i]);
+			if ((sect == _clusterData.sector(i)) && (panel == (_clusterData.layer(i) - 1))) {
+				_wp.setLocation(_clusterData.x(i), _clusterData.y(i));
 
 				container.worldToLocal(_pp, _wp);
 
 				if (_clusterData.contains(i, pp)) {
-					_clusterData.feedback("FTOF", i, feedbackStrings);
+					_clusterData.addFeedback(i, feedbackStrings);
 					break;
 				}
 			}

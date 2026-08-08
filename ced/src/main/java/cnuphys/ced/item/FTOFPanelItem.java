@@ -13,9 +13,9 @@ import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.ced.alldata.DataDrawSupport;
+import cnuphys.ced.alldata.FTOFClusters;
 import cnuphys.ced.alldata.FTOFHits;
 import cnuphys.ced.alldata.datacontainer.tof.FTOFADCData;
-import cnuphys.ced.alldata.datacontainer.tof.FTOFClusterData;
 import cnuphys.ced.cedview.sectorview.SectorView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
@@ -38,7 +38,7 @@ public class FTOFPanelItem extends PolygonItem {
 
 	//data containers
 	private FTOFADCData _adcData = FTOFADCData.getInstance();
-	private FTOFClusterData _clusterData = FTOFClusterData.getInstance();
+	private FTOFClusters _clusterData = FTOFClusters.getInstance();
 	private FTOFHits _hitData = FTOFHits.getInstance();
 
 	/**
@@ -192,8 +192,8 @@ public class FTOFPanelItem extends PolygonItem {
 
 
 		for (int i = 0; i < _clusterData.count(); i++) {
-			if ((_clusterData.sector[i] == _sector) && (_clusterData.layer[i] == layer)) {
-				_view.projectClasToWorld(_clusterData.x[i], _clusterData.y[i], _clusterData.z[i],
+			if ((_clusterData.sector(i) == _sector) && (_clusterData.layer(i) == layer)) {
+				_view.projectClasToWorld(_clusterData.x(i), _clusterData.y(i), _clusterData.z(i),
 						_view.getProjectionPlane(), wp);
 				container.worldToLocal(pp, wp);
 				DataDrawSupport.drawCluster(g, pp);
@@ -379,9 +379,9 @@ public class FTOFPanelItem extends PolygonItem {
 		if (_view.showClusters()) {
 
 			for (int i = 0; i < _clusterData.count(); i++) {
-				if ((_clusterData.sector[i] == _sector) && (_clusterData.layer[i] == _ftofPanel.getPanelType() + 1)) {
+				if ((_clusterData.sector(i) == _sector) && (_clusterData.layer(i) == _ftofPanel.getPanelType() + 1)) {
 					if (_clusterData.contains(i, screenPoint)) {
-						_clusterData.feedback("FTOF", i, feedbackStrings);
+						_clusterData.addFeedback(i, feedbackStrings);
 						break;
 					}
 				}

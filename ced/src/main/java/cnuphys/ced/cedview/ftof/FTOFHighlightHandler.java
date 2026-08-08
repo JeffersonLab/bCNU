@@ -7,8 +7,8 @@ import java.util.Hashtable;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DataDrawSupport;
+import cnuphys.ced.alldata.FTOFClusters;
 import cnuphys.ced.alldata.FTOFHits;
-import cnuphys.ced.alldata.datacontainer.tof.FTOFClusterData;
 
 public class FTOFHighlightHandler {
 
@@ -20,7 +20,7 @@ public class FTOFHighlightHandler {
 	private Point2D.Double _wp = new Point2D.Double();
 
 	// cluster data
-	private FTOFClusterData _clusterData = FTOFClusterData.getInstance();
+	private FTOFClusters _clusterData = FTOFClusters.getInstance();
 
 	//hit data
 	private FTOFHits _hitData = FTOFHits.getInstance();
@@ -59,10 +59,10 @@ public class FTOFHighlightHandler {
 		if ((index != null) && index.intValue() >= 0) {
 			int row = index.intValue();
 
-            byte layer = _clusterData.layer[row];
+            byte layer = _clusterData.layer(row);
 			if (_view.displayPanel() == (layer-1)) {
-				double x = _clusterData.x[row];
-				double y = _clusterData.y[row];
+				double x = _clusterData.x(row);
+				double y = _clusterData.y(row);
 				_wp.setLocation(x, y);
 				container.worldToLocal(_pp, _wp);
 				DataDrawSupport.drawClusterHighlight(g, _pp);
