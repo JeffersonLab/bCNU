@@ -19,6 +19,7 @@ import cnuphys.ced.alldata.datacontainer.tof.FTOFADCData;
 import cnuphys.ced.cedview.alert.AlertDCGeometryNumbering;
 import cnuphys.ced.cedview.central.CentralXYView;
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.IAccumulator;
 import cnuphys.ced.clasio.IClasIoEventListener;
 import cnuphys.ced.geometry.BSTGeometry;
@@ -152,7 +153,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	 */
 	private AccumulationManager() {
 		addAccumulationListener(this);
-		_eventManager.addClasIoEventListener(this, 1);
+		_eventManager.addClasIoEventListener(this, ClasIoEventListenerPhase.DERIVED);
 
 
 		// FTCAL data

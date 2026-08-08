@@ -6,6 +6,7 @@ import org.jlab.io.base.DataEvent;
 
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
 import cnuphys.ced.clasio.IClasIoEventListener;
 
@@ -19,7 +20,7 @@ public class TriggerMenuPanel extends TriggerPanel implements IClasIoEventListen
 
 	public TriggerMenuPanel() {
 		super(true);
-		ClasIoEventManager.getInstance().addClasIoEventListener(this, 2);
+		ClasIoEventManager.getInstance().addClasIoEventListener(this, ClasIoEventListenerPhase.VIEW);
 	}
 
 	@Override

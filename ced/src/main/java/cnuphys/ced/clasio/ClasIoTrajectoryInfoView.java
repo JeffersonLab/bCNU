@@ -23,7 +23,7 @@ public abstract class ClasIoTrajectoryInfoView extends BaseView implements IClas
 		add(_trajectoryTable.getScrollPane());
 
 		// need to listen for events
-		_eventManager.addClasIoEventListener(this, 1);
+		_eventManager.addClasIoEventListener(this, ClasIoEventListenerPhase.DERIVED);
 	}
 
 	/**

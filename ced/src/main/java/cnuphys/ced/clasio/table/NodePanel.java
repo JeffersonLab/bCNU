@@ -33,6 +33,7 @@ import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.ColumnData;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.ClasIoPresentBankPanel;
 import cnuphys.ced.clasio.IClasIoEventListener;
 import cnuphys.ced.event.AccumulationManager;
@@ -88,7 +89,7 @@ public class NodePanel extends JPanel
 	 */
 	public NodePanel(BaseView view) {
 		_view = view;
-		_eventManager.addClasIoEventListener(this, 1);
+		_eventManager.addClasIoEventListener(this, ClasIoEventListenerPhase.DERIVED);
 
 		setLayout(new BorderLayout());
 		addCenter();

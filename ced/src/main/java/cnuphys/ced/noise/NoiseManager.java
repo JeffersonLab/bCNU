@@ -6,6 +6,7 @@ import org.jlab.io.base.DataEvent;
 
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.IClasIoEventListener;
 import cnuphys.snr.NoiseReductionParameters;
 import cnuphys.snr.SNRAnalysisLevel;
@@ -39,7 +40,7 @@ public class NoiseManager implements IClasIoEventListener {
 	// private constructor
 	private NoiseManager() {
 		// I need to be notified before the views
-		_eventManager.addClasIoEventListener(this, 1);
+		_eventManager.addClasIoEventListener(this, ClasIoEventListenerPhase.DERIVED);
 	}
 
 	/**

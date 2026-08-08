@@ -42,6 +42,7 @@ import cnuphys.bCNU.view.ViewManager;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.IClasIoEventListener;
 import cnuphys.ced.clasio.datatable.IDataSelectedListener;
 import cnuphys.ced.clasio.datatable.SelectedDataManager;
@@ -193,7 +194,7 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 
 		readCommonProperties();
 
-		_eventManager.addClasIoEventListener(this, 2);
+		_eventManager.addClasIoEventListener(this, ClasIoEventListenerPhase.VIEW);
 
 		SelectedDataManager.addDataSelectedListener(this);
 

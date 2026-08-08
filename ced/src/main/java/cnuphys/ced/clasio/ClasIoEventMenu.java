@@ -86,7 +86,7 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 	public ClasIoEventMenu(boolean includeAccumulation, boolean includeQuit) {
 		super("Events");
 
-		_eventManager.addClasIoEventListener(this, 1);
+		_eventManager.addClasIoEventListener(this, ClasIoEventListenerPhase.DERIVED);
 
 		if (_hipoEventFileFilter == null) {
 			_hipoEventFileFilter = new FileFilter() {

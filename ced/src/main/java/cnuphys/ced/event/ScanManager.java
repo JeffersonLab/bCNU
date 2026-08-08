@@ -5,6 +5,7 @@ import java.util.TreeMap;
 import org.jlab.io.base.DataEvent;
 
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
 import cnuphys.ced.clasio.IClasIoEventListener;
 
@@ -23,7 +24,7 @@ public class ScanManager implements IClasIoEventListener {
 
 	//private constructor for singleton
 	private ScanManager() {
-		_eventManager.addClasIoEventListener(this, 1);
+		_eventManager.addClasIoEventListener(this, ClasIoEventListenerPhase.DERIVED);
 	}
 
 	//the map. Keys are true even numbers, values are sequential numbers

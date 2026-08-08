@@ -6,6 +6,7 @@ import cnuphys.bCNU.util.TextUtilities;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.IClasIoEventListener;
 import cnuphys.ced.component.IBankMatching;
 import cnuphys.ced.event.AccumulationManager;
@@ -42,7 +43,7 @@ public abstract class CedView3D extends PlainView3D
 	public CedView3D(String title, float angleX, float angleY, float angleZ, float xDist, float yDist, float zDist) {
 		super(title, angleX, angleY, angleZ, xDist, yDist, zDist);
 
-		_eventManager.addClasIoEventListener(this, 2);
+		_eventManager.addClasIoEventListener(this, ClasIoEventListenerPhase.VIEW);
 
 		// listen for trajectory changes
 		Swimming.addSwimTrajectoryListener(this);

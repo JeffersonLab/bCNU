@@ -1019,14 +1019,19 @@ public class ClasIoEventManager {
 	 * events.
 	 *
 	 * @param listener the IClasIoEventListener listener to add.
-	 * @param index    Determines gross notification order. Those in index 0 are
-	 *                 notified first. Then those in index 1. Finally those in index
-	 *                 2. The Data containers should be in index 0. The trajectory
-	 *                 and noise in index 1, and the regular views in index 2 (they
-	 *                 are notified last)
+	 * @param phase determines notification order: data first, derived processing
+	 *              second, and views last
 	 */
+	public void addClasIoEventListener(IClasIoEventListener listener, ClasIoEventListenerPhase phase) {
+		eventNotifiers.get(phase.ordinal()).addListener(listener);
+	}
+
+	/**
+	 * @deprecated use {@link #addClasIoEventListener(IClasIoEventListener, ClasIoEventListenerPhase)}
+	 */
+	@Deprecated(forRemoval = false)
 	public void addClasIoEventListener(IClasIoEventListener listener, int index) {
-		eventNotifiers.get(index).addListener(listener);
+		addClasIoEventListener(listener, ClasIoEventListenerPhase.fromIndex(index));
 	}
 
 

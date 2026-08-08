@@ -4,6 +4,7 @@ import org.jlab.io.base.DataEvent;
 
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
 import cnuphys.ced.clasio.IClasIoEventListener;
 import cnuphys.ced.clasio.filter.FilterManager;
@@ -28,7 +29,7 @@ public class TriggerManager implements IClasIoEventListener {
 
 	// private constructor for singleton
 	private TriggerManager() {
-		ClasIoEventManager.getInstance().addClasIoEventListener(this, 2);
+		ClasIoEventManager.getInstance().addClasIoEventListener(this, ClasIoEventListenerPhase.VIEW);
 	}
 
 	/**

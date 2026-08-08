@@ -26,6 +26,7 @@ import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
 import cnuphys.ced.clasio.IClasIoEventListener;
 import cnuphys.ced.clasio.datatable.BankDataTable;
@@ -102,7 +103,7 @@ public class CedDataView extends BaseView
 		pack();
 
         //add event listener
-		_eventManager.addClasIoEventListener(this, 2);
+		_eventManager.addClasIoEventListener(this, ClasIoEventListenerPhase.VIEW);
 
 		_isReady = true;
 	}

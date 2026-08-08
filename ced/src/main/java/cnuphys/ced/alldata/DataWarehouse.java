@@ -15,6 +15,7 @@ import cnuphys.bCNU.threading.EventNotifier;
 import cnuphys.bCNU.util.Environment;
 import cnuphys.ced.alldata.datacontainer.IDataContainer;
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
 import cnuphys.ced.clasio.IClasIoEventListener;
 
@@ -35,7 +36,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	private DataWarehouse() {
 		String cpath = Environment.getInstance().getClassPath();
 		System.out.println("DataWarehouse classpath: " + cpath);
-		ClasIoEventManager.getInstance().addClasIoEventListener(this, 0);
+		ClasIoEventManager.getInstance().addClasIoEventListener(this, ClasIoEventListenerPhase.DATA);
 		System.out.println("DataWarehouse created and registered as a listener");
 	}
 

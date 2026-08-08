@@ -152,7 +152,7 @@ public class ClasIoPresentBankPanel extends JPanel {
 				});
 			}
 		};
-		ClasIoEventManager.getInstance().addClasIoEventListener(_eventListener, 1);
+		ClasIoEventManager.getInstance().addClasIoEventListener(_eventListener, ClasIoEventListenerPhase.DERIVED);
 	}
 
 

@@ -9,6 +9,7 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 
 import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.IClasIoEventListener;
 
 /**
@@ -56,7 +57,7 @@ public abstract class CedWindow extends JFrame implements WindowListener, IClasI
         addWindowListener(this);
 
         //add event listener
-		_eventManager.addClasIoEventListener(this, 2);
+		_eventManager.addClasIoEventListener(this, ClasIoEventListenerPhase.VIEW);
    }
 
     // WindowListener methods
