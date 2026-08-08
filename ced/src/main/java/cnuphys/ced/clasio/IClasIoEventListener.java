@@ -4,10 +4,9 @@ import java.util.EventListener;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.threading.IEventListener;
 
-public interface IClasIoEventListener extends EventListener, IEventListener<Object> {
+public interface IClasIoEventListener extends EventListener, IEventListener<ClasIoEventNotification> {
 	/**
 	 * Notifies listeners that a new event has arrived.
 	 *
@@ -31,16 +30,8 @@ public interface IClasIoEventListener extends EventListener, IEventListener<Obje
 
 
 	@Override
-	default public void newEvent(Object data) {
-		if (data instanceof DataEvent) {
-			newClasIoEvent((DataEvent) data);
-		} else if (data instanceof String) {
-			openedNewEventFile((String) data);
-		} else if (data instanceof ClasIoEventManager.EventSourceType) {
-			changedEventSource((ClasIoEventManager.EventSourceType) data);
-		} else {
-			Log.getInstance().warning("Unknown event notification type: " + data);
-		}
+	default void newEvent(ClasIoEventNotification notification) {
+		notification.dispatchTo(this);
 	}
 
 

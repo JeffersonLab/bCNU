@@ -89,7 +89,7 @@ public class ClasIoEventManager {
 	// are notified first. Then those in index 1. Finally those in index 2. The
 	// Data containers should be in index 0. The trajectory and noise in index 1, and
 	// the regular views in index 2 (they are notified last)
-	private final List<EventNotifier<Object>> eventNotifiers = List.of(
+	private final List<EventNotifier<ClasIoEventNotification>> eventNotifiers = List.of(
 			new EventNotifier<>(), new EventNotifier<>(), new EventNotifier<>());
 
 	// someone who can swim all MC particles
@@ -912,7 +912,7 @@ public class ClasIoEventManager {
 		Swimming.clearAllTrajectories();
 		Swimming.setNotifyOn(true); // prevent refreshes
 		for (int index = 0; index < eventNotifiers.size(); index++) {
-			eventNotifiers.get(index).nonThreadedTriggerEvent(source);
+			eventNotifiers.get(index).nonThreadedTriggerEvent(new ClasIoEventNotification.SourceChanged(source));
 		}
 
 		Ced.getCed().fixTitle();
@@ -925,7 +925,8 @@ public class ClasIoEventManager {
 		Swimming.clearAllTrajectories();
 		Swimming.setNotifyOn(true); // prevent refreshes
 		for (int index = 0; index < eventNotifiers.size(); index++) {
-			eventNotifiers.get(index).nonThreadedTriggerEvent(file.getAbsolutePath());
+			eventNotifiers.get(index).nonThreadedTriggerEvent(
+					new ClasIoEventNotification.OpenedFile(file.getAbsolutePath()));
 		}
 
 		Ced.getCed().fixTitle();
@@ -952,7 +953,7 @@ public class ClasIoEventManager {
 
 		Swimming.clearAllTrajectories();
 		for (int index = 0; index < eventNotifiers.size(); index++) {
-			eventNotifiers.get(index).nonThreadedTriggerEvent(_currentEvent);
+			eventNotifiers.get(index).nonThreadedTriggerEvent(new ClasIoEventNotification.NewEvent(_currentEvent));
 		}
 		finalSteps();
 
