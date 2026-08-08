@@ -14,9 +14,17 @@ public class EventNotifier<T> {
         listeners.remove(listener);
     }
 
-	public void nonThreadedTriggerEvent(T data) {
+	public void notifyListeners(T data) {
 		for (IEventListener<T> listener : listeners) {
 			listener.newEvent(data);
 		}
+	}
+
+	/**
+	 * @deprecated notifications are synchronous; use {@link #notifyListeners(Object)}
+	 */
+	@Deprecated(forRemoval = false)
+	public void nonThreadedTriggerEvent(T data) {
+		notifyListeners(data);
 	}
 }

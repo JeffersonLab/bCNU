@@ -915,7 +915,7 @@ public class ClasIoEventManager {
 
 		clearTrajectoriesWithoutNotification();
 		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
-			notifier.nonThreadedTriggerEvent(new ClasIoEventNotification.SourceChanged(source));
+			notifier.notifyListeners(new ClasIoEventNotification.SourceChanged(source));
 		}
 
 		Ced.getCed().fixTitle();
@@ -926,7 +926,7 @@ public class ClasIoEventManager {
 
 		clearTrajectoriesWithoutNotification();
 		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
-			notifier.nonThreadedTriggerEvent(
+			notifier.notifyListeners(
 					new ClasIoEventNotification.OpenedFile(file.getAbsolutePath()));
 		}
 
@@ -951,7 +951,7 @@ public class ClasIoEventManager {
 		Ced.getCed().setEventFilteringLabel(FilterManager.getInstance().isFilteringOn());
 
 		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
-			notifier.nonThreadedTriggerEvent(new ClasIoEventNotification.NewEvent(_currentEvent));
+			notifier.notifyListeners(new ClasIoEventNotification.NewEvent(_currentEvent));
 		}
 		finalSteps();
 

@@ -355,7 +355,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 *
 	 */
 	public void notifyListeners(DataEvent event) {
-		eventNotifier.nonThreadedTriggerEvent(new DataContainerNotification.Update(event));
+		eventNotifier.notifyListeners(new DataContainerNotification.Update(event));
 	}
 
 	/**
@@ -363,7 +363,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 *
 	 */
 	public void notifyListeners() {
-		eventNotifier.nonThreadedTriggerEvent(DataContainerNotification.Clear.INSTANCE);
+		eventNotifier.notifyListeners(DataContainerNotification.Clear.INSTANCE);
 	}
 
 	/**

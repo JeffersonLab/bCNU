@@ -19,12 +19,12 @@ class EventNotifierTest {
         notifier.addListener(first);
         notifier.addListener(second);
         notifier.addListener(first);
-        notifier.nonThreadedTriggerEvent("one");
+        notifier.notifyListeners("one");
 
         assertEquals(List.of("first:one", "second:one"), received);
 
         notifier.removeListener(first);
-        notifier.nonThreadedTriggerEvent("two");
+        notifier.notifyListeners("two");
 
         assertEquals(List.of("first:one", "second:one", "second:two"), received);
     }
