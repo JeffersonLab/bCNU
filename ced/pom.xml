@@ -33,7 +33,22 @@
         <dependency>
             <groupId>cnuphys</groupId>
             <artifactId>swimmer</artifactId>
+            <version>13.7.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cnuphys</groupId>
+            <artifactId>clas12-swimmer</artifactId>
             <version>14.1.2-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>cnuphys</groupId>
+                    <artifactId>swimmer</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>cnuphys</groupId>
+                    <artifactId>magfield</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jlab.clas</groupId>

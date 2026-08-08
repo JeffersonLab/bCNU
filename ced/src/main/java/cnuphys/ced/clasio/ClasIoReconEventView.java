@@ -1,5 +1,6 @@
 package cnuphys.ced.clasio;
 
+import cnuphys.adaptiveSwim.SwimType;
 import java.util.Vector;
 
 import org.jlab.io.base.DataEvent;
@@ -117,7 +118,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 
 					// note conversions to degrees and MeV
 					TrajectoryRowData row = new TrajectoryRowData(id[i], lid, xo, yo, zo, 1000 * p,
-							Math.toDegrees(theta), Math.toDegrees(phi), status[i], bankName);
+							Math.toDegrees(theta), Math.toDegrees(phi), status[i], bankName, SwimType.RECONSWIM);
 					data.add(row);
 
 				}
@@ -177,7 +178,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 
 					// note conversions to degrees and MeV
 					TrajectoryRowData row = new TrajectoryRowData(0, lid, xo, yo, zo, 1000 * p, Math.toDegrees(theta),
-							Math.toDegrees(phi), status[i], bankName);
+							Math.toDegrees(phi), status[i], bankName, SwimType.RECONSWIM);
 					data.add(row);
 
 				}
@@ -218,7 +219,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 					double p = Math.sqrt(pxo * pxo + pyo * pyo + pzo * pzo);
 					double theta = Math.acos(pzo / p);
 					TrajectoryRowData row = new TrajectoryRowData(id[i], lid, xo, yo, zo, 1000 * p,
-							Math.toDegrees(theta), Math.toDegrees(phi0[i]), 0, bankName);
+							Math.toDegrees(theta), Math.toDegrees(phi0[i]), 0, bankName, SwimType.RECONSWIM);
 					data.add(row);
 				}
 			}
