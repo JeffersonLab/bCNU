@@ -2,6 +2,7 @@ package cnuphys.ced.clasio;
 
 import org.jlab.io.base.DataEvent;
 
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.threading.IEventListener;
 
 public class EventListener<Object> implements IEventListener<Object> {
@@ -22,7 +23,7 @@ public class EventListener<Object> implements IEventListener<Object> {
 		} else if (data instanceof ClasIoEventManager.EventSourceType) {
 			listener.changedEventSource((ClasIoEventManager.EventSourceType) data);
 		} else {
-			System.err.println("Unknown event type: " + data);
+			Log.getInstance().warning("Unknown event notification type: " + data);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package cnuphys.ced.clasio;
 
 import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.bCNU.log.Log;
 import cnuphys.magfield.MagneticFields;
 
 /**
@@ -52,8 +53,6 @@ public class RunData {
 
 			event = safeInt("event");
 
-//			System.err.println("In Set Data event num: " + event + "    event: " + dataEvent);
-
 			if (event < 0) {
 				return false;
 			}
@@ -79,7 +78,8 @@ public class RunData {
 			}
 			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.getInstance().error("Could not read RUN::config data");
+			Log.getInstance().exception(e);
 		}
 
 		return false;

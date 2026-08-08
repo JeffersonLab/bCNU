@@ -28,6 +28,7 @@ import cnuphys.bCNU.application.Desktop;
 import cnuphys.bCNU.dialog.DialogUtilities;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.IpField;
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
 import cnuphys.bCNU.threading.EventNotifier;
 import cnuphys.ced.alldata.DataWarehouse;
@@ -159,7 +160,8 @@ public class ClasIoEventManager {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.getInstance().error("Could not update the current event");
+			Log.getInstance().exception(e);
 		}
 
 	}
@@ -377,7 +379,8 @@ public class ClasIoEventManager {
 		try {
 			getNextEvent();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.getInstance().error("Could not read the first HIPO event from " + file);
+			Log.getInstance().exception(e);
 		}
 	}
 
@@ -423,7 +426,8 @@ public class ClasIoEventManager {
 		try {
 			getNextEvent();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.getInstance().error("Could not read the first EVIO event from " + file);
+			Log.getInstance().exception(e);
 		}
 	}
 
@@ -453,7 +457,7 @@ public class ClasIoEventManager {
 
 			// does the file exist?
 
-			System.err.println("ET File Name:_currentETFile [" + _currentETFile + "]");
+			Log.getInstance().info("ET file: " + _currentETFile);
 
 			try {
 
@@ -465,7 +469,7 @@ public class ClasIoEventManager {
 					return;
 				}
 
-				System.err.println("trying to connect using et file: " + _currentETFile);
+				Log.getInstance().info("Connecting to ET ring using " + _currentETFile);
 				setEventSourceType(EventSourceType.ET);
 				_dataSource.open(_currentETFile);
 
@@ -473,7 +477,8 @@ public class ClasIoEventManager {
 				Ced.getCed().getEventMenu().autoCheckAuto();
 			} catch (Exception e) {
 				String message = "Could not connect to ET Ring [" + e.getMessage() + "]";
-				System.err.println(message);
+				Log.getInstance().error(message);
+				Log.getInstance().exception(e);
 			}
 
 		} // end ok
@@ -680,8 +685,8 @@ public class ClasIoEventManager {
 		}
 
 		catch (Exception e) {
-			System.err.println("Error decoding evio to hipo: " + e.getMessage());
-			e.printStackTrace();
+			Log.getInstance().error("Error decoding EVIO to HIPO: " + e.getMessage());
+			Log.getInstance().exception(e);
 			return null;
 		}
 
@@ -740,7 +745,9 @@ public class ClasIoEventManager {
 					attempts++;
 					Thread.sleep(50);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					Thread.currentThread().interrupt();
+					Log.getInstance().warning("Interrupted while waiting for ET events");
+					return null;
 				}
 				_dataSource.waitForEvents();
 			}
@@ -908,8 +915,13 @@ public class ClasIoEventManager {
 		for (int index = 0; index < eventNotifiers.size(); index++) {
 			try {
 				eventNotifiers.get(index).nonThreadedTriggerEvent(source);
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				Log.getInstance().warning("Event-source notification interrupted");
+				return;
+			} catch (ExecutionException e) {
+				Log.getInstance().error("Event-source notification failed");
+				Log.getInstance().exception(e);
 			}
 		}
 
@@ -925,8 +937,13 @@ public class ClasIoEventManager {
 		for (int index = 0; index < eventNotifiers.size(); index++) {
 			try {
 				eventNotifiers.get(index).nonThreadedTriggerEvent(file.getAbsolutePath());
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				Log.getInstance().warning("Event-file notification interrupted");
+				return;
+			} catch (ExecutionException e) {
+				Log.getInstance().error("Event-file notification failed");
+				Log.getInstance().exception(e);
 			}
 		}
 
@@ -956,8 +973,13 @@ public class ClasIoEventManager {
 		for (int index = 0; index < eventNotifiers.size(); index++) {
 			try {
 				eventNotifiers.get(index).nonThreadedTriggerEvent(_currentEvent);
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				Log.getInstance().warning("Event notification interrupted");
+				return;
+			} catch (ExecutionException e) {
+				Log.getInstance().error("Event notification failed");
+				Log.getInstance().exception(e);
 			}
 		}
 		finalSteps();
