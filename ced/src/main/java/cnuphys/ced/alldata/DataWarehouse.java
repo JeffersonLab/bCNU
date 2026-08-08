@@ -106,9 +106,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return the known banks in a String array
 	 */
 	public String[] getKnownBanks() {
-		String[] kbArray = new String[_knownBanks.size()];
-		_knownBanks.toArray(kbArray);
-		return kbArray;
+		return _knownBanks.toArray(String[]::new);
 	}
 
 	/**
@@ -234,15 +232,16 @@ public class DataWarehouse implements IClasIoEventListener {
 	 */
 	public String[] banks() {
 		DataEvent event = getCurrentEvent();
-		if (event != null) {
-			String[] banks = event.getBankList();
+		return (event == null) ? null : sortedCopy(event.getBankList());
+	}
 
-			if (banks != null) {
-				Arrays.sort(banks);
-			}
-			return banks;
+	static String[] sortedCopy(String[] values) {
+		if (values == null) {
+			return null;
 		}
-        return null;
+		String[] copy = values.clone();
+		Arrays.sort(copy);
+		return copy;
     }
 	
 	/**

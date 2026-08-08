@@ -1,5 +1,6 @@
 package cnuphys.ced.alldata;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -66,6 +67,17 @@ class DataWarehouseTest {
         assertEquals("Unknown", DataWarehouse.typeName(-1));
         assertEquals("Unknown", DataWarehouse.typeName(100));
         assertEquals("int", DataWarehouse.typeName(DataWarehouse.INT32));
+    }
+
+    @Test
+    void returnsSortedBankNamesWithoutMutatingTheEventArray() {
+        String[] eventBanks = { "REC::Particle", "RUN::config", "BMT::adc" };
+
+        String[] sorted = DataWarehouse.sortedCopy(eventBanks);
+
+        assertArrayEquals(new String[] { "BMT::adc", "REC::Particle", "RUN::config" }, sorted);
+        assertArrayEquals(new String[] { "REC::Particle", "RUN::config", "BMT::adc" }, eventBanks);
+        assertNull(DataWarehouse.sortedCopy(null));
     }
 
     @SuppressWarnings("unchecked")
