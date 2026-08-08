@@ -30,6 +30,10 @@ public class SwimListener implements IEventListener<Object> {
 
 			result = data.swimmer.swim(lid.getCharge(), trd.getXo(), trd.getYo(), trd.getZo(), p, trd.getTheta(),
 					trd.getPhi(), data.sMax, data.h, data.tolerance);
+			if (!result.isSuccess()) {
+				return;
+			}
+
 			result.getTrajectory().setLundId(lid);
 			result.getTrajectory().setSource(trd.getSource());
 
