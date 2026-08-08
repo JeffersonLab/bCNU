@@ -1,0 +1,53 @@
+name: Maven verification
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out CED
+        uses: actions/checkout@v6
+        with:
+          path: bCNU
+
+      - name: Check out CED-compatible coatjava baseline
+        uses: actions/checkout@v6
+        with:
+          repository: JeffersonLab/coatjava
+          ref: 7a073f9a4da66f585fcf8a205d43b3882354d7ac
+          path: coatjava-13.7.1
+
+      - name: Check out experimental Commons Math swimmer
+        uses: actions/checkout@v6
+        with:
+          repository: JeffersonLab/coatjava
+          ref: CLAS12Swim-commons-math
+          path: coatjava
+
+      - name: Set up Java 21 and Maven cache
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          cache-dependency-path: |
+            bCNU/pom.xml
+            bCNU/bCNU/pom.xml
+            bCNU/bCNU3D/pom.xml
+            bCNU/ced/pom.xml
+            coatjava/pom.xml
+
+      - name: Install CED Maven prerequisites
+        working-directory: bCNU
+        run: ./scripts/bootstrap-maven-dependencies.sh
+
+      - name: Build and test CED
+        working-directory: bCNU
+        run: mvn --batch-mode clean test
