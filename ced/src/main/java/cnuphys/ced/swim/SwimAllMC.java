@@ -1,6 +1,7 @@
 package cnuphys.ced.swim;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
@@ -55,7 +56,7 @@ public class SwimAllMC implements ISwimAll {
 		double tolerance = 1.0e-6;
 
 		//used to avoid swimming duplicates
-		ArrayList<String> swam = new ArrayList<>();
+		Set<String> swam = new HashSet<>();
 
 		for (TrajectoryRowData trd : data) {
 			LundId lid = LundSupport.getInstance().get(trd.getId());
@@ -64,11 +65,9 @@ public class SwimAllMC implements ISwimAll {
 
 					String summaryStr = SwimRequestPolicy.mcDuplicateKey(lid, trd);
 
-					if (swam.contains(summaryStr)) {
+					if (!swam.add(summaryStr)) {
 						continue;
 					}
-
-					swam.add(summaryStr);
 
 					SwimData swimData = new SwimData(trd, SwimData.TrajectoryType.MC,
 							SwimRequestPolicy.DEFAULT_MAX_PATH, stepSize, tolerance);
