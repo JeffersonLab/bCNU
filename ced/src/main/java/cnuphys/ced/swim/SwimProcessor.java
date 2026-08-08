@@ -10,13 +10,18 @@ import cnuphys.swim.Swimming;
 
 public class SwimProcessor {
 
-	private SwimData data;
+	private final SwimData data;
 
 	public SwimProcessor(SwimData data) {
 		this.data = data;
 	}
 
-	public void process() {
+	public boolean process() {
+		if (data == null || !data.isValid()) {
+			Log.getInstance().warning("Omitting invalid swim request");
+			return false;
+		}
+
 		try {
 			CLAS12SwimResult result = null;
 			TrajectoryRowData trd = data.trd;
@@ -30,7 +35,7 @@ public class SwimProcessor {
 			if (!result.isSuccess()) {
 				Log.getInstance().warning("Omitting unsuccessful swim for track " + trd.getTrackId()
 						+ " from " + trd.getSource() + ": " + result.statusString());
-				return;
+				return false;
 			}
 
 			result.getTrajectory().setLundId(lid);
@@ -49,11 +54,14 @@ public class SwimProcessor {
 				Swimming.addReconTrajectory(result.getTrajectory());
 			} else {
 				Log.getInstance().warning("Unknown trajectory type in SwimProcessor: " + data.trajectoryType);
+				return false;
 			}
+			return true;
 		} catch (Exception e) {
 			Log.getInstance().error("Swim failed for track " + data.trd.getTrackId()
 					+ " from " + data.trd.getSource());
 			Log.getInstance().exception(e);
+			return false;
 		}
 	}
 

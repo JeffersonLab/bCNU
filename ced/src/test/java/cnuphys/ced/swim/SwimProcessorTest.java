@@ -1,8 +1,10 @@
 package cnuphys.ced.swim;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +39,7 @@ class SwimProcessorTest {
     void routesMonteCarloTrajectoryAndCopiesMetadata() {
         TrajectoryRowData row = row("MC::Particle", SwimType.MCSWIM);
 
-        new SwimProcessor(data(row, SwimData.TrajectoryType.MC)).process();
+        assertTrue(new SwimProcessor(data(row, SwimData.TrajectoryType.MC)).process());
 
         assertEquals(1, Swimming.getMCTrajectories().size());
         assertEquals(0, Swimming.getReconTrajectories().size());
@@ -48,7 +50,7 @@ class SwimProcessorTest {
     void routesReconstructedTrajectoryAndCopiesMetadata() {
         TrajectoryRowData row = row("REC::Particle", SwimType.RECONSWIM);
 
-        new SwimProcessor(data(row, SwimData.TrajectoryType.RECON)).process();
+        assertTrue(new SwimProcessor(data(row, SwimData.TrajectoryType.RECON)).process());
 
         assertEquals(0, Swimming.getMCTrajectories().size());
         assertEquals(1, Swimming.getReconTrajectories().size());
@@ -59,7 +61,16 @@ class SwimProcessorTest {
     void omitsUnsuccessfulSwimsFromTrajectoryRegistries() {
         TrajectoryRowData belowMinimumMomentum = row("MC::Particle", SwimType.MCSWIM, 0.001);
 
-        new SwimProcessor(data(belowMinimumMomentum, SwimData.TrajectoryType.MC)).process();
+        assertFalse(new SwimProcessor(data(belowMinimumMomentum, SwimData.TrajectoryType.MC)).process());
+
+        assertEquals(0, Swimming.getMCTrajectories().size());
+        assertEquals(0, Swimming.getReconTrajectories().size());
+    }
+
+    @Test
+    void rejectsInvalidRequestsWithoutChangingTrajectoryRegistries() {
+        assertFalse(new SwimProcessor(null).process());
+        assertFalse(new SwimProcessor(data(null, SwimData.TrajectoryType.MC)).process());
 
         assertEquals(0, Swimming.getMCTrajectories().size());
         assertEquals(0, Swimming.getReconTrajectories().size());
