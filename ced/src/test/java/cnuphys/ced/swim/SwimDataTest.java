@@ -25,6 +25,9 @@ class SwimDataTest {
     @Test
     void rejectsMissingRequiredObjects() {
         assertFalse(data(null, SwimData.TrajectoryType.MC, 900.0, 0.001, 1.0e-6).isValid());
+        assertFalse(data(new TrajectoryRowData(1, null, 0.0, 0.0, 0.0, 1000.0,
+                45.0, 0.0, 0, "test", SwimType.MCSWIM),
+                SwimData.TrajectoryType.MC, 900.0, 0.001, 1.0e-6).isValid());
         assertFalse(data(row(0.0, 0.0, 0.0, 1000.0, 45.0, 0.0),
                 null, 900.0, 0.001, 1.0e-6).isValid());
         assertFalse(new SwimData(row(0.0, 0.0, 0.0, 1000.0, 45.0, 0.0),

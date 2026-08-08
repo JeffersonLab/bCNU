@@ -4,6 +4,8 @@ import cnuphys.CLAS12Swim.ICLAS12Swimmer;
 import cnuphys.lund.TrajectoryRowData;
 
 public class SwimData {
+	private static final double MAX_REASONABLE_VALUE = 1.0e15;
+
 	public enum TrajectoryType {
 		MC, RECON
 	}
@@ -44,13 +46,15 @@ public class SwimData {
 	}
 	
 	public boolean isValid() {
-		return (trd != null && trajectoryType != null && swimmer != null && sMax > 0 && h > 0 && tolerance > 0
-				&& Math.abs(trd.getXo()) < 1.0e15 && Math.abs(trd.getYo()) < 1.0e15 
-				&& Math.abs(trd.getZo()) < 1.0e15 && Math.abs(trd.getTheta()) < 1.0e15
-				&& Math.abs(trd.getPhi()) < 1.0e15 && Math.abs(trd.getMomentum()) < 1.0e15
-				&& !Double.isNaN(trd.getXo()) && !Double.isNaN(trd.getYo())
-				&& !Double.isNaN(trd.getZo()) && !Double.isNaN(trd.getTheta())
-				&& !Double.isNaN(trd.getPhi()) && !Double.isNaN(trd.getMomentum()));
+		return trd != null && trd.getLundId() != null && trajectoryType != null && swimmer != null
+				&& sMax > 0 && h > 0 && tolerance > 0
+				&& isReasonable(trd.getXo()) && isReasonable(trd.getYo()) && isReasonable(trd.getZo())
+				&& isReasonable(trd.getTheta()) && isReasonable(trd.getPhi())
+				&& isReasonable(trd.getMomentum());
+	}
+
+	private static boolean isReasonable(double value) {
+		return Double.isFinite(value) && Math.abs(value) < MAX_REASONABLE_VALUE;
 	}
 
 }
