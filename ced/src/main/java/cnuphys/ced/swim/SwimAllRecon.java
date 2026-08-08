@@ -3,6 +3,7 @@ package cnuphys.ced.swim;
 import java.util.Vector;
 
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.threading.EventNotifier;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoReconEventView;
@@ -60,7 +61,7 @@ public class SwimAllRecon implements ISwimAll {
 				double sf = SwimRequestPolicy.maxPathForRecon(trd.getSource());
 				SwimData swimData = new SwimData(trd, SwimData.TrajectoryType.RECON, sf, stepSize, tolerance);
 				if (!swimData.isValid()) {
-					System.err.println("SwimAllRecon Invalid swim data for " + lid.getName());
+					Log.getInstance().warning("SwimAllRecon invalid swim data for " + lid.getName());
 					continue;
 				}
 				swimNotifier.addListener(new SwimListener(swimData));
@@ -72,7 +73,8 @@ public class SwimAllRecon implements ISwimAll {
 			swimNotifier.nonThreadedTriggerEvent(null);
 			swimNotifier.shutdown();
 		} catch (InterruptedException | java.util.concurrent.ExecutionException e) {
-			e.printStackTrace();
+			Log.getInstance().error("Failed while swimming reconstructed tracks");
+			Log.getInstance().exception(e);
 		}
 	}
 

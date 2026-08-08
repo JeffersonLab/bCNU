@@ -2,6 +2,7 @@ package cnuphys.ced.swim;
 
 import cnuphys.CLAS12Swim.CLAS12SwimResult;
 import cnuphys.CLAS12Swim.CLAS12Values;
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.threading.IEventListener;
 import cnuphys.lund.GeneratedParticleRecord;
 import cnuphys.lund.LundId;
@@ -31,6 +32,8 @@ public class SwimListener implements IEventListener<Object> {
 			result = data.swimmer.swim(lid.getCharge(), trd.getXo(), trd.getYo(), trd.getZo(), p, trd.getTheta(),
 					trd.getPhi(), data.sMax, data.h, data.tolerance);
 			if (!result.isSuccess()) {
+				Log.getInstance().warning("Omitting unsuccessful swim for track " + trd.getTrackId()
+						+ " from " + trd.getSource() + ": " + result.statusString());
 				return;
 			}
 
@@ -49,11 +52,12 @@ public class SwimListener implements IEventListener<Object> {
 			} else if (data.trajectoryType == SwimData.TrajectoryType.RECON) {
 				Swimming.addReconTrajectory(result.getTrajectory());
 			} else {
-				System.err.println("Unknown trajectory type in SwimListener: " + data.trajectoryType);
+				Log.getInstance().warning("Unknown trajectory type in SwimListener: " + data.trajectoryType);
 			}
 		} catch (Exception e) {
-			System.err.println("SwimListener.newEvent() exception: " + e.getMessage());
-			e.printStackTrace();
+			Log.getInstance().error("Swim failed for track " + data.trd.getTrackId()
+					+ " from " + data.trd.getSource());
+			Log.getInstance().exception(e);
 		}
 	}
 
