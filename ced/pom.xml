@@ -28,17 +28,17 @@
         <dependency>
             <groupId>cnuphys</groupId>
             <artifactId>snr</artifactId>
-            <version>13.7.1-SNAPSHOT</version>
+            <version>${cnuphys.legacy.version}</version>
         </dependency>
         <dependency>
             <groupId>cnuphys</groupId>
             <artifactId>swimmer</artifactId>
-            <version>13.7.1-SNAPSHOT</version>
+            <version>${cnuphys.legacy.version}</version>
         </dependency>
         <dependency>
             <groupId>cnuphys</groupId>
             <artifactId>clas12-swimmer</artifactId>
-            <version>14.1.2-SNAPSHOT</version>
+            <version>${clas12-swimmer.experimental.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>cnuphys</groupId>
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>org.jlab.clas</groupId>
             <artifactId>coat-libs</artifactId>
-            <version>13.7.1</version>
+            <version>${coat-libs.legacy.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

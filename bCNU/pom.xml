@@ -18,17 +18,17 @@
         <dependency>
             <groupId>cnuphys</groupId>
             <artifactId>magfield</artifactId>
-            <version>13.7.1-SNAPSHOT</version>
+            <version>${cnuphys.legacy.version}</version>
         </dependency>
         <dependency>
             <groupId>cnuphys</groupId>
             <artifactId>swimmer</artifactId>
-            <version>13.7.1-SNAPSHOT</version>
+            <version>${cnuphys.legacy.version}</version>
         </dependency>
         <dependency>
             <groupId>cnuphys</groupId>
             <artifactId>splot</artifactId>
-            <version>13.7.1-SNAPSHOT</version>
+            <version>${cnuphys.legacy.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

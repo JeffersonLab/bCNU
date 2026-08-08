@@ -26,6 +26,9 @@
         <maven.surefire.version>3.5.3</maven.surefire.version>
         <junit.version>5.12.2</junit.version>
         <jogl.version>2.6.0</jogl.version>
+        <cnuphys.legacy.version>13.7.1-SNAPSHOT</cnuphys.legacy.version>
+        <coat-libs.legacy.version>13.7.1</coat-libs.legacy.version>
+        <clas12-swimmer.experimental.version>14.1.2-SNAPSHOT</clas12-swimmer.experimental.version>
     </properties>
 
     <build>
