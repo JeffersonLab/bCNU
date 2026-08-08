@@ -44,7 +44,7 @@ import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
 import cnuphys.ced.alldata.datacontainer.cvt.CosmicData;
 import cnuphys.ced.alldata.CTOFAdc;
-import cnuphys.ced.alldata.datacontainer.tof.CTOFClusterData;
+import cnuphys.ced.alldata.CTOFClusters;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
 import cnuphys.ced.cedview.urwt.HighlightData;
@@ -92,7 +92,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 
 	// data containers
 	private CTOFAdc _ctofADCData = CTOFAdc.getInstance();
-	private CTOFClusterData _clusterCTOFData = CTOFClusterData.getInstance();
+	private CTOFClusters _clusterCTOFData = CTOFClusters.getInstance();
 	private BSTADCData _bstADCData = BSTADCData.getInstance();
 	private BMTADCData _bmtADCData = BMTADCData.getInstance();
 	private CosmicData _cosmicData = CosmicData.getInstance();
@@ -627,7 +627,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 				if (showClusters()) {
 					for (int i = 0; i < _clusterCTOFData.count(); i++) {
 						if (_clusterCTOFData.contains(i, screenPoint)) {
-							_clusterCTOFData.feedback("CTOF", i, feedbackStrings);
+							_clusterCTOFData.addFeedback(i, feedbackStrings);
 							break;
 						}
 					}

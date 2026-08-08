@@ -15,7 +15,7 @@ import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
 import cnuphys.ced.alldata.datacontainer.cnd.CNDADCData;
 import cnuphys.ced.alldata.CTOFAdc;
-import cnuphys.ced.alldata.datacontainer.tof.CTOFClusterData;
+import cnuphys.ced.alldata.CTOFClusters;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.alert.AlertXYView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -38,7 +38,7 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 	// data containers
 	private CNDADCData adcCNDData = CNDADCData.getInstance();
 	private CTOFAdc adcCTOFData = CTOFAdc.getInstance();
-	private CTOFClusterData clusterCTOFData = CTOFClusterData.getInstance();
+	private CTOFClusters clusterCTOFData = CTOFClusters.getInstance();
 	private BSTADCData adcBSTData = BSTADCData.getInstance();
 	private BMTADCData adcBMTData = BMTADCData.getInstance();
 	private BSTRecHitData bstRecHitData = BSTRecHitData.getInstance();
@@ -190,7 +190,7 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 			Point pp = new Point();
 			for (int i = 0; i < clusterCTOFData.count(); i++) {
 				// convert to mm
-				container.worldToLocal(pp, 10 * clusterCTOFData.x[i], 10 * clusterCTOFData.y[i]);
+				container.worldToLocal(pp, 10 * clusterCTOFData.x(i), 10 * clusterCTOFData.y(i));
 				DataDrawSupport.drawCluster(g, pp);
 				clusterCTOFData.setLocation(i, pp);
 			}

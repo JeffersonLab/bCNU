@@ -26,7 +26,7 @@ import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.CTOFAdc;
-import cnuphys.ced.alldata.datacontainer.tof.CTOFClusterData;
+import cnuphys.ced.alldata.CTOFClusters;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
 import cnuphys.ced.cedview.ILabCoordinates;
@@ -97,7 +97,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 	
 	// data containers
 	private CTOFAdc _ctofADCData = CTOFAdc.getInstance();
-	private CTOFClusterData _clusterCTOFData = CTOFClusterData.getInstance();
+	private CTOFClusters _clusterCTOFData = CTOFClusters.getInstance();
 	
 	// draws hits
 	private CentralXYHitDrawer _hitDrawer;
@@ -534,7 +534,7 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 			if (showClusters()) {
 				for (int i = 0; i < _clusterCTOFData.count(); i++) {
 					if (_clusterCTOFData.contains(i, pp)) {
-						_clusterCTOFData.feedback("CTOF", i, feedbackStrings);
+						_clusterCTOFData.addFeedback(i, feedbackStrings);
 						break;
 					}
 				}
