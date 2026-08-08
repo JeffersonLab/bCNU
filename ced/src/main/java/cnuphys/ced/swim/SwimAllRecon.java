@@ -61,7 +61,7 @@ public class SwimAllRecon implements ISwimAll {
 					Log.getInstance().warning("SwimAllRecon invalid swim data for " + lid.getName());
 					continue;
 				}
-				new SwimListener(swimData).newEvent(null);
+				new SwimProcessor(swimData).process();
 
 			}
 		} //for trd

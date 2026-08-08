@@ -3,23 +3,21 @@ package cnuphys.ced.swim;
 import cnuphys.CLAS12Swim.CLAS12SwimResult;
 import cnuphys.CLAS12Swim.CLAS12Values;
 import cnuphys.bCNU.log.Log;
-import cnuphys.bCNU.threading.IEventListener;
 import cnuphys.lund.GeneratedParticleRecord;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
 import cnuphys.swim.Swimming;
 
-public class SwimListener implements IEventListener<Object> {
+public class SwimProcessor {
 
 	private SwimData data;
 
-	public SwimListener(SwimData data) {
+	public SwimProcessor(SwimData data) {
 		this.data = data;
 	}
 
-	@Override
-	public void newEvent(Object o) {
+	public void process() {
 		try {
 			LundId lid = LundSupport.getInstance().get(data.trd.getId());
 
@@ -52,7 +50,7 @@ public class SwimListener implements IEventListener<Object> {
 			} else if (data.trajectoryType == SwimData.TrajectoryType.RECON) {
 				Swimming.addReconTrajectory(result.getTrajectory());
 			} else {
-				Log.getInstance().warning("Unknown trajectory type in SwimListener: " + data.trajectoryType);
+				Log.getInstance().warning("Unknown trajectory type in SwimProcessor: " + data.trajectoryType);
 			}
 		} catch (Exception e) {
 			Log.getInstance().error("Swim failed for track " + data.trd.getTrackId()

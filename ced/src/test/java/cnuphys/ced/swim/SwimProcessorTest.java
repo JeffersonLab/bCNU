@@ -17,7 +17,7 @@ import cnuphys.magfield.ZeroProbe;
 import cnuphys.swim.SwimTrajectory;
 import cnuphys.swim.Swimming;
 
-class SwimListenerTest {
+class SwimProcessorTest {
 
     private final CLAS12Swimmer swimmer = new CLAS12Swimmer(new ZeroProbe());
 
@@ -37,7 +37,7 @@ class SwimListenerTest {
     void routesMonteCarloTrajectoryAndCopiesMetadata() {
         TrajectoryRowData row = row("MC::Particle", SwimType.MCSWIM);
 
-        new SwimListener(data(row, SwimData.TrajectoryType.MC)).newEvent(null);
+        new SwimProcessor(data(row, SwimData.TrajectoryType.MC)).process();
 
         assertEquals(1, Swimming.getMCTrajectories().size());
         assertEquals(0, Swimming.getReconTrajectories().size());
@@ -48,7 +48,7 @@ class SwimListenerTest {
     void routesReconstructedTrajectoryAndCopiesMetadata() {
         TrajectoryRowData row = row("REC::Particle", SwimType.RECONSWIM);
 
-        new SwimListener(data(row, SwimData.TrajectoryType.RECON)).newEvent(null);
+        new SwimProcessor(data(row, SwimData.TrajectoryType.RECON)).process();
 
         assertEquals(0, Swimming.getMCTrajectories().size());
         assertEquals(1, Swimming.getReconTrajectories().size());
@@ -59,7 +59,7 @@ class SwimListenerTest {
     void omitsUnsuccessfulSwimsFromTrajectoryRegistries() {
         TrajectoryRowData belowMinimumMomentum = row("MC::Particle", SwimType.MCSWIM, 0.001);
 
-        new SwimListener(data(belowMinimumMomentum, SwimData.TrajectoryType.MC)).newEvent(null);
+        new SwimProcessor(data(belowMinimumMomentum, SwimData.TrajectoryType.MC)).process();
 
         assertEquals(0, Swimming.getMCTrajectories().size());
         assertEquals(0, Swimming.getReconTrajectories().size());

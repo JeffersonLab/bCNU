@@ -76,7 +76,7 @@ public class SwimAllMC implements ISwimAll {
 						Log.getInstance().warning("SwimAllMC invalid swim data for " + lid.getName());
 						continue;
 					}
-					new SwimListener(swimData).newEvent(null);
+					new SwimProcessor(swimData).process();
 
 			}
 
