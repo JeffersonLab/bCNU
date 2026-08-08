@@ -37,7 +37,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>${maven.enforcer.version}</version>
-                <inherited>false</inherited>
                 <executions>
                     <execution>
                         <id>enforce-build-toolchain</id>
@@ -54,6 +53,17 @@
                                     <version>[3.9.0,)</version>
                                     <message>CED requires Maven 3.9 or newer.</message>
                                 </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>enforce-dependency-convergence</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <dependencyConvergence/>
                             </rules>
                         </configuration>
                     </execution>
