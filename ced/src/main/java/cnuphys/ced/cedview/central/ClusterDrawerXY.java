@@ -14,9 +14,9 @@ import java.util.List;
 import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.container.IContainer;
+import cnuphys.ced.alldata.CNDClusters;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
-import cnuphys.ced.alldata.datacontainer.cnd.CNDClusterData;
 import cnuphys.ced.cedview.CedXYView;
 import cnuphys.ced.cedview.alert.AlertXYView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -71,13 +71,13 @@ public class ClusterDrawerXY extends CentralXYViewDrawer {
 			return;
 		}
 
-		CNDClusterData cndClusterData = CNDClusterData.getInstance();
+		CNDClusters cndClusterData = CNDClusters.getInstance();
 		int count = cndClusterData.count();
 		if (count > 0) {
 			Point p = new Point();
 			for (int i = 0; i < count; i++) {
-				float x = cndClusterData.x[i];
-				float y = cndClusterData.y[i];
+				float x = cndClusterData.x(i);
+				float y = cndClusterData.y(i);
 				container.worldToLocal(p, 10 * x, 10 * y);
 				DataDrawSupport.drawCluster(g, p);
 				cndClusterData.setLocation(i, p);
@@ -189,10 +189,10 @@ public class ClusterDrawerXY extends CentralXYViewDrawer {
 	public void feedback(IContainer container, Point screenPoint, Double worldPoint, List<String> feedbackStrings) {
 
 		// CND clusters
-		CNDClusterData cndClusterData = CNDClusterData.getInstance();
+		CNDClusters cndClusterData = CNDClusters.getInstance();
 		for (int i = 0; i < cndClusterData.count(); i++) {
 			if (cndClusterData.contains(i, screenPoint)) {
-				cndClusterData.feedback("CND", i, feedbackStrings);
+				cndClusterData.addFeedback(i, feedbackStrings);
 				break;
 			}
 		}
