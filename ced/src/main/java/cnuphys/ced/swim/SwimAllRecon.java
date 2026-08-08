@@ -19,9 +19,6 @@ import cnuphys.swim.Swimming;
  */
 public class SwimAllRecon implements ISwimAll {
 
-	// integration cutoff
-	private static final double PATHMAX = 900;
-
 	/**
 	 * Get all the row data so the trajectory dialog can be updated.
 	 *
@@ -60,12 +57,7 @@ public class SwimAllRecon implements ISwimAll {
 			LundId lid = LundSupport.getInstance().get(trd.getId());
 
 			if (lid != null) {
-				double sf = PATHMAX;
-				String source = trd.getSource();
-
-				if ((source != null) && (source.contains("CVT"))) {
-					sf = 150; //shorter max path for cvt tracks
-				}
+				double sf = SwimRequestPolicy.maxPathForRecon(trd.getSource());
 				SwimData swimData = new SwimData(trd, SwimData.TrajectoryType.RECON, sf, stepSize, tolerance);
 				if (!swimData.isValid()) {
 					System.err.println("SwimAllRecon Invalid swim data for " + lid.getName());

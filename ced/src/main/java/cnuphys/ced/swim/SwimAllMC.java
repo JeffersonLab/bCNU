@@ -20,9 +20,6 @@ import cnuphys.swim.Swimming;
  */
 public class SwimAllMC implements ISwimAll {
 
-	// integration cutoff
-	private static final double PATHMAX = 900;
-
 	/**
 	 * Get all the row data so the trajectory dialog can be updated.
 	 *
@@ -67,9 +64,7 @@ public class SwimAllMC implements ISwimAll {
 
 			if (lid != null) {
 
-					String summaryStr = String.format("%s %10.6f  %10.6f  %10.6f  %10.6f  %10.6f  %10.6f",
-							lid.getName(), trd.getXo(), trd.getYo(), trd.getZo(),
-							trd.getMomentum(), trd.getTheta(), trd.getPhi());
+					String summaryStr = SwimRequestPolicy.mcDuplicateKey(lid, trd);
 
 					if (swam.contains(summaryStr)) {
 						continue;
@@ -77,7 +72,8 @@ public class SwimAllMC implements ISwimAll {
 
 					swam.add(summaryStr);
 
-					SwimData swimData = new SwimData(trd, SwimData.TrajectoryType.MC, PATHMAX, stepSize, tolerance);
+					SwimData swimData = new SwimData(trd, SwimData.TrajectoryType.MC,
+							SwimRequestPolicy.DEFAULT_MAX_PATH, stepSize, tolerance);
 					if (!swimData.isValid()) {
 						System.err.println("SwimAllMC Invalid swim data for " + lid.getName());
 						continue;
