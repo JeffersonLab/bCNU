@@ -6,7 +6,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.ced.alldata.datacontainer.bmt.BMTADCData;
+import cnuphys.ced.alldata.BMTAdc;
 import cnuphys.ced.alldata.datacontainer.bmt.BMTCrossData;
 import cnuphys.ced.geometry.BMTGeometry;
 import cnuphys.ced.geometry.bmt.Constants;
@@ -25,7 +25,7 @@ public class BMTLayer3D extends DetectorItem3D {
 	private int _layer;
 
 	//data containers
-	private BMTADCData _bmtADCData = BMTADCData.getInstance();
+	private BMTAdc _bmtADCData = BMTAdc.getInstance();
 	private BMTCrossData _bmtCrossData = BMTCrossData.getInstance();
 
 
@@ -61,11 +61,11 @@ public class BMTLayer3D extends DetectorItem3D {
 
 		if (showHits()) {
 			for (int i = 0; i < _bmtADCData.count(); i++) {
-				if (_bmtADCData.sector[i] == _sector && _bmtADCData.layer[i] == _layer) {
-					int strip = _bmtADCData.component[i];
+				if (_bmtADCData.sector(i) == _sector && _bmtADCData.layer(i) == _layer) {
+					int strip = _bmtADCData.component(i);
 					BMTGeometry.getGeometry().getCRZEndPoints(_sector, _layer, strip, coords6);
 					if (!Float.isNaN(coords6[0])) {
-						Support3D.drawLine(drawable, coords6, _bmtADCData.adc[i] > 0 ? Color.red : Color.blue,
+						Support3D.drawLine(drawable, coords6, _bmtADCData.adc(i) > 0 ? Color.red : Color.blue,
 								STRIPLINEWIDTH);
 					}
 				}

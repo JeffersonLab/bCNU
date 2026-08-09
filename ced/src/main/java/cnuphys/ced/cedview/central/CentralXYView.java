@@ -38,7 +38,7 @@ import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
-import cnuphys.ced.alldata.datacontainer.bmt.BMTADCData;
+import cnuphys.ced.alldata.BMTAdc;
 import cnuphys.ced.alldata.BMTRecHits;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.BSTRecHits;
@@ -94,7 +94,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 	private CTOFAdc _ctofADCData = CTOFAdc.getInstance();
 	private CTOFClusters _clusterCTOFData = CTOFClusters.getInstance();
 	private BSTADCData _bstADCData = BSTADCData.getInstance();
-	private BMTADCData _bmtADCData = BMTADCData.getInstance();
+	private BMTAdc _bmtADCData = BMTAdc.getInstance();
 	private CosmicTracks _cosmicData = CosmicTracks.getInstance();
 	private BSTRecHits bstRecHitData = BSTRecHits.getInstance();
 	private BMTRecHits bmtRecHitData = BMTRecHits.getInstance();
@@ -656,7 +656,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 			// BMT ADC?
 			for (int i = 0; i < _bmtADCData.count(); i++) {
 				if (_bmtADCData.contains(i, screenPoint)) {
-					_bmtADCData.adcFeedback("BMT", i, feedbackStrings);
+					_bmtADCData.addFeedback(i, feedbackStrings);
 				}
 			}
 

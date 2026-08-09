@@ -9,7 +9,7 @@ import java.awt.geom.Point2D;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.datacontainer.bmt.BMTADCData;
+import cnuphys.ced.alldata.BMTAdc;
 import cnuphys.ced.alldata.BMTRecHits;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.BSTRecHits;
@@ -40,7 +40,7 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 	private CTOFAdc adcCTOFData = CTOFAdc.getInstance();
 	private CTOFClusters clusterCTOFData = CTOFClusters.getInstance();
 	private BSTADCData adcBSTData = BSTADCData.getInstance();
-	private BMTADCData adcBMTData = BMTADCData.getInstance();
+	private BMTAdc adcBMTData = BMTAdc.getInstance();
 	private BSTRecHits bstRecHitData = BSTRecHits.getInstance();
 	private BMTRecHits bmtRecHitData = BMTRecHits.getInstance();
 
@@ -220,7 +220,7 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 				Point2D.Double wp = new Point2D.Double();
 
 				for (int i = 0; i < count; i++) {
-					BMTSectorItem bmtItem = _iCentralView.getBMTSectorItem(adcBMTData.sector[i], adcBMTData.layer[i]);
+					BMTSectorItem bmtItem = _iCentralView.getBMTSectorItem(adcBMTData.sector(i), adcBMTData.layer(i));
 					if (bmtItem != null) {
 						if (bmtItem.getLastDrawnPolygon() != null) {
 							g.setColor(X11Colors.getX11Color("tan"));
@@ -228,20 +228,20 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 							g.setColor(Color.red);
 							g.drawPolygon(bmtItem.getLastDrawnPolygon());
 						}
-						Polygon poly = bmtItem.getStripPolygon(container, adcBMTData.component[i]);
+						Polygon poly = bmtItem.getStripPolygon(container, adcBMTData.component(i));
 						if (poly != null) {
 							g.setColor(Color.black);
 							g.fillPolygon(poly);
-							g.setColor(adcBMTData.getADCColor(i));
+							g.setColor(adcBMTData.color(i));
 							g.drawPolygon(poly);
 						}
 
 						if (bmtItem.isZLayer()) {
 
-							Color color = adcBMTData.getADCColor(adcBMTData.adc[i]);
+							Color color = adcBMTData.color(i);
 
-							double phi = BMTGeometry.getGeometry().CRZStrip_GetPhi(adcBMTData.sector[i],
-									adcBMTData.layer[i], adcBMTData.component[i]);
+							double phi = BMTGeometry.getGeometry().CRZStrip_GetPhi(adcBMTData.sector(i),
+									adcBMTData.layer(i), adcBMTData.component(i));
 
 							double rad = bmtItem.getInnerRadius() + BMTSectorItem.FAKEWIDTH / 2.;
 							wp.x = rad * Math.cos(phi);
