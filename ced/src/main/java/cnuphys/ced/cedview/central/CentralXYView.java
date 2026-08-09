@@ -39,7 +39,7 @@ import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.datacontainer.bmt.BMTADCData;
-import cnuphys.ced.alldata.datacontainer.bmt.BMTRecHitData;
+import cnuphys.ced.alldata.BMTRecHits;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
 import cnuphys.ced.alldata.CosmicTracks;
@@ -97,7 +97,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 	private BMTADCData _bmtADCData = BMTADCData.getInstance();
 	private CosmicTracks _cosmicData = CosmicTracks.getInstance();
 	private BSTRecHitData bstRecHitData = BSTRecHitData.getInstance();
-	private BMTRecHitData bmtRecHitData = BMTRecHitData.getInstance();
+	private BMTRecHits bmtRecHitData = BMTRecHits.getInstance();
 
 
 	// units are mm
@@ -672,7 +672,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 
 			for (int i = 0; i < bmtRecHitData.count(); i++) {
 				if (bmtRecHitData.contains(i, screenPoint)) {
-					bmtRecHitData.hitFeedback(i, feedbackStrings);
+					bmtRecHitData.addFeedback(i, feedbackStrings);
 					break;
 				}
 			}

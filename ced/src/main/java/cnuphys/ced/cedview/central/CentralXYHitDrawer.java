@@ -10,7 +10,7 @@ import java.awt.geom.Point2D;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.datacontainer.bmt.BMTADCData;
-import cnuphys.ced.alldata.datacontainer.bmt.BMTRecHitData;
+import cnuphys.ced.alldata.BMTRecHits;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
 import cnuphys.ced.alldata.CNDAdc;
@@ -42,7 +42,7 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 	private BSTADCData adcBSTData = BSTADCData.getInstance();
 	private BMTADCData adcBMTData = BMTADCData.getInstance();
 	private BSTRecHitData bstRecHitData = BSTRecHitData.getInstance();
-	private BMTRecHitData bmtRecHitData = BMTRecHitData.getInstance();
+	private BMTRecHits bmtRecHitData = BMTRecHits.getInstance();
 
 	// accumulation manager
 	private AccumulationManager _accumManager = AccumulationManager.getInstance();
@@ -271,11 +271,11 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 				Point2D.Double wp = new Point2D.Double();
 
 				for (int i = 0; i < count; i++) {
-					BMTSectorItem bmtItem = _iCentralView.getBMTSectorItem(bmtRecHitData.sector[i], bmtRecHitData.layer[i]);
+					BMTSectorItem bmtItem = _iCentralView.getBMTSectorItem(bmtRecHitData.sector(i), bmtRecHitData.layer(i));
 					if (bmtItem != null && bmtItem.isZLayer()) {
 
-						double phi = BMTGeometry.getGeometry().CRZStrip_GetPhi(bmtRecHitData.sector[i], bmtRecHitData.layer[i],
-								bmtRecHitData.strip[i]);
+						double phi = BMTGeometry.getGeometry().CRZStrip_GetPhi(bmtRecHitData.sector(i), bmtRecHitData.layer(i),
+								bmtRecHitData.strip(i));
 
 						double rad = bmtItem.getInnerRadius() + BMTSectorItem.FAKEWIDTH / 2.;
 						wp.x = rad * Math.cos(phi);
