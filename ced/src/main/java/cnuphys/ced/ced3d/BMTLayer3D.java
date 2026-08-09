@@ -7,7 +7,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.BMTAdc;
-import cnuphys.ced.alldata.datacontainer.bmt.BMTCrossData;
+import cnuphys.ced.alldata.CentralCrosses;
 import cnuphys.ced.geometry.BMTGeometry;
 import cnuphys.ced.geometry.bmt.Constants;
 
@@ -26,7 +26,7 @@ public class BMTLayer3D extends DetectorItem3D {
 
 	//data containers
 	private BMTAdc _bmtADCData = BMTAdc.getInstance();
-	private BMTCrossData _bmtCrossData = BMTCrossData.getInstance();
+	private CentralCrosses _bmtCrossData = CentralCrosses.bmt();
 
 
 	public BMTLayer3D(CedPanel3D panel3D, int sector, int layer) {
@@ -76,13 +76,13 @@ public class BMTLayer3D extends DetectorItem3D {
 		if (_cedPanel3D.showReconCrosses()) {
 
 			for (int i = 0; i < _bmtCrossData.count(); i++) {
-				if (_bmtCrossData.sector[i] == _sector && _bmtCrossData.layer[i] == _layer) {
-					float x = _bmtCrossData.x[i];
-					float y = _bmtCrossData.y[i];
-					float z = _bmtCrossData.z[i];
-					float ux = _bmtCrossData.ux[i];
-					float uy = _bmtCrossData.uy[i];
-					float uz = _bmtCrossData.uz[i];
+				if (_bmtCrossData.sector(i) == _sector && _bmtCrossData.layer(i) == _layer) {
+					float x = _bmtCrossData.x(i);
+					float y = _bmtCrossData.y(i);
+					float z = _bmtCrossData.z(i);
+					float ux = _bmtCrossData.ux(i);
+					float uy = _bmtCrossData.uy(i);
+					float uz = _bmtCrossData.uz(i);
 
 					Support3D.drawLine(drawable, x, y, z, ux, uy, uz, CROSS_LEN, crossColor, 3f);
 					Support3D.drawLine(drawable, x, y, z, ux, uy, uz, (float) (1.1 * CROSS_LEN), Color.black, 1f);

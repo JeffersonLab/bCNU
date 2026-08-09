@@ -14,8 +14,7 @@ import java.util.List;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.datacontainer.bmt.BMTCrossData;
-import cnuphys.ced.alldata.datacontainer.bst.BSTCrossData;
+import cnuphys.ced.alldata.CentralCrosses;
 import cnuphys.ced.cedview.alert.AlertXYView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 
@@ -25,8 +24,8 @@ public class CrossDrawerXY extends CentralXYViewDrawer {
 	private static final Stroke THICKLINE = new BasicStroke(1.5f);
 
 	// data containers
-	private BSTCrossData bstCrossData = BSTCrossData.getInstance();
-	private BMTCrossData bmtCrossData = BMTCrossData.getInstance();
+	private CentralCrosses bstCrossData = CentralCrosses.bst();
+	private CentralCrosses bmtCrossData = CentralCrosses.bmt();
 
 	/**
 	 * Create a central cross drawer
@@ -84,14 +83,14 @@ public class CrossDrawerXY extends CentralXYViewDrawer {
 			double r = pixlen / WorldGraphicsUtilities.getMeanPixelDensity(container);
 
 			for (int i = 0; i < count; i++) {
-				wp.setLocation(10.0 * bstCrossData.x[i], 10.0 * bstCrossData.y[i]);
+				wp.setLocation(10.0 * bstCrossData.x(i), 10.0 * bstCrossData.y(i));
 
 				if (!bstCrossData.isXYLocationBad(i)) {
 					container.worldToLocal(pp, wp);
 
 					if (!bstCrossData.isDirectionBad(i)) {
-						wp2.x = wp.x + r * bstCrossData.ux[i];
-						wp2.y = wp.y + r * bstCrossData.uy[i];
+						wp2.x = wp.x + r * bstCrossData.ux(i);
+						wp2.y = wp.y + r * bstCrossData.uy(i);
 						container.worldToLocal(pp2, wp2);
 
 						g.setColor(Color.orange);
@@ -132,14 +131,14 @@ public class CrossDrawerXY extends CentralXYViewDrawer {
 			double r = pixlen / WorldGraphicsUtilities.getMeanPixelDensity(container);
 
 			for (int i = 0; i < count; i++) {
-				wp.setLocation(10.0 * bmtCrossData.x[i], 10.0 * bmtCrossData.y[i]);
+				wp.setLocation(10.0 * bmtCrossData.x(i), 10.0 * bmtCrossData.y(i));
 
 				if (!bmtCrossData.isXYLocationBad(i)) {
 					container.worldToLocal(pp, wp);
 
 					if (!bmtCrossData.isDirectionBad(i)) {
-						wp2.x = wp.x + r * bmtCrossData.ux[i];
-						wp2.y = wp.y + r * bmtCrossData.uy[i];
+						wp2.x = wp.x + r * bmtCrossData.ux(i);
+						wp2.y = wp.y + r * bmtCrossData.uy(i);
 						container.worldToLocal(pp2, wp2);
 
 						g.setColor(Color.orange);
@@ -180,7 +179,7 @@ public class CrossDrawerXY extends CentralXYViewDrawer {
 
 			for (int i = 0; i < bstCrossData.count(); i++) {
 				if (bstCrossData.contains(i, screenPoint)) {
-					bstCrossData.feedback("BSTCross", i, feedbackStrings);
+					bstCrossData.addFeedback(i, feedbackStrings);
 					return;
 				}
 			}
@@ -192,7 +191,7 @@ public class CrossDrawerXY extends CentralXYViewDrawer {
 
 			for (int i = 0; i < bmtCrossData.count(); i++) {
 				if (bmtCrossData.contains(i, screenPoint)) {
-					bmtCrossData.feedback("BMTCross", i, feedbackStrings);
+					bmtCrossData.addFeedback(i, feedbackStrings);
 					return;
 				}
 			}

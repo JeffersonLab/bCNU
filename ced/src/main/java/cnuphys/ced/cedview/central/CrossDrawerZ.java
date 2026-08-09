@@ -12,8 +12,7 @@ import java.util.List;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.datacontainer.bmt.BMTCrossData;
-import cnuphys.ced.alldata.datacontainer.bst.BSTCrossData;
+import cnuphys.ced.alldata.CentralCrosses;
 import cnuphys.ced.clasio.ClasIoEventManager;
 
 public class CrossDrawerZ extends CentralZViewDrawer {
@@ -24,8 +23,8 @@ public class CrossDrawerZ extends CentralZViewDrawer {
 
 
 	// data containers
-	private BSTCrossData bstCrossData = BSTCrossData.getInstance();
-	private BMTCrossData bmtCrossData = BMTCrossData.getInstance();
+	private CentralCrosses bstCrossData = CentralCrosses.bst();
+	private CentralCrosses bmtCrossData = CentralCrosses.bmt();
 
 
 	/**
@@ -74,9 +73,9 @@ public class CrossDrawerZ extends CentralZViewDrawer {
 			for (int i = 0; i < count; i++) {
 
 				// convert to mm
-				_view.labToWorld(10*bstCrossData.x[i], 10*bstCrossData.y[i], 10*bstCrossData.z[i], wp);
-				wp3.setLocation(wp.x - 10*bstCrossData.err_z[i], wp.y);
-				wp4.setLocation(wp.x + 10*bstCrossData.err_z[i], wp.y);
+				_view.labToWorld(10*bstCrossData.x(i), 10*bstCrossData.y(i), 10*bstCrossData.z(i), wp);
+				wp3.setLocation(wp.x - 10*bstCrossData.errorZ(i), wp.y);
+				wp4.setLocation(wp.x + 10*bstCrossData.errorZ(i), wp.y);
 				container.worldToLocal(pp, wp3);
 				container.worldToLocal(pp2, wp4);
 				g.setColor(ERROR);
@@ -84,17 +83,17 @@ public class CrossDrawerZ extends CentralZViewDrawer {
 			}
 
 			for (int i = 0; i < count; i++) {
-				wp.setLocation(10.0 * bstCrossData.x[i], 10.0 * bstCrossData.y[i]);
+				wp.setLocation(10.0 * bstCrossData.x(i), 10.0 * bstCrossData.y(i));
 				if (!bstCrossData.isFullLocationBad(i)) {
-					_view.labToWorld(10 * bstCrossData.x[i], 10 * bstCrossData.y[i], 10 * bstCrossData.z[i], wp);
+					_view.labToWorld(10 * bstCrossData.x(i), 10 * bstCrossData.y(i), 10 * bstCrossData.z(i), wp);
 
 					// arrows
 					int pixlen = ARROWLEN;
 					double r = pixlen / WorldGraphicsUtilities.getMeanPixelDensity(container);
 
-					double xa = 10 * bstCrossData.x[i] + r * bstCrossData.ux[i];
-					double ya = 10 * bstCrossData.y[i] + r * bstCrossData.uy[i];
-					double za = 10 * bstCrossData.z[i] + r * bstCrossData.uz[i];
+					double xa = 10 * bstCrossData.x(i) + r * bstCrossData.ux(i);
+					double ya = 10 * bstCrossData.y(i) + r * bstCrossData.uy(i);
+					double za = 10 * bstCrossData.z(i) + r * bstCrossData.uz(i);
 					_view.labToWorld(xa, ya, za, wp2);
 					container.worldToLocal(pp, wp);
 					container.worldToLocal(pp2, wp2);
@@ -130,9 +129,9 @@ public class CrossDrawerZ extends CentralZViewDrawer {
 			for (int i = 0; i < count; i++) {
 
 				// convert to mm
-				_view.labToWorld(10*bmtCrossData.x[i], 10*bmtCrossData.y[i], 10*bmtCrossData.z[i], wp);
-				wp3.setLocation(wp.x - 10*bmtCrossData.err_z[i], wp.y);
-				wp4.setLocation(wp.x + 10*bmtCrossData.err_z[i], wp.y);
+				_view.labToWorld(10*bmtCrossData.x(i), 10*bmtCrossData.y(i), 10*bmtCrossData.z(i), wp);
+				wp3.setLocation(wp.x - 10*bmtCrossData.errorZ(i), wp.y);
+				wp4.setLocation(wp.x + 10*bmtCrossData.errorZ(i), wp.y);
 				container.worldToLocal(pp, wp3);
 				container.worldToLocal(pp2, wp4);
 				g.setColor(ERROR);
@@ -140,17 +139,17 @@ public class CrossDrawerZ extends CentralZViewDrawer {
 			}
 
 			for (int i = 0; i < count; i++) {
-				wp.setLocation(10.0 * bmtCrossData.x[i], 10.0 * bmtCrossData.y[i]);
+				wp.setLocation(10.0 * bmtCrossData.x(i), 10.0 * bmtCrossData.y(i));
 				if (!bmtCrossData.isFullLocationBad(i)) {
-					_view.labToWorld(10 * bmtCrossData.x[i], 10 * bmtCrossData.y[i], 10 * bmtCrossData.z[i], wp);
+					_view.labToWorld(10 * bmtCrossData.x(i), 10 * bmtCrossData.y(i), 10 * bmtCrossData.z(i), wp);
 
 					// arrows
 					int pixlen = ARROWLEN;
 					double r = pixlen / WorldGraphicsUtilities.getMeanPixelDensity(container);
 
-					double xa = 10 * bmtCrossData.x[i] + r * bmtCrossData.ux[i];
-					double ya = 10 * bmtCrossData.y[i] + r * bmtCrossData.uy[i];
-					double za = 10 * bmtCrossData.z[i] + r * bmtCrossData.uz[i];
+					double xa = 10 * bmtCrossData.x(i) + r * bmtCrossData.ux(i);
+					double ya = 10 * bmtCrossData.y(i) + r * bmtCrossData.uy(i);
+					double za = 10 * bmtCrossData.z(i) + r * bmtCrossData.uz(i);
 					_view.labToWorld(xa, ya, za, wp2);
 					container.worldToLocal(pp, wp);
 					container.worldToLocal(pp2, wp2);
@@ -189,7 +188,7 @@ public class CrossDrawerZ extends CentralZViewDrawer {
 
 			for (int i = 0; i < bstCrossData.count(); i++) {
 				if (bstCrossData.contains(i, screenPoint)) {
-					bstCrossData.feedback("BSTCross", i, feedbackStrings);
+					bstCrossData.addFeedback(i, feedbackStrings);
 					return;
 				}
 			}
@@ -201,7 +200,7 @@ public class CrossDrawerZ extends CentralZViewDrawer {
 
 			for (int i = 0; i < bmtCrossData.count(); i++) {
 				if (bmtCrossData.contains(i, screenPoint)) {
-					bmtCrossData.feedback("BMTCross", i, feedbackStrings);
+					bmtCrossData.addFeedback(i, feedbackStrings);
 					return;
 				}
 			}

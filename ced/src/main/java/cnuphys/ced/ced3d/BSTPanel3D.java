@@ -7,7 +7,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.BSTAdc;
-import cnuphys.ced.alldata.datacontainer.bst.BSTCrossData;
+import cnuphys.ced.alldata.CentralCrosses;
 import cnuphys.ced.alldata.CosmicTracks;
 import cnuphys.ced.geometry.BSTGeometry;
 
@@ -23,7 +23,7 @@ public class BSTPanel3D extends DetectorItem3D {
 
 	//data containers
 	private CosmicTracks _cosmicData = CosmicTracks.getInstance();
-	private BSTCrossData _bstCrossData = BSTCrossData.getInstance();
+	private CentralCrosses _bstCrossData = CentralCrosses.bst();
 
 	// the 1-based sect
 	private int _sector;
@@ -78,12 +78,12 @@ public class BSTPanel3D extends DetectorItem3D {
 			// BST
 
 			for (int i = 0; i < _bstCrossData.count(); i++) {
-                float x1 = _bstCrossData.x[i];
-                float y1 = _bstCrossData.y[i];
-                float z1 = _bstCrossData.z[i];
-                float ux = _bstCrossData.ux[i];
-                float uy = _bstCrossData.uy[i];
-                float uz = _bstCrossData.uz[i];
+                float x1 = _bstCrossData.x(i);
+                float y1 = _bstCrossData.y(i);
+                float z1 = _bstCrossData.z(i);
+                float ux = _bstCrossData.ux(i);
+                float uy = _bstCrossData.uy(i);
+                float uz = _bstCrossData.uz(i);
 
                 Support3D.drawLine(drawable, x1, y1, z1, ux, uy, uz, CROSS_LEN, crossColor, 3f);
                 Support3D.drawLine(drawable, x1, y1, z1, ux, uy, uz, (float) (1.1 * CROSS_LEN), Color.black, 1f);
