@@ -32,7 +32,7 @@ import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.PlotView;
 import cnuphys.bCNU.view.ViewManager;
 import cnuphys.ced.alldata.DCHits;
-import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
+import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.SliceView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -107,7 +107,7 @@ public class SectorView extends SliceView implements ChangeListener {
 			X11Colors.getX11Color("Dark Green"), Color.black, Color.gray, X11Colors.getX11Color("wheat") };
 
 	// data containers
-	private static DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
+	private static DCRawHits _dcData = DCRawHits.getInstance();
 
 
 	/**
@@ -577,7 +577,7 @@ public class SectorView extends SliceView implements ChangeListener {
 		int sector = getSector(container, pp, wp);
 
 		double totalOcc = 100. * _dcData.totalOccupancy();
-		double sectorOcc = 100. * _dcData.totalSectorOccupancy(sector);
+		double sectorOcc = 100. * _dcData.sectorOccupancy(sector);
 		String occStr = "Total DC occ " + DoubleFormat.doubleFormat(totalOcc, 2) + "%" + " sector " + sector + " occ "
 				+ DoubleFormat.doubleFormat(sectorOcc, 2) + "%";
 		feedbackStrings.add("$aqua$" + occStr);

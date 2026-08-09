@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
+import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.IClasIoEventListener;
@@ -34,7 +34,7 @@ public class NoiseManager implements IClasIoEventListener {
 	private ClasIoEventManager _eventManager = ClasIoEventManager.getInstance();
 
 	// data containers
-	private static DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
+	private static DCRawHits _dcData = DCRawHits.getInstance();
 
 
 	// private constructor
@@ -79,43 +79,22 @@ public class NoiseManager implements IClasIoEventListener {
 
 		int count = _dcData.count();
 		if (count > 0) {
-			int sector[] = toIntArray(_dcData.sector);
-			int superlayer[] = toIntArray(_dcData.superlayer);
-			int layer[] = toIntArray(_dcData.layer6);
-			int wire[] = toIntArray(_dcData.component);
-
-			noisePackage.findNoise(sector, superlayer, layer, wire, _noiseResults);
-
+			int sector[] = new int[count];
+			int superlayer[] = new int[count];
+			int layer[] = new int[count];
+			int wire[] = new int[count];
 			for (int i = 0; i < count; i++) {
-				_dcData.noise[i] = _noiseResults.noise[i];
+				sector[i] = _dcData.sector(i);
+				superlayer[i] = _dcData.superlayer(i);
+				layer[i] = _dcData.layerInSuperlayer(i);
+				wire[i] = _dcData.wire(i);
 			}
 
+			noisePackage.findNoise(sector, superlayer, layer, wire, _noiseResults);
+			_dcData.setNoiseFlags(_noiseResults.noise);
+
 		}
 
-	}
-
-	// HACK
-	private int[] toIntArray(byte[] bytes) {
-		if (bytes == null) {
-			return null;
-		}
-		int ints[] = new int[bytes.length];
-		for (int i = 0; i < bytes.length; i++) {
-			ints[i] = bytes[i];
-		}
-		return ints;
-	}
-
-	// HACK
-	private int[] toIntArray(short[] shorts) {
-		if (shorts == null) {
-			return null;
-		}
-		int ints[] = new int[shorts.length];
-		for (int i = 0; i < shorts.length; i++) {
-			ints[i] = shorts[i];
-		}
-		return ints;
 	}
 
 	@Override

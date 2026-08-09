@@ -31,7 +31,7 @@ import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.ViewConfiguration;
 import cnuphys.bCNU.view.VirtualView;
-import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
+import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.HexView;
 import cnuphys.ced.cedview.SwimTrajectoryDrawerXY;
@@ -69,7 +69,7 @@ public class DCXYView extends HexView {
 	private static String _defMatches[] = {"DC:"};
 
 	// data containers
-	private static DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
+	private static DCRawHits _dcData = DCRawHits.getInstance();
 
 
 	// each superlayer in a different color
@@ -302,10 +302,10 @@ public class DCXYView extends HexView {
 					Point2D.Double wp2 = new Point2D.Double();
 
 					for (int i = 0; i < count; i++) {
-						int sect = _dcData.sector[i];
-						int supl = _dcData.superlayer[i];
-						int lay = _dcData.layer6[i];
-						int wire = _dcData.component[i];
+						int sect = _dcData.sector(i);
+						int supl = _dcData.superlayer(i);
+						int lay = _dcData.layerInSuperlayer(i);
+						int wire = _dcData.wire(i);
 						projectWire(g, container, sect, supl, lay, wire, wp1, wp2, pp1, pp2);
 						g.setColor(_wireColors[supl - 1]);
 						g.drawLine(pp1.x, pp1.y, pp2.x, pp2.y);

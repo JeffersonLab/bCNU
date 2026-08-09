@@ -21,7 +21,7 @@ import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.ViewConfiguration;
 import cnuphys.bCNU.view.VirtualView;
-import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
+import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.HexView;
 import cnuphys.ced.cedview.RollOverDCPanel;
@@ -52,7 +52,7 @@ public class DCHexView extends HexView {
 	private static String _defMatches[] = {"DC:", "HitBased", "TimeBased"};
 
 	// data containers
-	private static DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
+	private static DCRawHits _dcData = DCRawHits.getInstance();
 
 	//superlayer items
 	private DCHexSuperLayer[][] _superLayerItems;
@@ -332,8 +332,8 @@ public class DCHexView extends HexView {
 
 
 			double totalOcc = 100. * _dcData.totalOccupancy();
-			double sectorOcc = 100. * _dcData.totalSectorOccupancy(sector);
-			double superlayerOcc = 100. * _dcData.totalSuperlayerOccupancy(sector, superlayer);
+			double sectorOcc = 100. * _dcData.sectorOccupancy(sector);
+			double superlayerOcc = 100. * _dcData.superlayerOccupancy(sector, superlayer);
 
 			String occStr = String.format("occ  total %-6.2f%%  sect %-6.2f%%  suplay %-6.2f%%", totalOcc,
 					sectorOcc, superlayerOcc);

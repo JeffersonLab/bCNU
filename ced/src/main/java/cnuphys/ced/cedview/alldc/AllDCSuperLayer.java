@@ -20,7 +20,7 @@ import cnuphys.bCNU.item.RectangleItem;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
+import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.alldata.DCHits;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -79,7 +79,7 @@ public class AllDCSuperLayer extends RectangleItem {
 	private Rectangle2D.Double _positionWorldRects[];
 
 	// data containers
-	private DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
+	private DCRawHits _dcData = DCRawHits.getInstance();
 	private DCHits _hbData = DCHits.hitBased();
 	private DCHits _tbData = DCHits.timeBased();
 	private DCHits _hbAIData = DCHits.aiHitBased();
@@ -210,9 +210,9 @@ public class AllDCSuperLayer extends RectangleItem {
 
 			for (int i = 0; i < _dcData.count(); i++) {
 				// draw the hit
-				if ((_dcData.sector[i] == _sector) && (_dcData.superlayer[i] == _superLayer)) {
-					drawDCRawHit(g, container, _dcData.layer6[i], _dcData.component[i], _dcData.noise[i], -1,
-							_dcData.order[i], wr, useOrderColoring);
+				if ((_dcData.sector(i) == _sector) && (_dcData.superlayer(i) == _superLayer)) {
+					drawDCRawHit(g, container, _dcData.layerInSuperlayer(i), _dcData.wire(i), _dcData.isNoise(i), -1,
+							_dcData.order(i), wr, useOrderColoring);
 				}
 			}
 		}
@@ -535,9 +535,9 @@ public class AllDCSuperLayer extends RectangleItem {
 
 		for (int i = 0; i < _dcData.count(); i++) {
 			// draw the hit
-			if ((_dcData.sector[i] == _sector) && (_dcData.superlayer[i] == _superLayer) && (_dcData.layer6[i] == layer)
-					&& (_dcData.component[i] == wire)) {
-				_dcData.tdcFeedback(i, _view.showNoiseAnalysis(), _view.showMcTruth(), feedbackStrings);
+			if ((_dcData.sector(i) == _sector) && (_dcData.superlayer(i) == _superLayer) && (_dcData.layerInSuperlayer(i) == layer)
+					&& (_dcData.wire(i) == wire)) {
+				_dcData.addFeedback(i, _view.showNoiseAnalysis(), _view.showMcTruth(), feedbackStrings);
 
 				break;
 			}

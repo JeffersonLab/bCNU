@@ -24,7 +24,7 @@ import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DCSegments;
 import cnuphys.ced.alldata.DCHits;
-import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
+import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
@@ -66,7 +66,7 @@ public class SuperLayerDrawing {
 	private double[] _direction;
 
 	// data containers
-	private DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
+	private DCRawHits _dcData = DCRawHits.getInstance();
 	private DCSegments _hbTrkgSegmentData = DCSegments.hitBased();
 	private DCSegments _tbTrkgSegmentData = DCSegments.timeBased();
 	private DCSegments _hbTrkgAISegmentData = DCSegments.aiHitBased();
@@ -321,11 +321,11 @@ public class SuperLayerDrawing {
 				boolean useOrderColoring = Ced.useOrderColoring;
 
 				for (int i = 0; i < _dcData.count(); i++) {
-					if ((_dcData.sector[i] == _iSupl.sector()) && (_dcData.superlayer[i] == _iSupl.superlayer())) {
-						drawBasicDCHit(g, container, _dcData.layer6[i], _dcData.component[i], _dcData.noise[i], -1,
-								_dcData.order[i], useOrderColoring);
+					if ((_dcData.sector(i) == _iSupl.sector()) && (_dcData.superlayer(i) == _iSupl.superlayer())) {
+						drawBasicDCHit(g, container, _dcData.layerInSuperlayer(i), _dcData.wire(i), _dcData.isNoise(i), -1,
+								_dcData.order(i), useOrderColoring);
 						// just draw the wire again
-						drawOneWire(g, container, _dcData.layer6[i], _dcData.component[i], reallyClose, pp);
+						drawOneWire(g, container, _dcData.layerInSuperlayer(i), _dcData.wire(i), reallyClose, pp);
 					}
 				}
 
@@ -989,10 +989,10 @@ public class SuperLayerDrawing {
 
 				boolean hit = false;
 				for (int i = 0; i < _dcData.count(); i++) {
-					if ((_dcData.sector[i] == _iSupl.sector()) && (_dcData.superlayer[i] == _iSupl.superlayer())
-							&& (_dcData.layer6[i] == layer) && (_dcData.component[i] == wire)) {
+					if ((_dcData.sector(i) == _iSupl.sector()) && (_dcData.superlayer(i) == _iSupl.superlayer())
+							&& (_dcData.layerInSuperlayer(i) == layer) && (_dcData.wire(i) == wire)) {
 						hit = true;
-						_dcData.tdcFeedback(i, _view.showNoiseAnalysis(), _view.showMcTruth(), feedbackStrings);						break;
+						_dcData.addFeedback(i, _view.showNoiseAnalysis(), _view.showMcTruth(), feedbackStrings);						break;
 					}
 				}
 

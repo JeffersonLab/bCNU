@@ -12,7 +12,7 @@ import cnuphys.ced.alldata.BSTAdc;
 import cnuphys.ced.alldata.ECalAdc;
 import cnuphys.ced.alldata.CNDAdc;
 import cnuphys.ced.alldata.CherenkovAdc;
-import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
+import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.alldata.FTCalAdc;
 import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.FTOFAdc;
@@ -148,7 +148,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private BSTAdc bstADCData = BSTAdc.getInstance();
 	private CherenkovAdc htccADCData = CherenkovAdc.htcc();
 	private CherenkovAdc ltccADCData = CherenkovAdc.ltcc();
-	private DCTDCandDOCAData dcTDCData = DCTDCandDOCAData.getInstance();
+	private DCRawHits dcTDCData = DCRawHits.getInstance();
 
 	/**
 	 * private constructor for singleton.
@@ -1106,7 +1106,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private void accumDC() {
 
 		for (int i = 0; i < dcTDCData.count(); i++) {
-             _DCAccumulatedData[dcTDCData.sector[i] - 1][dcTDCData.superlayer[i] - 1][dcTDCData.layer6[i] - 1][dcTDCData.component[i] - 1] += 1;
+			 _DCAccumulatedData[dcTDCData.sector(i) - 1][dcTDCData.superlayer(i) - 1][dcTDCData.layerInSuperlayer(i) - 1][dcTDCData.wire(i) - 1] += 1;
  		}
 	}
 

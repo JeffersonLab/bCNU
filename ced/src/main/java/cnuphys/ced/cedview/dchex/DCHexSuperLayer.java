@@ -13,7 +13,7 @@ import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.DCHits;
-import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
+import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.frame.Ced;
@@ -53,7 +53,7 @@ public class DCHexSuperLayer extends PolygonItem {
 	private Point2D.Double _layerPolygons[][] = new Point2D.Double[6][4];
 
 	// data containers
-	private DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
+	private DCRawHits _dcData = DCRawHits.getInstance();
 	private DCHits _hbData = DCHits.hitBased();
 	private DCHits _tbData = DCHits.timeBased();
 	private DCHits _hbAIData = DCHits.aiHitBased();
@@ -173,9 +173,9 @@ public class DCHexSuperLayer extends PolygonItem {
 		if (_view.showRawHits()) {
 
 			for (int i = 0; i < _dcData.count(); i++) {
-                if ((_dcData.sector[i] == _sector) && (_dcData.superlayer[i] == _superLayer) &&
-                    (_dcData.layer6[i] == layer) && (_dcData.component[i] == wire)) {
-                	String fbs = String.format("$red$raw hit  tdc %d,  order %d", _dcData.tdc[i], _dcData.order[i]);
+                if ((_dcData.sector(i) == _sector) && (_dcData.superlayer(i) == _superLayer) &&
+                    (_dcData.layerInSuperlayer(i) == layer) && (_dcData.wire(i) == wire)) {
+					String fbs = String.format("$red$raw hit  tdc %d,  order %d", _dcData.tdc(i), _dcData.order(i));
                     feedbackStrings.add(fbs);
                     break;
                }
@@ -241,9 +241,9 @@ public class DCHexSuperLayer extends PolygonItem {
 			for (int i = 0; i < _dcData.count(); i++) {
 				boolean useOrderColoring = Ced.useOrderColoring;
 				// draw the hit
-				if ((_dcData.sector[i] == _sector) && (_dcData.superlayer[i] == _superLayer)) {
-					drawDCRawHit(g, container, _dcData.layer6[i], _dcData.component[i],
-							_dcData.noise[i], _dcData.order[i], useOrderColoring);
+				if ((_dcData.sector(i) == _sector) && (_dcData.superlayer(i) == _superLayer)) {
+					drawDCRawHit(g, container, _dcData.layerInSuperlayer(i), _dcData.wire(i),
+							_dcData.isNoise(i), _dcData.order(i), useOrderColoring);
 				}
 			}
 		}

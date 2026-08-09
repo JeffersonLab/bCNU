@@ -6,7 +6,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
+import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.geometry.DCGeometry;
 
 public class DCSuperLayer3D extends DetectorItem3D {
@@ -25,7 +25,7 @@ public class DCSuperLayer3D extends DetectorItem3D {
 	private float[] coords = new float[18];
 
 	//data containers
-	private static DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
+	private static DCRawHits _dcData = DCRawHits.getInstance();
 
 	/**
 	 * The owner panel
@@ -60,8 +60,8 @@ public class DCSuperLayer3D extends DetectorItem3D {
 		float coords[] = new float[6];
 
 		for (int i = 0; i < _dcData.count(); i++) {
-			if ((_dcData.sector[i] == _sector) && (_dcData.superlayer[i] == _superLayer)) {
-				getWire(_dcData.layer6[i], _dcData.component[i], coords);
+			if ((_dcData.sector(i) == _sector) && (_dcData.superlayer(i) == _superLayer)) {
+				getWire(_dcData.layerInSuperlayer(i), _dcData.wire(i), coords);
 				Support3D.drawLine(drawable, coords, docaColor, WIRELINEWIDTH);
 			}
 		}

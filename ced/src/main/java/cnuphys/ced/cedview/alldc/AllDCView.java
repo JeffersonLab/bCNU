@@ -27,7 +27,7 @@ import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
-import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
+import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.RollOverDCPanel;
 import cnuphys.ced.component.ControlPanel;
@@ -96,7 +96,7 @@ public class AllDCView extends CedView  {
 	private static String _defMatches[] = {"DC:", "HitBased", "TimeBased"};
 
 	// data containers
-	private static DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
+	private static DCRawHits _dcData = DCRawHits.getInstance();
 
 	/**
 	 * Create an allDCView
@@ -368,7 +368,7 @@ public class AllDCView extends CedView  {
 		int sector = getSector(container, screenPoint, worldPoint);
 
 		double totalOcc = 100. * _dcData.totalOccupancy();
-		double sectorOcc = 100. * _dcData.totalSectorOccupancy(sector);
+		double sectorOcc = 100. * _dcData.sectorOccupancy(sector);
 		String occStr = "Total DC occ " + DoubleFormat.doubleFormat(totalOcc, 2) + "%" + " sector " + sector + " occ "
 				+ DoubleFormat.doubleFormat(sectorOcc, 2) + "%";
 		feedbackStrings.add("$aqua$" + occStr);
