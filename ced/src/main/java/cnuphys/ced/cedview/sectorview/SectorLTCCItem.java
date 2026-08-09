@@ -15,7 +15,7 @@ import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.ADCSupport;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
-import cnuphys.ced.alldata.datacontainer.cc.LTCCRecData;
+import cnuphys.ced.alldata.LTCCRecHits;
 import cnuphys.ced.alldata.datacontainer.cc.LTCCTDCData;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.common.SuperLayerDrawing;
@@ -32,7 +32,7 @@ public class SectorLTCCItem extends PolygonItem {
 	
 	//data containers
 	private LTCCTDCData tdcData = LTCCTDCData.getInstance();
-	private LTCCRecData recData = LTCCRecData.getInstance();
+	private LTCCRecHits recData = LTCCRecHits.getInstance();
 
 	// the ced datawarehouse
 	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
@@ -142,9 +142,9 @@ public class SectorLTCCItem extends PolygonItem {
 			Point pp = new Point();
 
 			for (int i = 0; i < recData.count(); i++) {
-				float x = recData.x[i];
-				float y = recData.y[i];
-				float z = recData.z[i];
+				float x = recData.x(i);
+				float y = recData.y(i);
+				float z = recData.z(i);
 
 				int sect = GeometryManager.getSector(x, y);
 				if (sect == _sector) {
@@ -228,17 +228,16 @@ public class SectorLTCCItem extends PolygonItem {
 		// hit feedback
 		if (_view.showReconHits()) {
 
-			LTCCRecData recData = LTCCRecData.getInstance();
 			for (int i = 0; i < recData.count(); i++) {
 
-				float x = recData.x[i];
-				float y = recData.y[i];
+				float x = recData.x(i);
+				float y = recData.y(i);
 
 				int sect = GeometryManager.getSector(x, y);
 				if (sect == _sector) {
 
 					if (recData.contains(i, screenPoint)) {
-						recData.recFeedback("LTTC", i, feedbackStrings);
+						recData.addFeedback(i, feedbackStrings);
 						break;
 					}
 				}

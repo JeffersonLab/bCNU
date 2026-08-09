@@ -14,7 +14,7 @@ import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.ced.alldata.ADCSupport;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
-import cnuphys.ced.alldata.datacontainer.cc.HTCCRecData;
+import cnuphys.ced.alldata.HTCCRecHits;
 import cnuphys.ced.alldata.datacontainer.cc.HTCCTDCData;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.common.SuperLayerDrawing;
@@ -29,7 +29,7 @@ public class SectorHTCCItem extends PolygonItem {
 
 	//data containers
 	private HTCCTDCData tdcData = HTCCTDCData.getInstance();
-	private HTCCRecData recData = HTCCRecData.getInstance();
+	private HTCCRecHits recData = HTCCRecHits.getInstance();
 	
 	// the ced datawarehouse
 	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
@@ -140,9 +140,9 @@ public class SectorHTCCItem extends PolygonItem {
 			Point pp = new Point();
 
 			for (int i = 0; i < recData.count(); i++) {
-				float x = recData.x[i];
-				float y = recData.y[i];
-				float z = recData.z[i];
+				float x = recData.x(i);
+				float y = recData.y(i);
+				float z = recData.z(i);
 
 				int sect = GeometryManager.getSector(x, y);
 				if (sect == _sector) {
@@ -235,14 +235,14 @@ public class SectorHTCCItem extends PolygonItem {
 
 			for (int i = 0; i < recData.count(); i++) {
 
-				float x = recData.x[i];
-				float y = recData.y[i];
+				float x = recData.x(i);
+				float y = recData.y(i);
 
 				int sect = GeometryManager.getSector(x, y);
 				if (sect == _sector) {
 
 					if (recData.contains(i, screenPoint)) {
-						recData.recFeedback("FTCAL", i, feedbackStrings);
+						recData.addFeedback(i, feedbackStrings);
 						break;
 					}
 				}
