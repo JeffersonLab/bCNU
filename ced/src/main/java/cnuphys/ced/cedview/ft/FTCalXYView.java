@@ -18,8 +18,8 @@ import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.ViewConfiguration;
 import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.alldata.DataDrawSupport;
+import cnuphys.ced.alldata.FTCalAdc;
 import cnuphys.ced.alldata.FTCalHits;
-import cnuphys.ced.alldata.datacontainer.ftcal.FTCalADCData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
 import cnuphys.ced.component.ControlPanel;
@@ -51,7 +51,7 @@ public class FTCalXYView extends CedXYView {
 	private static final short[] goodIds = FTCALGeometry.getGoodIds();
 
 	//data containers
-	private FTCalADCData adcData = FTCalADCData.getInstance();
+	private FTCalAdc adcData = FTCalAdc.getInstance();
 	private FTCalHits hitData = FTCalHits.getInstance();
 
 	/**
@@ -245,15 +245,15 @@ public class FTCalXYView extends CedXYView {
 	private void drawSingleEventHits(Graphics g, IContainer container) {
 
 		for (int i = 0; i < adcData.count(); i++) {
-			short component = adcData.component[i];
+			short component = adcData.component(i);
 			if (component < 0 || component >= componentToIndex.length) {
 				continue; // skip bad components
 			}
 			short index = componentToIndex[component];
-			int adc = adcData.adc[i];
+			int adc = adcData.adc(i);
 			if (index >= 0 && index < ftCalPoly.length && adc > 0) {
 				FTCalXYPolygon poly = ftCalPoly[index];
-				Color color = adcData.getADCColor(adc);
+				Color color = adcData.color(i);
 				g.setColor(color);
 				g.fillPolygon(poly);
 				g.setColor(Color.black);
@@ -342,15 +342,15 @@ public class FTCalXYView extends CedXYView {
 		}
 
 		if (inIndex >= 0) {
-			FTCalADCData adcData = FTCalADCData.getInstance();
+			FTCalAdc adcData = FTCalAdc.getInstance();
 			for (int i = 0; i < adcData.count(); i++) {
-				short component = adcData.component[i];
+				short component = adcData.component(i);
 				if (component < 0 || component >= componentToIndex.length) {
 					continue; // skip bad components
 				}
 				short index = componentToIndex[component];
 				if (index == inIndex) {
-					adcData.adcFeedback("FTCAL", i, feedbackStrings);
+					adcData.addFeedback(i, feedbackStrings);
 				}
 			}
 		}

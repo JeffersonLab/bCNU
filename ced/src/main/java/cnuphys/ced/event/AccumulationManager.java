@@ -13,7 +13,7 @@ import cnuphys.ced.alldata.datacontainer.cal.ECalADCData;
 import cnuphys.ced.alldata.datacontainer.cal.PCalADCData;
 import cnuphys.ced.alldata.CNDAdc;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
-import cnuphys.ced.alldata.datacontainer.ftcal.FTCalADCData;
+import cnuphys.ced.alldata.FTCalAdc;
 import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.FTOFAdc;
 import cnuphys.ced.cedview.alert.AlertDCGeometryNumbering;
@@ -144,7 +144,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private PCalADCData pcADCData = PCalADCData.getInstance();
 	private FTOFAdc ftofADCData = FTOFAdc.getInstance();
 	private CTOFAdc ctofADCData = CTOFAdc.getInstance();
-	private FTCalADCData ftcalADCData = FTCalADCData.getInstance();
+	private FTCalAdc ftcalADCData = FTCalAdc.getInstance();
 	private BSTADCData bstADCData = BSTADCData.getInstance();
 	private DCTDCandDOCAData dcTDCData = DCTDCandDOCAData.getInstance();
 
@@ -1003,8 +1003,8 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private void accumFTCAL() {
         //use the adc arrays to accumulate
 		for (int i = 0; i < ftcalADCData.count(); i++) {
-			int component = ftcalADCData.component[i];
-			if (component >= _FTCALAccumulatedData.length) {
+			int component = ftcalADCData.component(i);
+			if (component < 0 || component >= _FTCALAccumulatedData.length) {
 				continue;
 			}
 			_FTCALAccumulatedData[component] += 1;

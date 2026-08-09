@@ -6,7 +6,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.ced.alldata.datacontainer.ftcal.FTCalADCData;
+import cnuphys.ced.alldata.FTCalAdc;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.geometry.FTCALGeometry;
@@ -23,7 +23,7 @@ public class FTCalPaddle3D extends DetectorItem3D {
 	private static boolean _frame = true;
 
 	//data container
-	private FTCalADCData adcData = FTCalADCData.getInstance();
+	private FTCalAdc adcData = FTCalAdc.getInstance();
 
 	/**
 	 * Create a FTCAL paddle
@@ -45,10 +45,9 @@ public class FTCalPaddle3D extends DetectorItem3D {
 
 		// draw "hit" based on adc values
 		for (int i = 0; i < adcData.count(); i++) {
-			if (adcData.component[i] == _id) {
-				int adc = adcData.adc[i];
+			if (adcData.component(i) == _id) {
 
-				color = adcData.getADCColor(adc);
+				color = adcData.color(i);
 				color = new Color(color.getRed(), color.getGreen(), color.getBlue(), getVolumeAlpha());
 				break;
 			}
