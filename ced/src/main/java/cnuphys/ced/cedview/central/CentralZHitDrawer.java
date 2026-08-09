@@ -8,7 +8,7 @@ import java.awt.Point;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
-import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
+import cnuphys.ced.alldata.BSTRecHits;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.BSTGeometry;
 import cnuphys.ced.geometry.BSTxyPanel;
@@ -22,7 +22,7 @@ public class CentralZHitDrawer extends CentralHitDrawer {
 
 	//data containers
 	private BSTADCData adcBSTData = BSTADCData.getInstance();
-	private BSTRecHitData bstRecHitData = BSTRecHitData.getInstance();
+	private BSTRecHits bstRecHitData = BSTRecHits.getInstance();
 
 
 	public CentralZHitDrawer(CentralZView view) {
@@ -94,11 +94,10 @@ public class CentralZHitDrawer extends CentralHitDrawer {
 				Point pp = new Point();
 
 				for (int i = 0; i < count; i++) {
-					int sector = bstRecHitData.sector[i];
-					int layer = bstRecHitData.layer[i];
-					int strip = bstRecHitData.strip[i];
-					if (sector > 0 && layer > 0 && strip > 0 && layer < 7 && strip < 257
-							&& (sector <= BSTGeometry.sectorsPerLayer[layer - 1])) {
+					int sector = bstRecHitData.sector(i);
+					int layer = bstRecHitData.layer(i);
+					int strip = bstRecHitData.strip(i);
+					if (bstRecHitData.hasValidGeometry(i, BSTGeometry.sectorsPerLayer)) {
 						Vector3d v = BSTGeometry.getStripMidpoint(sector - 1, layer - 1, strip - 1);
 						double alpha = _view.labToLocalWithAlpha(v.x, v.y, v.z, pp);
 						int alp = (int) Math.max(0, Math.min(255, 255 * alpha));

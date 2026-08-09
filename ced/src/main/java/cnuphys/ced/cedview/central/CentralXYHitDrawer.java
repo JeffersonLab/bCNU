@@ -12,7 +12,7 @@ import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.datacontainer.bmt.BMTADCData;
 import cnuphys.ced.alldata.BMTRecHits;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
-import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
+import cnuphys.ced.alldata.BSTRecHits;
 import cnuphys.ced.alldata.CNDAdc;
 import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.CTOFClusters;
@@ -41,7 +41,7 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 	private CTOFClusters clusterCTOFData = CTOFClusters.getInstance();
 	private BSTADCData adcBSTData = BSTADCData.getInstance();
 	private BMTADCData adcBMTData = BMTADCData.getInstance();
-	private BSTRecHitData bstRecHitData = BSTRecHitData.getInstance();
+	private BSTRecHits bstRecHitData = BSTRecHits.getInstance();
 	private BMTRecHits bmtRecHitData = BMTRecHits.getInstance();
 
 	// accumulation manager
@@ -327,11 +327,9 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 				Point2D.Double wp = new Point2D.Double();
 
 				for (int i = 0; i < count; i++) {
-					if (bstRecHitData.sector[i] > 0 && bstRecHitData.layer[i] > 0 && bstRecHitData.strip[i] > 0
-							&& bstRecHitData.layer[i] < 7 && bstRecHitData.strip[i] < 257
-							&& (bstRecHitData.sector[i] <= BSTGeometry.sectorsPerLayer[bstRecHitData.layer[i] - 1])) {
-						BSTGeometry.getStripMidpointXY(bstRecHitData.sector[i] - 1, bstRecHitData.layer[i] - 1,
-								bstRecHitData.strip[i] - 1, wp);
+					if (bstRecHitData.hasValidGeometry(i, BSTGeometry.sectorsPerLayer)) {
+						BSTGeometry.getStripMidpointXY(bstRecHitData.sector(i) - 1, bstRecHitData.layer(i) - 1,
+								bstRecHitData.strip(i) - 1, wp);
 						container.worldToLocal(pp, wp);
 						bstRecHitData.setLocation(i, pp);
 						DataDrawSupport.drawReconHit(g, pp);

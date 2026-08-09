@@ -35,7 +35,7 @@ import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
-import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
+import cnuphys.ced.alldata.BSTRecHits;
 import cnuphys.ced.alldata.CosmicTracks;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.ILabCoordinates;
@@ -100,7 +100,7 @@ public class CentralZView extends CedView implements ChangeListener, ILabCoordin
 
 	//data containers
 	private CosmicTracks _cosmicData = CosmicTracks.getInstance();
-	private BSTRecHitData bstRecHitData = BSTRecHitData.getInstance();
+	private BSTRecHits bstRecHitData = BSTRecHits.getInstance();
 
 
 	public CentralZView(Object... keyVals) {
@@ -717,7 +717,7 @@ public class CentralZView extends CedView implements ChangeListener, ILabCoordin
 		if (showReconHits()) {
 			for (int i = 0; i < bstRecHitData.count(); i++) {
 				if (bstRecHitData.contains(i, screenPoint)) {
-					bstRecHitData.hitFeedback(i, feedbackStrings);
+					bstRecHitData.addFeedback(i, feedbackStrings);
 					break;
 				}
 			}

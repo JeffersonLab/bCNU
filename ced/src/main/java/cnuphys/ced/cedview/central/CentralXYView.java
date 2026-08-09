@@ -41,7 +41,7 @@ import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.datacontainer.bmt.BMTADCData;
 import cnuphys.ced.alldata.BMTRecHits;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
-import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
+import cnuphys.ced.alldata.BSTRecHits;
 import cnuphys.ced.alldata.CosmicTracks;
 import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.CTOFClusters;
@@ -96,7 +96,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 	private BSTADCData _bstADCData = BSTADCData.getInstance();
 	private BMTADCData _bmtADCData = BMTADCData.getInstance();
 	private CosmicTracks _cosmicData = CosmicTracks.getInstance();
-	private BSTRecHitData bstRecHitData = BSTRecHitData.getInstance();
+	private BSTRecHits bstRecHitData = BSTRecHits.getInstance();
 	private BMTRecHits bmtRecHitData = BMTRecHits.getInstance();
 
 
@@ -665,7 +665,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 		if (showReconHits()) {
 			for (int i = 0; i < bstRecHitData.count(); i++) {
 				if (bstRecHitData.contains(i, screenPoint)) {
-					bstRecHitData.hitFeedback(i, feedbackStrings);
+					bstRecHitData.addFeedback(i, feedbackStrings);
 					break;
 				}
 			}
