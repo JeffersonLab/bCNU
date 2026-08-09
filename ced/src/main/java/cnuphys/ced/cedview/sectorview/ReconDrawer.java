@@ -13,8 +13,7 @@ import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.view.FBData;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.ECalClusters;
-import cnuphys.ced.alldata.datacontainer.cal.ECalReconData;
-import cnuphys.ced.alldata.datacontainer.cal.PCalReconData;
+import cnuphys.ced.alldata.RecCalorimeter;
 import cnuphys.ced.alldata.datacontainer.dc.ATrkgHitData;
 import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAIHitData;
 import cnuphys.ced.alldata.datacontainer.dc.HBTrkgHitData;
@@ -31,8 +30,8 @@ public class ReconDrawer extends SectorViewDrawer {
 	private ArrayList<FBData> _fbData = new ArrayList<>();
 
 	// data containers
-	ECalReconData ecRecData = ECalReconData.getInstance();
-	PCalReconData pcalRecData = PCalReconData.getInstance();
+	RecCalorimeter ecRecData = RecCalorimeter.getInstance();
+	RecCalorimeter pcalRecData = RecCalorimeter.getInstance();
 	private HBTrkgHitData _hbData = HBTrkgHitData.getInstance();
 	private TBTrkgHitData _tbData = TBTrkgHitData.getInstance();
 	private HBTrkgAIHitData _hbAIData = HBTrkgAIHitData.getInstance();
@@ -107,11 +106,11 @@ public class ReconDrawer extends SectorViewDrawer {
 
 		// draw ECAL
 		for (int i = 0; i < ecRecData.count(); i++) {
-			if (_view.containsSector(ecRecData.sector.get(i))) {
+			if (ecRecData.isECal(i) && _view.containsSector(ecRecData.sector(i))) {
 
-				float x = ecRecData.x.get(i);
-				float y = ecRecData.y.get(i);
-				float z = ecRecData.z.get(i);
+				float x = ecRecData.x(i);
+				float y = ecRecData.y(i);
+				float z = ecRecData.z(i);
 
 				_view.projectClasToWorld(x, y, z, _view.getProjectionPlane(), wp);
 				container.worldToLocal(pp, wp);
@@ -121,7 +120,7 @@ public class ReconDrawer extends SectorViewDrawer {
 				double theta = Math.toDegrees(Math.acos(z / r));
 				double phi = Math.toDegrees(Math.atan2(y, x));
 
-				float radius = ecRecData.getRadius(ecRecData.energy.get(i));
+				float radius = ecRecData.radius(i);
 				if (radius > 0) {
 					container.localToWorld(pp, wp);
 					wr.setRect(wp.x - radius, wp.y - radius, 2 * radius, 2 * radius);
@@ -130,21 +129,21 @@ public class ReconDrawer extends SectorViewDrawer {
 
 				_fbData.add(new FBData(pp, String.format("$magenta$REC xyz (%-6.3f, %-6.3f, %-6.3f) cm", x, y, z),
 						String.format("$magenta$REC %s (%-6.3f, %-6.3f, %-6.3f)", CedView.rThetaPhi, r, theta, phi),
-						String.format("$magenta$REC plane %s", ECGeometry.PLANE_NAMES[ecRecData.plane.get(i)]),
-						String.format("$magenta$REC view %s", ECGeometry.VIEW_NAMES[ecRecData.view.get(i)]),
-						String.format("$magenta$%s", ecRecData.getPIDStr(i)),
-						String.format("$magenta$REC Energy %-7.4f GeV", ecRecData.energy.get(i))));
+						String.format("$magenta$REC plane %s", ECGeometry.PLANE_NAMES[ecRecData.plane(i)]),
+						String.format("$magenta$REC view %s", ECGeometry.VIEW_NAMES[ecRecData.view(i)]),
+						String.format("$magenta$%s", ecRecData.pidString(i)),
+						String.format("$magenta$REC Energy %-7.4f GeV", ecRecData.energy(i))));
 
 			}
 		} // for i
 
 		// draw PCAL
 		for (int i = 0; i < pcalRecData.count(); i++) {
-			if (_view.containsSector(pcalRecData.sector.get(i))) {
+			if (pcalRecData.isPCal(i) && _view.containsSector(pcalRecData.sector(i))) {
 
-				float x = pcalRecData.x.get(i);
-				float y = pcalRecData.y.get(i);
-				float z = pcalRecData.z.get(i);
+				float x = pcalRecData.x(i);
+				float y = pcalRecData.y(i);
+				float z = pcalRecData.z(i);
 
 				_view.projectClasToWorld(x, y, z, _view.getProjectionPlane(), wp);
 				container.worldToLocal(pp, wp);
@@ -154,7 +153,7 @@ public class ReconDrawer extends SectorViewDrawer {
 				double theta = Math.toDegrees(Math.acos(z / r));
 				double phi = Math.toDegrees(Math.atan2(y, x));
 
-				float radius = pcalRecData.getRadius(pcalRecData.energy.get(i));
+				float radius = pcalRecData.radius(i);
 				if (radius > 0) {
 					container.localToWorld(pp, wp);
 					wr.setRect(wp.x - radius, wp.y - radius, 2 * radius, 2 * radius);
@@ -163,9 +162,9 @@ public class ReconDrawer extends SectorViewDrawer {
 
 				_fbData.add(new FBData(pp, String.format("$magenta$REC xyz (%-6.3f, %-6.3f, %-6.3f) cm", x, y, z),
 						String.format("$magenta$REC %s (%-6.3f, %-6.3f, %-6.3f)", CedView.rThetaPhi, r, theta, phi),
-						String.format("$magenta$REC view %s", ECGeometry.VIEW_NAMES[pcalRecData.view.get(i)]),
-						String.format("$magenta$%s", pcalRecData.getPIDStr(i)),
-						String.format("$magenta$REC Energy %-7.4f GeV", pcalRecData.energy.get(i))));
+						String.format("$magenta$REC view %s", ECGeometry.VIEW_NAMES[pcalRecData.view(i)]),
+						String.format("$magenta$%s", pcalRecData.pidString(i)),
+						String.format("$magenta$REC Energy %-7.4f GeV", pcalRecData.energy(i))));
 
 			}
 		} // for i

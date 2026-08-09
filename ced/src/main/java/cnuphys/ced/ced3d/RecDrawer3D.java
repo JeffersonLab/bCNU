@@ -9,8 +9,7 @@ import org.jlab.io.base.DataEvent;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
-import cnuphys.ced.alldata.datacontainer.cal.ECalReconData;
-import cnuphys.ced.alldata.datacontainer.cal.PCalReconData;
+import cnuphys.ced.alldata.RecCalorimeter;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.frame.CedColors;
 import item3D.Item3D;
@@ -27,8 +26,8 @@ public class RecDrawer3D extends Item3D {
 	private CedPanel3D _cedPanel3D;
 
 //data containers
-	ECalReconData ecRecData = ECalReconData.getInstance();
-	PCalReconData pcalRecData = PCalReconData.getInstance();
+	RecCalorimeter ecRecData = RecCalorimeter.getInstance();
+	RecCalorimeter pcalRecData = RecCalorimeter.getInstance();
 
 
 	public RecDrawer3D(CedPanel3D panel3D) {
@@ -59,11 +58,12 @@ public class RecDrawer3D extends Item3D {
 
 		if (_cedPanel3D.showECAL()) {
 			for (int i = 0; i < ecRecData.count(); i++) {
-				float x = ecRecData.x.get(i);
-				float y = ecRecData.y.get(i);
-				float z = ecRecData.z.get(i);
+				if (!ecRecData.isECal(i)) continue;
+				float x = ecRecData.x(i);
+				float y = ecRecData.y(i);
+				float z = ecRecData.z(i);
 				Support3D.drawPoint(drawable, x, y, z, Color.black, POINTSIZE, true);
-				float radius = ecRecData.getRadius(ecRecData.energy.get(i));
+				float radius = ecRecData.radius(i);
 				if (radius > 0) {
 					Support3D.solidSphere(drawable, x, y, z, radius, 40, 40, CedColors.RECCalFill);
 				}
@@ -72,11 +72,12 @@ public class RecDrawer3D extends Item3D {
 
 		if (_cedPanel3D.showPCAL()) {
 			for (int i = 0; i < pcalRecData.count(); i++) {
-				float x = pcalRecData.x.get(i);
-				float y = pcalRecData.y.get(i);
-				float z = pcalRecData.z.get(i);
+				if (!pcalRecData.isPCal(i)) continue;
+				float x = pcalRecData.x(i);
+				float y = pcalRecData.y(i);
+				float z = pcalRecData.z(i);
 				Support3D.drawPoint(drawable, x, y, z, Color.black, POINTSIZE, true);
-				float radius = pcalRecData.getRadius(pcalRecData.energy.get(i));
+				float radius = pcalRecData.radius(i);
 				if (radius > 0) {
 					Support3D.solidSphere(drawable, x, y, z, radius, 40, 40, CedColors.RECCalFill);
 				}

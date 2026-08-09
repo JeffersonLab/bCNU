@@ -15,7 +15,7 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.view.FBData;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.datacontainer.cal.PCalReconData;
+import cnuphys.ced.alldata.RecCalorimeter;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.frame.CedColors;
 import cnuphys.ced.geometry.ECGeometry;
@@ -29,7 +29,7 @@ import cnuphys.ced.geometry.PCALGeometry;
 public class PCALRecDrawer extends PCALViewDrawer {
 
 	//the EC data container
-	private static PCalReconData _pcReconData = PCalReconData.getInstance();
+	private static RecCalorimeter _pcReconData = RecCalorimeter.getInstance();
 
 	//the current event
 	private DataEvent _currentEvent;
@@ -64,7 +64,7 @@ public class PCALRecDrawer extends PCALViewDrawer {
 		}
 
 		for (int index = 0; index < _pcReconData.count(); index++) {
-			drawRecCal(g, container, index, false);
+			if (_pcReconData.isPCal(index)) drawRecCal(g, container, index, false);
 		}
 
 	}
@@ -83,9 +83,9 @@ public class PCALRecDrawer extends PCALViewDrawer {
 		Rectangle2D.Double wr = new Rectangle2D.Double();
 		Point2D.Double wp = new Point2D.Double();
 
-		float x = _pcReconData.x.get(index);
-		float y = _pcReconData.y.get(index);
-		float z = _pcReconData.z.get(index);
+		float x = _pcReconData.x(index);
+		float y = _pcReconData.y(index);
+		float z = _pcReconData.z(index);
 
 		Point3D clasP = new Point3D(x, y, z);
 		Point3D localP = new Point3D();
@@ -94,11 +94,11 @@ public class PCALRecDrawer extends PCALViewDrawer {
 		localP.setZ(0);
 
 		// get the right item
-		_view.getHexSectorItem(_pcReconData.sector.get(index)).ijkToScreen(container, localP, pp);
+		_view.getHexSectorItem(_pcReconData.sector(index)).ijkToScreen(container, localP, pp);
 
 		DataDrawSupport.drawECALRec(g, pp, highlight);
 
-		float radius = _pcReconData.getRadius(_pcReconData.energy.get(index));
+		float radius = _pcReconData.radius(index);
 		if (radius > 0) {
 			container.localToWorld(pp, wp);
 			wr.setRect(wp.x - radius, wp.y - radius, 2 * radius, 2 * radius);
@@ -108,10 +108,10 @@ public class PCALRecDrawer extends PCALViewDrawer {
 
 		_fbData.add(new FBData(pp,
 				String.format("$magenta$REC xyz (%-6.3f, %-6.3f, %-6.3f) cm", x, y, z),
-				String.format("$magenta$REC sector: %d", _pcReconData.sector.get(index)),
-				String.format("$magenta$REC view %s", ECGeometry.VIEW_NAMES[_pcReconData.view.get(index)]),
-				String.format("$magenta$%s", _pcReconData.getPIDStr(index)),
-				String.format("$magenta$REC Energy %-7.4f", _pcReconData.energy.get(index))));
+				String.format("$magenta$REC sector: %d", _pcReconData.sector(index)),
+				String.format("$magenta$REC view %s", ECGeometry.VIEW_NAMES[_pcReconData.view(index)]),
+				String.format("$magenta$%s", _pcReconData.pidString(index)),
+				String.format("$magenta$REC Energy %-7.4f", _pcReconData.energy(index))));
 
 	}
 
