@@ -12,12 +12,8 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgHitData;
+import cnuphys.ced.alldata.DCHits;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAIHitData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgHitData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAIHitData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgHitData;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.frame.Ced;
@@ -58,10 +54,10 @@ public class DCHexSuperLayer extends PolygonItem {
 
 	// data containers
 	private DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
-	private HBTrkgHitData _hbData = HBTrkgHitData.getInstance();
-	private TBTrkgHitData _tbData = TBTrkgHitData.getInstance();
-	private HBTrkgAIHitData _hbAIData = HBTrkgAIHitData.getInstance();
-	private TBTrkgAIHitData _tbAIData = TBTrkgAIHitData.getInstance();
+	private DCHits _hbData = DCHits.hitBased();
+	private DCHits _tbData = DCHits.timeBased();
+	private DCHits _hbAIData = DCHits.aiHitBased();
+	private DCHits _tbAIData = DCHits.aiTimeBased();
 
 	//workspace
 	private Point2D.Double wirePoly[] = new Point2D.Double[4];
@@ -211,12 +207,12 @@ public class DCHexSuperLayer extends PolygonItem {
 	}
 
 	//common feedback string
-	private void fbStr(ATrkgHitData data, int layer, int wire, String name, String color, List<String> feedbackStrings) {
+	private void fbStr(DCHits data, int layer, int wire, String name, String color, List<String> feedbackStrings) {
 		for (int i = 0; i < data.count(); i++) {
-			if ((data.sector[i] == _sector) && (data.superlayer[i] == _superLayer) && (data.layer[i] == layer)
-					&& (data.wire[i] == wire)) {
+			if ((data.sector(i) == _sector) && (data.superlayer(i) == _superLayer) && (data.layer(i) == layer)
+					&& (data.wire(i) == wire)) {
 				String fbs = String.format("$%s$%s cluster %d  status %d trkDOCA %-5.3f", color,
-						name, data.clusterID[i], data.status[i], data.trkDoca[i]);
+						name, data.clusterId(i), data.status(i), data.trackDoca(i));
 				feedbackStrings.add(fbs);
 				return;
 			}
@@ -256,8 +252,8 @@ public class DCHexSuperLayer extends PolygonItem {
 		if (_view.showHBHits()) {
 			for (int i = 0; i < _hbData.count(); i++) {
 				// draw the hit
-				if ((_hbData.sector[i] == _sector) && (_hbData.superlayer[i] == _superLayer)) {
-					drawDCHit(g, container, _hbData.layer[i], _hbData.wire[i], CedColors.HB_COLOR);
+				if ((_hbData.sector(i) == _sector) && (_hbData.superlayer(i) == _superLayer)) {
+					drawDCHit(g, container, _hbData.layer(i), _hbData.wire(i), CedColors.HB_COLOR);
 				}
 			}
 		}
@@ -266,8 +262,8 @@ public class DCHexSuperLayer extends PolygonItem {
 		if (_view.showTBHits()) {
 			for (int i = 0; i < _tbData.count(); i++) {
 				// draw the hit
-				if ((_tbData.sector[i] == _sector) && (_tbData.superlayer[i] == _superLayer)) {
-					drawDCHit(g, container, _tbData.layer[i], _tbData.wire[i], CedColors.TB_COLOR);
+				if ((_tbData.sector(i) == _sector) && (_tbData.superlayer(i) == _superLayer)) {
+					drawDCHit(g, container, _tbData.layer(i), _tbData.wire(i), CedColors.TB_COLOR);
 				}
 			}
 		}
@@ -276,8 +272,8 @@ public class DCHexSuperLayer extends PolygonItem {
 		if (_view.showAIHBHits()) {
 			for (int i = 0; i < _hbAIData.count(); i++) {
 				// draw the hit
-				if ((_hbAIData.sector[i] == _sector) && (_hbAIData.superlayer[i] == _superLayer)) {
-					drawDCHit(g, container, _hbAIData.layer[i], _hbAIData.wire[i], CedColors.AIHB_COLOR);
+				if ((_hbAIData.sector(i) == _sector) && (_hbAIData.superlayer(i) == _superLayer)) {
+					drawDCHit(g, container, _hbAIData.layer(i), _hbAIData.wire(i), CedColors.AIHB_COLOR);
 				}
 			}
 		}
@@ -286,8 +282,8 @@ public class DCHexSuperLayer extends PolygonItem {
 		if (_view.showAITBHits()) {
 			for (int i = 0; i < _tbAIData.count(); i++) {
 				// draw the hit
-				if ((_tbAIData.sector[i] == _sector) && (_tbAIData.superlayer[i] == _superLayer)) {
-					drawDCHit(g, container, _tbAIData.layer[i], _tbAIData.wire[i], CedColors.AITB_COLOR);
+				if ((_tbAIData.sector(i) == _sector) && (_tbAIData.superlayer(i) == _superLayer)) {
+					drawDCHit(g, container, _tbAIData.layer(i), _tbAIData.wire(i), CedColors.AITB_COLOR);
 				}
 			}
 		}

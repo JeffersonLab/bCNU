@@ -14,11 +14,7 @@ import cnuphys.bCNU.view.FBData;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.ECalClusters;
 import cnuphys.ced.alldata.RecCalorimeter;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgHitData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAIHitData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgHitData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAIHitData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgHitData;
+import cnuphys.ced.alldata.DCHits;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.frame.CedColors;
@@ -32,10 +28,10 @@ public class ReconDrawer extends SectorViewDrawer {
 	// data containers
 	RecCalorimeter ecRecData = RecCalorimeter.getInstance();
 	RecCalorimeter pcalRecData = RecCalorimeter.getInstance();
-	private HBTrkgHitData _hbData = HBTrkgHitData.getInstance();
-	private TBTrkgHitData _tbData = TBTrkgHitData.getInstance();
-	private HBTrkgAIHitData _hbAIData = HBTrkgAIHitData.getInstance();
-	private TBTrkgAIHitData _tbAIData = TBTrkgAIHitData.getInstance();
+	private DCHits _hbData = DCHits.hitBased();
+	private DCHits _tbData = DCHits.timeBased();
+	private DCHits _hbAIData = DCHits.aiHitBased();
+	private DCHits _tbAIData = DCHits.aiTimeBased();
 
 	/**
 	 * Reconstructed hits drawer
@@ -263,9 +259,9 @@ public class ReconDrawer extends SectorViewDrawer {
 		if (_view.showDCHBHits()) {
 
 			for (int i = 0; i < _hbData.count(); i++) {
-				if (_view.containsSector(_hbData.sector[i])) {
+				if (_view.containsSector(_hbData.sector(i))) {
 					if (_hbData.contains(i, screenPoint)) {
-						_hbData.feedback(i, feedbackStrings);
+						_hbData.addFeedback(i, feedbackStrings);
 						break;
 					}
 				}
@@ -276,9 +272,9 @@ public class ReconDrawer extends SectorViewDrawer {
 		if (_view.showDCTBHits()) {
 
 			for (int i = 0; i < _tbData.count(); i++) {
-				if (_view.containsSector(_tbData.sector[i])) {
+				if (_view.containsSector(_tbData.sector(i))) {
 					if (_tbData.contains(i, screenPoint)) {
-						_tbData.feedback(i, feedbackStrings);
+						_tbData.addFeedback(i, feedbackStrings);
 						break;
 					}
 				}
@@ -289,9 +285,9 @@ public class ReconDrawer extends SectorViewDrawer {
 		// AI DC HB Recon Hits
 		if (_view.showAIDCHBHits()) {
 			for (int i = 0; i < _hbAIData.count(); i++) {
-				if (_view.containsSector(_hbAIData.sector[i])) {
+				if (_view.containsSector(_hbAIData.sector(i))) {
 					if (_hbAIData.contains(i, screenPoint)) {
-						_hbAIData.feedback(i, feedbackStrings);
+						_hbAIData.addFeedback(i, feedbackStrings);
 						break;
 					}
 				}
@@ -301,9 +297,9 @@ public class ReconDrawer extends SectorViewDrawer {
 		// AI DC TB Recon Hits
 		if (_view.showAIDCTBHits()) {
 			for (int i = 0; i < _tbAIData.count(); i++) {
-				if (_view.containsSector(_tbAIData.sector[i])) {
+				if (_view.containsSector(_tbAIData.sector(i))) {
 					if (_tbAIData.contains(i, screenPoint)) {
-						_tbAIData.feedback(i, feedbackStrings);
+						_tbAIData.addFeedback(i, feedbackStrings);
 						break;
 					}
 				}
@@ -313,14 +309,14 @@ public class ReconDrawer extends SectorViewDrawer {
 	}
 
 	// draw a reconstructed hit list
-	private void drawDCHitList(Graphics g, IContainer container, Color fillColor, ATrkgHitData hits,
+	private void drawDCHitList(Graphics g, IContainer container, Color fillColor, DCHits hits,
 			boolean isTimeBased) {
 		if (hits == null) {
 			return;
 		}
 
 		for (int i = 0; i < hits.count(); i++) {
-			if (_view.containsSector(hits.sector[i])) {
+			if (_view.containsSector(hits.sector(i))) {
 				_view.drawDCReconHit(g, container, fillColor, Color.black, hits, i, isTimeBased);
 			}
 		}

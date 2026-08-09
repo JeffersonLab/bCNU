@@ -8,7 +8,6 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
-import java.util.HashMap;
 import java.util.List;
 
 import org.jlab.geom.prim.Line3D;
@@ -24,7 +23,7 @@ import cnuphys.bCNU.util.MathUtilities;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DCSegments;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgHitData;
+import cnuphys.ced.alldata.DCHits;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -73,8 +72,6 @@ public class SuperLayerDrawing {
 	private DCSegments _hbTrkgAISegmentData = DCSegments.aiHitBased();
 	private DCSegments _tbTrkgAISegmentData = DCSegments.aiTimeBased();
 
-
-	HashMap<String, Polygon> hexMap = new HashMap<String, Polygon>();
 
 	/**
 	 * Constructor
@@ -482,11 +479,11 @@ public class SuperLayerDrawing {
 	 * @param hit         the hit to draw
 	 * @param isTimeBased hit based or time based?
 	 */
-	public void drawReconDCHitAndDOCA(Graphics g, IContainer container, Color fillColor, Color frameColor, ATrkgHitData hits, int index,
+	public void drawReconDCHitAndDOCA(Graphics g, IContainer container, Color fillColor, Color frameColor, DCHits hits, int index,
 			boolean isTimeBased) {
 
-		int layer = hits.layer[index];
-		int wire = hits.wire[index];
+		int layer = hits.layer(index);
+		int wire = hits.wire(index);
 
 		Point pp = new Point();
 
@@ -512,7 +509,6 @@ public class SuperLayerDrawing {
 	public Polygon getLayerPolygon(IContainer container, int layer) {
 
 		if (_iSupl.item().isDirty()) {
-			hexMap.clear();
 			Point2D.Double verticies[] = GeometryManager.allocate(14);
 
 			// all indices in DCGeometry calls are 1-based
@@ -651,11 +647,6 @@ public class SuperLayerDrawing {
 		}
 	}
 
-	private String hexHashKey(int layer, int wire) {
-		return String.format("%d-%d", layer, wire);
-	}
-
-
 	/**
 	 * Gets the cell hexagon as a screen polygon.
 	 *
@@ -666,13 +657,6 @@ public class SuperLayerDrawing {
 	 */
 	public Polygon getHexagon(IContainer container, int layer, int wire) {
 		
-		// check the cache
-		String key = hexHashKey(layer, wire);
-		Polygon hexagon = hexMap.get(key);
-		if (hexagon != null) {
-			return hexagon;
-		}
-
 		Point2D.Double wpoly[] = GeometryManager.allocate(6);
 		// note all indices in calls to DCGeometry are 1-based
 		if (!DCGeometry.getHexagon(_iSupl.superlayer(), layer, wire, _iSupl.projectionPlane(), wpoly, null)) {
@@ -691,8 +675,6 @@ public class SuperLayerDrawing {
 			poly.addPoint(pp.x, pp.y);
 		}
 
-		// cache it
-		hexMap.put(key, poly);
 		return poly;
 	}
 
@@ -717,21 +699,23 @@ public class SuperLayerDrawing {
 	 * @return the point, which might have NaNs
 	 */
 	public Point2D.Double wire(int superlayer, int layer, int wire, boolean isLower) {
-		// the indices to all DCGeometry calls are 1-based
-
-		Point2D.Double wp = null;
+		Point2D.Double centroid = new Point2D.Double();
 		try {
-			wp = DCGeometry.getCenter(superlayer, layer, wire, _iSupl.projectionPlane());
+			Point2D.Double[] hexagon = GeometryManager.allocate(6);
+			if (!DCGeometry.getHexagon(superlayer, layer, wire, _iSupl.projectionPlane(), hexagon, centroid)) {
+				return null;
+			}
 
-			if ((wp != null) && isLower) {
-				wp.y = -wp.y;
+			if (isLower) {
+				centroid.y = -centroid.y;
 			}
 		} catch (Exception e) {
 			String s = "Problem  in wire() [SectorSuperLayer] layer = " + layer + "  wire = " + wire;
 			System.err.println(s);
 			e.printStackTrace(); // System.exit(1);
+			return null;
 		}
-		return wp;
+		return centroid;
 	}
 
 	/**
@@ -743,19 +727,19 @@ public class SuperLayerDrawing {
 	 * @param wire      the 1-based wire 1..112
 	 * @param doca2d    the doca in mm
 	 */
-	public void drawDOCA(Graphics g, IContainer container, ATrkgHitData hits, int index, boolean isTimeBased) {
+	public void drawDOCA(Graphics g, IContainer container, DCHits hits, int index, boolean isTimeBased) {
 
 		float docas[] = { -1, -1 };
 		Color frameColor;
 		Color fillColors[] = { CedColors.DOCA_COLOR, CedColors.TRKDOCA_COLOR };
 
 		if (isTimeBased) {
-			docas[0] = _view.showTBDoca() ? hits.doca[index] : 0f;
-			docas[1] = _view.showTBTrkDoca() ? hits.trkDoca[index] : 0f;
+			docas[0] = _view.showTBDoca() ? hits.docaError(index) : 0f;
+			docas[1] = _view.showTBTrkDoca() ? hits.trackDoca(index) : 0f;
 			frameColor = CedColors.TB_DOCAFRAME;
 		} else { // hit based
-			docas[0] = _view.showHBDoca() ? hits.doca[index] : 0f;
-			docas[1] = _view.showHBTrkDoca() ? hits.trkDoca[index] : 0f;
+			docas[0] = _view.showHBDoca() ? hits.docaError(index) : 0f;
+			docas[1] = _view.showHBTrkDoca() ? hits.trackDoca(index) : 0f;
 			frameColor = CedColors.HB_DOCAFRAME;
 		}
 
@@ -769,14 +753,14 @@ public class SuperLayerDrawing {
 			if (radius > 5) {
 
 				String wmsg = "Very large doca radius: " + radius + " cm. Sect: " + _iSupl.sector() + " supl: "
-						+ _iSupl.superlayer() + "lay: " + hits.layer[index] + " wire: " + hits.wire[index];
+						+ _iSupl.superlayer() + "lay: " + hits.layer(index) + " wire: " + hits.wire(index);
 				System.err.println(wmsg);
 				return;
 			}
 
 			// center is the given wire projected locations
 
-			Point2D.Double center = wire(_iSupl.superlayer(), hits.layer[index], hits.wire[index], _iSupl.isLowerSector());
+			Point2D.Double center = wire(_iSupl.superlayer(), hits.layer(index), hits.wire(index), _iSupl.isLowerSector());
 			Point2D.Double doca[] = _view.getCenteredWorldCircle(center, radius);
 
 			if (doca != null) {

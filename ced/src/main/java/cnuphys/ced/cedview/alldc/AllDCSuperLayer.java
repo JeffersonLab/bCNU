@@ -21,10 +21,7 @@ import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAIHitData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgHitData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAIHitData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgHitData;
+import cnuphys.ced.alldata.DCHits;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
@@ -83,10 +80,10 @@ public class AllDCSuperLayer extends RectangleItem {
 
 	// data containers
 	private DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
-	private HBTrkgHitData _hbData = HBTrkgHitData.getInstance();
-	private TBTrkgHitData _tbData = TBTrkgHitData.getInstance();
-	private HBTrkgAIHitData _hbAIData = HBTrkgAIHitData.getInstance();
-	private TBTrkgAIHitData _tbAIData = TBTrkgAIHitData.getInstance();
+	private DCHits _hbData = DCHits.hitBased();
+	private DCHits _tbData = DCHits.timeBased();
+	private DCHits _hbAIData = DCHits.aiHitBased();
+	private DCHits _tbAIData = DCHits.aiTimeBased();
 
 	/**
 	 * Constructor for a geometrically unfaithful "all dc" superlayer.
@@ -224,8 +221,8 @@ public class AllDCSuperLayer extends RectangleItem {
 		if (_view.showHBHits()) {
 			for (int i = 0; i < _hbData.count(); i++) {
 				// draw the hit
-				if ((_hbData.sector[i] == _sector) && (_hbData.superlayer[i] == _superLayer)) {
-					drawDCHit(g, container, _hbData.layer[i], _hbData.wire[i], pr, wr, CedColors.HB_COLOR);
+				if ((_hbData.sector(i) == _sector) && (_hbData.superlayer(i) == _superLayer)) {
+					drawDCHit(g, container, _hbData.layer(i), _hbData.wire(i), pr, wr, CedColors.HB_COLOR);
 				}
 			}
 		}
@@ -234,8 +231,8 @@ public class AllDCSuperLayer extends RectangleItem {
 		if (_view.showTBHits()) {
 			for (int i = 0; i < _tbData.count(); i++) {
 				// draw the hit
-				if ((_tbData.sector[i] == _sector) && (_tbData.superlayer[i] == _superLayer)) {
-					drawDCHit(g, container, _tbData.layer[i], _tbData.wire[i], pr, wr, CedColors.TB_COLOR);
+				if ((_tbData.sector(i) == _sector) && (_tbData.superlayer(i) == _superLayer)) {
+					drawDCHit(g, container, _tbData.layer(i), _tbData.wire(i), pr, wr, CedColors.TB_COLOR);
 				}
 			}
 		}
@@ -244,8 +241,8 @@ public class AllDCSuperLayer extends RectangleItem {
 		if (_view.showAIHBHits()) {
 			for (int i = 0; i < _hbAIData.count(); i++) {
 				// draw the hit
-				if ((_hbAIData.sector[i] == _sector) && (_hbAIData.superlayer[i] == _superLayer)) {
-					drawDCHit(g, container, _hbAIData.layer[i], _hbAIData.wire[i], pr, wr, CedColors.AIHB_COLOR);
+				if ((_hbAIData.sector(i) == _sector) && (_hbAIData.superlayer(i) == _superLayer)) {
+					drawDCHit(g, container, _hbAIData.layer(i), _hbAIData.wire(i), pr, wr, CedColors.AIHB_COLOR);
 				}
 			}
 		}
@@ -254,8 +251,8 @@ public class AllDCSuperLayer extends RectangleItem {
 		if (_view.showAITBHits()) {
 			for (int i = 0; i < _tbAIData.count(); i++) {
 				// draw the hit
-				if ((_tbAIData.sector[i] == _sector) && (_tbAIData.superlayer[i] == _superLayer)) {
-					drawDCHit(g, container, _tbAIData.layer[i], _tbAIData.wire[i], pr, wr, CedColors.AITB_COLOR);
+				if ((_tbAIData.sector(i) == _sector) && (_tbAIData.superlayer(i) == _superLayer)) {
+					drawDCHit(g, container, _tbAIData.layer(i), _tbAIData.wire(i), pr, wr, CedColors.AITB_COLOR);
 				}
 			}
 		}

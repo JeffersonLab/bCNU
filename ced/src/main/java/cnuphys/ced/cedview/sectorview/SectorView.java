@@ -31,7 +31,7 @@ import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.PlotView;
 import cnuphys.bCNU.view.ViewManager;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgHitData;
+import cnuphys.ced.alldata.DCHits;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.SliceView;
@@ -751,9 +751,9 @@ public class SectorView extends SliceView implements ChangeListener {
 	 * @param frameColor the border color
 	 */
 	public void drawDCReconHit(Graphics g, IContainer container, Color fillColor, Color frameColor,
-			ATrkgHitData hits, int index, boolean isTimeBased) {
+			DCHits hits, int index, boolean isTimeBased) {
 
-		SectorSuperLayer sectSL = _superLayers[(hits.sector[index] < 4) ? 0 : 1][hits.superlayer[index] - 1];
+		SectorSuperLayer sectSL = _superLayers[(hits.sector(index) < 4) ? 0 : 1][hits.superlayer(index) - 1];
 		sectSL.drawDCReconHit(g, container, fillColor, frameColor, hits, index, isTimeBased);
 
 	}

@@ -12,11 +12,7 @@ import java.awt.geom.Point2D;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DCClusters;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgHitData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAIHitData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgHitData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAIHitData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgHitData;
+import cnuphys.ced.alldata.DCHits;
 import cnuphys.ced.frame.CedColors;
 
 public class DCHexClusterDrawer {
@@ -27,10 +23,10 @@ public class DCHexClusterDrawer {
 	public static final Stroke THICKLINE = new BasicStroke(2.0f);
 
 	// data containers
-	private HBTrkgHitData _hbData = HBTrkgHitData.getInstance();
-	private TBTrkgHitData _tbData = TBTrkgHitData.getInstance();
-	private HBTrkgAIHitData _hbAIData = HBTrkgAIHitData.getInstance();
-	private TBTrkgAIHitData _tbAIData = TBTrkgAIHitData.getInstance();
+	private DCHits _hbData = DCHits.hitBased();
+	private DCHits _tbData = DCHits.timeBased();
+	private DCHits _hbAIData = DCHits.aiHitBased();
+	private DCHits _tbAIData = DCHits.aiTimeBased();
 	private DCClusters _hbClusterData = DCClusters.hitBased();
 	private DCClusters _tbClusterData = DCClusters.timeBased();
 	private DCClusters _hbAIClusterData = DCClusters.aiHitBased();
@@ -78,7 +74,7 @@ public class DCHexClusterDrawer {
 
 
 	//draws the HB or TB clusters
-	private void drawDCClusterList(Graphics g, IContainer container, DCClusters clusters, ATrkgHitData reconHits, Color color) {
+	private void drawDCClusterList(Graphics g, IContainer container, DCClusters clusters, DCHits reconHits, Color color) {
 
 		if ((clusters == null) || (reconHits == null)) {
 			return;
@@ -108,8 +104,8 @@ public class DCHexClusterDrawer {
 						if (element > 0) {
 							int index = reconHits.indexFromId(element);
 							if (index >= 0) {
-								layer[j] = reconHits.layer[index];
-								wire[j] = reconHits.wire[index];
+								layer[j] = reconHits.layer(index);
+								wire[j] = reconHits.wire(index);
 							}
 							j++;
 						}

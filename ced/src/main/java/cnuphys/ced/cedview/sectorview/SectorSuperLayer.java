@@ -11,7 +11,7 @@ import org.jlab.geom.prim.Plane3D;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgHitData;
+import cnuphys.ced.alldata.DCHits;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.common.ISuperLayer;
 import cnuphys.ced.common.SuperLayerDrawing;
@@ -81,7 +81,7 @@ public class SectorSuperLayer extends PolygonItem implements ISuperLayer {
 	 * @param isTimeBase  Hit based or time based?
 	 */
 	public void drawDCReconHit(Graphics g, IContainer container, Color fillColor, Color frameColor,
-			ATrkgHitData hits, int index, boolean isTimeBased) {
+			DCHits hits, int index, boolean isTimeBased) {
 
 		_superlayerDrawer.drawReconDCHitAndDOCA(g, container, fillColor, frameColor, hits, index, isTimeBased);
 	}
