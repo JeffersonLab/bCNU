@@ -6,17 +6,14 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import org.jlab.io.base.DataEvent;
-
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.ced.alldata.ADCSupport;
+import cnuphys.ced.alldata.CherenkovAdc;
+import cnuphys.ced.alldata.CherenkovTdc;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.LTCCRecHits;
-import cnuphys.ced.alldata.datacontainer.cc.LTCCTDCData;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.common.SuperLayerDrawing;
 import cnuphys.ced.event.AccumulationManager;
@@ -31,14 +28,9 @@ public class SectorLTCCItem extends PolygonItem {
 	private ClasIoEventManager _eventManager = ClasIoEventManager.getInstance();
 	
 	//data containers
-	private LTCCTDCData tdcData = LTCCTDCData.getInstance();
+	private CherenkovAdc adcData = CherenkovAdc.ltcc();
+	private CherenkovTdc tdcData = CherenkovTdc.ltcc();
 	private LTCCRecHits recData = LTCCRecHits.getInstance();
-
-	// the ced datawarehouse
-	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
-	
-	//adc bank name
-	private static String _adcBankName = "HTCC::adc";
 
 	// sector 1-based 1..6
 	private byte _sector;
@@ -110,28 +102,13 @@ public class SectorLTCCItem extends PolygonItem {
 	// single event drawer
 	private void drawSingleEventHits(Graphics g, IContainer container) {
 
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (dataEvent == null) {
-			return;
-		}
-
-		// use the adc arrays
-		if (dataEvent.hasBank(_adcBankName)) {
-			int adc[] = _dataWarehouse.getInt(_adcBankName, "ADC");
-			int count = adc != null ? adc.length : 0;
-			if (count > 0) {
-				byte[] sector = _dataWarehouse.getByte(_adcBankName, "sector");
-				byte[] layer = _dataWarehouse.getByte(_adcBankName, "layer");
-				short[] component = _dataWarehouse.getShort(_adcBankName, "component");
-
-				for (int i = 0; i < count; i++) {
-					if ((sector[i] == _sector) && (layer[i] == _half) && (component[i] == _ring)) {
-						g.setColor(ADCSupport.getADCAlphaColor(_adcBankName, adc[i]));
-						g.fillPolygon(_lastDrawnPolygon);
-						g.setColor(Color.black);
-						g.drawPolygon(_lastDrawnPolygon);
-					}
-				}
+		for (int i = 0; i < adcData.count(); i++) {
+			if ((adcData.sector(i) == _sector) && (adcData.layer(i) == _half)
+					&& (adcData.component(i) == _ring)) {
+				g.setColor(adcData.alphaColor(i));
+				g.fillPolygon(_lastDrawnPolygon);
+				g.setColor(Color.black);
+				g.drawPolygon(_lastDrawnPolygon);
 			}
 		}
 
@@ -192,34 +169,18 @@ public class SectorLTCCItem extends PolygonItem {
 
 			feedbackStrings.add(DataDrawSupport.prelimColor + "LTCC sect " + _sector + " ring " + _ring + " half " + _half);
 
-			DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-			if (dataEvent == null) {
-				return;
-			}
-
-			if (dataEvent.hasBank(_adcBankName)) {
-				int adc[] = _dataWarehouse.getInt(_adcBankName, "ADC");
-				int count = adc != null ? adc.length : 0;
-				if (count > 0) {
-					byte[] sector = _dataWarehouse.getByte(_adcBankName, "sector");
-					byte[] layer = _dataWarehouse.getByte(_adcBankName, "layer");
-					short[] component = _dataWarehouse.getShort(_adcBankName, "component");
-					float[] time = _dataWarehouse.getFloat(_adcBankName, "time");
-
-					for (int i = 0; i < count; i++) {
-						if ((sector[i] == _sector) && (layer[i] == _half) && (component[i] == _ring)) {
-							String s = String.format("LTCC adc: %d time: %8.3f", adc[i], time[i]);
-							feedbackStrings.add(s);
-							break;
-						}
-					}
+			for (int i = 0; i < adcData.count(); i++) {
+				if ((adcData.sector(i) == _sector) && (adcData.layer(i) == _half)
+						&& (adcData.component(i) == _ring)) {
+					adcData.addFeedback(i, feedbackStrings);
+					break;
 				}
 			}
 
 			for (int i = 0; i < tdcData.count(); i++) {
-				if ((tdcData.sector[i] == _sector) && (tdcData.layer[i] == _half) && (tdcData.component[i] == _ring)) {
-					String s = String.format("LTCC tdc: %d", tdcData.tdc[i]);
-					feedbackStrings.add(s);
+				if ((tdcData.sector(i) == _sector) && (tdcData.layer(i) == _half)
+						&& (tdcData.component(i) == _ring)) {
+					tdcData.addFeedback(i, feedbackStrings);
 					break;
 				}
 			} // end has data
