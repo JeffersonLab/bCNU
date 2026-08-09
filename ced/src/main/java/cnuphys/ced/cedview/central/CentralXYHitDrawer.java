@@ -11,7 +11,7 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.BMTAdc;
 import cnuphys.ced.alldata.BMTRecHits;
-import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
+import cnuphys.ced.alldata.BSTAdc;
 import cnuphys.ced.alldata.BSTRecHits;
 import cnuphys.ced.alldata.CNDAdc;
 import cnuphys.ced.alldata.CTOFAdc;
@@ -39,7 +39,7 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 	private CNDAdc adcCNDData = CNDAdc.getInstance();
 	private CTOFAdc adcCTOFData = CTOFAdc.getInstance();
 	private CTOFClusters clusterCTOFData = CTOFClusters.getInstance();
-	private BSTADCData adcBSTData = BSTADCData.getInstance();
+	private BSTAdc adcBSTData = BSTAdc.getInstance();
 	private BMTAdc adcBMTData = BMTAdc.getInstance();
 	private BSTRecHits bstRecHitData = BSTRecHits.getInstance();
 	private BMTRecHits bmtRecHitData = BMTRecHits.getInstance();
@@ -307,10 +307,10 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 
 		if (_view.showADCHits()) {
 			for (int i = 0; i < adcBSTData.count(); i++) {
-				BSTxyPanel panel = CentralXYView.getPanel(adcBSTData.layer[i], adcBSTData.sector[i]);
+				BSTxyPanel panel = CentralXYView.getPanel(adcBSTData.layer(i), adcBSTData.sector(i));
 				if (panel != null) {
 					_iCentralView.drawBSTPanel((Graphics2D) g, container, panel, _baseColor);
-					_iCentralView.drawBSTPanel((Graphics2D) g, container, panel, adcBSTData.getADCColor(i));
+					_iCentralView.drawBSTPanel((Graphics2D) g, container, panel, adcBSTData.color(i));
 				}
 			}
 		}

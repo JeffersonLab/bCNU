@@ -40,7 +40,7 @@ import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.BMTAdc;
 import cnuphys.ced.alldata.BMTRecHits;
-import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
+import cnuphys.ced.alldata.BSTAdc;
 import cnuphys.ced.alldata.BSTRecHits;
 import cnuphys.ced.alldata.CosmicTracks;
 import cnuphys.ced.alldata.CTOFAdc;
@@ -93,7 +93,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 	// data containers
 	private CTOFAdc _ctofADCData = CTOFAdc.getInstance();
 	private CTOFClusters _clusterCTOFData = CTOFClusters.getInstance();
-	private BSTADCData _bstADCData = BSTADCData.getInstance();
+	private BSTAdc _bstADCData = BSTAdc.getInstance();
 	private BMTAdc _bmtADCData = BMTAdc.getInstance();
 	private CosmicTracks _cosmicData = CosmicTracks.getInstance();
 	private BSTRecHits bstRecHitData = BSTRecHits.getInstance();
@@ -644,9 +644,9 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 			if (_closestPanel != null) {
 
 				for (int i = 0; i < _bstADCData.count(); i++) {
-					if ((_bstADCData.sector[i] == _closestPanel.getSector())
-							&& (_bstADCData.layer[i] == _closestPanel.getLayer())) {
-						_bstADCData.adcFeedback(i, feedbackStrings);
+					if ((_bstADCData.sector(i) == _closestPanel.getSector())
+							&& (_bstADCData.layer(i) == _closestPanel.getLayer())) {
+						_bstADCData.addFeedback(i, feedbackStrings);
 					}
 				}
 

@@ -6,7 +6,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
+import cnuphys.ced.alldata.BSTAdc;
 import cnuphys.ced.alldata.datacontainer.bst.BSTCrossData;
 import cnuphys.ced.alldata.CosmicTracks;
 import cnuphys.ced.geometry.BSTGeometry;
@@ -19,7 +19,7 @@ public class BSTPanel3D extends DetectorItem3D {
 	protected static final Color crossColor = X11Colors.getX11Color("dark green");
 
 	//bst adc data
-	private BSTADCData _bstADCData = BSTADCData.getInstance();
+	private BSTAdc _bstADCData = BSTAdc.getInstance();
 
 	//data containers
 	private CosmicTracks _cosmicData = CosmicTracks.getInstance();
@@ -58,11 +58,11 @@ public class BSTPanel3D extends DetectorItem3D {
 		if (showHits()) {
 
 			for (int i = 0; i < _bstADCData.count(); i++) {
-				if (_bstADCData.sector[i] == _sector && _bstADCData.layer[i] == _layer) {
+				if (_bstADCData.sector(i) == _sector && _bstADCData.layer(i) == _layer) {
 					drawOutline = true;
-					int strip = _bstADCData.component[i];
+					int strip = _bstADCData.component(i);
 					BSTGeometry.getStripCM(_sector - 1, _layer - 1, strip - 1, coords6);
-					Support3D.drawLine(drawable, coords6, _bstADCData.adc[i] > 0 ? Color.red : Color.blue,
+					Support3D.drawLine(drawable, coords6, _bstADCData.adc(i) > 0 ? Color.red : Color.blue,
 							STRIPLINEWIDTH);
 				}
 			}

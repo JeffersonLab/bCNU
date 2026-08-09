@@ -8,7 +8,7 @@ import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
 import cnuphys.ced.alldata.DataWarehouse;
-import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
+import cnuphys.ced.alldata.BSTAdc;
 import cnuphys.ced.alldata.ECalAdc;
 import cnuphys.ced.alldata.CNDAdc;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
@@ -144,7 +144,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private FTOFAdc ftofADCData = FTOFAdc.getInstance();
 	private CTOFAdc ctofADCData = CTOFAdc.getInstance();
 	private FTCalAdc ftcalADCData = FTCalAdc.getInstance();
-	private BSTADCData bstADCData = BSTADCData.getInstance();
+	private BSTAdc bstADCData = BSTAdc.getInstance();
 	private DCTDCandDOCAData dcTDCData = DCTDCandDOCAData.getInstance();
 
 	/**
@@ -975,11 +975,11 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private void accumBST() {
 
 		for (int i = 0; i < bstADCData.count(); i++) {
-			BSTxyPanel panel = CentralXYView.getPanel(bstADCData.layer[i], bstADCData.sector[i]);
+			BSTxyPanel panel = CentralXYView.getPanel(bstADCData.layer(i), bstADCData.sector(i));
 			if (panel != null) {
-				int lay0 = bstADCData.layer[i] - 1;
-				int sect0 =  bstADCData.sector[i] - 1;
-				int strip0 = bstADCData.component[i] - 1;
+				int lay0 = bstADCData.layer(i) - 1;
+				int sect0 =  bstADCData.sector(i) - 1;
+				int strip0 = bstADCData.component(i) - 1;
 				try {
 					_BSTAccumulatedData[lay0][sect0] += 1;
 
@@ -989,7 +989,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 
 				} catch (ArrayIndexOutOfBoundsException e) {
 					String msg = String.format("Index out of bounds (BST). Event# %d lay %d sect %d  strip %d",
-							_eventManager.getSequentialEventNumber(), bstADCData.layer[i], bstADCData.sector[i], bstADCData.component[i]);
+							_eventManager.getSequentialEventNumber(), bstADCData.layer(i), bstADCData.sector(i), bstADCData.component(i));
 					System.err.println(msg);
 				}
 
