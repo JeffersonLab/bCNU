@@ -12,11 +12,7 @@ import java.util.List;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgCrossData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAICrossData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgCrossData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAICrossData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgCrossData;
+import cnuphys.ced.alldata.DCCrosses;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.item.HexSectorItem;
 
@@ -32,10 +28,10 @@ public class CrossDrawer extends DCXYViewDrawer {
 	private static final Stroke THICKLINE = cnuphys.ced.common.CrossDrawer.THICKLINE;
 
 	//data containers
-	private HBTrkgCrossData _hbCrossData = HBTrkgCrossData.getInstance();
-	private TBTrkgCrossData _tbCrossData = TBTrkgCrossData.getInstance();
-	private HBTrkgAICrossData _hbAICrossData = HBTrkgAICrossData.getInstance();
-	private TBTrkgAICrossData _tbAICrossData = TBTrkgAICrossData.getInstance();
+	private DCCrosses _hbCrossData = DCCrosses.hitBased();
+	private DCCrosses _tbCrossData = DCCrosses.timeBased();
+	private DCCrosses _hbAICrossData = DCCrosses.aiHitBased();
+	private DCCrosses _tbAICrossData = DCCrosses.aiTimeBased();
 
 	private int _mode = HB;
 
@@ -63,7 +59,7 @@ public class CrossDrawer extends DCXYViewDrawer {
 			return;
 		}
 
-		ATrkgCrossData crossData = null;
+		DCCrosses crossData = null;
 
 		// any crosses?
 		if (_mode == HB) {
@@ -92,16 +88,16 @@ public class CrossDrawer extends DCXYViewDrawer {
 		Point pp = new Point();
 
 		for (int i = 0; i < crossData.count(); i++) {
-			HexSectorItem hsItem = _view.getHexSectorItem(crossData.sector[i]);
+			HexSectorItem hsItem = _view.getHexSectorItem(crossData.sector(i));
 
 			if (hsItem == null) {
-				System.err.println("null sector item in DCXY Cross Drawer sector: " + crossData.sector[i]);
+				System.err.println("null sector item in DCXY Cross Drawer sector: " + crossData.sector(i));
 				break;
 			}
 
-			result[0] = crossData.x[i];
-			result[1] = crossData.y[i];
-			result[2] = crossData.z[i];
+			result[0] = crossData.x(i);
+			result[1] = crossData.y(i);
+			result[2] = crossData.z(i);
 
 			_view.tiltedToSector(result, result);
 
@@ -116,9 +112,9 @@ public class CrossDrawer extends DCXYViewDrawer {
 			int pixlen = ARROWLEN;
 			double r = pixlen / WorldGraphicsUtilities.getMeanPixelDensity(container);
 
-			result[0] = crossData.x[i] + r * crossData.ux[i];
-			result[1] = crossData.y[i] + r * crossData.uy[i];
-			result[2] = crossData.z[i] + r * crossData.uz[i];
+			result[0] = crossData.x(i) + r * crossData.directionX(i);
+			result[1] = crossData.y(i) + r * crossData.directionY(i);
+			result[2] = crossData.z(i) + r * crossData.directionZ(i);
 
 			_view.tiltedToSector(result, result);
 	        sp.setLocation(result[0], result[1]);
@@ -151,7 +147,7 @@ public class CrossDrawer extends DCXYViewDrawer {
 	public void feedback(IContainer container, Point screenPoint, Point2D.Double worldPoint,
 			List<String> feedbackStrings) {
 
-		ATrkgCrossData crossData = null;
+		DCCrosses crossData = null;
 
 		// any crosses?
 		if (_mode == HB) {
@@ -173,7 +169,7 @@ public class CrossDrawer extends DCXYViewDrawer {
 
 		for (int i = 0; i < crossData.count(); i++) {
 			if (crossData.contains(i, screenPoint)) {
-				crossData.feedback(i, feedbackStrings);
+				crossData.addFeedback(i, feedbackStrings);
 				break;
 			}
 		}

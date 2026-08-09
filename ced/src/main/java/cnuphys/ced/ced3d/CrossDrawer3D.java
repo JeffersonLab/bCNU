@@ -5,11 +5,7 @@ import java.awt.Color;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgCrossData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAICrossData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgCrossData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAICrossData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgCrossData;
+import cnuphys.ced.alldata.DCCrosses;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.frame.CedColors;
 import item3D.Item3D;
@@ -23,10 +19,10 @@ public class CrossDrawer3D extends Item3D {
 	private CedPanel3D _cedPanel3D;
 
 	//data containers
-	private HBTrkgCrossData _hbCrossData = HBTrkgCrossData.getInstance();
-	private TBTrkgCrossData _tbCrossData = TBTrkgCrossData.getInstance();
-	private HBTrkgAICrossData _hbAICrossData = HBTrkgAICrossData.getInstance();
-	private TBTrkgAICrossData _tbAICrossData = TBTrkgAICrossData.getInstance();
+	private DCCrosses _hbCrossData = DCCrosses.hitBased();
+	private DCCrosses _tbCrossData = DCCrosses.timeBased();
+	private DCCrosses _hbAICrossData = DCCrosses.aiHitBased();
+	private DCCrosses _tbAICrossData = DCCrosses.aiTimeBased();
 
 
 	public CrossDrawer3D(CedPanel3D panel3D) {
@@ -41,7 +37,7 @@ public class CrossDrawer3D extends Item3D {
 			return;
 		}
 
-		ATrkgCrossData crossData = null;
+		DCCrosses crossData = null;
 		if (_cedPanel3D.showHBCross()) {
 			crossData = _hbCrossData;
 			drawCrossData(drawable, crossData, CedColors.HB_COLOR);
@@ -61,7 +57,7 @@ public class CrossDrawer3D extends Item3D {
 
 	}
 
-	private void drawCrossData(GLAutoDrawable drawable, ATrkgCrossData crossData, Color color) {
+	private void drawCrossData(GLAutoDrawable drawable, DCCrosses crossData, Color color) {
 		if (crossData == null) {
 			return;
 		}
@@ -70,14 +66,14 @@ public class CrossDrawer3D extends Item3D {
 			float[] p3d0 = new float[3];
 			float[] p3d1 = new float[3];
 
-			tiltedToSector(crossData.x[i], crossData.y[i], crossData.z[i], p3d0);
+			tiltedToSector(crossData.x(i), crossData.y(i), crossData.z(i), p3d0);
 			float x = p3d0[0];
 			float y = p3d0[1];
 			float z = p3d0[2];
 
-			float tx = crossData.x[i] + CROSS_LEN * crossData.ux[i];
-			float ty = crossData.y[i] + CROSS_LEN * crossData.uy[i];
-			float tz = crossData.z[i] + CROSS_LEN * crossData.uz[i];
+			float tx = crossData.x(i) + CROSS_LEN * crossData.directionX(i);
+			float ty = crossData.y(i) + CROSS_LEN * crossData.directionY(i);
+			float tz = crossData.z(i) + CROSS_LEN * crossData.directionZ(i);
 			tiltedToSector(tx, ty, tz, p3d1);
 
 			Support3D.drawLine(drawable, x, y, z, p3d1[0], p3d1[1], p3d1[2], Color.black, 3f);

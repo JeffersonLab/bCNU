@@ -12,11 +12,7 @@ import java.util.List;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgCrossData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAICrossData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgCrossData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAICrossData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgCrossData;
+import cnuphys.ced.alldata.DCCrosses;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 
@@ -32,10 +28,10 @@ public class CrossDrawer extends CedViewDrawer {
 
 
 	//data containers
-	private HBTrkgCrossData _hbCrossData = HBTrkgCrossData.getInstance();
-	private TBTrkgCrossData _tbCrossData = TBTrkgCrossData.getInstance();
-	private HBTrkgAICrossData _hbAICrossData = HBTrkgAICrossData.getInstance();
-	private TBTrkgAICrossData _tbAICrossData = TBTrkgAICrossData.getInstance();
+	private DCCrosses _hbCrossData = DCCrosses.hitBased();
+	private DCCrosses _tbCrossData = DCCrosses.timeBased();
+	private DCCrosses _hbAICrossData = DCCrosses.aiHitBased();
+	private DCCrosses _tbAICrossData = DCCrosses.aiTimeBased();
 
 
 	// feedback string color
@@ -71,7 +67,7 @@ public class CrossDrawer extends CedViewDrawer {
 			return;
 		}
 
-		ATrkgCrossData crossData = null;
+		DCCrosses crossData = null;
 
 		// any crosses?
 		if (_mode == HB) {
@@ -101,15 +97,15 @@ public class CrossDrawer extends CedViewDrawer {
 		Point2D.Double wp = new Point2D.Double();
 
 		for (int i = 0; i < crossData.count(); i++) {
-			result[0] = crossData.x[i];
-			result[1] = crossData.y[i];
-			result[2] = crossData.z[i];
+			result[0] = crossData.x(i);
+			result[1] = crossData.y(i);
+			result[2] = crossData.z(i);
 			_view.tiltedToSector(result, result);
-			_view.sectorToWorld(_view.getProjectionPlane(), wp, result, crossData.sector[i]);
+			_view.sectorToWorld(_view.getProjectionPlane(), wp, result, crossData.sector(i));
 
 			// right sector?
 			int mySector = _view.getSector(container, null, wp);
-			if (mySector == crossData.sector[i]) {
+			if (mySector == crossData.sector(i)) {
 				container.worldToLocal(pp, wp);
 				crossData.setLocation(i, pp);
 
@@ -120,12 +116,12 @@ public class CrossDrawer extends CedViewDrawer {
 				int pixlen = ARROWLEN;
 				double r = pixlen / WorldGraphicsUtilities.getMeanPixelDensity(container);
 
-				result[0] = crossData.x[i] + r * crossData.ux[i];
-				result[1] = crossData.y[i] + r * crossData.uy[i];
-				result[2] = crossData.z[i] + r * crossData.uz[i];
+				result[0] = crossData.x(i) + r * crossData.directionX(i);
+				result[1] = crossData.y(i) + r * crossData.directionY(i);
+				result[2] = crossData.z(i) + r * crossData.directionZ(i);
 				_view.tiltedToSector(result, result);
 
-				_view.sectorToWorld(_view.getProjectionPlane(), wp2, result, crossData.sector[i]);
+				_view.sectorToWorld(_view.getProjectionPlane(), wp2, result, crossData.sector(i));
 				container.worldToLocal(pp2, wp2);
 
 				g.setColor(Color.orange);
@@ -156,7 +152,7 @@ public class CrossDrawer extends CedViewDrawer {
 	public void vdrawFeedback(IContainer container, Point screenPoint, Point2D.Double worldPoint,
 			List<String> feedbackStrings, int option) {
 
-		ATrkgCrossData crossData = null;
+		DCCrosses crossData = null;
 
 		// any crosses?
 		if (_mode == HB) {
@@ -178,7 +174,7 @@ public class CrossDrawer extends CedViewDrawer {
 
 		for (int i = 0; i < crossData.count(); i++) {
 			if (crossData.contains(i, screenPoint)) {
-				crossData.feedback(i, feedbackStrings);
+				crossData.addFeedback(i, feedbackStrings);
 				break;
 			}
 		}
