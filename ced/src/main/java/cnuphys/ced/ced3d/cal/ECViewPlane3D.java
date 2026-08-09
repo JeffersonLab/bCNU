@@ -6,7 +6,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.ced.alldata.datacontainer.cal.ECalADCData;
+import cnuphys.ced.alldata.ECalAdc;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.ced3d.PlainPanel3D;
 import cnuphys.ced.geometry.ECGeometry;
@@ -27,7 +27,7 @@ public class ECViewPlane3D extends DetectorItem3D {
 	private float _coords[];
 
 	//data container
-	private ECalADCData ecADCData = ECalADCData.getInstance();
+	private ECalAdc ecADCData = ECalAdc.getInstance();
 
 
 	public ECViewPlane3D(PlainPanel3D panel3D, int sector, int stack, int view) {
@@ -77,12 +77,12 @@ public class ECViewPlane3D extends DetectorItem3D {
 		float coords[] = new float[24];
 
 		for (int i = 0; i < count; i++) {
-			if (ecADCData.sector.get(i) == _sector) {
-				if (ecADCData.plane.get(i) == (_plane - 1)) {
-					if (ecADCData.view.get(i) == (_view - 1)) {
-						int adc = ecADCData.adc.get(i);
-						int strip = ecADCData.strip.get(i);
-						Color color = ecADCData.getADCColor(adc);
+			if (ecADCData.isECal(i) && ecADCData.sector(i) == _sector) {
+				if (ecADCData.plane(i) == (_plane - 1)) {
+					if (ecADCData.view(i) == (_view - 1)) {
+						int adc = ecADCData.adc(i);
+						int strip = ecADCData.strip(i);
+						Color color = ecADCData.adcColor(i);
 						PCALGeometry.getStrip(_sector, _view, strip, coords);
 						drawStrip(drawable, color, coords);
 					}

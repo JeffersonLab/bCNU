@@ -11,7 +11,7 @@ import org.jlab.geom.prim.Point3D;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
-import cnuphys.ced.alldata.datacontainer.cal.PCalADCData;
+import cnuphys.ced.alldata.ECalAdc;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
@@ -32,7 +32,7 @@ public class PCALHexSectorItem extends HexSectorItem {
 	private static int[] _stripCounts = PCALGeometry.PCAL_NUMSTRIP; // u,v,w
 
 	//the EC data container
-	private static PCalADCData _pcalADCData = PCalADCData.getInstance();
+	private static ECalAdc _pcalADCData = ECalAdc.getInstance();
 
 
 	/**
@@ -128,24 +128,24 @@ public class PCALHexSectorItem extends HexSectorItem {
 
 		// use the adc values
 		for (int i = 0; i < _pcalADCData.count(); i++) {
-			if (_sector == _pcalADCData.sector.get(i)) {
-				if (_pcalView.showView(_pcalADCData.view.get(i))) {
-					int strip0 = _pcalADCData.strip.get(i) - 1;
-					Polygon poly = stripPolygon(container, _pcalADCData.view.get(i), strip0);
+			if (_pcalADCData.isPCal(i) && _sector == _pcalADCData.sector(i)) {
+				if (_pcalView.showView(_pcalADCData.view(i))) {
+					int strip0 = _pcalADCData.strip(i) - 1;
+					Polygon poly = stripPolygon(container, _pcalADCData.view(i), strip0);
 
-					g.setColor(_pcalADCData.getADCColor(_pcalADCData.adc.get(i)));
+					g.setColor(_pcalADCData.adcColor(i));
 					g.fillPolygon(poly);
 
 					g.setColor(Color.black);
 					g.drawPolygon(poly);
 
 					// extension
-					if (_pcalADCData.adc.get(i) > 0) {
-						int adcmax = Math.max(1, _pcalADCData.maxADC);
-						double fract = ((double) _pcalADCData.adc.get(i) / (double) adcmax);
+					if (_pcalADCData.adc(i) > 0) {
+						int adcmax = Math.max(1, _pcalADCData.maxAdc(i));
+						double fract = ((double) _pcalADCData.adc(i) / (double) adcmax);
 						fract = Math.max(0.15, Math.min(1.0, fract));
 
-						poly = extensionPolygon(container, _pcalADCData.view.get(i), strip0, fract);
+						poly = extensionPolygon(container, _pcalADCData.view(i), strip0, fract);
 						g.setColor(Color.yellow);
 						g.fillPolygon(poly);
 						g.setColor(X11Colors.getX11Color("dark red"));
@@ -392,14 +392,14 @@ public class PCALHexSectorItem extends HexSectorItem {
 
 				// any hits?
 				for (int i = 0; i < _pcalADCData.count(); i++) {
-					byte sect = _pcalADCData.sector.get(i);
-					if (sect == getSector()) {
-						byte view = _pcalADCData.view.get(i);
-						short component = _pcalADCData.strip.get(i);
+					byte sect = _pcalADCData.sector(i);
+					if (_pcalADCData.isPCal(i) && sect == getSector()) {
+						byte view = _pcalADCData.view(i);
+						short component = _pcalADCData.strip(i);
 						if (uvw[view] == component) {
 							String str = String.format("%s strip %d adc %d time %-7.3f",
 									ECGeometry.VIEW_NAMES[view], component,
-									_pcalADCData.adc.get(i), _pcalADCData.time.get(i));
+									_pcalADCData.adc(i), _pcalADCData.time(i));
 
 							feedbackStrings.add("$coral$" + str);
 						}

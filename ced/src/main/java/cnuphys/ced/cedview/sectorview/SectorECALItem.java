@@ -12,7 +12,7 @@ import cnuphys.bCNU.graphics.style.LineStyle;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
-import cnuphys.ced.alldata.datacontainer.cal.ECalADCData;
+import cnuphys.ced.alldata.ECalAdc;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.ECGeometry;
@@ -37,7 +37,7 @@ public class SectorECALItem extends PolygonItem {
 	private static final Color _ecLine[] = { Color.gray, Color.gray };
 
 	//data containers
-	ECalADCData ecData = ECalADCData.getInstance();
+	ECalAdc ecData = ECalAdc.getInstance();
 
 
 	/**
@@ -151,17 +151,17 @@ public class SectorECALItem extends PolygonItem {
 	private void drawSingleEventADC(Graphics g, IContainer container) {
 
 		for (int i = 0; i < ecData.count(); i++) {
-			byte sector = ecData.sector.get(i);
-			byte plane = ecData.plane.get(i);
-			byte view = ecData.view.get(i);
+			byte sector = ecData.sector(i);
+			byte plane = ecData.plane(i);
+			byte view = ecData.view(i);
 
-			if ((sector == _sector) && (plane == _plane) && (view == _viewType)) {
-				int strip0 = ecData.strip.get(i) - 1;
+			if (ecData.isECal(i) && (sector == _sector) && (plane == _plane) && (view == _viewType)) {
+				int strip0 = ecData.strip(i) - 1;
 				Point2D.Double wp[] = getStrip(strip0);
 
 				if (wp != null) {
 					Path2D.Double path = WorldGraphicsUtilities.worldPolygonToPath(wp);
-					Color fc = ecData.getADCColor(ecData.adc.get(i));
+					Color fc = ecData.adcColor(i);
 					WorldGraphicsUtilities.drawPath2D(g, container, path, fc, fc, 0, LineStyle.SOLID, true);
 				}
 			}
@@ -250,15 +250,16 @@ public class SectorECALItem extends PolygonItem {
 							+ " strip " + (strip0 + 1));
 
 					for (int i = 0; i < ecData.count(); i++) {
-						byte sector = ecData.sector.get(i);
-						byte plane = ecData.plane.get(i);
-						byte view = ecData.view.get(i);
-						int strip = ecData.strip.get(i);
+						byte sector = ecData.sector(i);
+						byte plane = ecData.plane(i);
+						byte view = ecData.view(i);
+						int strip = ecData.strip(i);
 
-						if ((sector == _sector) && (plane == _plane) && (view == _viewType) && (strip == (strip0+1))) {
+						if (ecData.isECal(i) && (sector == _sector) && (plane == _plane)
+								&& (view == _viewType) && (strip == (strip0+1))) {
 							String str = String.format("%s %s strip %d adc %d time %-7.3f",
 									ECGeometry.PLANE_NAMES[plane], ECGeometry.VIEW_NAMES[view], strip,
-									ecData.adc.get(i), ecData.time.get(i));
+									ecData.adc(i), ecData.time(i));
 
 							feedbackStrings.add("$coral$" + str);
 

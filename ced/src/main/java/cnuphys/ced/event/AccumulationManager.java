@@ -9,8 +9,7 @@ import org.jlab.io.base.DataEvent;
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
-import cnuphys.ced.alldata.datacontainer.cal.ECalADCData;
-import cnuphys.ced.alldata.datacontainer.cal.PCalADCData;
+import cnuphys.ced.alldata.ECalAdc;
 import cnuphys.ced.alldata.CNDAdc;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.alldata.FTCalAdc;
@@ -140,8 +139,8 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 
 	//data containers
 	private CNDAdc cndADCData = CNDAdc.getInstance();
-	private ECalADCData ecADCData = ECalADCData.getInstance();
-	private PCalADCData pcADCData = PCalADCData.getInstance();
+	private ECalAdc ecADCData = ECalAdc.getInstance();
+	private ECalAdc pcADCData = ECalAdc.getInstance();
 	private FTOFAdc ftofADCData = FTOFAdc.getInstance();
 	private CTOFAdc ctofADCData = CTOFAdc.getInstance();
 	private FTCalAdc ftcalADCData = FTCalAdc.getInstance();
@@ -1101,11 +1100,11 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 
 		//use ADC data
 		for (int i = 0; i < ecADCData.count(); i++) {
-			if (ecADCData.adc.get(i) > 0) {
-				int sect0 = ecADCData.sector.get(i) - 1;
-				int plane0 = ecADCData.plane.get(i); // already zero based
-				int view0 = ecADCData.view.get(i); // already zero based
-				int strip0 = ecADCData.strip.get(i) - 1;
+			if (ecADCData.isECal(i) && ecADCData.adc(i) > 0) {
+				int sect0 = ecADCData.sector(i) - 1;
+				int plane0 = ecADCData.plane(i); // already zero based
+				int view0 = ecADCData.view(i); // already zero based
+				int strip0 = ecADCData.strip(i) - 1;
 				_ECALAccumulatedData[sect0][plane0][view0][strip0] += 1;
 			}
 		}
@@ -1117,10 +1116,10 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 		//use ADC data
 
 		for (int i = 0; i < pcADCData.count(); i++) {
-			if (pcADCData.adc.get(i) > 0) {
-				int sect0 = pcADCData.sector.get(i) - 1;
-				int view0 = pcADCData.view.get(i); // already zero based
-				int strip0 = pcADCData.strip.get(i) - 1;
+			if (pcADCData.isPCal(i) && pcADCData.adc(i) > 0) {
+				int sect0 = pcADCData.sector(i) - 1;
+				int view0 = pcADCData.view(i); // already zero based
+				int strip0 = pcADCData.strip(i) - 1;
 				_PCALAccumulatedData[sect0][view0][strip0] += 1;
 			}
 		}

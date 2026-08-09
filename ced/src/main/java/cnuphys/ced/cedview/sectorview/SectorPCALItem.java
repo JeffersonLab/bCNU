@@ -13,7 +13,7 @@ import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.ced.alldata.datacontainer.cal.PCalADCData;
+import cnuphys.ced.alldata.ECalAdc;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.ECGeometry;
@@ -138,18 +138,18 @@ public class SectorPCALItem extends PolygonItem {
 	// single event drawer
 	private void drawSingleEventADC(Graphics g, IContainer container) {
 
-		PCalADCData pcalData = PCalADCData.getInstance();
+		ECalAdc pcalData = ECalAdc.getInstance();
 		for (int i = 0; i < pcalData.count(); i++) {
-			byte sector = pcalData.sector.get(i);
-			byte view = pcalData.view.get(i);
+			byte sector = pcalData.sector(i);
+			byte view = pcalData.view(i);
 
-			if ((sector == _sector) &&  (view == _viewType)) {
-				int strip0 = pcalData.strip.get(i) - 1;
+			if (pcalData.isPCal(i) && (sector == _sector) &&  (view == _viewType)) {
+				int strip0 = pcalData.strip(i) - 1;
 				Point2D.Double wp[] = getStrip(strip0);
 
 				if (wp != null) {
 					Path2D.Double path = WorldGraphicsUtilities.worldPolygonToPath(wp);
-					Color fc = pcalData.getADCColor(pcalData.adc.get(i));
+					Color fc = pcalData.adcColor(i);
 					WorldGraphicsUtilities.drawPath2D(g, container, path, fc, fc, 0, LineStyle.SOLID, true);
 				}
 			}
@@ -235,16 +235,17 @@ public class SectorPCALItem extends PolygonItem {
 					feedbackStrings.add("$white$view " + _pcalViews[_viewType]
 							+ " strip " + (strip0 + 1));
 
-					PCalADCData pcalData = PCalADCData.getInstance();
+					ECalAdc pcalData = ECalAdc.getInstance();
 					for (int i = 0; i < pcalData.count(); i++) {
-						byte sector = pcalData.sector.get(i);
-						byte view = pcalData.view.get(i);
-						int strip = pcalData.strip.get(i);
+						byte sector = pcalData.sector(i);
+						byte view = pcalData.view(i);
+						int strip = pcalData.strip(i);
 
-						if ((sector == _sector) && (view == _viewType) && (strip == (strip0+1))) {
+						if (pcalData.isPCal(i) && (sector == _sector) && (view == _viewType)
+								&& (strip == (strip0+1))) {
 							String str = String.format("%s strip %d adc %d time %-7.3f",
 									ECGeometry.VIEW_NAMES[view], strip,
-									pcalData.adc.get(i), pcalData.time.get(i));
+									pcalData.adc(i), pcalData.time(i));
 
 							feedbackStrings.add("$coral$" + str);
 

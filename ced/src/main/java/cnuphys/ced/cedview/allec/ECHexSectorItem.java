@@ -11,7 +11,7 @@ import org.jlab.geom.prim.Point3D;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
-import cnuphys.ced.alldata.datacontainer.cal.ECalADCData;
+import cnuphys.ced.alldata.ECalAdc;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
@@ -34,7 +34,7 @@ public class ECHexSectorItem extends HexSectorItem {
 	public static final Color baseFillColor = new Color(139, 0, 0, 160);
 
 	//the EC ac data container
-	private static ECalADCData _ecADCData = ECalADCData.getInstance();
+	private static ECalAdc _ecADCData = ECalAdc.getInstance();
 
 	/**
 	 * Get a hex sector item
@@ -135,27 +135,27 @@ public class ECHexSectorItem extends HexSectorItem {
 
 		//use the adc values
 		for (int i = 0; i < _ecADCData.count(); i++) {
-			if (_sector == _ecADCData.sector.get(i)) {
-				if (plane == _ecADCData.plane.get(i)) {
-					if (_ecView.showView(_ecADCData.view.get(i))) {
-						int strip0 = _ecADCData.strip.get(i) - 1;
-						Polygon poly = stripPolygon(container, plane, _ecADCData.view.get(i), strip0);
+			if (_ecADCData.isECal(i) && _sector == _ecADCData.sector(i)) {
+				if (plane == _ecADCData.plane(i)) {
+					if (_ecView.showView(_ecADCData.view(i))) {
+						int strip0 = _ecADCData.strip(i) - 1;
+						Polygon poly = stripPolygon(container, plane, _ecADCData.view(i), strip0);
 
-						g.setColor(_ecADCData.getADCColor(_ecADCData.adc.get(i)));
+						g.setColor(_ecADCData.adcColor(i));
 						g.fillPolygon(poly);
 
-						if (_ecADCData.adc.get(i) > 0) {
+						if (_ecADCData.adc(i) > 0) {
 							g.setColor(X11Colors.getX11Color("dark red"));
 							g.drawPolygon(poly);
 						}
 
 						// extension
-						if (_ecADCData.adc.get(i) > 0) {
-							int adcmax = Math.max(1, _ecADCData.maxADC);
-							double fract = ((double) _ecADCData.adc.get(i) / (double) adcmax);
+						if (_ecADCData.adc(i) > 0) {
+							int adcmax = Math.max(1, _ecADCData.maxAdc(i));
+							double fract = ((double) _ecADCData.adc(i) / (double) adcmax);
 							fract = Math.max(0.15, Math.min(1.0, fract));
 
-							poly = extensionPolygon(container, plane, _ecADCData.view.get(i), strip0, fract);
+							poly = extensionPolygon(container, plane, _ecADCData.view(i), strip0, fract);
 							g.setColor(Color.yellow);
 							g.fillPolygon(poly);
 							g.setColor(X11Colors.getX11Color("dark red"));
@@ -420,14 +420,15 @@ public class ECHexSectorItem extends HexSectorItem {
 
 				// any hits?
 				for (int i = 0; i < _ecADCData.count(); i++) {
-					byte sect = _ecADCData.sector.get(i);
-					if (sect == getSector()) {
-						byte view = _ecADCData.view.get(i);
-						short component = _ecADCData.strip.get(i);
+					byte sect = _ecADCData.sector(i);
+					if (_ecADCData.isECal(i) && sect == getSector()
+							&& _ecADCData.plane(i) == _ecView.getDisplayPlane()) {
+						byte view = _ecADCData.view(i);
+						short component = _ecADCData.strip(i);
 						if (uvw[view] == component) {
 							String str = String.format("%s strip %d adc %d time %-7.3f",
 									ECGeometry.VIEW_NAMES[view], component,
-									_ecADCData.adc.get(i), _ecADCData.time.get(i));
+									_ecADCData.adc(i), _ecADCData.time(i));
 
 							feedbackStrings.add("$coral$" + str);
 						}
