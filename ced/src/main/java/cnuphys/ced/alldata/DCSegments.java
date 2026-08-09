@@ -1,5 +1,7 @@
 package cnuphys.ced.alldata;
 
+import java.awt.Point;
+import java.awt.geom.Line2D;
 import java.util.function.Supplier;
 
 import org.jlab.io.base.DataBank;
@@ -32,5 +34,8 @@ public final class DCSegments {
     public float z1(int row) { return bank().getFloat("SegEndPoint1Z", row); }
     public float x2(int row) { return bank().getFloat("SegEndPoint2X", row); }
     public float z2(int row) { return bank().getFloat("SegEndPoint2Z", row); }
+    public static boolean isNearScreenLine(Point start, Point end, Point point, double tolerance) {
+        return Line2D.ptSegDist(start.x, start.y, end.x, end.y, point.x, point.y) <= tolerance;
+    }
     private DataBank bank() { return bankSupplier.get(); }
 }

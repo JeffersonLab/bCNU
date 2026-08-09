@@ -1,7 +1,10 @@
 package cnuphys.ced.alldata;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.Point;
 import java.lang.reflect.Proxy;
 
 import org.jlab.io.base.DataBank;
@@ -16,6 +19,15 @@ class DCSegmentsTest {
         assertEquals(4, segments.superlayer(0));
         assertEquals(-15.5f, segments.x1(0));
         assertEquals(230.0f, segments.z2(0));
+    }
+
+    @Test
+    void hitTestsTheWholeDrawnSegment() {
+        Point start = new Point(10, 20);
+        Point end = new Point(110, 20);
+        assertTrue(DCSegments.isNearScreenLine(start, end, new Point(60, 24), 5.0));
+        assertFalse(DCSegments.isNearScreenLine(start, end, new Point(60, 27), 5.0));
+        assertFalse(DCSegments.isNearScreenLine(start, end, new Point(120, 20), 5.0));
     }
 
     private static DataBank bank() {

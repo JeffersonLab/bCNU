@@ -8,7 +8,10 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Point3D;
@@ -71,6 +74,13 @@ public class SuperLayerDrawing {
 	private DCSegments _tbTrkgSegmentData = DCSegments.timeBased();
 	private DCSegments _hbTrkgAISegmentData = DCSegments.aiHitBased();
 	private DCSegments _tbTrkgAISegmentData = DCSegments.aiTimeBased();
+	private final Map<DCSegments, List<SegmentFeedback>> _segmentFeedback = new IdentityHashMap<>();
+
+	private record SegmentFeedback(DCSegments segments, int row, String name, Point start, Point end) {
+		boolean contains(Point point) {
+			return DCSegments.isNearScreenLine(start, end, point, 5.0);
+		}
+	}
 
 
 	/**
@@ -793,7 +803,9 @@ public class SuperLayerDrawing {
 		return _view.projectedPoint(x, y, z, _iSupl.projectionPlane(), wp);
 	}
 
-	private void drawSegments(Graphics g, IContainer container, DCSegments segments, Color lc, Color fc) {
+	private void drawSegments(Graphics g, IContainer container, DCSegments segments, String name, Color lc, Color fc) {
+		List<SegmentFeedback> feedback = new ArrayList<>();
+		_segmentFeedback.put(segments, feedback);
 		int count = segments.count();
         if (count > 0) {
             Point2D.Double wp1 = new Point2D.Double();
@@ -810,7 +822,8 @@ public class SuperLayerDrawing {
                     	wp1.y = -wp1.y;
 						wp2.y = -wp2.y;
                     }
-                    drawSegment(g, container, _view, wp1, wp2, lc, fc);
+                    Point[] endpoints = drawSegment(g, container, _view, wp1, wp2, lc, fc);
+                    feedback.add(new SegmentFeedback(segments, i, name, endpoints[0], endpoints[1]));
 
                 }
             }
@@ -825,7 +838,9 @@ public class SuperLayerDrawing {
 	public void drawHitBasedSegments(Graphics g, IContainer container) {
 
 		if (_view.showDCHBSegments()) {
-			drawSegments(g, container, _hbTrkgSegmentData, CedColors.hbSegmentLine, CedColors.HB_COLOR);
+			drawSegments(g, container, _hbTrkgSegmentData, "HB segment", CedColors.hbSegmentLine, CedColors.HB_COLOR);
+		} else {
+			_segmentFeedback.remove(_hbTrkgSegmentData);
 		}
 	} // drawHitBasedSegments
 
@@ -837,7 +852,9 @@ public class SuperLayerDrawing {
 	public void drawTimeBasedSegments(Graphics g, IContainer container) {
 
 		if (_view.showDCTBSegments()) {
-			drawSegments(g, container, _tbTrkgSegmentData, CedColors.tbSegmentLine, CedColors.TB_COLOR);
+			drawSegments(g, container, _tbTrkgSegmentData, "TB segment", CedColors.tbSegmentLine, CedColors.TB_COLOR);
+		} else {
+			_segmentFeedback.remove(_tbTrkgSegmentData);
 		}
 
 	} // drawTimeBasedSegments
@@ -852,7 +869,9 @@ public class SuperLayerDrawing {
 	public void drawAIHitBasedSegments(Graphics g, IContainer container) {
 
 		if (_view.showAIDCHBSegments()) {
-			drawSegments(g, container, _hbTrkgAISegmentData, CedColors.aihbSegmentLine, CedColors.AIHB_COLOR);
+			drawSegments(g, container, _hbTrkgAISegmentData, "AI HB segment", CedColors.aihbSegmentLine, CedColors.AIHB_COLOR);
+		} else {
+			_segmentFeedback.remove(_hbTrkgAISegmentData);
 		}
 	} // drawAIHitBasedSegments
 
@@ -864,13 +883,15 @@ public class SuperLayerDrawing {
 	public void drawAITimeBasedSegments(Graphics g, IContainer container) {
 
 		if (_view.showAIDCTBSegments()) {
-			drawSegments(g, container, _tbTrkgAISegmentData, CedColors.aitbSegmentLine, CedColors.AITB_COLOR);
+			drawSegments(g, container, _tbTrkgAISegmentData, "AI TB segment", CedColors.aitbSegmentLine, CedColors.AITB_COLOR);
+		} else {
+			_segmentFeedback.remove(_tbTrkgAISegmentData);
 		}
 
 	} // drawAITimeBasedSegments
 
 	// draw a HB or TB segement
-	private void drawSegment(Graphics g, IContainer container, CedView view, Point2D.Double sectPnt1,
+	private Point[] drawSegment(Graphics g, IContainer container, CedView view, Point2D.Double sectPnt1,
 			Point2D.Double sectPnt2, Color lineColor, Color endColor) {
 
 		Graphics2D g2 = (Graphics2D) g;
@@ -893,6 +914,7 @@ public class SuperLayerDrawing {
 		SymbolDraw.drawOval(g2, p2.x, p2.y, 3, 3, Color.black, endColor);
 
 		g2.setStroke(oldStroke);
+		return new Point[] { p1, p2 };
 	}
 
 	/**
@@ -938,6 +960,7 @@ public class SuperLayerDrawing {
 			List<String> feedbackStrings) {
 
 		if (_iSupl.item().contains(container, screenPoint)) {
+			addSegmentFeedback(screenPoint, feedbackStrings);
 
 			NoiseReductionParameters parameters = _noiseManager.getParameters(_iSupl.sector() - 1,
 					_iSupl.superlayer() - 1);
@@ -1005,6 +1028,22 @@ public class SuperLayerDrawing {
 			} // good layer
 
 			addReconstructedFeedback(feedbackStrings);
+		}
+	}
+
+	private void addSegmentFeedback(Point screenPoint, List<String> feedbackStrings) {
+		for (List<SegmentFeedback> entries : _segmentFeedback.values()) {
+			for (SegmentFeedback entry : entries) {
+				if (entry.contains(screenPoint)) {
+					DCSegments segments = entry.segments();
+					int row = entry.row();
+					feedbackStrings.add(String.format("$orange$%s sector %d superlayer %d", entry.name(),
+							segments.sector(row), segments.superlayer(row)));
+					feedbackStrings.add(String.format("$orange$endpoints (x,z) (%-6.2f, %-6.2f) to (%-6.2f, %-6.2f) cm",
+							segments.x1(row), segments.z1(row), segments.x2(row), segments.z2(row)));
+					return;
+				}
+			}
 		}
 	}
 
