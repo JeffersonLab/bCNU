@@ -13,7 +13,7 @@ import cnuphys.ced.alldata.datacontainer.bmt.BMTADCData;
 import cnuphys.ced.alldata.datacontainer.bmt.BMTRecHitData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
-import cnuphys.ced.alldata.datacontainer.cnd.CNDADCData;
+import cnuphys.ced.alldata.CNDAdc;
 import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.CTOFClusters;
 import cnuphys.ced.cedview.CedView;
@@ -36,7 +36,7 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 	private CedView _view;
 
 	// data containers
-	private CNDADCData adcCNDData = CNDADCData.getInstance();
+	private CNDAdc adcCNDData = CNDAdc.getInstance();
 	private CTOFAdc adcCTOFData = CTOFAdc.getInstance();
 	private CTOFClusters clusterCTOFData = CTOFClusters.getInstance();
 	private BSTADCData adcBSTData = BSTADCData.getInstance();
@@ -160,9 +160,9 @@ public class CentralXYHitDrawer extends CentralHitDrawer {
 		// draw based on adc data
 
 		for (int i = 0; i < adcCNDData.count(); i++) {
-			CNDXYPolygon poly = _iCentralView.getCNDPolygon(adcCNDData.sector[i], adcCNDData.layer[i], adcCNDData.order[i] + 1);
+			CNDXYPolygon poly = _iCentralView.getCNDPolygon(adcCNDData.sector(i), adcCNDData.layer(i), adcCNDData.order(i) + 1);
 			if (poly != null) {
-				Color color = adcCNDData.getADCColor(adcCNDData.adc[i]);
+				Color color = adcCNDData.color(i);
 				poly.draw(g, container, color, Color.black);
 			}
 		}

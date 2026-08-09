@@ -11,7 +11,7 @@ import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.cal.ECalADCData;
 import cnuphys.ced.alldata.datacontainer.cal.PCalADCData;
-import cnuphys.ced.alldata.datacontainer.cnd.CNDADCData;
+import cnuphys.ced.alldata.CNDAdc;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
 import cnuphys.ced.alldata.datacontainer.ftcal.FTCalADCData;
 import cnuphys.ced.alldata.CTOFAdc;
@@ -139,7 +139,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private EventListenerList _listeners;
 
 	//data containers
-	private CNDADCData cndADCData = CNDADCData.getInstance();
+	private CNDAdc cndADCData = CNDAdc.getInstance();
 	private ECalADCData ecADCData = ECalADCData.getInstance();
 	private PCalADCData pcADCData = PCalADCData.getInstance();
 	private FTOFAdc ftofADCData = FTOFAdc.getInstance();
@@ -1015,10 +1015,10 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private void accumCND() {
 
 		for (int i = 0; i < cndADCData.count(); i++) {
-			if (cndADCData.adc[i] > 0) {
-				int sect0 = cndADCData.sector[i] - 1;
-				int lay0 = cndADCData.layer[i] - 1;
-				int ord0 = cndADCData.order[i];
+			if (cndADCData.adc(i) > 0) {
+				int sect0 = cndADCData.sector(i) - 1;
+				int lay0 = cndADCData.layer(i) - 1;
+				int ord0 = cndADCData.order(i);
 				_CNDAccumulatedData[sect0][lay0][ord0] += 1;
 			}
 		}

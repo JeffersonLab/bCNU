@@ -16,7 +16,7 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.ced.alldata.datacontainer.cnd.CNDADCData;
+import cnuphys.ced.alldata.CNDAdc;
 import cnuphys.ced.alldata.datacontainer.cnd.CNDTDCData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
@@ -31,7 +31,7 @@ public class CNDXYPolygon extends Polygon {
 	private Point pp = new Point();
 
 	//data containers
-	CNDADCData adcData = CNDADCData.getInstance();
+	CNDAdc adcData = CNDAdc.getInstance();
 	CNDTDCData tdcData = CNDTDCData.getInstance();
 
 	/**
@@ -147,10 +147,10 @@ public class CNDXYPolygon extends Polygon {
 		if (view.isSingleEventMode()) {
 
 			for (int i = 0; i < adcData.count(); i++) {
-				if ((adcData.sector[i] == sector) && (adcData.layer[i] == layer)
-						&& (adcData.order[i] == (_leftRight - 1))) {
+				if ((adcData.sector(i) == sector) && (adcData.layer(i) == layer)
+						&& (adcData.order(i) == (_leftRight - 1))) {
 
-					adcData.adcFeedback("CND", i, feedbackStrings);
+					adcData.addFeedback(i, feedbackStrings);
 					break;
 				}
 			}
