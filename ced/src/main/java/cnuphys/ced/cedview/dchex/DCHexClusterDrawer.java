@@ -11,15 +11,11 @@ import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 
 import cnuphys.bCNU.graphics.container.IContainer;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgClusterData;
+import cnuphys.ced.alldata.DCClusters;
 import cnuphys.ced.alldata.datacontainer.dc.ATrkgHitData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAIClusterData;
 import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAIHitData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgClusterData;
 import cnuphys.ced.alldata.datacontainer.dc.HBTrkgHitData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAIClusterData;
 import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAIHitData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgClusterData;
 import cnuphys.ced.alldata.datacontainer.dc.TBTrkgHitData;
 import cnuphys.ced.frame.CedColors;
 
@@ -35,10 +31,10 @@ public class DCHexClusterDrawer {
 	private TBTrkgHitData _tbData = TBTrkgHitData.getInstance();
 	private HBTrkgAIHitData _hbAIData = HBTrkgAIHitData.getInstance();
 	private TBTrkgAIHitData _tbAIData = TBTrkgAIHitData.getInstance();
-	private HBTrkgClusterData _hbClusterData = HBTrkgClusterData.getInstance();
-	private TBTrkgClusterData _tbClusterData = TBTrkgClusterData.getInstance();
-	private HBTrkgAIClusterData _hbAIClusterData = HBTrkgAIClusterData.getInstance();
-	private TBTrkgAIClusterData _tbAIClusterData = TBTrkgAIClusterData.getInstance();
+	private DCClusters _hbClusterData = DCClusters.hitBased();
+	private DCClusters _tbClusterData = DCClusters.timeBased();
+	private DCClusters _hbAIClusterData = DCClusters.aiHitBased();
+	private DCClusters _tbAIClusterData = DCClusters.aiTimeBased();
 
 
 
@@ -82,14 +78,14 @@ public class DCHexClusterDrawer {
 
 
 	//draws the HB or TB clusters
-	private void drawDCClusterList(Graphics g, IContainer container, ATrkgClusterData clusters, ATrkgHitData reconHits, Color color) {
+	private void drawDCClusterList(Graphics g, IContainer container, DCClusters clusters, ATrkgHitData reconHits, Color color) {
 
 		if ((clusters == null) || (reconHits == null)) {
 			return;
 		}
 
 		for (int i = 0; i < clusters.count(); i++) {
-			short hitIds[] = clusters.getHitIds(i);
+			short hitIds[] = clusters.hitIds(i);
 			if (hitIds != null) {
 				//count the non-negative hit ids
 				int length = 0;
@@ -102,8 +98,8 @@ public class DCHexClusterDrawer {
 				}
 
 				if (length > 0) {
-					int sector = clusters.sector[i]; // 1..6
-					int superlayer = clusters.superlayer[i]; // 1..6
+					int sector = clusters.sector(i); // 1..6
+					int superlayer = clusters.superlayer(i); // 1..6
 					int layer[] = new int[length]; // 1..6
 					int wire[] = new int[length]; // 1..112
 
