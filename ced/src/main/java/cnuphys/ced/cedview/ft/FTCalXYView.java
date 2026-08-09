@@ -18,8 +18,8 @@ import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.ViewConfiguration;
 import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.alldata.DataDrawSupport;
+import cnuphys.ced.alldata.FTCalHits;
 import cnuphys.ced.alldata.datacontainer.ftcal.FTCalADCData;
-import cnuphys.ced.alldata.datacontainer.ftcal.FTCalHitData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
 import cnuphys.ced.component.ControlPanel;
@@ -52,7 +52,7 @@ public class FTCalXYView extends CedXYView {
 
 	//data containers
 	private FTCalADCData adcData = FTCalADCData.getInstance();
-	private FTCalHitData hitData = FTCalHitData.getInstance();
+	private FTCalHits hitData = FTCalHits.getInstance();
 
 	/**
 	 * Create a FTCalXYView View
@@ -270,10 +270,8 @@ public class FTCalXYView extends CedXYView {
 			if (count > 0) {
 				Point pp = new Point();
 				Point2D.Double wp = new Point2D.Double();
-				float x[] = hitData.x;
-				float y[] = hitData.y;
-				for (int i = 0; i < count; i++) {
-					wp.setLocation(x[i], y[i]);
+					for (int i = 0; i < count; i++) {
+						wp.setLocation(hitData.x(i), hitData.y(i));
 					container.worldToLocal(pp, wp);
 					DataDrawSupport.drawReconHit(g, pp);
 					hitData.setLocation(i, pp);
@@ -369,7 +367,7 @@ public class FTCalXYView extends CedXYView {
 			if (count > 0) {
 				for (int i = 0; i < count; i++) {
 					if (hitData.contains(i, screenPoint)) {
-						hitData.recFeedback("HTTC", i, feedbackStrings);
+						hitData.addFeedback(i, feedbackStrings);
 						break;
 					}
 				}
