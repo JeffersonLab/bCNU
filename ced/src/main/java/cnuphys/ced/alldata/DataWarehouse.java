@@ -11,8 +11,6 @@ import org.jlab.io.base.DataEvent;
 import org.jlab.jnp.hipo4.data.Schema;
 import org.jlab.jnp.hipo4.data.SchemaFactory;
 
-import cnuphys.bCNU.threading.EventNotifier;
-import cnuphys.ced.alldata.datacontainer.IDataContainer;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
@@ -80,9 +78,6 @@ public class DataWarehouse implements IClasIoEventListener {
 
 	/** the column data used by the node panel */
 	private ArrayList<ColumnData> _columnData = new ArrayList<>();
-
-	//for notifying about new data
-	private final EventNotifier<DataContainerNotification> eventNotifier = new EventNotifier<>();
 
 	/**
 	 * Public access to the singleton
@@ -349,24 +344,6 @@ public class DataWarehouse implements IClasIoEventListener {
 	}
 
 	/**
-	 * Notify the data containers of a new event
-	 *
-	 * @param event the new event they should use to update themselves.
-	 *
-	 */
-	public void notifyListeners(DataEvent event) {
-		eventNotifier.notifyListeners(new DataContainerNotification.Update(event));
-	}
-
-	/**
-	 * Notify the data containers to clear their data
-	 *
-	 */
-	public void notifyListeners() {
-		eventNotifier.notifyListeners(DataContainerNotification.Clear.INSTANCE);
-	}
-
-	/**
 	 * Does the current event have a bank with the given name?
 	 * @param bankName the bank name
 	 * @param columnName the column name
@@ -403,15 +380,6 @@ public class DataWarehouse implements IClasIoEventListener {
 	}
 
 
-	/**
-	 * Add an data container listener.
-	 *
-	 * @param listener the data container listener to add.
-	 */
-	public void addDataContainerListener(IDataContainer listener) {
-		eventNotifier.addListener(new DataListener(listener));
-	}
-
 
 	@Override
 	public void newClasIoEvent(DataEvent event) {
@@ -446,8 +414,6 @@ public class DataWarehouse implements IClasIoEventListener {
 			}
 		}
 
-		notifyListeners(); //clear previous data
-		notifyListeners(event);
 	}
 	
 	/**
@@ -477,13 +443,11 @@ public class DataWarehouse implements IClasIoEventListener {
 	@Override
 	public void openedNewEventFile(String path) {
 		_seenBanks.clear();
-		notifyListeners();
 	}
 
 	@Override
 	public void changedEventSource(EventSourceType source) {
 		_seenBanks.clear();
-		notifyListeners();
 	}
 
 	/**

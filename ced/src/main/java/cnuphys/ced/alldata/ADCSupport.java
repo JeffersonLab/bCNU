@@ -2,7 +2,6 @@ package cnuphys.ced.alldata;
 
 import java.awt.Color;
 
-import cnuphys.ced.alldata.datacontainer.AdcColorScale;
 
 /**
  * Static methods to support ADC banks

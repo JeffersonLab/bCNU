@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 
 import org.jlab.io.base.DataBank;
 
-import cnuphys.ced.alldata.datacontainer.AdcColorScale;
 
 /** Read-through access to the current {@code FTOF::adc} bank. */
 public final class FTOFAdc {

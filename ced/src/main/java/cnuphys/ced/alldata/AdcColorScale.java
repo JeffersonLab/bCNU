@@ -1,4 +1,4 @@
-package cnuphys.ced.alldata.datacontainer;
+package cnuphys.ced.alldata;
 
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
 
