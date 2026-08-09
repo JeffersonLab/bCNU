@@ -17,7 +17,7 @@ import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.CNDAdc;
-import cnuphys.ced.alldata.datacontainer.cnd.CNDTDCData;
+import cnuphys.ced.alldata.CNDTdc;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
 import cnuphys.ced.event.AccumulationManager;
@@ -32,7 +32,7 @@ public class CNDXYPolygon extends Polygon {
 
 	//data containers
 	CNDAdc adcData = CNDAdc.getInstance();
-	CNDTDCData tdcData = CNDTDCData.getInstance();
+	CNDTdc tdcData = CNDTdc.getInstance();
 
 	/**
 	 * The layer, 1..3
@@ -156,9 +156,9 @@ public class CNDXYPolygon extends Polygon {
 			}
 
 			for (int i = 0; i < tdcData.count(); i++) {
-				if ((tdcData.sector[i] == sector) && (tdcData.layer[i] == layer)
-						&& (tdcData.order[i] == (_leftRight + 1))) {
-					feedbackStrings.add(String.format("$cyan$CND tdc %d", tdcData.tdc[i]));
+				if ((tdcData.sector(i) == sector) && (tdcData.layer(i) == layer)
+						&& (tdcData.order(i) == (_leftRight + 1))) {
+					feedbackStrings.add(String.format("$cyan$CND tdc %d", tdcData.tdc(i)));
 					break;
 				}
 			}
