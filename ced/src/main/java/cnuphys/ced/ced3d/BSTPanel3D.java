@@ -8,7 +8,7 @@ import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTCrossData;
-import cnuphys.ced.alldata.datacontainer.cvt.CosmicData;
+import cnuphys.ced.alldata.CosmicTracks;
 import cnuphys.ced.geometry.BSTGeometry;
 
 public class BSTPanel3D extends DetectorItem3D {
@@ -22,7 +22,7 @@ public class BSTPanel3D extends DetectorItem3D {
 	private BSTADCData _bstADCData = BSTADCData.getInstance();
 
 	//data containers
-	private CosmicData _cosmicData = CosmicData.getInstance();
+	private CosmicTracks _cosmicData = CosmicTracks.getInstance();
 	private BSTCrossData _bstCrossData = BSTCrossData.getInstance();
 
 	// the 1-based sect
@@ -98,10 +98,10 @@ public class BSTPanel3D extends DetectorItem3D {
 			for (int i = 0; i < _cosmicData.count(); i++) {
                     float y1 = 1000;
                     float y2 = -1000;
-                    float x1 = _cosmicData.trkline_yx_slope[i] * y1 + _cosmicData.trkline_yx_interc[i];
-                    float x2 = _cosmicData.trkline_yx_slope[i] * y2 + _cosmicData.trkline_yx_interc[i];
-                    float z1 = _cosmicData.trkline_yz_slope[i] * y1 + _cosmicData.trkline_yz_interc[i];
-                    float z2 = _cosmicData.trkline_yz_slope[i] * y2 + _cosmicData.trkline_yz_interc[i];
+                    float x1 = _cosmicData.xAtY(i, y1);
+                    float x2 = _cosmicData.xAtY(i, y2);
+                    float z1 = _cosmicData.zAtY(i, y1);
+                    float z2 = _cosmicData.zAtY(i, y2);
 					Support3D.drawLine(drawable, x1, y1, z1, x2, y2, z2, Color.red, 1f);
 			}
 

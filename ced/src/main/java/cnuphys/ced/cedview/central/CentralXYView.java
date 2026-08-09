@@ -42,7 +42,7 @@ import cnuphys.ced.alldata.datacontainer.bmt.BMTADCData;
 import cnuphys.ced.alldata.datacontainer.bmt.BMTRecHitData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTADCData;
 import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
-import cnuphys.ced.alldata.datacontainer.cvt.CosmicData;
+import cnuphys.ced.alldata.CosmicTracks;
 import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.CTOFClusters;
 import cnuphys.ced.cedview.CedView;
@@ -95,7 +95,7 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 	private CTOFClusters _clusterCTOFData = CTOFClusters.getInstance();
 	private BSTADCData _bstADCData = BSTADCData.getInstance();
 	private BMTADCData _bmtADCData = BMTADCData.getInstance();
-	private CosmicData _cosmicData = CosmicData.getInstance();
+	private CosmicTracks _cosmicData = CosmicTracks.getInstance();
 	private BSTRecHitData bstRecHitData = BSTRecHitData.getInstance();
 	private BMTRecHitData bmtRecHitData = BMTRecHitData.getInstance();
 
@@ -363,8 +363,8 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 			for (int i = 0; i < count; i++) {
 				double y1 = 100;
 				double y2 = -100;
-				double x1 = _cosmicData.trkline_yx_slope[i] * y1 + _cosmicData.trkline_yx_interc[i];
-				double x2 = _cosmicData.trkline_yx_slope[i] * y2 + _cosmicData.trkline_yx_interc[i];
+				double x1 = _cosmicData.xAtY(i, (float) y1);
+				double x2 = _cosmicData.xAtY(i, (float) y2);
 				// convert to mm
 				x1 *= 10;
 				x2 *= 10;

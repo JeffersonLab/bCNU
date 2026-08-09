@@ -36,7 +36,7 @@ import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.datacontainer.bst.BSTRecHitData;
-import cnuphys.ced.alldata.datacontainer.cvt.CosmicData;
+import cnuphys.ced.alldata.CosmicTracks;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.ILabCoordinates;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -99,7 +99,7 @@ public class CentralZView extends CedView implements ChangeListener, ILabCoordin
 	private static String _defMatches[] = {"BMT", "BST", "CND", "CVT", "CTOF"};
 
 	//data containers
-	private CosmicData _cosmicData = CosmicData.getInstance();
+	private CosmicTracks _cosmicData = CosmicTracks.getInstance();
 	private BSTRecHitData bstRecHitData = BSTRecHitData.getInstance();
 
 
@@ -301,10 +301,10 @@ public class CentralZView extends CedView implements ChangeListener, ILabCoordin
 			for (int i = 0; i < count; i++) {
 				double y1 = 100;
 				double y2 = -100;
-				double x1 = _cosmicData.trkline_yx_slope[i] * y1 + _cosmicData.trkline_yx_interc[i];
-				double x2 = _cosmicData.trkline_yx_slope[i] * y2 + _cosmicData.trkline_yx_interc[i];
-				double z1 = _cosmicData.trkline_yz_slope[i] * y1 + _cosmicData.trkline_yz_interc[i];
-				double z2 = _cosmicData.trkline_yz_slope[i] * y2 + _cosmicData.trkline_yz_interc[i];
+				double x1 = _cosmicData.xAtY(i, (float) y1);
+				double x2 = _cosmicData.xAtY(i, (float) y2);
+				double z1 = _cosmicData.zAtY(i, (float) y1);
+				double z2 = _cosmicData.zAtY(i, (float) y2);
 
 				// convert to mm
 				x1 *= 10;
