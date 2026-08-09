@@ -12,9 +12,8 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.view.FBData;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.datacontainer.cal.ECalClusterData;
+import cnuphys.ced.alldata.ECalClusters;
 import cnuphys.ced.alldata.datacontainer.cal.ECalReconData;
-import cnuphys.ced.alldata.datacontainer.cal.PCalClusterData;
 import cnuphys.ced.alldata.datacontainer.cal.PCalReconData;
 import cnuphys.ced.alldata.datacontainer.dc.ATrkgHitData;
 import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAIHitData;
@@ -184,31 +183,16 @@ public class ReconDrawer extends SectorViewDrawer {
 		Point2D.Double wp = new Point2D.Double();
 		Point pp = new Point();
 
-		// ECal
-		ECalClusterData ecClusterData = ECalClusterData.getInstance();
-		for (int i = 0; i < ecClusterData.count(); i++) {
-			if (_view.containsSector(ecClusterData.sector.get(i))) {
-
-				_view.projectClasToWorld(ecClusterData.x.get(i), ecClusterData.y.get(i), ecClusterData.z.get(i),
+		ECalClusters clusters = ECalClusters.getInstance();
+		for (int i = 0; i < clusters.count(); i++) {
+			if ((clusters.isPCal(i) || clusters.isECal(i)) && _view.containsSector(clusters.sector(i))) {
+				_view.projectClasToWorld(clusters.x(i), clusters.y(i), clusters.z(i),
 						_view.getProjectionPlane(), wp);
 				container.worldToLocal(pp, wp);
-				ecClusterData.setLocation(i, pp);
+				clusters.setLocation(i, pp);
 				DataDrawSupport.drawCluster(g, pp);
 			}
-		} // for i
-
-		// PCal
-		PCalClusterData pcalClusterData = PCalClusterData.getInstance();
-		for (int i = 0; i < pcalClusterData.count(); i++) {
-			if (_view.containsSector(pcalClusterData.sector.get(i))) {
-
-				_view.projectClasToWorld(pcalClusterData.x.get(i), pcalClusterData.y.get(i), pcalClusterData.z.get(i),
-						_view.getProjectionPlane(), wp);
-				container.worldToLocal(pp, wp);
-				pcalClusterData.setLocation(i, pp);
-				DataDrawSupport.drawCluster(g, pp);
-			}
-		} // for i
+		}
 	}
 
 	// draw reconstructed DC hit Hit based and time based based hits
@@ -232,51 +216,14 @@ public class ReconDrawer extends SectorViewDrawer {
 			List<String> feedbackStrings) {
 		if (_view.showClusters()) {
 
-			// ECal
-			ECalClusterData ecClusterData = ECalClusterData.getInstance();
-			for (int i = 0; i < ecClusterData.count(); i++) {
-				if (_view.containsSector(ecClusterData.sector.get(i))) {
-					if (ecClusterData.contains(i, screenPoint)) {
-
-						float x = ecClusterData.x.get(i);
-						float y = ecClusterData.y.get(i);
-						float z = ecClusterData.z.get(i);
-
-						feedbackStrings
-								.add(String.format("$magenta$EC cluster xyz (%-6.3f, %-6.3f, %-6.3f) cm", x, y, z));
-						feedbackStrings.add(String.format("$magenta$EC cluster plane %s",
-								ECGeometry.PLANE_NAMES[ecClusterData.plane.get(i)]));
-						feedbackStrings.add(String.format("$magenta$EC cluster view %s",
-								ECGeometry.VIEW_NAMES[ecClusterData.view.get(i)]));
-						feedbackStrings.add(
-								String.format("$magenta$EC cluster Energy %-7.4f GeV", ecClusterData.energy.get(i)));
-
-						return true;
-					}
+			ECalClusters clusters = ECalClusters.getInstance();
+			for (int i = 0; i < clusters.count(); i++) {
+				if ((clusters.isPCal(i) || clusters.isECal(i)) && _view.containsSector(clusters.sector(i))
+						&& clusters.contains(i, screenPoint)) {
+					clusters.addFeedback(i, feedbackStrings);
+					return true;
 				}
-			} // for i
-
-			// PCal
-			PCalClusterData pcalClusterData = PCalClusterData.getInstance();
-			for (int i = 0; i < pcalClusterData.count(); i++) {
-				if (_view.containsSector(pcalClusterData.sector.get(i))) {
-					if (pcalClusterData.contains(i, screenPoint)) {
-
-						float x = pcalClusterData.x.get(i);
-						float y = pcalClusterData.y.get(i);
-						float z = pcalClusterData.z.get(i);
-
-						feedbackStrings
-								.add(String.format("$magenta$PCAL cluster xyz (%-6.3f, %-6.3f, %-6.3f) cm", x, y, z));
-						feedbackStrings.add(String.format("$magenta$PCAL cluster view %s",
-								ECGeometry.VIEW_NAMES[pcalClusterData.view.get(i)]));
-						feedbackStrings.add(String.format("$magenta$PCAL cluster Energy %-6.3f GeV",
-								pcalClusterData.energy.get(i)));
-
-						return true;
-					}
-				}
-			} // for i
+			}
 
 		}
 
