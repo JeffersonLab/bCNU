@@ -13,9 +13,7 @@ import cnuphys.bCNU.drawable.IDrawable;
 import cnuphys.bCNU.graphics.SymbolDraw;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DataWarehouse;
-import cnuphys.ced.alldata.datacontainer.cvt.CVTRecKFTrajData;
-import cnuphys.ced.alldata.datacontainer.cvt.CVTRecTrajData;
-import cnuphys.ced.alldata.datacontainer.cvt.CVTTrajData;
+import cnuphys.ced.alldata.CVTTrajectories;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.ILabCoordinates;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -36,9 +34,9 @@ public abstract class CentralHitDrawer implements IDrawable {
 	private ILabCoordinates labCoord;
 
 	//data containers
-	CVTRecTrajData cvtRecTrajData = CVTRecTrajData.getInstance();
-	CVTRecKFTrajData cvtRecKFTrajData = CVTRecKFTrajData.getInstance();
-	CVTTrajData cvtP1TrajData = CVTTrajData.getInstance();
+	CVTTrajectories cvtRecTrajData = CVTTrajectories.reconstructed();
+	CVTTrajectories cvtRecKFTrajData = CVTTrajectories.kalmanFilter();
+	CVTTrajectories cvtP1TrajData = CVTTrajectories.pass1();
 
 	/**
 	 * Create a central hit drawer
@@ -140,14 +138,14 @@ public abstract class CentralHitDrawer implements IDrawable {
 			Point pp = new Point();
 			for (int i = 0; i < count; i++) {
 
-				if (Double.isNaN(cvtP1TrajData.x[i]) || Double.isNaN(cvtP1TrajData.y[i])
-						|| Double.isNaN(cvtP1TrajData.z[i])) {
+				if (Double.isNaN(cvtP1TrajData.x(i)) || Double.isNaN(cvtP1TrajData.y(i))
+						|| Double.isNaN(cvtP1TrajData.z(i))) {
 					continue;
 				}
 
 				// cm to mm
-				labCoord.labToLocal(container, 10 * cvtP1TrajData.x[i], 10 * cvtP1TrajData.y[i],
-						10 * cvtP1TrajData.z[i], pp);
+				labCoord.labToLocal(container, 10 * cvtP1TrajData.x(i), 10 * cvtP1TrajData.y(i),
+						10 * cvtP1TrajData.z(i), pp);
 				SymbolDraw.drawStar(g, pp.x, pp.y, 6, Color.blue);
 				cvtP1TrajData.setLocation(i, pp);
 			}
@@ -166,15 +164,15 @@ public abstract class CentralHitDrawer implements IDrawable {
 			Point pp = new Point();
 			for (int i = 0; i < count; i++) {
 
-				if (Double.isNaN(cvtRecKFTrajData.x[i]) || Double.isNaN(cvtRecKFTrajData.y[i])
-						|| Double.isNaN(cvtRecKFTrajData.z[i])) {
+				if (Double.isNaN(cvtRecKFTrajData.x(i)) || Double.isNaN(cvtRecKFTrajData.y(i))
+						|| Double.isNaN(cvtRecKFTrajData.z(i))) {
 					continue;
 				}
 
 
 				// cm to mm
-				labCoord.labToLocal(container, 10 * cvtRecKFTrajData.x[i], 10 * cvtRecKFTrajData.y[i],
-						10 * cvtRecKFTrajData.z[i], pp);
+				labCoord.labToLocal(container, 10 * cvtRecKFTrajData.x(i), 10 * cvtRecKFTrajData.y(i),
+						10 * cvtRecKFTrajData.z(i), pp);
 
 				SymbolDraw.drawStar(g, pp.x, pp.y, 6, Color.green);
 				cvtRecKFTrajData.setLocation(i, pp);
@@ -195,14 +193,14 @@ public abstract class CentralHitDrawer implements IDrawable {
 			Point pp = new Point();
 			for (int i = 0; i < count; i++) {
 
-				if (Double.isNaN(cvtRecTrajData.x[i]) || Double.isNaN(cvtRecTrajData.y[i])
-						|| Double.isNaN(cvtRecTrajData.z[i])) {
+				if (Double.isNaN(cvtRecTrajData.x(i)) || Double.isNaN(cvtRecTrajData.y(i))
+						|| Double.isNaN(cvtRecTrajData.z(i))) {
 					continue;
 				}
 
 				// cm to mm
-				labCoord.labToLocal(container, 10 * cvtRecTrajData.x[i], 10 * cvtRecTrajData.y[i],
-						10 * cvtRecTrajData.z[i], pp);
+				labCoord.labToLocal(container, 10 * cvtRecTrajData.x(i), 10 * cvtRecTrajData.y(i),
+						10 * cvtRecTrajData.z(i), pp);
 				SymbolDraw.drawStar(g, pp.x, pp.y, 6, Color.black);
 				cvtRecTrajData.setLocation(i, pp);
 			}
@@ -249,7 +247,7 @@ public abstract class CentralHitDrawer implements IDrawable {
 		if (_view.showCVTRecTraj()) {
 			for (int i = 0; i < cvtRecTrajData.count(); i++) {
 				if (cvtRecTrajData.contains(i, screenPoint)) {
-					cvtRecTrajData.recTrajFeedback("CVTRecTraj", i, feedbackStrings);
+					cvtRecTrajData.addFeedback("CVTRecTraj", i, feedbackStrings);
 					break;
 				}
 			}
@@ -259,7 +257,7 @@ public abstract class CentralHitDrawer implements IDrawable {
 		if (_view.showRecKFTraj()) {
 			for (int i = 0; i < cvtRecKFTrajData.count(); i++) {
 				if (cvtRecKFTrajData.contains(i, screenPoint)) {
-					cvtRecKFTrajData.recTrajFeedback("CVTRecKFTraj", i, feedbackStrings);
+					cvtRecKFTrajData.addFeedback("CVTRecKFTraj", i, feedbackStrings);
 					break;
 				}
 			}
