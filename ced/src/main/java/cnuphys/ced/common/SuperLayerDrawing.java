@@ -23,13 +23,9 @@ import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.util.MathUtilities;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.DataDrawSupport;
+import cnuphys.ced.alldata.DCSegments;
 import cnuphys.ced.alldata.datacontainer.dc.ATrkgHitData;
-import cnuphys.ced.alldata.datacontainer.dc.ATrkgSegmentData;
 import cnuphys.ced.alldata.datacontainer.dc.DCTDCandDOCAData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgAISegmentData;
-import cnuphys.ced.alldata.datacontainer.dc.HBTrkgSegmentData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgAISegmentData;
-import cnuphys.ced.alldata.datacontainer.dc.TBTrkgSegmentData;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
@@ -72,10 +68,10 @@ public class SuperLayerDrawing {
 
 	// data containers
 	private DCTDCandDOCAData _dcData = DCTDCandDOCAData.getInstance();
-	private HBTrkgSegmentData _hbTrkgSegmentData = HBTrkgSegmentData.getInstance();
-	private TBTrkgSegmentData _tbTrkgSegmentData = TBTrkgSegmentData.getInstance();
-	private HBTrkgAISegmentData _hbTrkgAISegmentData = HBTrkgAISegmentData.getInstance();
-	private TBTrkgAISegmentData _tbTrkgAISegmentData = TBTrkgAISegmentData.getInstance();
+	private DCSegments _hbTrkgSegmentData = DCSegments.hitBased();
+	private DCSegments _tbTrkgSegmentData = DCSegments.timeBased();
+	private DCSegments _hbTrkgAISegmentData = DCSegments.aiHitBased();
+	private DCSegments _tbTrkgAISegmentData = DCSegments.aiTimeBased();
 
 
 	HashMap<String, Polygon> hexMap = new HashMap<String, Polygon>();
@@ -813,17 +809,17 @@ public class SuperLayerDrawing {
 		return _view.projectedPoint(x, y, z, _iSupl.projectionPlane(), wp);
 	}
 
-	private void drawSegments(Graphics g, IContainer container, ATrkgSegmentData segments, Color lc, Color fc) {
+	private void drawSegments(Graphics g, IContainer container, DCSegments segments, Color lc, Color fc) {
 		int count = segments.count();
         if (count > 0) {
             Point2D.Double wp1 = new Point2D.Double();
             Point2D.Double wp2 = new Point2D.Double();
             for (int i = 0; i < count; i++) {
-                if ((segments.sector[i] == _iSupl.sector())
-                        && (segments.superlayer[i] == _iSupl.superlayer())) {
+				if ((segments.sector(i) == _iSupl.sector())
+						&& (segments.superlayer(i) == _iSupl.superlayer())) {
                 	
-                    projectedPoint(segments.x1[i], 0, segments.z1[i], wp1);
-                    projectedPoint(segments.x2[i], 0, segments.z2[i], wp2);
+					projectedPoint(segments.x1(i), 0, segments.z1(i), wp1);
+					projectedPoint(segments.x2(i), 0, segments.z2(i), wp2);
                     
                  	//data is in sector coordinates, so check x values to determine if need to flip to lower sector
                    if (_iSupl.isLowerSector()) {
