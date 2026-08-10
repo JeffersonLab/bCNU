@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -45,7 +46,7 @@ import cnuphys.lund.LundId;
 public class ClasIoEventManager {
 
 	// Unique lund ids in the event (if any)
-	private ArrayList<LundId> _uniqueLundIds = new ArrayList<>();
+	private volatile List<LundId> _uniqueLundIds;
 
 	// used in pcal and ec hex gradient displays
 	private double maxEDepCal[] = { Double.NaN, Double.NaN, Double.NaN };
@@ -181,13 +182,13 @@ public class ClasIoEventManager {
 	 */
 	public ArrayList<LundId> uniqueLundIds() {
 
-		if (_uniqueLundIds != null) {
-			return _uniqueLundIds;
+		List<LundId> uniqueLundIds = _uniqueLundIds;
+		if (uniqueLundIds == null) {
+			uniqueLundIds = List.copyOf(EventParticleIds.getInstance().uniqueLundIds());
+			_uniqueLundIds = uniqueLundIds;
 		}
 
-		_uniqueLundIds = new ArrayList<>(EventParticleIds.getInstance().uniqueLundIds());
-
-		return _uniqueLundIds;
+		return new ArrayList<>(uniqueLundIds);
 	}
 
 	/**
