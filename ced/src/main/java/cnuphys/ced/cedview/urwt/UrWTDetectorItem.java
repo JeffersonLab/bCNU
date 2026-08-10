@@ -6,17 +6,15 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import org.jlab.io.base.DataEvent;
-
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.URWTHits;
 import cnuphys.ced.alldata.URWTClusters;
+import cnuphys.ced.alldata.URWTCrosses;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.urwt.UrWTGeometry;
@@ -36,9 +34,6 @@ public class UrWTDetectorItem extends PolygonItem {
 	private Point _pp1 = new Point();
 	private Point _pp2 = new Point();
 	
-	//data warehouse
-	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
-
 	
 	//layer colors
 	public static Color layerColors[] = {
@@ -134,26 +129,11 @@ public class UrWTDetectorItem extends PolygonItem {
 			return;
 		}
 		
-		
-		DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (event == null) {
-			return;
-		}
-		byte sectors[] = _dataWarehouse.getByte("URWT::crosses", "sector");
 
-		int count = (sectors == null) ? 0 : sectors.length;
-		if (count == 0) {
-			return;
-		}
-		
-		float x[] = _dataWarehouse.getFloat("URWT::crosses", "x");
-		float y[] = _dataWarehouse.getFloat("URWT::crosses", "y");
-		float z[] = _dataWarehouse.getFloat("URWT::crosses", "z");
-
-		
-		for (int i = 0; i < count; i++) {
-			if (sectors[i] == this.sector) {
-				view.projectPoint(container, x[i], y[i], z[i], _pp1);
+		URWTCrosses crosses = URWTCrosses.getInstance();
+		for (int i = 0; i < crosses.count(); i++) {
+			if (crosses.hasValidSector(i) && crosses.sector(i) == sector) {
+				view.projectPoint(container, crosses.x(i), crosses.y(i), crosses.z(i), _pp1);
 				DataDrawSupport.drawCross(g, _pp1.x, _pp1.y, 4);
 			}
 		}

@@ -31,9 +31,9 @@ import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.URWTHits;
 import cnuphys.ced.alldata.URWTClusters;
+import cnuphys.ced.alldata.URWTCrosses;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.HexView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -49,8 +49,6 @@ import cnuphys.ced.item.HexSectorItem;
 public class UrWTXYView extends HexView {
 
 	//data warehouse
-	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
-
 	private static int CLONE_COUNT = 0;
 
 
@@ -291,12 +289,10 @@ public class UrWTXYView extends HexView {
 			}
 		}
 
-		if (dataEvent.hasBank("URWT::crosses") && (_highlightData.cross >= 0) && showCrosses()) {
+		URWTCrosses crosses = URWTCrosses.getInstance();
+		if (crosses.hasRow(_highlightData.cross) && showCrosses()) {
 			int idx = _highlightData.cross; //0 based
-			float x = _dataWarehouse.getFloat("URWT::crosses", "x")[idx];
-			float y = _dataWarehouse.getFloat("URWT::crosses", "y")[idx];
-			float z = _dataWarehouse.getFloat("URWT::crosses", "z")[idx];
-			projectPoint(container, x, y, z, _pp1);
+			projectPoint(container, crosses.x(idx), crosses.y(idx), crosses.z(idx), _pp1);
 			DataDrawSupport.drawBiggerCross(g, _pp1.x, _pp1.y, 5);
 		}
 
@@ -459,36 +455,13 @@ public class UrWTXYView extends HexView {
 	private void crossesFeedback(IContainer container, Point pp, Point2D.Double wp, List<String> feedbackStrings) {
 
 		if (isSingleEventMode()) {
-			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-			if (event == null) {
-				return;
-			}
-
-			byte sector[] = _dataWarehouse.getByte("URWT::crosses", "sector");
-
-			int count = (sector == null) ? 0 : sector.length;
-			if (count == 0) {
-				return;
-			}
-
-			float x[] = _dataWarehouse.getFloat("URWT::crosses", "x");
-			float y[] = _dataWarehouse.getFloat("URWT::crosses", "y");
-			float z[] = _dataWarehouse.getFloat("URWT::crosses", "z");
-
-			for (int i = 0; i < count; i++) {
-				projectPoint(container, x[i], y[i], z[i], _pp1);
+			URWTCrosses crosses = URWTCrosses.getInstance();
+			for (int i = 0; i < crosses.count(); i++) {
+				projectPoint(container, crosses.x(i), crosses.y(i), crosses.z(i), _pp1);
 				_fbRect.setBounds(_pp1.x-5, _pp1.y-5, 10, 10);
 
 				if (_fbRect.contains(pp)) {
-					short id = _dataWarehouse.getShort("URWT::crosses", "id")[i];
-					short cluster1 = _dataWarehouse.getShort("URWT::crosses", "cluster1")[i];
-					short cluster2 = _dataWarehouse.getShort("URWT::crosses", "cluster2")[i];
-					short status = _dataWarehouse.getShort("URWT::crosses", "status")[i];
-
-					String fbs1 = String.format("$cyan$cross: %d  status: %d", id, status);
-					String fbs2 = String.format("$cyan$cross clusters: %d and %d", cluster1, cluster2);
-					feedbackStrings.add(fbs1);
-					feedbackStrings.add(fbs2);
+					crosses.addFeedback(i, feedbackStrings);
 					return;
 				}
 			}
