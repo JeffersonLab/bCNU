@@ -64,7 +64,7 @@ public class ClasIoEventManager {
 	private SchemaFactory _schemaFactory;
 
 	// reset everytime hipo or evio file is opened
-	private int _currentEventIndex;
+	private volatile int _currentEventIndex;
 
 	// sources of events (the type, not the actual source)
 	public enum EventSourceType {
@@ -78,11 +78,11 @@ public class ClasIoEventManager {
 	private ConnectETDialog _etDialog;
 
 	// flag that set set to <code>true</code> if we are accumulating events
-	private boolean _accumulating = false;
+	private volatile boolean _accumulating = false;
 	private volatile boolean _updatingEventDisplay;
 
 	// flag that set set to <code>true</code> if we are quickly scanning events events
-	private boolean _scanning = false;
+	private volatile boolean _scanning = false;
 
 
 
@@ -130,7 +130,7 @@ public class ClasIoEventManager {
 	private static volatile ClasIoEventManager instance;
 
 	// the current event
-	private DataEvent _currentEvent;
+	private volatile DataEvent _currentEvent;
 
 	// private constructor for singleton
 	private ClasIoEventManager() {
