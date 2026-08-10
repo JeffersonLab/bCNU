@@ -56,7 +56,7 @@ public class FMTPanel3D extends CedPanel3D {
 		//the layers
 		for (int layer = 0; layer < 6; layer++) {
 			for (int strip = 0; strip < 1024; strip++) {
-				FMTStrip3D fmt = new FMTStrip3D(this, 0, 0, layer, strip);
+				FMTStrip3D fmt = new FMTStrip3D(this, layer, strip);
 				addItem(fmt);
 			}
 		}

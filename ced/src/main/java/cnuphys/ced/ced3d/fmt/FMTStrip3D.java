@@ -13,13 +13,13 @@ import cnuphys.ced.geometry.fmt.FMTGeometry;
 
 public class FMTStrip3D extends DetectorItem3D {
 
-	private final int _sector = 0;
-	private final int _superlayer = 0;
-	private int _layerId; // 0..5
-	private int _stripId; // 0..1023
+	private static final int SECTOR = 0;
+	private static final int SUPERLAYER = 0;
+	private final int _layerId; // 0..5
+	private final int _stripId; // 0..1023
 
 	// the cached vertices
-	private float[] _coords = new float[24];
+	private final float[] _coords = new float[24];
 
 	// frame the paddle?
 	private static boolean _frame = true;
@@ -31,19 +31,12 @@ public class FMTStrip3D extends DetectorItem3D {
 	 * @param layer   0-based layer [0..5]
 	 * @param strip   0-based strip Id [0..1023]
 	 */
-	public FMTStrip3D(CedPanel3D panel3D, int sector, int superlayer, int layer, int strip) {
-		// just to be confusing, these are 1-based
+	public FMTStrip3D(CedPanel3D panel3D, int layer, int strip) {
 		super(panel3D);
 
 		_layerId = layer;
 		_stripId = strip;
-		try {
-			FMTGeometry.stripVertices(_sector, _superlayer, _layerId, _stripId, _coords);
-		} catch (Exception e) {
-			System.err.println(String.format("ERROR sector = %d  superlayer = %d  layer = %d   strip = %d", _sector, _superlayer, _layerId, _stripId));
-			e.printStackTrace();
-			System.exit(1);
-		}
+		FMTGeometry.stripVertices(SECTOR, SUPERLAYER, _layerId, _stripId, _coords);
 
 	}
 
