@@ -5,11 +5,10 @@ import java.util.Vector;
 
 import org.jlab.io.base.DataEvent;
 
+import cnuphys.ced.alldata.CVTTracks;
 import cnuphys.ced.alldata.DCTracks;
-import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.RECParticles;
 import cnuphys.lund.LundId;
-import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
 import cnuphys.lund.TrajectoryTableModel;
 
@@ -58,40 +57,19 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 
 			addDCTracks(_trajData, DCTracks.hitBased());
 			addDCTracks(_trajData, DCTracks.timeBased());
-			addTracks(_trajData, "REC::Particle");
+			addRECParticleTracks(_trajData);
 
 			addDCTracks(_trajData, DCTracks.aiHitBased());
 			addDCTracks(_trajData, DCTracks.aiTimeBased());
 
-			// look for cvt tyracks
-			addTracks(_trajData, "CVTRec::Tracks");
-			addTracks(_trajData, "CVT::Tracks"); // pass 1
+			addCVTTracks(_trajData, CVTTracks.reconstructed());
+			addCVTTracks(_trajData, CVTTracks.pass1());
 
 			model.setData(_trajData);
 			model.fireTableDataChanged();
 			_trajectoryTable.repaint();
 			_trajectoryTable.repaint();
 		} // !accumulating
-	}
-
-	// add tracks
-	private void addTracks(Vector<TrajectoryRowData> data, String bankName) {
-		try {
-
-			if (bankName.contains("CVT::Tracks") || bankName.contains("CVTRec::Tracks")) {
-				addCVTTracks(data, bankName);
-				return;
-			}
-
-			if (bankName.contains("REC::Particle")) {
-				addRECParticleTracks(data);
-				return;
-			}
-
-		} catch (Exception e) {
-			String warning = "[ClasIoReconEventView.addTracks] " + e.getMessage();
-			System.err.println(warning);
-		}
 	}
 
 	private void addDCTracks(Vector<TrajectoryRowData> data, DCTracks tracks) {
@@ -148,47 +126,22 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 	}
 
 	// add CVT reconstructed tracks
-	private void addCVTTracks(Vector<TrajectoryRowData> data, String bankName) {
+	private void addCVTTracks(Vector<TrajectoryRowData> data, CVTTracks tracks) {
 		try {
-			DataWarehouse dm = DataWarehouse.getInstance();
-			byte q[] = dm.getByte(bankName, "q");
-			int count = (q == null) ? 0 : q.length;
+			for (int i = 0; i < tracks.count(); i++) {
+				double phi0 = tracks.phi0(i);
+				double pt = tracks.pt(i);
+				double xo = -tracks.d0(i) * Math.sin(phi0);
+				double yo = tracks.d0(i) * Math.cos(phi0);
+				double px = pt * Math.cos(phi0);
+				double py = pt * Math.sin(phi0);
+				double pz = pt * tracks.tanDip(i);
+				double p = Math.sqrt(px * px + py * py + pz * pz);
+				double theta = Math.acos(pz / p);
 
-			// System.err.println("Number of cvt tracks found: " + count);
-			if (count > 0) {
-				float pt[] = dm.getFloat(bankName, "pt");
-				float phi0[] = dm.getFloat(bankName, "phi0");
-				float d0[] = dm.getFloat(bankName, "d0");
-				float z0[] = dm.getFloat(bankName, "z0");
-				float tandip[] = dm.getFloat(bankName, "tandip");
-				short id[] = dm.getShort(bankName, "ID");
-
-				for (int i = 0; i < count; i++) {
-
-					LundId lid = LundSupport.getCVTbased(q[i]);
-
-					double xo = -d0[i] * Math.sin(phi0[i]);
-					double yo = d0[i] * Math.cos(phi0[i]);
-					double zo = z0[i];
-					double pxo = pt[i] * Math.cos(phi0[i]);
-					double pyo = pt[i] * Math.sin(phi0[i]);
-					double pzo = pt[i] * tandip[i];
-
-					double p = Math.sqrt(pxo * pxo + pyo * pyo + pzo * pzo);
-					double theta = Math.acos(pzo / p);
-					TrajectoryRowData row = new TrajectoryRowData(id[i], lid, xo, yo, zo, 1000 * p,
-							Math.toDegrees(theta), Math.toDegrees(phi0[i]), 0, bankName, SwimType.RECONSWIM);
-					data.add(row);
-				}
+				data.add(new TrajectoryRowData(tracks.id(i), tracks.lundId(i), xo, yo, tracks.z0(i), 1000 * p,
+						Math.toDegrees(theta), Math.toDegrees(phi0), 0, tracks.bankName(), SwimType.RECONSWIM));
 			}
-
-//			X_vtx = -d0*sin(phi0)
-//			Y_vtx = d0*cos(phi0)
-//			Z_vtx = z0
-//			Px_vtx = pt*cos(phi0)
-//			Py_vtx = pt*sin(phi0)
-//			Pz_vtx = pt*tandip
-
 		} catch (Exception e) {
 			String warning = "[ClasIoReconEventView.addCVTTracks] " + e.getMessage();
 			System.err.println(warning);
