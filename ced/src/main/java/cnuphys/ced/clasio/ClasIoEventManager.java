@@ -39,8 +39,8 @@ import cnuphys.ced.clasio.filter.FilterManager;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.event.ScanManager;
 import cnuphys.ced.frame.Ced;
+import cnuphys.ced.swim.EventTrajectoryUpdate;
 import cnuphys.lund.LundId;
-import cnuphys.swim.Swimming;
 
 public class ClasIoEventManager {
 
@@ -907,25 +907,21 @@ public class ClasIoEventManager {
 			return;
 		}
 
-		clearTrajectoriesWithoutNotification();
+		boolean displayEvent = !isAccumulating() && !isScanning();
+		try (EventTrajectoryUpdate ignored = EventTrajectoryUpdate.begin(displayEvent)) {
+			_uniqueLundIds = null;
+			Ced.getCed().setEventFilteringLabel(FilterManager.getInstance().isFilteringOn());
 
-		_uniqueLundIds = null;
-		Ced.getCed().setEventFilteringLabel(FilterManager.getInstance().isFilteringOn());
-
-		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
-			notifier.notifyListeners(new ClasIoEventNotification.NewEvent(_currentEvent));
+			for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
+				notifier.notifyListeners(new ClasIoEventNotification.NewEvent(_currentEvent));
+			}
+			finalSteps();
 		}
-		finalSteps();
 
 	}
 
 	private static void clearTrajectoriesWithoutNotification() {
-		Swimming.setNotifyOn(false);
-		try {
-			Swimming.clearAllTrajectories();
-		} finally {
-			Swimming.setNotifyOn(true);
-		}
+		EventTrajectoryUpdate.clearWithoutNotification();
 	}
 
 
