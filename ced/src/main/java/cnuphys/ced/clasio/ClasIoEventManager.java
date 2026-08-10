@@ -10,7 +10,6 @@ import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
 
 import org.jlab.detector.decode.CLASDecoder4;
 import org.jlab.io.base.DataEvent;
@@ -26,7 +25,6 @@ import org.jlab.utils.system.ClasUtilsFile;
 
 import cnuphys.bCNU.application.Desktop;
 import cnuphys.bCNU.dialog.DialogUtilities;
-import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.IpField;
 import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
@@ -430,36 +428,23 @@ public class ClasIoEventManager {
 		_etDialog.setVisible(true);
 
 		if (_etDialog.reason() == DialogUtilities.OK_RESPONSE) {
+			String machine = _etDialog.getMachine();
+			String etFile = _etDialog.getFile();
+			String station = _etDialog.getStation();
+			int port = _etDialog.getPort();
 
-			reset();
-			
-			if (_dataSource != null) {
-				_dataSource.close();
-			}
-
-			_dataSource = null;
-			_currentMachine = _etDialog.getMachine();
-			_currentETFile = _etDialog.getFile();
-			_currentStation = _etDialog.getStation();
-			_currentPort = _etDialog.getPort();
-
-			// does the file exist?
-
-			Log.getInstance().info("ET file: " + _currentETFile);
+			Log.getInstance().info("ET file: " + etFile);
 
 			try {
-
-				_dataSource = new EvioETSource(_currentMachine, _currentPort, _currentStation);
-
-				if (_dataSource == null) {
-					JOptionPane.showMessageDialog(null, "The ET Data Source is null, used Machine: " + _currentMachine,
-							"ET null Data Source", JOptionPane.INFORMATION_MESSAGE, ImageManager.cnuIcon);
-					return;
-				}
-
-				Log.getInstance().info("Connecting to ET ring using " + _currentETFile);
+				EvioETSource etSource = new EvioETSource(machine, port, station);
+				Log.getInstance().info("Connecting to ET ring using " + etFile);
+				_dataSource = openReplacement(_dataSource, etSource, etFile);
+				_currentMachine = machine;
+				_currentETFile = etFile;
+				_currentStation = station;
+				_currentPort = port;
+				reset();
 				setEventSourceType(EventSourceType.ET);
-				_dataSource.open(_currentETFile);
 
 				//auto select events every 2 sec
 				Ced.getCed().getEventMenu().autoCheckAuto();
