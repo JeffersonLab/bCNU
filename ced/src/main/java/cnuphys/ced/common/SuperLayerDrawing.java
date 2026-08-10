@@ -22,6 +22,7 @@ import cnuphys.bCNU.graphics.SymbolDraw;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.style.LineStyle;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.util.MathUtilities;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.DataDrawSupport;
@@ -709,6 +710,8 @@ public class SuperLayerDrawing {
 	 * @return the point, which might have NaNs
 	 */
 	public Point2D.Double wire(int superlayer, int layer, int wire, boolean isLower) {
+		if (superlayer < 1 || superlayer > 6 || layer < 1 || layer > 6 || wire < 1 || wire > 112) return null;
+
 		Point2D.Double centroid = new Point2D.Double();
 		try {
 			Point2D.Double[] hexagon = GeometryManager.allocate(6);
@@ -719,10 +722,10 @@ public class SuperLayerDrawing {
 			if (isLower) {
 				centroid.y = -centroid.y;
 			}
-		} catch (Exception e) {
-			String s = "Problem  in wire() [SectorSuperLayer] layer = " + layer + "  wire = " + wire;
-			System.err.println(s);
-			e.printStackTrace(); // System.exit(1);
+		} catch (RuntimeException e) {
+			Log.getInstance().warning("Could not project DC wire: superlayer " + superlayer + ", layer " + layer
+					+ ", wire " + wire);
+			Log.getInstance().exception(e);
 			return null;
 		}
 		return centroid;
@@ -764,13 +767,14 @@ public class SuperLayerDrawing {
 
 				String wmsg = "Very large doca radius: " + radius + " cm. Sect: " + _iSupl.sector() + " supl: "
 						+ _iSupl.superlayer() + "lay: " + hits.layer(index) + " wire: " + hits.wire(index);
-				System.err.println(wmsg);
+				Log.getInstance().warning(wmsg);
 				return;
 			}
 
 			// center is the given wire projected locations
 
 			Point2D.Double center = wire(_iSupl.superlayer(), hits.layer(index), hits.wire(index), _iSupl.isLowerSector());
+			if (center == null) return;
 			Point2D.Double doca[] = _view.getCenteredWorldCircle(center, radius);
 
 			if (doca != null) {
