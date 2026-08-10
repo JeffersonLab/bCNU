@@ -485,7 +485,6 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 	 * shift takers don't have to remember to do it.
 	 */
 	public void autoCheckAuto() {
-		System.err.println("AUTO CHECK AUTO");
 		_periodEvent.setSelected(true);
 		fixState();
 		autoAction();
@@ -496,8 +495,8 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 		if (_periodEvent.isSelected()) {
 			if (_nextEventTimer == null) {
 
-				float period = Float.parseFloat(_periodTF.getText());
-				_period = Math.max(0.001f, Math.min(60f, period));
+				_period = normalizedEventPeriod(_periodTF.getText(), _period);
+				_periodTF.setText(Float.toString(_period));
 
 				ActionListener nextAl = new ActionListener() {
 
@@ -545,18 +544,13 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 			public void keyReleased(KeyEvent kev) {
 				if (kev.getKeyCode() == KeyEvent.VK_ENTER) {
 					MenuSelectionManager.defaultManager().clearSelectedPath();
-					try {
-						float period = Float.parseFloat(_periodTF.getText());
-						_period = Math.max(0.001f, Math.min(60f, period));
+					_period = normalizedEventPeriod(_periodTF.getText(), _period);
 
-						if (_nextEventTimer != null) {
-							int delay = (int) (1000 * _period);
-//							System.err.println("Set next event delay to " + delay + " ms");
-							_nextEventTimer.setDelay(delay);
-						}
-					} catch (Exception e) {
+					if (_nextEventTimer != null) {
+						int delay = (int) (1000 * _period);
+						_nextEventTimer.setDelay(delay);
 					}
-					_periodTF.setText("" + _period);
+					_periodTF.setText(Float.toString(_period));
 				}
 			}
 		};
@@ -568,6 +562,16 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 		_periodEvent.setEnabled(false);
 		_periodTF.setEnabled(false);
 		return sp;
+	}
+
+	static float normalizedEventPeriod(String text, float fallback) {
+		try {
+			float period = Float.parseFloat(text);
+			if (!Float.isFinite(period)) return fallback;
+			return Math.max(0.001f, Math.min(60f, period));
+		} catch (NumberFormatException exception) {
+			return fallback;
+		}
 	}
 
 	@Override
