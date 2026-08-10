@@ -72,30 +72,24 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 	}
 
 	private void addDCTracks(Vector<TrajectoryRowData> data, DCTracks tracks) {
-		try {
-			for (int i = 0; i < tracks.count(); i++) {
+		TrackRowProcessor.process(tracks.count(), i -> {
 				TrackKinematics.Direction direction = TrackKinematics.fromMomentum(tracks.px(i), tracks.py(i),
 						tracks.pz(i));
 				if (direction == null) {
-					continue;
+					return;
 				}
 
 				data.add(new TrajectoryRowData(tracks.id(i), tracks.lundId(i), tracks.vx(i), tracks.vy(i),
 						tracks.vz(i), 1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(),
 						tracks.status(i), tracks.bankName(), SwimType.RECONSWIM));
-			}
-		} catch (Exception e) {
-			logTrackFailure("DC", tracks.bankName(), e);
-		}
+		}, (row, exception) -> logTrackFailure("DC", tracks.bankName(), row, exception));
 	}
 
 	// add CVT reconstructed tracks
 	private void addRECParticleTracks(Vector<TrajectoryRowData> data) {
 
-		try {
-			RECParticles particles = RECParticles.getInstance();
-			if (particles.count() > 0) {
-				for (int i = 0; i < particles.count(); i++) {
+		RECParticles particles = RECParticles.getInstance();
+		TrackRowProcessor.process(particles.count(), i -> {
 					LundId lid = particles.lundId(i);
 
 					double xo = particles.vx(i); // cm
@@ -108,7 +102,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 
 					TrackKinematics.Direction direction = TrackKinematics.fromMomentum(pxo, pyo, pzo);
 					if (direction == null) {
-						continue;
+						return;
 					}
 
 					// note conversions to degrees and MeV
@@ -116,18 +110,12 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 							1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(),
 							particles.status(i), RECParticles.BANK_NAME, SwimType.RECONSWIM);
 					data.add(row);
-
-				}
-			}
-		} catch (Exception e) {
-			logTrackFailure("REC particle", RECParticles.BANK_NAME, e);
-		}
+		}, (row, exception) -> logTrackFailure("REC particle", RECParticles.BANK_NAME, row, exception));
 	}
 
 	// add CVT reconstructed tracks
 	private void addCVTTracks(Vector<TrajectoryRowData> data, CVTTracks tracks) {
-		try {
-			for (int i = 0; i < tracks.count(); i++) {
+		TrackRowProcessor.process(tracks.count(), i -> {
 				double phi0 = tracks.phi0(i);
 				double pt = tracks.pt(i);
 				double xo = -tracks.d0(i) * Math.sin(phi0);
@@ -137,20 +125,17 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 				double pz = pt * tracks.tanDip(i);
 				TrackKinematics.Direction direction = TrackKinematics.fromMomentum(px, py, pz);
 				if (direction == null) {
-					continue;
+					return;
 				}
 
 				data.add(new TrajectoryRowData(tracks.id(i), tracks.lundId(i), xo, yo, tracks.z0(i),
 						1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(), 0,
 						tracks.bankName(), SwimType.RECONSWIM));
-			}
-		} catch (Exception e) {
-			logTrackFailure("CVT", tracks.bankName(), e);
-		}
+		}, (row, exception) -> logTrackFailure("CVT", tracks.bankName(), row, exception));
 	}
 
-	private static void logTrackFailure(String kind, String bankName, Exception exception) {
-		Log.getInstance().warning("Could not create " + kind + " trajectories from " + bankName);
+	private static void logTrackFailure(String kind, String bankName, int row, RuntimeException exception) {
+		Log.getInstance().warning("Could not create " + kind + " trajectory from " + bankName + " row " + row);
 		Log.getInstance().exception(exception);
 	}
 

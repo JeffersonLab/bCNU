@@ -67,16 +67,13 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 
 	// add tracks
 	private void addTracks(Vector<TrajectoryRowData> data, MCParticles particles) {
-		try {
-			for (int i = 0; i < particles.count(); i++) {
+		TrackRowProcessor.process(particles.count(), i -> {
 
 				LundId lid = LundSupport.getInstance().get(particles.pid(i));
 
-					if (lid == null) {
-						//can't swim if don't know the charge!
-					//	System.err.println("Cannot swim unknown LundID: " + pid[i]);
-						continue;
-					}
+				if (lid == null) {
+					return; // cannot swim without a known charge
+				}
 
 				double xo = particles.vx(i); // cm
 				double yo = particles.vy(i); // cm
@@ -86,22 +83,22 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 				double pyo = particles.py(i);
 				double pzo = particles.pz(i);
 
-					TrackKinematics.Direction direction = TrackKinematics.fromMomentum(pxo, pyo, pzo);
-					if (direction == null) {
-						continue;
-					}
+				TrackKinematics.Direction direction = TrackKinematics.fromMomentum(pxo, pyo, pzo);
+				if (direction == null) {
+					return;
+				}
 
-					// note conversions to degrees and MeV
-					TrajectoryRowData row = new TrajectoryRowData(i, lid, xo, yo, zo,
-							1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(), 0,
-							particles.bankName(), SwimType.MCSWIM);
-					data.add(row);
+				// note conversions to degrees and MeV
+				TrajectoryRowData row = new TrajectoryRowData(i, lid, xo, yo, zo,
+						1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(), 0,
+						particles.bankName(), SwimType.MCSWIM);
+				data.add(row);
 
-			}
-		} catch (Exception e) {
-			Log.getInstance().warning("Could not create Monte Carlo trajectories from " + particles.bankName());
-			Log.getInstance().exception(e);
-		}
+		}, (row, exception) -> {
+			Log.getInstance().warning(
+					"Could not create Monte Carlo trajectory from " + particles.bankName() + " row " + row);
+			Log.getInstance().exception(exception);
+		});
 	}
 
 
