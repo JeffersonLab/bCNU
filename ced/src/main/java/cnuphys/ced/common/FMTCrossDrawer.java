@@ -12,12 +12,10 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.List;
 
-import org.jlab.io.base.DataBank;
-
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.FMTCrosses;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.dcxy.DCXYView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -27,14 +25,11 @@ public class FMTCrossDrawer extends CedViewDrawer {
 
 	private static final int ARROWLEN = 30; // pixels
 	private static final Stroke THICKLINE = new BasicStroke(1.5f);
-	private static final String FMT_CROSSES_BANK = "FMTRec::Crosses";
-
 	public FMTCrossDrawer(CedView view) {
 		super(view);
 	}
 
-	private DataBank _drawnCrosses;
-	private Point[] _drawnLocations;
+	private final FMTCrosses crosses = FMTCrosses.getInstance();
 
 	@Override
 	public void draw(Graphics g, IContainer container) {
@@ -65,9 +60,7 @@ public class FMTCrossDrawer extends CedViewDrawer {
 	 * @param container the drawing container
 	 */
 	public void drawFMTCrosses(Graphics g, IContainer container) {
-		_drawnCrosses = DataWarehouse.getInstance().getBank(FMT_CROSSES_BANK);
 		int count = crossCount();
-		_drawnLocations = (count == 0) ? null : new Point[count];
 
 		// treat DCXY view separately
 		if (_view instanceof DCXYView) {
@@ -84,16 +77,16 @@ public class FMTCrossDrawer extends CedViewDrawer {
 
 			for (int i = 0; i < count; i++) {
 
-				result[0] = _drawnCrosses.getFloat("x", i);
-				result[1] = _drawnCrosses.getFloat("y", i);
-				result[2] = _drawnCrosses.getFloat("z", i);
+				result[0] = crosses.x(i);
+				result[1] = crosses.y(i);
+				result[2] = crosses.z(i);
 
 				int crossSector = GeometryManager.labXYZToSectorNumber(result);
 				_view.projectClasToWorld(result[0], result[1], result[2], _view.getProjectionPlane(), wp);
 				int mySector = _view.getSector(container, null, wp);
 				if (mySector == crossSector) {
 					container.worldToLocal(pp, wp);
-					_drawnLocations[i] = new Point(pp);
+					crosses.setLocation(i, pp);
 
 					// arrows
 
@@ -101,9 +94,9 @@ public class FMTCrossDrawer extends CedViewDrawer {
 					double r = pixlen / WorldGraphicsUtilities.getMeanPixelDensity(container);
 
 					// lab coordinates of end of arrow
-					result[0] = _drawnCrosses.getFloat("x", i) + r * _drawnCrosses.getFloat("ux", i);
-					result[1] = _drawnCrosses.getFloat("y", i) + r * _drawnCrosses.getFloat("uy", i);
-					result[2] = _drawnCrosses.getFloat("z", i) + r * _drawnCrosses.getFloat("uz", i);
+					result[0] = crosses.x(i) + r * crosses.ux(i);
+					result[1] = crosses.y(i) + r * crosses.uy(i);
+					result[2] = crosses.z(i) + r * crosses.uz(i);
 					_view.projectClasToWorld(result[0], result[1], result[2], _view.getProjectionPlane(), wp2);
 					container.worldToLocal(pp2, wp2);
 
@@ -135,10 +128,10 @@ public class FMTCrossDrawer extends CedViewDrawer {
 			Point pp2 = new Point();
 
 			for (int i = 0; i < count; i++) {
-				float x = _drawnCrosses.getFloat("x", i);
-				float y = _drawnCrosses.getFloat("y", i);
+				float x = crosses.x(i);
+				float y = crosses.y(i);
 				container.worldToLocal(pp, x, y);
-				_drawnLocations[i] = new Point(pp);
+				crosses.setLocation(i, pp);
 
 				// arrows
 
@@ -146,8 +139,7 @@ public class FMTCrossDrawer extends CedViewDrawer {
 				double r = pixlen / WorldGraphicsUtilities.getMeanPixelDensity(container);
 
 				// lab coordinates of end of arrow
-				wp2.setLocation(x + r * _drawnCrosses.getFloat("ux", i),
-						y + r * _drawnCrosses.getFloat("uy", i));
+				wp2.setLocation(x + r * crosses.ux(i), y + r * crosses.uy(i));
 				container.worldToLocal(pp2, wp2);
 
 				g.setColor(Color.orange);
@@ -188,28 +180,15 @@ public class FMTCrossDrawer extends CedViewDrawer {
 	}
 
 	private int crossCount() {
-		return (_drawnCrosses == null) ? 0 : _drawnCrosses.rows();
+		return crosses.count();
 	}
 
 	private boolean contains(int index, Point screenPoint) {
-		Point location = (_drawnLocations == null || index >= _drawnLocations.length) ? null : _drawnLocations[index];
-		return location != null && Math.abs(location.x - screenPoint.x) <= DataDrawSupport.HITHALF
-				&& Math.abs(location.y - screenPoint.y) <= DataDrawSupport.HITHALF;
+		return crosses.contains(index, screenPoint);
 	}
 
 	private void addFeedback(int index, List<String> feedbackStrings) {
-		feedbackStrings.add(String.format("$Forest Green$FMTRec cross ID %d", _drawnCrosses.getShort("ID", index)));
-		feedbackStrings.add(String.format("$Forest Green$FMTRec sector %d region %d",
-				_drawnCrosses.getByte("sector", index), _drawnCrosses.getByte("region", index)));
-		feedbackStrings.add(String.format("$Forest Green$FMTRec cross xyz (%-6.3f, %-6.3f, %-6.3f) cm",
-				_drawnCrosses.getFloat("x", index), _drawnCrosses.getFloat("y", index),
-				_drawnCrosses.getFloat("z", index)));
-		feedbackStrings.add(String.format("$Forest Green$FMTRec cross error (%-6.3f, %-6.3f, %-6.3f) cm",
-				_drawnCrosses.getFloat("err_x", index), _drawnCrosses.getFloat("err_y", index),
-				_drawnCrosses.getFloat("err_z", index)));
-		feedbackStrings.add(String.format("$Forest Green$FMTRec cross direction (%-6.3f, %-6.3f, %-6.3f)",
-				_drawnCrosses.getFloat("ux", index), _drawnCrosses.getFloat("uy", index),
-				_drawnCrosses.getFloat("uz", index)));
+		crosses.addFeedback(index, feedbackStrings);
 	}
 
 	@Override
