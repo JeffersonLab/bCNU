@@ -36,15 +36,15 @@ public class TriggerManager implements IClasIoEventListener {
 		if (_instance == null) {
 			synchronized (TriggerManager.class) {
 				if (_instance == null) {
-					_instance = new TriggerManager();
 					_filter = new TriggerFilter.Builder().setActive(false).setBits(0xFFFFFFFF)
 							.setType(TriggerMatch.ANY).setName("Trigger Filter").build();
+					TriggerManager manager = new TriggerManager();
+					FilterManager.getInstance().register(_filter);
+					_instance = manager;
 				}
 			}
 		}
 
-
-		FilterManager.getInstance().add(_filter);
 		return _instance;
 	}
 

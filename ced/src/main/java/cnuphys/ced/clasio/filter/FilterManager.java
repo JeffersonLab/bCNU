@@ -46,6 +46,12 @@ public class FilterManager extends ArrayList<IEventFilter> {
 		return false;
 	}
 
+	/** Register a filter once, preserving filter evaluation order. */
+	public boolean register(IEventFilter filter) {
+		if (filter == null || contains(filter)) return false;
+		return add(filter);
+	}
+
 
 	/**
 	 * Do this late in ced initialization

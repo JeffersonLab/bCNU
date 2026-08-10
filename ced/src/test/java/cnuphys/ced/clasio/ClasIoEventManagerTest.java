@@ -1,6 +1,7 @@
 package cnuphys.ced.clasio;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,6 +12,7 @@ import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jlab.io.base.DataSource;
+import org.jlab.io.base.DataEvent;
 import org.junit.jupiter.api.Test;
 
 class ClasIoEventManagerTest {
@@ -76,6 +78,46 @@ class ClasIoEventManagerTest {
             dataSource.set(manager, oldDataSource);
             sourceType.set(manager, oldSourceType);
             exhausted.setBoolean(manager, oldExhausted);
+        }
+    }
+
+    @Test
+    void countsEverySuccessfullyConsumedSourceEvent() throws Exception {
+        ClasIoEventManager manager = ClasIoEventManager.getInstance();
+        DataEvent event = (DataEvent) Proxy.newProxyInstance(DataEvent.class.getClassLoader(),
+                new Class<?>[] { DataEvent.class }, (proxy, method, args) -> null);
+        DataSource source = (DataSource) Proxy.newProxyInstance(DataSource.class.getClassLoader(),
+                new Class<?>[] { DataSource.class }, (proxy, method, args) -> {
+                    if ("hasEvent".equals(method.getName())) return true;
+                    if ("getNextEvent".equals(method.getName())) return event;
+                    return switch (method.getReturnType().getName()) {
+                        case "boolean" -> false;
+                        case "int" -> 0;
+                        default -> null;
+                    };
+                });
+
+        Field dataSource = field("_dataSource");
+        Field sourceType = field("_sourceType");
+        Field exhausted = field("_sourceExhausted");
+        Field eventIndex = field("_currentEventIndex");
+        Object oldDataSource = dataSource.get(manager);
+        Object oldSourceType = sourceType.get(manager);
+        boolean oldExhausted = exhausted.getBoolean(manager);
+        int oldEventIndex = eventIndex.getInt(manager);
+        try {
+            dataSource.set(manager, source);
+            sourceType.set(manager, ClasIoEventManager.EventSourceType.HIPOFILE);
+            exhausted.setBoolean(manager, false);
+            eventIndex.setInt(manager, 8);
+
+            assertSame(event, manager.readNextDecodedEvent());
+            assertEquals(9, manager.getSequentialEventNumber());
+        } finally {
+            dataSource.set(manager, oldDataSource);
+            sourceType.set(manager, oldSourceType);
+            exhausted.setBoolean(manager, oldExhausted);
+            eventIndex.setInt(manager, oldEventIndex);
         }
     }
 

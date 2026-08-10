@@ -643,7 +643,7 @@ public class ClasIoEventManager {
 		_allReconSwimmer = allSwimmer;
 	}
 
-	private DataEvent readNextDecodedEvent() {
+	DataEvent readNextDecodedEvent() {
 		if (_dataSource == null || (_sourceExhausted && !isSourceET())) return null;
 		if (!_dataSource.hasEvent()) {
 			markSourceExhausted();
@@ -663,6 +663,7 @@ public class ClasIoEventManager {
 			markSourceExhausted();
 			return null;
 		}
+		_currentEventIndex++;
 		return event instanceof EvioDataEvent evioEvent ? _evioDecoder.decode(evioEvent) : event;
 	}
 
@@ -699,10 +700,6 @@ public class ClasIoEventManager {
 
 				done = (_currentEvent == null) || FilterManager.getInstance().pass();
 			}
-			if (_currentEvent != null) {
-				_currentEventIndex++;
-			}
-
 			break;
 
 		case ET:
@@ -728,9 +725,7 @@ public class ClasIoEventManager {
 
 				_currentEvent = readNextDecodedEvent();
 
-				if (FilterManager.getInstance().pass()) {
-					_currentEventIndex++;
-				} else {
+				if (!FilterManager.getInstance().pass()) {
 					_currentEvent = null;
 				}
 
@@ -787,9 +782,7 @@ public class ClasIoEventManager {
 			while (!done && (_currentEventIndex < stopIndex)) {
 				if (hasEvent()) {
 					_currentEvent = readNextDecodedEvent();
-					if (_currentEvent != null && FilterManager.getInstance().pass()) {
-						_currentEventIndex++;
-					}
+					if (_currentEvent == null) done = true;
 				}
 				else {
 					done = true;
