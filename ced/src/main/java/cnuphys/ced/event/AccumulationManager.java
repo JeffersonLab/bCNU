@@ -7,6 +7,7 @@ import javax.swing.event.EventListenerList;
 import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
+import cnuphys.bCNU.log.Log;
 import cnuphys.ced.alldata.AHDCAdc;
 import cnuphys.ced.alldata.ATOFTdc;
 import cnuphys.ced.alldata.URWTHits;
@@ -909,7 +910,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 
 			for (int i = 0; i < tdcData.count(); i++) {
 				if (tdcData.component(i) == 10) {
-					_AlertTOFSL0AccumulatedData[tdcData.sector(i)][tdcData.layer(i)][0] += 1;
+					increment(_AlertTOFSL0AccumulatedData, tdcData.sector(i), tdcData.layer(i), 0);
 				}
 			}
 		}
@@ -932,7 +933,8 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 
 			for (int i = 0; i < tdcData.count(); i++) {
 				if (tdcData.component(i) != 10) {
-					_AlertTOFSL1AccumulatedData[tdcData.sector(i)][tdcData.layer(i)][tdcData.component(i)] += 1;
+					increment(_AlertTOFSL1AccumulatedData, tdcData.sector(i), tdcData.layer(i),
+							tdcData.component(i));
 				}
 			}
 		}
@@ -947,17 +949,15 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 				int lay0 = bstADCData.layer(i) - 1;
 				int sect0 =  bstADCData.sector(i) - 1;
 				int strip0 = bstADCData.component(i) - 1;
-				try {
-					_BSTAccumulatedData[lay0][sect0] += 1;
+				boolean valid = increment(_BSTAccumulatedData, lay0, sect0);
+				if (valid && (strip0 >= 0)) {
+					valid = increment(_BSTFullAccumulatedData, lay0, sect0, strip0);
+				}
 
-					if (strip0 >= 0) {
-						_BSTFullAccumulatedData[lay0][sect0][strip0] += 1;
-					}
-
-				} catch (ArrayIndexOutOfBoundsException e) {
+				if (!valid) {
 					String msg = String.format("Index out of bounds (BST). Event# %d lay %d sect %d  strip %d",
 							_eventManager.getSequentialEventNumber(), bstADCData.layer(i), bstADCData.sector(i), bstADCData.component(i));
-					System.err.println(msg);
+					Log.getInstance().warning(msg);
 				}
 
 			}
@@ -1070,7 +1070,8 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private void accumDC() {
 
 		for (int i = 0; i < dcTDCData.count(); i++) {
-			 _DCAccumulatedData[dcTDCData.sector(i) - 1][dcTDCData.superlayer(i) - 1][dcTDCData.layerInSuperlayer(i) - 1][dcTDCData.wire(i) - 1] += 1;
+			increment(_DCAccumulatedData, dcTDCData.sector(i) - 1, dcTDCData.superlayer(i) - 1,
+					dcTDCData.layerInSuperlayer(i) - 1, dcTDCData.wire(i) - 1);
  		}
 	}
 
@@ -1078,7 +1079,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	private void accumCTOF() {
 
 		for (int i = 0; i < ctofADCData.count(); i++) {
-			_CTOFAccumulatedData[ctofADCData.component(i) - 1] += 1;
+			increment(_CTOFAccumulatedData, ctofADCData.component(i) - 1);
 		}
 	}
 
@@ -1089,17 +1090,48 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 			int sect0 = ftofADCData.sector(i) - 1;
 			int paddle0 = ftofADCData.component(i) - 1;
 
-			if (ftofADCData.layer(i) == 1) {
-				_FTOF1AAccumulatedData[sect0][paddle0] += 1;
-			} else if (ftofADCData.layer(i) == 2) {
-				_FTOF1BAccumulatedData[sect0][paddle0] += 1;
-			} else if (ftofADCData.layer(i) == 3) {
-				_FTOF2AccumulatedData[sect0][paddle0] += 1;
-			} else {
-				System.out.println("ERROR:  accumFTOF layer out of bounds: " + ftofADCData.layer(i));
+			switch (ftofADCData.layer(i)) {
+			case 1:
+				increment(_FTOF1AAccumulatedData, sect0, paddle0);
+				break;
+			case 2:
+				increment(_FTOF1BAccumulatedData, sect0, paddle0);
+				break;
+			case 3:
+				increment(_FTOF2AccumulatedData, sect0, paddle0);
+				break;
+			default:
+				Log.getInstance().warning("FTOF accumulation ignored invalid layer: " + ftofADCData.layer(i));
+				break;
 			}
 		}
 
+	}
+
+	static boolean increment(int[] counts, int index) {
+		if ((counts == null) || (index < 0) || (index >= counts.length)) {
+			return false;
+		}
+		counts[index]++;
+		return true;
+	}
+
+	static boolean increment(int[][] counts, int first, int second) {
+		return (counts != null) && (first >= 0) && (first < counts.length)
+				&& increment(counts[first], second);
+	}
+
+	static boolean increment(int[][][] counts, int first, int second, int third) {
+		return (counts != null) && (first >= 0) && (first < counts.length)
+				&& (counts[first] != null) && (second >= 0) && (second < counts[first].length)
+				&& increment(counts[first][second], third);
+	}
+
+	static boolean increment(int[][][][] counts, int first, int second, int third, int fourth) {
+		return (counts != null) && (first >= 0) && (first < counts.length)
+				&& (counts[first] != null) && (second >= 0) && (second < counts[first].length)
+				&& (counts[first][second] != null) && (third >= 0) && (third < counts[first][second].length)
+				&& increment(counts[first][second][third], fourth);
 	}
 
 	@Override
