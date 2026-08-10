@@ -32,6 +32,7 @@ import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
 import cnuphys.bCNU.threading.EventNotifier;
 import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.RunConfig;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.et.ConnectETDialog;
 import cnuphys.ced.clasio.filter.FilterManager;
@@ -577,16 +578,7 @@ public class ClasIoEventManager {
 	 * @return the true number of the current event.
 	 */
 	public int getTrueEventNumber() {
-		if (_currentEvent != null) {
-			DataBank db = _currentEvent.getBank("RUN::config");
-			if (db != null) {
-				int[] ia = db.getInt("event");
-				if ((ia != null) && (ia.length > 0)) {
-					return ia[0];
-				}
-			}
-		}
-		return -1;
+		return (_currentEvent == null) ? -1 : RunConfig.getInstance().eventOrMinusOne();
 	}
 
 

@@ -20,8 +20,10 @@ class RunConfigTest {
         RunConfig config = RunConfig.forTesting(() -> bank(COLUMNS));
 
         assertTrue(config.hasUsableRow());
+		assertTrue(config.hasEvent());
         assertEquals(19210, config.run());
         assertEquals(5228740, config.event());
+		assertEquals(5228740, config.eventOrMinusOne());
         assertEquals(0x40000000L, config.trigger());
         assertEquals(123456789L, config.timestamp());
         assertEquals(1, config.type());
@@ -34,6 +36,8 @@ class RunConfigTest {
     void rejectsMissingBankRowsAndColumns() {
         assertFalse(RunConfig.forTesting(() -> null).hasUsableRow());
         assertFalse(RunConfig.forTesting(() -> bank(new String[] { "run" })).hasUsableRow());
+		assertEquals(-1, RunConfig.forTesting(() -> null).eventOrMinusOne());
+		assertEquals(-1, RunConfig.forTesting(() -> bank(new String[] { "run" })).eventOrMinusOne());
     }
 
     private static DataBank bank(String[] columns) {

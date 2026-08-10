@@ -20,6 +20,13 @@ public final class RunConfig {
 
     public static RunConfig getInstance() { return INSTANCE; }
 
+    public boolean hasEvent() {
+        DataBank bank = bank();
+        return bank != null && bank.rows() > 0 && DataWarehouse.hasColumn(bank, "event");
+    }
+
+    public int eventOrMinusOne() { return hasEvent() ? event() : -1; }
+
     public boolean hasUsableRow() {
         DataBank bank = bank();
         if (bank == null || bank.rows() < 1) return false;
