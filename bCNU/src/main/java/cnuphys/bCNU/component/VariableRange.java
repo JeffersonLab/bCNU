@@ -88,28 +88,22 @@ public class VariableRange extends JPanel {
 
 	//get the min value, watch for bad input
 	private double getMinValue() {
-		try {
-			double v = Double.parseDouble(_minValue.getText());
-			_lastGoodMin = v;
-			return v;
-		}
-		catch (Exception e) {
+		double value = finiteOrDefault(_minValue.getText(), _lastGoodMin);
+		if (value == _lastGoodMin && !isFiniteDouble(_minValue.getText())) {
 			_minValue.setText(valStr(_lastGoodMin));
-			return _lastGoodMin;
 		}
+		_lastGoodMin = value;
+		return value;
 	}
 
 	//get the max value, watch for bad input
 	private double getMaxValue() {
-		try {
-			double v = Double.parseDouble(_maxValue.getText());
-			_lastGoodMax = v;
-			return v;
-		}
-		catch (Exception e) {
+		double value = finiteOrDefault(_maxValue.getText(), _lastGoodMax);
+		if (value == _lastGoodMax && !isFiniteDouble(_maxValue.getText())) {
 			_maxValue.setText(valStr(_lastGoodMax));
-			return _lastGoodMax;
 		}
+		_lastGoodMax = value;
+		return value;
 	}
 
 	/**
@@ -117,14 +111,50 @@ public class VariableRange extends JPanel {
 	 * @return a random number corresponding to the range
 	 */
 	public double nextRandom() {
+		return nextRandom(_rand);
+	}
+
+	/**
+	 * Get a random number corresponding to the range using the supplied generator.
+	 *
+	 * @param random random number generator
+	 * @return a value in the configured range
+	 */
+	public double nextRandom(Random random) {
 		double minV = getMinValue();
 		double maxV = getMaxValue();
+		return randomBetween(minV, maxV, random);
+	}
 
-		if (Math.abs(minV - maxV) < 1.0e-16) {
-			return minV;
+	static double randomBetween(double minimum, double maximum, Random random) {
+		if (Math.abs(minimum - maximum) < 1.0e-16) {
+			return minimum;
 		}
 
-		return minV + (maxV - minV) * _rand.nextDouble();
+		return minimum + (maximum - minimum) * random.nextDouble();
+	}
+
+	static double finiteOrDefault(String text, double defaultValue) {
+		if (text == null) {
+			return defaultValue;
+		}
+		try {
+			double value = Double.parseDouble(text.trim());
+			return Double.isFinite(value) ? value : defaultValue;
+		} catch (NumberFormatException exception) {
+			return defaultValue;
+		}
+	}
+
+	private static boolean isFiniteDouble(String text) {
+		if (text == null) {
+			return false;
+		}
+		try {
+			return Double.isFinite(Double.parseDouble(text.trim()));
+		} catch (NumberFormatException exception) {
+			return false;
+		}
 	}
 
 

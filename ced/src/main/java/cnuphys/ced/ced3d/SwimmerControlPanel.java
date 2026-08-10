@@ -340,14 +340,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 			_randomSeed.setText(Long.toString(seed));
 		}
 
-		if (seed != _lastRandomSeed) {
-			if (seed  == 0) {
-				_rand = new Random();
-			}
-			else {
-				_rand = new Random(seed);
-			}
-		}
+		_rand = (seed == 0) ? new Random() : new Random(seed);
 
 		_lastRandomSeed = seed;
 		return _rand;
@@ -640,12 +633,12 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 			CLAS12SwimResult result = null;
 
 			int q = getCharge();
-			double p = _ranges[0].nextRandom();
-			double xo = _ranges[1].nextRandom(); //cm
-			double yo = _ranges[2].nextRandom(); //cm
-			double zo = _ranges[3].nextRandom(); //cm
-			double theta = _ranges[4].nextRandom();
-			double phi = _ranges[5].nextRandom();
+			double p = _ranges[0].nextRandom(_rand);
+			double xo = _ranges[1].nextRandom(_rand); //cm
+			double yo = _ranges[2].nextRandom(_rand); //cm
+			double zo = _ranges[3].nextRandom(_rand); //cm
+			double theta = _ranges[4].nextRandom(_rand);
+			double phi = _ranges[5].nextRandom(_rand);
 
 			switch(_algorithm) {
 			case STANDARD:
