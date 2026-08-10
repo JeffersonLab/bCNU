@@ -59,7 +59,8 @@ public class AlertTOFHitDrawer {
 			AlertTOFGeometryNumbering tdcGeom = new AlertTOFGeometryNumbering();
 
 			for (int i = 0; i < tdcData.count(); i++) {
-				tdcGeom.fromHipoNumbering(tdcData.sector(i), tdcData.layer(i), tdcData.component(i), tdcData.order(i));
+				if (!tdcGeom.fromHipoNumbering(tdcData.sector(i), tdcData.layer(i), tdcData.component(i),
+						tdcData.order(i))) continue;
 				TOFLayer tofl = AlertGeometry.getTOFLayer(tdcGeom.sector, tdcGeom.superlayer, tdcGeom.layer);
 				if (tofl == null) {
 					System.err.println("TOF layer not found for sector " + tdcGeom.sector + ", superlayer "
@@ -85,8 +86,8 @@ public class AlertTOFHitDrawer {
 	public void drawHighlightHit(Graphics g, IContainer container, DataEvent dataEvent, int index) {
 		if (dataEvent.hasBank(ATOFTdc.BANK_NAME) && _view.showADCHits() && tdcData.hasRow(index)) {
 			AlertTOFGeometryNumbering tdcGeom = new AlertTOFGeometryNumbering();
-			tdcGeom.fromHipoNumbering(tdcData.sector(index), tdcData.layer(index), tdcData.component(index),
-					tdcData.order(index));
+			if (!tdcGeom.fromHipoNumbering(tdcData.sector(index), tdcData.layer(index), tdcData.component(index),
+					tdcData.order(index))) return;
 			TOFLayer tofl = AlertGeometry.getTOFLayer(tdcGeom.sector, tdcGeom.superlayer, tdcGeom.layer);
 			if (tofl != null) {
 				ScintillatorPaddle paddle = tofl.getPaddle(tdcGeom.paddleIndex);
@@ -169,7 +170,8 @@ public class AlertTOFHitDrawer {
 		AlertTOFGeometryNumbering tdcGeom = new AlertTOFGeometryNumbering();
 
 		for (int i = 0; i < tdcData.count(); i++) {
-			tdcGeom.fromHipoNumbering(tdcData.sector(i), tdcData.layer(i), tdcData.component(i), tdcData.order(i));
+			if (!tdcGeom.fromHipoNumbering(tdcData.sector(i), tdcData.layer(i), tdcData.component(i),
+					tdcData.order(i))) continue;
 			if (tdcGeom.match(tofl)) {
 				ScintillatorPaddle paddle = tofl.getPaddle(tdcGeom.paddleIndex);
 				if (tofl.paddleContains(paddle, pp)) {

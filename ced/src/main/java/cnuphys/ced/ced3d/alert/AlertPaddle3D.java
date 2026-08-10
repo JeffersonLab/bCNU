@@ -83,7 +83,8 @@ public class AlertPaddle3D extends DetectorItem3D {
 		AlertTOFGeometryNumbering tdcGeom = new AlertTOFGeometryNumbering();
 
 		for (int i = 0; i < tdcData.count(); i++) {
-			tdcGeom.fromHipoNumbering(tdcData.sector(i), tdcData.layer(i), tdcData.component(i), tdcData.order(i));
+			if (!tdcGeom.fromHipoNumbering(tdcData.sector(i), tdcData.layer(i), tdcData.component(i),
+					tdcData.order(i))) continue;
 
 			if ((tdcGeom.sector == _sectorId) && (tdcGeom.superlayer == _superlayerId)
 					&& (tdcGeom.layer == _layerId) && (tdcGeom.paddleIndex == _paddleIndex)) {

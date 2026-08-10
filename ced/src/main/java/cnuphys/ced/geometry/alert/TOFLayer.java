@@ -79,15 +79,7 @@ public class TOFLayer {
 	 * @return the paddle
 	 */
 	public ScintillatorPaddle getPaddle(int paddleId) {
-		try {
-			ScintillatorPaddle paddle = paddles.get(paddleId);
-			return paddle;
-		}
-		catch (Exception e) {
-            System.err.println("Exception in TOFLayer.getPaddle: " + e);
-            e.printStackTrace();
-        }
-		return null;
+		return paddleId >= 0 && paddleId < paddles.size() ? paddles.get(paddleId) : null;
 	}
 
 

@@ -23,29 +23,27 @@ public class AlertTOFGeometryNumbering {
 	 * @param comp the 10-based componentID (10, 0-9)
 	 * @param order
 	 */
-	public void fromHipoNumbering(int sect, int lay, int comp, int order) {
+	public boolean fromHipoNumbering(int sect, int lay, int comp, int order) {
 
 		//ALERT TOF hipo data is 0 -based
 
 		if (sect < 0 || sect > 14) {
-			System.err.println("[AlertTOFGeometry] Bad sector number: " + sect);
-            return;
+			return false;
         }
 
-		if (layer < 0 || layer > 3) {
-			System.err.println("[AlertTOFGeometry] Bad layer number: " + layer);
-            return;
-		}
+		if (lay < 0 || lay > 3) {
+			return false;
+        }
 
 		if (comp < 0 || comp > 10) {
-            System.err.println("[AlertTOFGeometry] Bad component number: " + comp);
-            return;
+			return false;
 		}
 
 		sector = sect;
 		layer = lay;
 		paddleIndex = comp % 10; //[0, 0-9]
 		superlayer = (comp == 10) ? 0 : 1;
+		return true;
 	}
 
 	/**
