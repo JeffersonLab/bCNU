@@ -40,6 +40,7 @@ import cnuphys.ced.event.ScanManager;
 import cnuphys.ced.frame.Ced;
 import cnuphys.ced.swim.EventTrajectoryUpdate;
 import cnuphys.lund.LundId;
+import cnuphys.magfield.MagneticFields;
 
 public class ClasIoEventManager {
 
@@ -50,7 +51,7 @@ public class ClasIoEventManager {
 	private double maxEDepCal[] = { Double.NaN, Double.NaN, Double.NaN };
 
 	// Data from the special run bank
-	private RunData _runData = new RunData();
+	private volatile RunData _runData = RunData.empty();
 
 	// for HIPO ring
 	public IpField _ipField;
@@ -161,7 +162,7 @@ public class ClasIoEventManager {
                     ScanManager.getInstance().newClasIoEvent(_currentEvent);
                 }
 				else {
-					_runData.set();
+					updateRunData();
 					notifyEventListeners();
 					Ced.refreshEventDisplay();
 				}
@@ -171,6 +172,17 @@ public class ClasIoEventManager {
 			Log.getInstance().exception(e);
 		}
 
+	}
+
+	private void updateRunData() {
+		RunData next = RunData.from(RunConfig.getInstance().valuesOrNull());
+		if (next == null) return;
+
+		RunData previous = _runData;
+		_runData = next;
+		if (previous.run != next.run) {
+			MagneticFields.getInstance().changeFieldsAndMenus(next.torus, next.solenoid);
+		}
 	}
 
 	/**
@@ -360,7 +372,7 @@ public class ClasIoEventManager {
 
 	//partial reset for new event source
 	private void reset() {
-		_runData.reset();
+		_runData = RunData.empty();
 		_currentEvent = null;
 		_currentEventIndex = 0;
 	}

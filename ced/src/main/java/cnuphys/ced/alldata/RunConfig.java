@@ -27,6 +27,27 @@ public final class RunConfig {
 
     public int eventOrMinusOne() { return hasEvent() ? event() : -1; }
 
+    /** A complete, internally consistent first-row snapshot. */
+    public record Values(int run, int event, long trigger, long timestamp, byte type,
+            byte mode, float solenoid, float torus) {}
+
+    public Values valuesOrNull() {
+        DataBank bank = bank();
+        if (bank == null || bank.rows() < 1) return null;
+        for (String column : REQUIRED_COLUMNS) {
+            if (!DataWarehouse.hasColumn(bank, column)) return null;
+        }
+
+        int run = bank.getInt("run", 0);
+        int event = bank.getInt("event", 0);
+        float solenoid = bank.getFloat("solenoid", 0);
+        float torus = bank.getFloat("torus", 0);
+        if (run < 0 || event < 0 || !Float.isFinite(solenoid) || !Float.isFinite(torus)) return null;
+
+        return new Values(run, event, longValue(bank, "trigger"), longValue(bank, "timestamp"),
+                byteValue(bank, "type"), byteValue(bank, "mode"), solenoid, torus);
+    }
+
     public boolean hasUsableRow() {
         DataBank bank = bank();
         if (bank == null || bank.rows() < 1) return false;
@@ -47,11 +68,19 @@ public final class RunConfig {
 
     private long longValue(String column) {
         DataBank bank = bank();
-        return DataWarehouse.hasColumn(bank, column) ? bank.getLong(column, 0) : -1L;
+        return longValue(bank, column);
     }
 
     private byte byteValue(String column) {
         DataBank bank = bank();
+        return byteValue(bank, column);
+    }
+
+    private static long longValue(DataBank bank, String column) {
+        return DataWarehouse.hasColumn(bank, column) ? bank.getLong(column, 0) : -1L;
+    }
+
+    private static byte byteValue(DataBank bank, String column) {
         return DataWarehouse.hasColumn(bank, column) ? bank.getByte(column, 0) : (byte) -1;
     }
 

@@ -2,6 +2,7 @@ package cnuphys.ced.alldata;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Proxy;
@@ -30,6 +31,12 @@ class RunConfigTest {
         assertEquals(2, config.mode());
         assertEquals(-1.0f, config.solenoid());
         assertEquals(1.0f, config.torus());
+
+        RunConfig.Values values = config.valuesOrNull();
+        assertEquals(19210, values.run());
+        assertEquals(5228740, values.event());
+        assertEquals(-1.0f, values.solenoid());
+        assertEquals(1.0f, values.torus());
     }
 
     @Test
@@ -38,6 +45,8 @@ class RunConfigTest {
         assertFalse(RunConfig.forTesting(() -> bank(new String[] { "run" })).hasUsableRow());
 		assertEquals(-1, RunConfig.forTesting(() -> null).eventOrMinusOne());
 		assertEquals(-1, RunConfig.forTesting(() -> bank(new String[] { "run" })).eventOrMinusOne());
+		assertNull(RunConfig.forTesting(() -> null).valuesOrNull());
+		assertNull(RunConfig.forTesting(() -> bank(new String[] { "run" })).valuesOrNull());
     }
 
     private static DataBank bank(String[] columns) {

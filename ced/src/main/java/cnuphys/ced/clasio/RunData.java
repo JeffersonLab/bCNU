@@ -1,95 +1,50 @@
 package cnuphys.ced.clasio;
 
 import cnuphys.ced.alldata.RunConfig;
-import cnuphys.bCNU.log.Log;
-import cnuphys.magfield.MagneticFields;
 
-/**
- * Information in the run bank
- *
- * @author heddle
- *
- */
+/** Immutable snapshot of the most recently valid {@code RUN::config} row. */
+public final class RunData {
 
-public class RunData {
+    public final int run;
+    public final int event;
+    public final long trigger;
+    public final long timestamp;
+    public final byte type;
+    public final byte mode;
+    public final float solenoid;
+    public final float torus;
 
-	public int run = -1;
-	public int event;
-	public long trigger;
-	public long timestamp;
-	public byte type;
-	public byte mode;
-	public float solenoid;
-	public float torus;
+    private RunData(int run, int event, long trigger, long timestamp, byte type,
+            byte mode, float solenoid, float torus) {
+        this.run = run;
+        this.event = event;
+        this.trigger = trigger;
+        this.timestamp = timestamp;
+        this.type = type;
+        this.mode = mode;
+        this.solenoid = solenoid;
+        this.torus = torus;
+    }
 
-	public void reset() {
-		run = -1;
-	}
+    static RunData empty() {
+        return new RunData(-1, -1, -1L, -1L, (byte) -1, (byte) -1,
+                Float.NaN, Float.NaN);
+    }
 
-	/**
-	 * Change the fields if the current event contains the run bank
-	 *
-	 * @return true if a run config bank was found and successfully parsed
-	 */
-	public boolean set() {
+    static RunData from(RunConfig.Values values) {
+        return values == null ? null : new RunData(values.run(), values.event(), values.trigger(),
+                values.timestamp(), values.type(), values.mode(), values.solenoid(), values.torus());
+    }
 
-		RunConfig config = RunConfig.getInstance();
-		if (!config.hasUsableRow()) {
-			return false;
-		}
-
-		int oldRun = run;
-
-		try {
-			run = config.run();
-			if (run < 0) {
-				return false;
-			}
-
-			event = config.event();
-
-			if (event < 0) {
-				return false;
-			}
-
-			trigger = config.trigger();
-			timestamp = config.timestamp();
-			type = config.type();
-			mode = config.mode();
-
-			solenoid = config.solenoid();
-			if (Float.isNaN(solenoid)) {
-				return false;
-			}
-
-			torus = config.torus();
-			if (Float.isNaN(torus)) {
-				return false;
-			}
-
-			if (oldRun != run) {
-				// set the mag field and menus
-				MagneticFields.getInstance().changeFieldsAndMenus(torus, solenoid);
-			}
-			return true;
-		} catch (Exception e) {
-			Log.getInstance().error("Could not read RUN::config data");
-			Log.getInstance().exception(e);
-		}
-
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		String s = "run: " + run;
-		s += "\nevent: " + event;
-		s += "\ntrigger: " + trigger;
-		s += "\ntype: " + type;
-		s += "\nmode: " + mode;
-		s += "\nsolenoid: " + solenoid;
-		s += "\ntorus: " + torus;
-		s += "\ntimeStamp: " + timestamp;
-		return s;
-	}
+    @Override
+    public String toString() {
+        return "run: " + run
+                + "\nevent: " + event
+                + "\ntrigger: " + trigger
+                + "\ntype: " + type
+                + "\nmode: " + mode
+                + "\nsolenoid: " + solenoid
+                + "\ntorus: " + torus
+                + "\ntimeStamp: " + timestamp;
+    }
 }
