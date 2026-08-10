@@ -36,11 +36,12 @@ import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
+import cnuphys.ced.alldata.BMTClusters;
 import cnuphys.ced.alldata.DataDrawSupport;
-import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.BMTAdc;
 import cnuphys.ced.alldata.BMTRecHits;
 import cnuphys.ced.alldata.BSTAdc;
+import cnuphys.ced.alldata.BSTClusters;
 import cnuphys.ced.alldata.BSTRecHits;
 import cnuphys.ced.alldata.CosmicTracks;
 import cnuphys.ced.alldata.CTOFAdc;
@@ -61,9 +62,6 @@ import cnuphys.swim.SwimTrajectory2D;
 
 @SuppressWarnings("serial")
 public class CentralXYView extends CedXYView implements ICentralXYView {
-
-	//data warehouse
-	private DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
 
 	// for naming clones
 	private static int CLONE_COUNT = 0;
@@ -301,16 +299,16 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 	private void drawHighlightClusters(Graphics g, IContainer container, DataEvent dataEvent) {
 		// indices are zero based
 		if ((_bstHighlightData.cluster >= 0) && dataEvent.hasBank("BSTRec::Clusters")) {
-
-			if (_dataWarehouse.getFloat("BMTRec::Clusters", "x1") == null) {
+			BSTClusters clusters = BSTClusters.getInstance();
+			int idx = _bstHighlightData.cluster; // 0 based
+			if (!clusters.hasRow(idx)) {
 				return;
 			}
-			int idx = _bstHighlightData.cluster; // 0 based
 
-			float x1 = _dataWarehouse.getFloat("BSTRec::Clusters", "x1")[idx];
-			float y1 = _dataWarehouse.getFloat("BSTRec::Clusters", "y1")[idx];
-			float x2 = _dataWarehouse.getFloat("BSTRec::Clusters", "x2")[idx];
-			float y2 = _dataWarehouse.getFloat("BSTRec::Clusters", "y2")[idx];
+			float x1 = clusters.x1(idx);
+			float y1 = clusters.y1(idx);
+			float x2 = clusters.x2(idx);
+			float y2 = clusters.y2(idx);
 
 			Point p1 = new Point();
 			Point p2 = new Point();
@@ -328,12 +326,16 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 		}
 
 		if ((_bmtHighlightData.cluster >= 0) && dataEvent.hasBank("BMTRec::Clusters")) {
+			BMTClusters clusters = BMTClusters.getInstance();
 			int idx = _bmtHighlightData.cluster; // 0 based
+			if (!clusters.hasRow(idx)) {
+				return;
+			}
 
-			float x1 = _dataWarehouse.getFloat("BMTRec::Clusters", "x1")[idx];
-			float y1 = _dataWarehouse.getFloat("BMTRec::Clusters", "y1")[idx];
-			float x2 = _dataWarehouse.getFloat("BMTRec::Clusters", "x2")[idx];
-			float y2 = _dataWarehouse.getFloat("BMTRec::Clusters", "y2")[idx];
+			float x1 = clusters.x1(idx);
+			float y1 = clusters.y1(idx);
+			float x2 = clusters.x2(idx);
+			float y2 = clusters.y2(idx);
 			Point p1 = new Point();
 			Point p2 = new Point();
 
