@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 import cnuphys.bCNU.dialog.IColorChangeListener;
 import cnuphys.bCNU.dialog.SimpleDialog;
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.properties.PropertiesManager;
 
@@ -47,9 +48,9 @@ public class OrderColors extends SimpleDialog implements IColorChangeListener {
 			String vprop = CHK_KEY + i;
 
 			String rgbstr = PropertiesManager.getInstance().get(cprop);
-			if (rgbstr != null) {
-				int rgb = Integer.parseInt(rgbstr);
-				_colorOptions[i].setCurrentColor(new Color(rgb));
+			Color savedColor = parseSavedColor(rgbstr);
+			if (savedColor != null) {
+				_colorOptions[i].setCurrentColor(savedColor);
 			}
 
 			String chkstr = PropertiesManager.getInstance().get(vprop);
@@ -60,6 +61,19 @@ public class OrderColors extends SimpleDialog implements IColorChangeListener {
 
 		}
 
+	}
+
+	static Color parseSavedColor(String rgbText) {
+		if (rgbText == null) {
+			return null;
+		}
+
+		try {
+			return new Color(Integer.parseInt(rgbText));
+		} catch (NumberFormatException exception) {
+			Log.getInstance().warning("Ignoring invalid saved DC order color: " + rgbText);
+			return null;
+		}
 	}
 
 	//write the properties
@@ -79,7 +93,10 @@ public class OrderColors extends SimpleDialog implements IColorChangeListener {
 
 	@Override
 	protected Component createNorthComponent() {
-		return new JLabel("      DC Cell Fill Color Based on DC::tdc.order      ");
+		return new JLabel("<html><div style='text-align:center'>"
+				+ "DC Cell Fill Color Based on DC::tdc.order<br>"
+				+ "<small>Click a row to enable or disable it. Command-click (macOS) or Ctrl-click opens the color chooser.</small>"
+				+ "</div></html>");
 	}
 
 	@Override
