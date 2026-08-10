@@ -7,10 +7,9 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.OptionalInt;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -19,6 +18,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import cnuphys.bCNU.util.Fonts;
@@ -26,7 +26,7 @@ import cnuphys.bCNU.util.MathUtilities;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.splot.plot.GraphicsUtilities;
 
-public class TriggerPanel extends JPanel implements KeyListener {
+public class TriggerPanel extends JPanel {
 
 	// the trigger word id 1,2 or 3
 	private int _id;
@@ -131,7 +131,7 @@ public class TriggerPanel extends JPanel implements KeyListener {
 			};
 
 			_decimalTF.setFont(_labelFont);
-			_decimalTF.addKeyListener(this);
+			_decimalTF.addActionListener(event -> applyEnteredTriggerWord());
 
 			Border lborder = BorderFactory.createLineBorder(Color.red);
 			_decimalTF.setBorder(lborder);
@@ -259,15 +259,6 @@ public class TriggerPanel extends JPanel implements KeyListener {
 		return x ^ (1L << k);
 	}
 
-	// some simple tests
-	public static void main(String arg[]) {
-		long x = Integer.MAX_VALUE;
-		System.out.println("long " + x + "   int " + (int) x);
-		x += 1;
-		System.out.println("long " + x + "   int " + (int) x);
-
-	}
-
 	// used to display (and possibly edit) the word
 	class BitDisplay extends JComponent {
 
@@ -340,28 +331,18 @@ public class TriggerPanel extends JPanel implements KeyListener {
 		}
 	}
 
-	@Override
-	public void keyTyped(KeyEvent e) {
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			try {
-				long lval = Long.parseLong(_decimalTF.getText().trim());
-				int intTrig = (int) lval;
-				setBits(-1, intTrig);
-				TriggerManager.getInstance().getTriggerFilter().setBits(intTrig);
-				_decimalTF.getParent().requestFocus();
-			} catch (Exception ne) {
-				ne.printStackTrace();
-			}
-
+	private void applyEnteredTriggerWord() {
+		OptionalInt trigger = TriggerWordParser.parse(_decimalTF.getText());
+		if (trigger.isEmpty()) {
+			UIManager.getLookAndFeel().provideErrorFeedback(_decimalTF);
+			_decimalTF.selectAll();
+			return;
 		}
+
+		int triggerWord = trigger.getAsInt();
+		setBits(-1, triggerWord);
+		TriggerManager.getInstance().getTriggerFilter().setBits(triggerWord);
+		_decimalTF.getParent().requestFocus();
 	}
 
 }
