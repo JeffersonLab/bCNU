@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import org.jlab.io.base.DataEvent;
 
+import cnuphys.ced.alldata.DCTracks;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.RECParticles;
 import cnuphys.lund.LundId;
@@ -55,12 +56,12 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 			// now fill the table.
 			TrajectoryTableModel model = _trajectoryTable.getTrajectoryModel();
 
-			addTracks( _trajData, "HitBasedTrkg::HBTracks");
-			addTracks(_trajData, "TimeBasedTrkg::TBTracks");
+			addDCTracks(_trajData, DCTracks.hitBased());
+			addDCTracks(_trajData, DCTracks.timeBased());
 			addTracks(_trajData, "REC::Particle");
 
-			addTracks(_trajData, "HitBasedTrkg::AITracks");
-			addTracks(_trajData, "TimeBasedTrkg::AITracks");
+			addDCTracks(_trajData, DCTracks.aiHitBased());
+			addDCTracks(_trajData, DCTracks.aiTimeBased());
 
 			// look for cvt tyracks
 			addTracks(_trajData, "CVTRec::Tracks");
@@ -87,46 +88,28 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 				return;
 			}
 
-			boolean hitBased = bankName.contains("HitBased");
-
-			DataWarehouse dm = DataWarehouse.getInstance();
-			float[] vx = dm.getFloat(bankName, "Vtx0_x"); // vertex x cm
-			if ((vx != null) && (vx.length > 0)) {
-				float[] vy = dm.getFloat(bankName, "Vtx0_y"); // vertex y cm
-				float[] vz = dm.getFloat(bankName, "Vtx0_z"); // vertex z cm
-				float px[] = dm.getFloat(bankName, "p0_x");
-				float py[] = dm.getFloat(bankName, "p0_y");
-				float pz[] = dm.getFloat(bankName, "p0_z");
-				byte q[] = dm.getByte(bankName, "q");
-				short status[] = dm.getShort(bankName, "status");
-				short id[] = dm.getShort(bankName, "id");
-
-				for (int i = 0; i < vx.length; i++) {
-
-					LundId lid = (hitBased ? LundSupport.getHitbased(q[i]) : LundSupport.getTrackbased(q[i]));
-
-					double xo = vx[i]; // cm
-					double yo = vy[i]; // cm
-					double zo = vz[i]; // cm
-
-					double pxo = px[i]; // GeV/c
-					double pyo = py[i];
-					double pzo = pz[i];
-
-					double p = Math.sqrt(pxo * pxo + pyo * pyo + pzo * pzo); // GeV
-					double phi = Math.atan2(pyo, pxo);
-					double theta = Math.acos(pzo / p);
-
-					// note conversions to degrees and MeV
-					TrajectoryRowData row = new TrajectoryRowData(id[i], lid, xo, yo, zo, 1000 * p,
-							Math.toDegrees(theta), Math.toDegrees(phi), status[i], bankName, SwimType.RECONSWIM);
-					data.add(row);
-
-				}
-			}
 		} catch (Exception e) {
 			String warning = "[ClasIoReconEventView.addTracks] " + e.getMessage();
 			System.err.println(warning);
+		}
+	}
+
+	private void addDCTracks(Vector<TrajectoryRowData> data, DCTracks tracks) {
+		try {
+			for (int i = 0; i < tracks.count(); i++) {
+				double px = tracks.px(i);
+				double py = tracks.py(i);
+				double pz = tracks.pz(i);
+				double p = Math.sqrt(px * px + py * py + pz * pz);
+				double phi = Math.atan2(py, px);
+				double theta = Math.acos(pz / p);
+
+				data.add(new TrajectoryRowData(tracks.id(i), tracks.lundId(i), tracks.vx(i), tracks.vy(i),
+						tracks.vz(i), 1000 * p, Math.toDegrees(theta), Math.toDegrees(phi), tracks.status(i),
+						tracks.bankName(), SwimType.RECONSWIM));
+			}
+		} catch (Exception e) {
+			System.err.println("[ClasIoReconEventView.addDCTracks] " + e.getMessage());
 		}
 	}
 
