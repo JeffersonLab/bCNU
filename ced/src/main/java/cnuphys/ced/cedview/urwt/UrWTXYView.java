@@ -33,6 +33,7 @@ import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.URWTHits;
+import cnuphys.ced.alldata.URWTClusters;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.HexView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -275,21 +276,16 @@ public class UrWTXYView extends HexView {
 
 		//indices are zero based
 
-		if (dataEvent.hasBank("URWT::clusters") && (_highlightData.cluster >= 0) && showClusters()) {
+		URWTClusters clusters = URWTClusters.getInstance();
+		if (clusters.hasValidGeometry(_highlightData.cluster) && showClusters()) {
 			int idx = _highlightData.cluster; // 0 based
 
-			byte layer = _dataWarehouse.getByte("URWT::clusters", "layer")[idx];
+			byte layer = clusters.layer(idx);
 
 			if (showLayer(layer)) {
 
-				float xo = _dataWarehouse.getFloat("URWT::clusters", "xo")[idx];
-				float yo = _dataWarehouse.getFloat("URWT::clusters", "yo")[idx];
-				float zo = _dataWarehouse.getFloat("URWT::clusters", "zo")[idx];
-				float xe = _dataWarehouse.getFloat("URWT::clusters", "xe")[idx];
-				float ye = _dataWarehouse.getFloat("URWT::clusters", "ye")[idx];
-				float ze = _dataWarehouse.getFloat("URWT::clusters", "ze")[idx];
-
-				projectLine(container, xo, yo, zo, xe, ye, ze, _pp1, _pp2);
+				projectLine(container, clusters.xo(idx), clusters.yo(idx), clusters.zo(idx),
+						clusters.xe(idx), clusters.ye(idx), clusters.ze(idx), _pp1, _pp2);
 				GraphicsUtilities.drawThickHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, Color.orange,
 						Color.white);
 			}

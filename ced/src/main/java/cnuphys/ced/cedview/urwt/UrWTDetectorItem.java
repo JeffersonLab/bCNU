@@ -16,6 +16,7 @@ import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.URWTHits;
+import cnuphys.ced.alldata.URWTClusters;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.urwt.UrWTGeometry;
@@ -165,31 +166,12 @@ public class UrWTDetectorItem extends PolygonItem {
 		if (!view.showClusters()) {
 			return;
 		}
-		
-		DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (event == null) {
-			return;
-		}
-		byte sectors[] = _dataWarehouse.getByte("URWT::clusters", "sector");
 
-		int count = (sectors == null) ? 0 : sectors.length;
-		if (count == 0) {
-			return;
-		}
-		
-		byte layers[] = _dataWarehouse.getByte("URWT::clusters", "layer");
-
-		float xo[] = _dataWarehouse.getFloat("URWT::clusters", "xo");
-		float yo[] = _dataWarehouse.getFloat("URWT::clusters", "yo");
-		float zo[] = _dataWarehouse.getFloat("URWT::clusters", "zo");
-		float xe[] = _dataWarehouse.getFloat("URWT::clusters", "xe");
-		float ye[] = _dataWarehouse.getFloat("URWT::clusters", "ye");
-		float ze[] = _dataWarehouse.getFloat("URWT::clusters", "ze");
-
-		for (int i = 0; i < count; i++) {
-			if (sectors[i] == this.sector && layers[i] == this.layer) {
-
-				view.projectLine(container, xo[i], yo[i], zo[i], xe[i], ye[i], ze[i], _pp1, _pp2);
+		URWTClusters clusters = URWTClusters.getInstance();
+		for (int i = 0; i < clusters.count(); i++) {
+			if (clusters.hasValidGeometry(i) && clusters.sector(i) == sector && clusters.layer(i) == layer) {
+				view.projectLine(container, clusters.xo(i), clusters.yo(i), clusters.zo(i),
+						clusters.xe(i), clusters.ye(i), clusters.ze(i), _pp1, _pp2);
 				GraphicsUtilities.drawHighlightedLine(g, _pp1.x, _pp1.y, _pp2.x, _pp2.y, clusterColor1, clusterColor2);
 			}
 		}
@@ -297,39 +279,14 @@ public class UrWTDetectorItem extends PolygonItem {
 	private void clusterFeedback(IContainer container, Point pp, List<String> feedbackStrings) {
 		UrWTXYView view = getView();
 		if (view.isSingleEventMode() && view.showClusters()) {
-			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-			if (event == null) {
-				return;
-			}
-
-			byte sector[] = _dataWarehouse.getByte("URWT::clusters", "sector");
-
-			int count = (sector == null) ? 0 : sector.length;
-			if (count == 0) {
-				return;
-			}
-
-			byte layer[] = _dataWarehouse.getByte("URWT::clusters", "layer");
-			short strip[] = _dataWarehouse.getShort("URWT::clusters", "strip");
-
-			if (layer == null || strip == null) {
-				return;
-			}
-
-			float xo[] = _dataWarehouse.getFloat("URWT::clusters", "xo");
-			float yo[] = _dataWarehouse.getFloat("URWT::clusters", "yo");
-			float zo[] = _dataWarehouse.getFloat("URWT::clusters", "zo");
-			float xe[] = _dataWarehouse.getFloat("URWT::clusters", "xe");
-			float ye[] = _dataWarehouse.getFloat("URWT::clusters", "ye");
-			float ze[] = _dataWarehouse.getFloat("URWT::clusters", "ze");
-
-			for (int i = 0; i < count; i++) {
-				if (sector[i] == this.sector && layer[i] == this.layer) {
-					view.projectLine(container, xo[i], yo[i], zo[i], xe[i], ye[i], ze[i], _pp1, _pp2);
+			URWTClusters clusters = URWTClusters.getInstance();
+			for (int i = 0; i < clusters.count(); i++) {
+				if (clusters.hasValidGeometry(i) && clusters.sector(i) == sector && clusters.layer(i) == layer) {
+					view.projectLine(container, clusters.xo(i), clusters.yo(i), clusters.zo(i),
+							clusters.xe(i), clusters.ye(i), clusters.ze(i), _pp1, _pp2);
 					boolean hit = GraphicsUtilities.isPointOnLine(_pp1, _pp2, pp, HIT_TEST_TOLERANCE);
 					if (hit) {
-						feedbackStrings.add(String.format("cluster sector %d layer %d strip %d", sector[i],
-								layer[i], strip[i]));
+						clusters.addFeedback(i, feedbackStrings);
 					}
 				}
 			}
