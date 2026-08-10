@@ -2,16 +2,14 @@ package cnuphys.ced.ced3d.alert;
 
 import java.awt.Color;
 
-import org.jlab.io.base.DataEvent;
-
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
+import cnuphys.ced.alldata.ATOFTdc;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.cedview.alert.AlertTOFGeometryNumbering;
-import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.geometry.alert.AlertGeometry;
 
 public class AlertPaddle3D extends DetectorItem3D {
@@ -80,46 +78,23 @@ public class AlertPaddle3D extends DetectorItem3D {
 	@Override
 	public void drawData(GLAutoDrawable drawable) {
 		// draw adc hits in red
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (dataEvent == null) {
-			return;
-		}
+		ATOFTdc tdcData = ATOFTdc.getInstance();
+		Color color = Color.red;
+		AlertTOFGeometryNumbering tdcGeom = new AlertTOFGeometryNumbering();
 
-		if (dataEvent.hasBank("ATOF::tdc")) {
+		for (int i = 0; i < tdcData.count(); i++) {
+			tdcGeom.fromHipoNumbering(tdcData.sector(i), tdcData.layer(i), tdcData.component(i), tdcData.order(i));
 
-			short component[] = _dataWarehouse.getShort("ATOF::tdc", "component");
-			if (component != null) {
-				int count = component.length;
-				if (count > 0) {
-					Color color = Color.red;
-
-					byte sector[] = _dataWarehouse.getByte("ATOF::tdc", "sector");
-					byte layer[] = _dataWarehouse.getByte("ATOF::tdc", "layer");
-					byte order[] = _dataWarehouse.getByte("ATOF::tdc", "order");
-
-					AlertTOFGeometryNumbering tdcGeom = new AlertTOFGeometryNumbering();
-
-					for (int i = 0; i < count; i++) {
-						tdcGeom.fromHipoNumbering(sector[i], layer[i], component[i], order[i]);
-
-						if ((tdcGeom.sector == _sectorId) && (tdcGeom.superlayer == _superlayerId)
-								&& (tdcGeom.layer == _layerId) && ((tdcGeom.paddleIndex) == _paddleIndex)) {
-
-							Support3D.drawQuad(drawable, _coords, 0, 1, 2, 3, color, 1f, _frame);
-							Support3D.drawQuad(drawable, _coords, 3, 7, 6, 2, color, 1f, _frame);
-							Support3D.drawQuad(drawable, _coords, 0, 4, 7, 3, color, 1f, _frame);
-							Support3D.drawQuad(drawable, _coords, 0, 4, 5, 1, color, 1f, _frame);
-							Support3D.drawQuad(drawable, _coords, 1, 5, 6, 2, color, 1f, _frame);
-							Support3D.drawQuad(drawable, _coords, 4, 5, 6, 7, color, 1f, _frame);
-
-
-							return;
-						}
-					}
-				}
+			if ((tdcGeom.sector == _sectorId) && (tdcGeom.superlayer == _superlayerId)
+					&& (tdcGeom.layer == _layerId) && (tdcGeom.paddleIndex == _paddleIndex)) {
+				Support3D.drawQuad(drawable, _coords, 0, 1, 2, 3, color, 1f, _frame);
+				Support3D.drawQuad(drawable, _coords, 3, 7, 6, 2, color, 1f, _frame);
+				Support3D.drawQuad(drawable, _coords, 0, 4, 7, 3, color, 1f, _frame);
+				Support3D.drawQuad(drawable, _coords, 0, 4, 5, 1, color, 1f, _frame);
+				Support3D.drawQuad(drawable, _coords, 1, 5, 6, 2, color, 1f, _frame);
+				Support3D.drawQuad(drawable, _coords, 4, 5, 6, 7, color, 1f, _frame);
+				return;
 			}
-
-
 		}
 	}
 

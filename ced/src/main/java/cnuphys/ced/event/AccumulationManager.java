@@ -8,6 +8,7 @@ import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
 import cnuphys.ced.alldata.AHDCAdc;
+import cnuphys.ced.alldata.ATOFTdc;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.BSTAdc;
 import cnuphys.ced.alldata.ECalAdc;
@@ -902,9 +903,9 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	 */
 	
 	private void accumAlertSL0TOF() {
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
+		ATOFTdc tdcData = ATOFTdc.getInstance();
 
-		if (dataEvent.hasBank("ATOF::tdc")) {
+		if (tdcData.count() > 0) {
 			
 			// Alert TOF data
 			if (_AlertTOFSL0AccumulatedData == null) {
@@ -912,20 +913,10 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 				_AlertTOFSL0AccumulatedData = new int[15][4][1];
 			}
 
-			short component[] = _dataWarehouse.getShort("ATOF::tdc", "component");
-			if (component != null) {
-				int count = component.length;
-				if (count > 0) {
-					byte sector[] = _dataWarehouse.getByte("ATOF::tdc", "sector");
-					byte layer[] = _dataWarehouse.getByte("ATOF::tdc", "layer");
-
-					for (int i = 0; i < count; i++) {
-						if (component[i] == 10) {
-							_AlertTOFSL0AccumulatedData[sector[i]][layer[i]][0] += 1;
-						}
-					}
+			for (int i = 0; i < tdcData.count(); i++) {
+				if (tdcData.component(i) == 10) {
+					_AlertTOFSL0AccumulatedData[tdcData.sector(i)][tdcData.layer(i)][0] += 1;
 				}
-
 			}
 		}
 	}
@@ -935,9 +926,9 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	 * accumulation strategy using the data warehouse.
 	 */
 	private void accumAlertSL1TOF() {
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
+		ATOFTdc tdcData = ATOFTdc.getInstance();
 
-		if (dataEvent.hasBank("ATOF::tdc")) {
+		if (tdcData.count() > 0) {
 
 			// Alert TOF data
 			if (_AlertTOFSL1AccumulatedData == null) {
@@ -945,21 +936,10 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 				_AlertTOFSL1AccumulatedData = new int[15][4][10];
 			}
 
-			short component[] = _dataWarehouse.getShort("ATOF::tdc", "component");
-
-			if (component != null) {
-				int count = component.length;
-				if (count > 0) {
-					byte sector[] = _dataWarehouse.getByte("ATOF::tdc", "sector");
-					byte layer[] = _dataWarehouse.getByte("ATOF::tdc", "layer");
-
-					for (int i = 0; i < count; i++) {
-						if (component[i] != 10) {
-							_AlertTOFSL1AccumulatedData[sector[i]][layer[i]][component[i]] += 1;
-						}
-					}
+			for (int i = 0; i < tdcData.count(); i++) {
+				if (tdcData.component(i) != 10) {
+					_AlertTOFSL1AccumulatedData[tdcData.sector(i)][tdcData.layer(i)][tdcData.component(i)] += 1;
 				}
-
 			}
 		}
 	}
