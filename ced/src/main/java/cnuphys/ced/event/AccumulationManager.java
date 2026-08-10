@@ -7,6 +7,7 @@ import javax.swing.event.EventListenerList;
 import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
+import cnuphys.ced.alldata.AHDCAdc;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.BSTAdc;
 import cnuphys.ced.alldata.ECalAdc;
@@ -854,9 +855,9 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	 * strategy using the data warehouse.
 	 */
 	private void accumAlertDC() {
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
+		AHDCAdc adcData = AHDCAdc.getInstance();
 
-		if (dataEvent.hasBank("AHDC::adc")) {
+		if (adcData.count() > 0) {
 			
 			// Alert DC data
 			if (_AlertDCSL0AccumulatedData == null) {
@@ -867,40 +868,29 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
                 _AlertDCSL4AccumulatedData = new int[1][1][99];
 			}
 
-			short component[] = _dataWarehouse.getShort("AHDC::adc", "component");
-			if (component != null) {
-				int count = component.length;
-				if (count > 0) {
-					byte sector[] = _dataWarehouse.getByte("AHDC::adc", "sector");
-					byte compLayer[] = _dataWarehouse.getByte("AHDC::adc", "layer");
-					byte order[] = _dataWarehouse.getByte("AHDC::adc", "order");
+			AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
 
-					AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
+			for (int i = 0; i < adcData.count(); i++) {
+				adcGeom.fromDataNumbering(adcData.sector(i), adcData.layer(i), adcData.component(i), adcData.order(i));
 
-					for (int i = 0; i < count; i++) {
-						adcGeom.fromDataNumbering(sector[i], compLayer[i], component[i], order[i]);
+				switch (adcGeom.superlayer) {
+				case 0:
+					_AlertDCSL0AccumulatedData[0][adcGeom.layer][adcGeom.component] += 1;
+					break;
+				case 1:
+					_AlertDCSL1AccumulatedData[0][adcGeom.layer][adcGeom.component] += 1;
+					break;
+				case 2:
+					_AlertDCSL2AccumulatedData[0][adcGeom.layer][adcGeom.component] += 1;
+					break;
+				case 3:
+					_AlertDCSL3AccumulatedData[0][adcGeom.layer][adcGeom.component] += 1;
+					break;
+				case 4:
+					_AlertDCSL4AccumulatedData[0][adcGeom.layer][adcGeom.component] += 1;
+					break;
 
-						switch (adcGeom.superlayer) {
-						case 0:
-							_AlertDCSL0AccumulatedData[0][adcGeom.layer][adcGeom.component] += 1;
-							break;
-						case 1:
-							_AlertDCSL1AccumulatedData[0][adcGeom.layer][adcGeom.component] += 1;
-							break;
-						case 2:
-							_AlertDCSL2AccumulatedData[0][adcGeom.layer][adcGeom.component] += 1;
-							break;
-						case 3:
-							_AlertDCSL3AccumulatedData[0][adcGeom.layer][adcGeom.component] += 1;
-							break;
-						case 4:
-							_AlertDCSL4AccumulatedData[0][adcGeom.layer][adcGeom.component] += 1;
-							break;
-
-						}
-					}
 				}
-
 			}
 		}
 

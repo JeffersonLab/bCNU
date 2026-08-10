@@ -9,8 +9,8 @@ import java.util.List;
 import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.container.IContainer;
+import cnuphys.ced.alldata.AHDCAdc;
 import cnuphys.ced.alldata.ADCSupport;
-import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.alert.AlertGeometry;
@@ -18,11 +18,7 @@ import cnuphys.ced.geometry.alert.DCLayer;
 
 public class AlertDCHitDrawer {
 
-	// data warehouse
-	private DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
-	
-	// the bank name for adc data
-	private static String adcBankName = "AHDC::adc";
+	private final AHDCAdc adcData = AHDCAdc.getInstance();
 
 	// the alert view
 	private AlertXYView _view;
@@ -61,35 +57,23 @@ public class AlertDCHitDrawer {
 
 		int minADC = _view.getADCThreshold();
 		
-		if (dataEvent.hasBank(adcBankName) && _view.showADCHits()) {
+		if (dataEvent.hasBank(AHDCAdc.BANK_NAME) && _view.showADCHits()) {
+			AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
 
-			short component[] = _dataWarehouse.getShort("AHDC::adc", "component");
-			if (component != null) {
-				int count = component.length;
-				if (count > 0) {
-					int adc[] = _dataWarehouse.getInt(adcBankName, "ADC");
-					byte sector[] = _dataWarehouse.getByte(adcBankName, "sector");
-					byte compLayer[] = _dataWarehouse.getByte(adcBankName, "layer");
-					byte order[] = _dataWarehouse.getByte(adcBankName, "order");
-
-					AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
-
-					for (int i = 0; i < count; i++) {
-						if (adc[i] < minADC) {
-							continue;
-						}
-						adcGeom.fromDataNumbering(sector[i], compLayer[i], component[i], order[i]);
-						DCLayer dcl = AlertGeometry.getDCLayer(adcGeom.sector, adcGeom.superlayer, adcGeom.layer);
-						if (dcl == null) {
-							System.err.println("AHDC layer not found for sector " + adcGeom.sector + ", superlayer "
-									+ adcGeom.superlayer + ", layer " + adcGeom.layer);
-							continue;
-						}
-					
-						Color color = ADCSupport.getADCColor(adcBankName, adc[i]);
-						dcl.drawXYWire(g, container, adcGeom.component, color, color.darker(),  _view.getFixedZ(), true);
-					}
+			for (int i = 0; i < adcData.count(); i++) {
+				if (adcData.adc(i) < minADC) {
+					continue;
 				}
+				adcGeom.fromDataNumbering(adcData.sector(i), adcData.layer(i), adcData.component(i), adcData.order(i));
+				DCLayer dcl = AlertGeometry.getDCLayer(adcGeom.sector, adcGeom.superlayer, adcGeom.layer);
+				if (dcl == null) {
+					System.err.println("AHDC layer not found for sector " + adcGeom.sector + ", superlayer "
+							+ adcGeom.superlayer + ", layer " + adcGeom.layer);
+					continue;
+				}
+
+				Color color = adcData.color(i);
+				dcl.drawXYWire(g, container, adcGeom.component, color, color.darker(), _view.getFixedZ(), true);
 			}
 		}
 	}
@@ -102,22 +86,13 @@ public class AlertDCHitDrawer {
 	 * @param index     the 0-based index of the hit
 	 */
 	public void drawHighlightHit(Graphics g, IContainer container, DataEvent dataEvent, int index) {
-		if (dataEvent.hasBank(adcBankName) && _view.showADCHits()) {
-			short component[] = _dataWarehouse.getShort(adcBankName, "component");
-			if (component != null) {
-				int count = component.length;
-				if (count > index) {
-					byte sector[] = _dataWarehouse.getByte(adcBankName, "sector");
-					byte compLayer[] = _dataWarehouse.getByte(adcBankName, "layer");
-					byte order[] = _dataWarehouse.getByte(adcBankName, "order");
-
-					AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
-					adcGeom.fromDataNumbering(sector[index], compLayer[index], component[index], order[index]);
-					DCLayer dcl = AlertGeometry.getDCLayer(adcGeom.sector, adcGeom.superlayer, adcGeom.layer);
-					if (dcl != null) {
-						dcl.drawXYWire(g, container, adcGeom.component, Color.orange, Color.black, _view.getFixedZ());
-					}
-				}
+		if (dataEvent.hasBank(AHDCAdc.BANK_NAME) && _view.showADCHits() && adcData.hasRow(index)) {
+			AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
+			adcGeom.fromDataNumbering(adcData.sector(index), adcData.layer(index), adcData.component(index),
+					adcData.order(index));
+			DCLayer dcl = AlertGeometry.getDCLayer(adcGeom.sector, adcGeom.superlayer, adcGeom.layer);
+			if (dcl != null) {
+				dcl.drawXYWire(g, container, adcGeom.component, Color.orange, Color.black, _view.getFixedZ());
 			}
 		}
 	}
@@ -170,45 +145,23 @@ public class AlertDCHitDrawer {
 
 
 		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if ((dataEvent == null) || !dataEvent.hasBank(adcBankName)) {
+		if ((dataEvent == null) || !dataEvent.hasBank(AHDCAdc.BANK_NAME)) {
 			return;
 		}
 
-		short component[] = _dataWarehouse.getShort("AHDC::adc", "component");
-		if (component != null) {
-			int count = component.length;
-			if (count > 0) {
-				
-				int maxADC = ADCSupport.getMaxADC(adcBankName);
+		if (adcData.count() > 0) {
+			int maxADC = ADCSupport.getMaxADC(AHDCAdc.BANK_NAME);
+			feedbackStrings.add(String.format("max AHDC ADC in this event %d", maxADC));
+			AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
 
-				feedbackStrings.add(String.format("max AHDC ADC in this event %d", maxADC));
-				byte sector[] = _dataWarehouse.getByte(adcBankName, "sector");
-				byte compLayer[] = _dataWarehouse.getByte(adcBankName, "layer");
-				byte order[] = _dataWarehouse.getByte(adcBankName, "order");
-
-				AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
-
-				for (int i = 0; i < count; i++) {
-
-					adcGeom.fromDataNumbering(sector[i], compLayer[i], component[i], order[i]);
-
-					if (adcGeom.match(dcl)) {
-						if (dcl.wireContainsXY(component[i] - 1, wp)) {
-							AlertFeedbackSupport.handleInt(adcBankName, "ADC", i, "$orange$", feedbackStrings);
-							AlertFeedbackSupport.handleInt(adcBankName, "integral", i, "$orange$", feedbackStrings);
-							AlertFeedbackSupport.handleByte(adcBankName, "order", i, "$orange$", feedbackStrings);
-
-							AlertFeedbackSupport.handleShort(adcBankName, "ped", i, "$orange$", feedbackStrings);
-							AlertFeedbackSupport.handleFloat(adcBankName, "time", i, "$orange$", feedbackStrings);
-							AlertFeedbackSupport.handleFloat(adcBankName, "timeOverThreshold", i, "$orange$", feedbackStrings);
-
-							return;
-						}
-					}
-
+			for (int i = 0; i < adcData.count(); i++) {
+				adcGeom.fromDataNumbering(adcData.sector(i), adcData.layer(i), adcData.component(i), adcData.order(i));
+				if (adcGeom.match(dcl) && dcl.wireContainsXY(adcData.component(i) - 1, wp)) {
+					adcData.addFeedback(i, feedbackStrings);
+					return;
 				}
 			}
-		} // component != null
+		}
 
 	}
 	

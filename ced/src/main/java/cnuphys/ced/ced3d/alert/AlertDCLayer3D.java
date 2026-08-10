@@ -2,15 +2,13 @@ package cnuphys.ced.ced3d.alert;
 
 import java.awt.Color;
 
-import org.jlab.io.base.DataEvent;
-
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
+import cnuphys.ced.alldata.AHDCAdc;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.cedview.alert.AlertDCGeometryNumbering;
-import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.geometry.alert.AlertGeometry;
 import cnuphys.ced.geometry.alert.DCLayer;
 
@@ -65,36 +63,18 @@ public class AlertDCLayer3D extends DetectorItem3D {
 	@Override
 	public void drawData(GLAutoDrawable drawable) {
 		// draw adc hits in red
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (dataEvent == null) {
-			return;
-		}
+		AHDCAdc adcData = AHDCAdc.getInstance();
+		Color color = Color.red;
+		AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
 
-		if (dataEvent.hasBank("AHDC::adc")) {
+		for (int i = 0; i < adcData.count(); i++) {
+			adcGeom.fromDataNumbering(adcData.sector(i), adcData.layer(i), adcData.component(i), adcData.order(i));
 
-			short component[] = _dataWarehouse.getShort("AHDC::adc", "component");
-			if (component != null) {
-				int count = component.length;
-				if (count > 0) {
-					Color color = Color.red;
-					byte sector[] = _dataWarehouse.getByte("AHDC::adc", "sector");
-					byte compLayer[] = _dataWarehouse.getByte("AHDC::adc", "layer");
-					byte order[] = _dataWarehouse.getByte("AHDC::adc", "order");
-
-					AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
-
-					for (int i = 0; i < count; i++) {
-						adcGeom.fromDataNumbering(sector[i], compLayer[i], component[i], order[i]);
-
-						if ((adcGeom.sector == _sector) && (adcGeom.superlayer == _superlayer)
-								&& (adcGeom.layer == _layer)) {
-							_dcLayer.getWireCoords(adcGeom.component, coords);
-							Support3D.drawLine(drawable, coords, color, 2*WIRELINEWIDTH);
-						}
-					}
-				} //count >0
-			} //component != null
-
+			if ((adcGeom.sector == _sector) && (adcGeom.superlayer == _superlayer)
+					&& (adcGeom.layer == _layer)) {
+				_dcLayer.getWireCoords(adcGeom.component, coords);
+				Support3D.drawLine(drawable, coords, color, 2*WIRELINEWIDTH);
+			}
 		}
 	}
 
