@@ -5,7 +5,7 @@ import java.util.Vector;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.MCParticles;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
@@ -55,8 +55,8 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 			// now fill the table.
 			TrajectoryTableModel model = _trajectoryTable.getTrajectoryModel();
 
-			addTracks(_trajData, "MC::Particle");
-			addTracks(_trajData, "MC::Lund");
+			addTracks(_trajData, MCParticles.particles());
+			addTracks(_trajData, MCParticles.lund());
 
 			model.setData(_trajData);
 			model.fireTableDataChanged();
@@ -66,25 +66,11 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 	}
 
 	// add tracks
-	private void addTracks(Vector<TrajectoryRowData> data, String bankName) {
+	private void addTracks(Vector<TrajectoryRowData> data, MCParticles particles) {
 		try {
+			for (int i = 0; i < particles.count(); i++) {
 
-
-			DataWarehouse dm = DataWarehouse.getInstance();
-
-
-			float[] vx = dm.getFloat(bankName, "vx"); // vertex x cm
-			if ((vx != null) && (vx.length > 0)) {
-				float[] vy = dm.getFloat(bankName, "vy"); // vertex y cm
-				float[] vz = dm.getFloat(bankName, "vz"); // vertex z cm
-				float px[] = dm.getFloat(bankName, "px");
-				float py[] = dm.getFloat(bankName, "py");
-				float pz[] = dm.getFloat(bankName, "pz");
-				int pid[] = dm.getInt(bankName, "pid");
-
-				for (int i = 0; i < vx.length; i++) {
-
-					LundId lid = LundSupport.getInstance().get(pid[i]);
+				LundId lid = LundSupport.getInstance().get(particles.pid(i));
 
 					if (lid == null) {
 						//can't swim if don't know the charge!
@@ -92,13 +78,13 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 						continue;
 					}
 
-					double xo = vx[i]; // cm
-					double yo = vy[i]; // cm
-					double zo = vz[i]; // cm
+				double xo = particles.vx(i); // cm
+				double yo = particles.vy(i); // cm
+				double zo = particles.vz(i); // cm
 
-					double pxo = px[i]; // GeV/c
-					double pyo = py[i];
-					double pzo = pz[i];
+				double pxo = particles.px(i); // GeV/c
+				double pyo = particles.py(i);
+				double pzo = particles.pz(i);
 
 					double p = Math.sqrt(pxo * pxo + pyo * pyo + pzo * pzo); // GeV/c
 
@@ -112,10 +98,9 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 
 					// note conversions to degrees and MeV
 					TrajectoryRowData row = new TrajectoryRowData(i, lid, xo, yo, zo, 1000 * p,
-							Math.toDegrees(theta), Math.toDegrees(phi), 0, bankName, SwimType.MCSWIM);
+							Math.toDegrees(theta), Math.toDegrees(phi), 0, particles.bankName(), SwimType.MCSWIM);
 					data.add(row);
 
-				}
 			}
 		} catch (Exception e) {
 			String warning = "[ClasIoMonteCarloEventView.addTracks] " + e.getMessage();
