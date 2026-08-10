@@ -6,6 +6,7 @@ import java.util.Vector;
 import org.jlab.io.base.DataEvent;
 
 import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.RECParticles;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
@@ -82,7 +83,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 			}
 
 			if (bankName.contains("REC::Particle")) {
-				addRECParticleTracks(data, bankName);
+				addRECParticleTracks(data);
 				return;
 			}
 
@@ -130,47 +131,21 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 	}
 
 	// add CVT reconstructed tracks
-	private void addRECParticleTracks(Vector<TrajectoryRowData> data, String bankName) {
-
-		DataWarehouse dm = DataWarehouse.getInstance();
+	private void addRECParticleTracks(Vector<TrajectoryRowData> data) {
 
 		try {
-			float[] vx = dm.getFloat(bankName, "vx"); // vertex x cm
-			if ((vx != null) && (vx.length > 0)) {
-				float[] vy = dm.getFloat(bankName, "vy"); // vertex y cm
-				float[] vz = dm.getFloat(bankName, "vz"); // vertex z cm
-				float px[] = dm.getFloat(bankName, "px");
-				float py[] = dm.getFloat(bankName, "py");
-				float pz[] = dm.getFloat(bankName, "pz");
-				byte charge[] = dm.getByte(bankName, "charge");
-				short status[] = dm.getShort(bankName, "status");
-				int pid[] = dm.getInt(bankName, "pid");
+			RECParticles particles = RECParticles.getInstance();
+			if (particles.count() > 0) {
+				for (int i = 0; i < particles.count(); i++) {
+					LundId lid = particles.lundId(i);
 
-				LundId lid;
+					double xo = particles.vx(i); // cm
+					double yo = particles.vy(i); // cm
+					double zo = particles.vz(i); // cm
 
-				for (int i = 0; i < vx.length; i++) {
-
-					if (pid[i] == 0) {
-						if (charge[i] == -1) {
-							lid = LundSupport.unknownMinus;
-						}
-						if (charge[i] == 1) {
-							lid = LundSupport.unknownPlus;
-						} else {
-							lid = LundSupport.unknownNeutral;
-
-						}
-					} else {
-						lid = LundSupport.getInstance().get(pid[i], charge[i]);
-					}
-
-					double xo = vx[i]; // cm
-					double yo = vy[i]; // cm
-					double zo = vz[i]; // cm
-
-					double pxo = px[i]; // GeV/c
-					double pyo = py[i];
-					double pzo = pz[i];
+					double pxo = particles.px(i); // GeV/c
+					double pyo = particles.py(i);
+					double pzo = particles.pz(i);
 
 					double p = Math.sqrt(pxo * pxo + pyo * pyo + pzo * pzo); // GeV
 					double phi = Math.atan2(pyo, pxo);
@@ -178,7 +153,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 
 					// note conversions to degrees and MeV
 					TrajectoryRowData row = new TrajectoryRowData(0, lid, xo, yo, zo, 1000 * p, Math.toDegrees(theta),
-							Math.toDegrees(phi), status[i], bankName, SwimType.RECONSWIM);
+							Math.toDegrees(phi), particles.status(i), RECParticles.BANK_NAME, SwimType.RECONSWIM);
 					data.add(row);
 
 				}
