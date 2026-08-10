@@ -335,18 +335,13 @@ public class ClasIoEventManager {
 			throw (new FileNotFoundException("Event file cannot be read"));
 		}
 
+		HipoDataSource hipoSource = new HipoDataSource();
+		_dataSource = openReplacement(_dataSource, hipoSource, file.getPath());
 		_currentHipoFile = file;
-		
-		if (_dataSource != null) {
-			_dataSource.close();
-		}
-
-		_dataSource = new HipoDataSource();
-		_dataSource.open(file.getPath());
 
 
 		//let the data manager know
-		_schemaFactory = ((HipoDataSource)_dataSource).getReader().getSchemaFactory();
+		_schemaFactory = hipoSource.getReader().getSchemaFactory();
 		DataWarehouse.getInstance().updateSchema(_schemaFactory);
 
 		//notify the listeners
@@ -388,14 +383,9 @@ public class ClasIoEventManager {
 			throw (new FileNotFoundException("Event file cannot be read"));
 		}
 
+		EvioSource evioSource = new EvioSource();
+		_dataSource = openReplacement(_dataSource, evioSource, file.getPath());
 		_currentEvioFile = file;
-		
-		if (_dataSource != null) {
-			_dataSource.close();
-		}
-
-		_dataSource = new EvioSource();
-		_dataSource.open(file.getPath());
 		notifyEventListeners(_currentEvioFile);
 		setEventSourceType(EventSourceType.EVIOFILE);
 
@@ -409,6 +399,24 @@ public class ClasIoEventManager {
 			Log.getInstance().error("Could not read the first EVIO event from " + file);
 			Log.getInstance().exception(e);
 		}
+	}
+
+	static DataSource openReplacement(DataSource current, DataSource replacement, String path) {
+		try {
+			replacement.open(path);
+		} catch (RuntimeException exception) {
+			try {
+				replacement.close();
+			} catch (RuntimeException closeException) {
+				exception.addSuppressed(closeException);
+			}
+			throw exception;
+		}
+
+		if (current != null) {
+			current.close();
+		}
+		return replacement;
 	}
 
 	/**
