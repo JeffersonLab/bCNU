@@ -86,19 +86,15 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 				double pyo = particles.py(i);
 				double pzo = particles.pz(i);
 
-					double p = Math.sqrt(pxo * pxo + pyo * pyo + pzo * pzo); // GeV/c
-
-//					if (p < 1.0e-3) {
-//						System.err.println(String.format("Skipping extremely low momentum track %-5.3f GeV/c for %s",
-//								p, lid.getName()));
-//						continue;
-//					}
-					double phi = Math.atan2(pyo, pxo);
-					double theta = Math.acos(pzo / p);
+					TrackKinematics.Direction direction = TrackKinematics.fromMomentum(pxo, pyo, pzo);
+					if (direction == null) {
+						continue;
+					}
 
 					// note conversions to degrees and MeV
-					TrajectoryRowData row = new TrajectoryRowData(i, lid, xo, yo, zo, 1000 * p,
-							Math.toDegrees(theta), Math.toDegrees(phi), 0, particles.bankName(), SwimType.MCSWIM);
+					TrajectoryRowData row = new TrajectoryRowData(i, lid, xo, yo, zo,
+							1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(), 0,
+							particles.bankName(), SwimType.MCSWIM);
 					data.add(row);
 
 			}

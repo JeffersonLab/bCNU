@@ -74,16 +74,15 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 	private void addDCTracks(Vector<TrajectoryRowData> data, DCTracks tracks) {
 		try {
 			for (int i = 0; i < tracks.count(); i++) {
-				double px = tracks.px(i);
-				double py = tracks.py(i);
-				double pz = tracks.pz(i);
-				double p = Math.sqrt(px * px + py * py + pz * pz);
-				double phi = Math.atan2(py, px);
-				double theta = Math.acos(pz / p);
+				TrackKinematics.Direction direction = TrackKinematics.fromMomentum(tracks.px(i), tracks.py(i),
+						tracks.pz(i));
+				if (direction == null) {
+					continue;
+				}
 
 				data.add(new TrajectoryRowData(tracks.id(i), tracks.lundId(i), tracks.vx(i), tracks.vy(i),
-						tracks.vz(i), 1000 * p, Math.toDegrees(theta), Math.toDegrees(phi), tracks.status(i),
-						tracks.bankName(), SwimType.RECONSWIM));
+						tracks.vz(i), 1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(),
+						tracks.status(i), tracks.bankName(), SwimType.RECONSWIM));
 			}
 		} catch (Exception e) {
 			logTrackFailure("DC", tracks.bankName(), e);
@@ -107,13 +106,15 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 					double pyo = particles.py(i);
 					double pzo = particles.pz(i);
 
-					double p = Math.sqrt(pxo * pxo + pyo * pyo + pzo * pzo); // GeV
-					double phi = Math.atan2(pyo, pxo);
-					double theta = Math.acos(pzo / p);
+					TrackKinematics.Direction direction = TrackKinematics.fromMomentum(pxo, pyo, pzo);
+					if (direction == null) {
+						continue;
+					}
 
 					// note conversions to degrees and MeV
-					TrajectoryRowData row = new TrajectoryRowData(0, lid, xo, yo, zo, 1000 * p, Math.toDegrees(theta),
-							Math.toDegrees(phi), particles.status(i), RECParticles.BANK_NAME, SwimType.RECONSWIM);
+					TrajectoryRowData row = new TrajectoryRowData(0, lid, xo, yo, zo,
+							1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(),
+							particles.status(i), RECParticles.BANK_NAME, SwimType.RECONSWIM);
 					data.add(row);
 
 				}
@@ -134,11 +135,14 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 				double px = pt * Math.cos(phi0);
 				double py = pt * Math.sin(phi0);
 				double pz = pt * tracks.tanDip(i);
-				double p = Math.sqrt(px * px + py * py + pz * pz);
-				double theta = Math.acos(pz / p);
+				TrackKinematics.Direction direction = TrackKinematics.fromMomentum(px, py, pz);
+				if (direction == null) {
+					continue;
+				}
 
-				data.add(new TrajectoryRowData(tracks.id(i), tracks.lundId(i), xo, yo, tracks.z0(i), 1000 * p,
-						Math.toDegrees(theta), Math.toDegrees(phi0), 0, tracks.bankName(), SwimType.RECONSWIM));
+				data.add(new TrajectoryRowData(tracks.id(i), tracks.lundId(i), xo, yo, tracks.z0(i),
+						1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(), 0,
+						tracks.bankName(), SwimType.RECONSWIM));
 			}
 		} catch (Exception e) {
 			logTrackFailure("CVT", tracks.bankName(), e);
