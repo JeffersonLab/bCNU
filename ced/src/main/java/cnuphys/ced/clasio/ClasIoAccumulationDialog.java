@@ -15,7 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import org.jlab.io.base.DataEvent;
 
@@ -24,6 +24,7 @@ import cnuphys.bCNU.dialog.DialogUtilities;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.CommonBorder;
+import cnuphys.bCNU.log.Log;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.frame.Ced;
 
@@ -64,6 +65,7 @@ public class ClasIoAccumulationDialog extends JDialog {
 	// Object that accumulates and stores data
 	// This will be the accumulation manager
 	private IAccumulator _accumulator;
+	private SwingWorker<Void, Integer> _worker;
 
 	private static boolean lastState = false;
 	private static int lastCount = 1000;
@@ -229,70 +231,15 @@ public class ClasIoAccumulationDialog extends JDialog {
 
 			try {
 				int count = Integer.parseInt(_numberField.getText().trim());
+				count = Math.min(count, MAXACCUMULATIONCOUNT);
+				count = Math.min(count, _numRemaining - 1);
 				if (count < 1) {
 					_reason = DialogUtilities.CANCEL_RESPONSE;
-				} else {
-					count = Math.min(count, MAXACCUMULATIONCOUNT);
-					count = Math.min(count, _numRemaining - 1);
+					AccumulationManager.getInstance().notifyListeners(AccumulationManager.ACCUMULATION_CANCELLED);
+					setVisible(false);
+					return;
 				}
-				final int fcount = count;
-
-				Runnable runnable = new Runnable() {
-
-					@Override
-					public void run() {
-						_eventManager.setAccumulating(true);
-
-						int modCount = Math.max(2, fcount / 100);
-
-						int count = 0;
-						while (isVisible() && (count < fcount)) {
-
-							if (_eventManager.hasEvent()) {
-								DataEvent event = _eventManager.getNextEvent();
-								if (event == null) {
-									try {
-
-										System.err.println("SLEEP count = " + count + "/" + fcount);
-										Thread.sleep(30);
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-									}
-								} else {
-									count++;
-								}
-							}
-
-
-							if (((count + 1) % modCount) == 0) {
-								int value = (int) ((100.0 * count) / fcount);
-								_progressBar.setValue(value);
-							}
-						}
-
-						// we are done accumulating
-						_eventManager.setAccumulating(false);
-						AccumulationManager.getInstance().notifyListeners(AccumulationManager.ACCUMULATION_FINISHED);
-
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								setVisible(false);
-								// reload last event
-								_eventManager.reloadCurrentEvent();
-
-								Ced.refresh();
-
-							}
-						});
-
-					}
-				};
-
-				AccumulationManager.getInstance().notifyListeners(AccumulationManager.ACCUMULATION_STARTED);
-
-				(new Thread(runnable)).start();
-
+				startAccumulation(count);
 				lastCount = count;
 			} catch (Exception e) {
 				_reason = DialogUtilities.CANCEL_RESPONSE;
@@ -300,8 +247,71 @@ public class ClasIoAccumulationDialog extends JDialog {
 
 		} // ok
 		else {
+			if (_worker != null && !_worker.isDone()) {
+				_worker.cancel(true);
+			}
 			setVisible(false);
 		}
+	}
+
+	private void startAccumulation(int eventCount) {
+		_worker = new SwingWorker<>() {
+			private boolean failed;
+
+			@Override
+			protected Void doInBackground() {
+				_eventManager.setAccumulating(true);
+				int progressInterval = Math.max(2, eventCount / 100);
+				int count = 0;
+
+				try {
+					while (!isCancelled() && count < eventCount) {
+						if (_eventManager.hasEvent()) {
+							DataEvent event = _eventManager.getNextEvent();
+							if (event == null) {
+								try {
+									Thread.sleep(30);
+								} catch (InterruptedException e) {
+									Thread.currentThread().interrupt();
+									cancel(false);
+								}
+							} else {
+								count++;
+							}
+						}
+
+						if (count == eventCount || ((count + 1) % progressInterval) == 0) {
+							publish((int) ((100.0 * count) / eventCount));
+						}
+					}
+				} catch (RuntimeException e) {
+					failed = true;
+					Log.getInstance().error("Event accumulation failed");
+					Log.getInstance().exception(e);
+				} finally {
+					_eventManager.setAccumulating(false);
+				}
+				return null;
+			}
+
+			@Override
+			protected void process(java.util.List<Integer> values) {
+				if (!values.isEmpty()) _progressBar.setValue(values.get(values.size() - 1));
+			}
+
+			@Override
+			protected void done() {
+				int reason = (isCancelled() || failed) ? AccumulationManager.ACCUMULATION_CANCELLED
+						: AccumulationManager.ACCUMULATION_FINISHED;
+				AccumulationManager.getInstance().notifyListeners(reason);
+				setVisible(false);
+				_eventManager.reloadCurrentEvent();
+				Ced.refresh();
+			}
+		};
+
+		AccumulationManager.getInstance().notifyListeners(AccumulationManager.ACCUMULATION_STARTED);
+		_worker.execute();
 	}
 
 	/**
