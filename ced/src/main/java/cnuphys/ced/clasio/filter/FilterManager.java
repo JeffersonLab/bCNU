@@ -1,14 +1,16 @@
 package cnuphys.ced.clasio.filter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cnuphys.ced.frame.Ced;
 
-public class FilterManager extends ArrayList<IEventFilter> {
+public final class FilterManager {
 
 
 	// singleton
 	private static volatile FilterManager _instance;
+	private final List<IEventFilter> filters = new ArrayList<>();
 
 	// private constructor for singleton
 	private FilterManager() {
@@ -38,7 +40,7 @@ public class FilterManager extends ArrayList<IEventFilter> {
 	 * @return <code>true</code> if there are any active filters
 	 */
 	public boolean isFilteringOn() {
-			for (IEventFilter filter : this) {
+		for (IEventFilter filter : snapshot()) {
 				if (filter.isActive()) {
 					return true;
 				}
@@ -47,9 +49,14 @@ public class FilterManager extends ArrayList<IEventFilter> {
 	}
 
 	/** Register a filter once, preserving filter evaluation order. */
-	public boolean register(IEventFilter filter) {
-		if (filter == null || contains(filter)) return false;
-		return add(filter);
+	public synchronized boolean register(IEventFilter filter) {
+		if (filter == null || filters.contains(filter)) return false;
+		return filters.add(filter);
+	}
+
+	/** Remove a previously registered filter. */
+	synchronized boolean unregister(IEventFilter filter) {
+		return filters.remove(filter);
 	}
 
 
@@ -57,10 +64,8 @@ public class FilterManager extends ArrayList<IEventFilter> {
 	 * Do this late in ced initialization
 	 */
 	public void setUpFilterMenu() {
-		if (!isEmpty()) {
-			for (IEventFilter filter : this) {
-				Ced.getCed().getEventFilterMenu().add(filter.getMenuComponent());
-			}
+		for (IEventFilter filter : snapshot()) {
+			Ced.getCed().getEventFilterMenu().add(filter.getMenuComponent());
 		}
 	}
 
@@ -71,18 +76,18 @@ public class FilterManager extends ArrayList<IEventFilter> {
 	 */
 	public boolean pass() {
 
-		if (!isEmpty()) {
-			for(IEventFilter filter : this) {
-				if (filter.isActive()) {
-					boolean pass = filter.pass();
-
-					if (!pass) {
-						return false;
-					}
+		for (IEventFilter filter : snapshot()) {
+			if (filter.isActive()) {
+				if (!filter.pass()) {
+					return false;
 				}
 			}
 		}
 		return true;
+	}
+
+	private synchronized List<IEventFilter> snapshot() {
+		return List.copyOf(filters);
 	}
 
 
