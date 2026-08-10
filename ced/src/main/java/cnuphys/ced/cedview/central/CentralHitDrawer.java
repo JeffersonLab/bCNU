@@ -12,7 +12,6 @@ import java.util.List;
 import cnuphys.bCNU.drawable.IDrawable;
 import cnuphys.bCNU.graphics.SymbolDraw;
 import cnuphys.bCNU.graphics.container.IContainer;
-import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.alldata.CVTTrajectories;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.ILabCoordinates;
@@ -21,9 +20,6 @@ import cnuphys.ced.clasio.ClasIoEventManager;
 public abstract class CentralHitDrawer implements IDrawable {
 
 	private boolean _visible = true;
-
-	//the DataWarehouse
-	protected  DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
 
 	// the event manager
 	protected final ClasIoEventManager _eventManager = ClasIoEventManager.getInstance();

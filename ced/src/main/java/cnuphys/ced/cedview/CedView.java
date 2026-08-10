@@ -39,7 +39,6 @@ import cnuphys.bCNU.util.TextUtilities;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.ViewManager;
-import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
 import cnuphys.ced.clasio.ClasIoEventListenerPhase;
@@ -66,8 +65,6 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 		MagneticFieldChangeListener, IAccumulationListener, IClasIoEventListener, IDataSelectedListener, IBankMatching {
 
 	// the data warehouse
-	protected DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
-
 	// for bank matching property
 	public static final String BANKMATCHPROP = "BANKMATCH";
 
