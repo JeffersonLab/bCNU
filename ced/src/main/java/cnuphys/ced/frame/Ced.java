@@ -31,6 +31,7 @@ import cnuphys.bCNU.component.MagnifyWindow;
 import cnuphys.bCNU.dialog.TextDisplayDialog;
 import cnuphys.bCNU.fortune.FortuneManager;
 import cnuphys.bCNU.graphics.ImageManager;
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.menu.MenuManager;
 import cnuphys.bCNU.ping.Ping;
 import cnuphys.bCNU.util.Environment;
@@ -765,8 +766,12 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 						refreshAllViews();
 					}
 				});
-			} catch (InvocationTargetException | InterruptedException e) {
-				e.printStackTrace();
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				Log.getInstance().warning("Interrupted while refreshing CED views");
+			} catch (InvocationTargetException e) {
+				Log.getInstance().error("CED view refresh failed");
+				Log.getInstance().exception(e.getCause() == null ? e : e.getCause());
 			}
 		}
 	}
