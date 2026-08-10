@@ -12,7 +12,6 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
 import org.jlab.detector.decode.CLASDecoder4;
-import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.base.DataSource;
 import org.jlab.io.evio.EvioDataEvent;
@@ -32,6 +31,7 @@ import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
 import cnuphys.bCNU.threading.EventNotifier;
 import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.EventParticleIds;
 import cnuphys.ced.alldata.RunConfig;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.et.ConnectETDialog;
@@ -40,7 +40,6 @@ import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.event.ScanManager;
 import cnuphys.ced.frame.Ced;
 import cnuphys.lund.LundId;
-import cnuphys.lund.LundSupport;
 import cnuphys.swim.Swimming;
 
 public class ClasIoEventManager {
@@ -185,36 +184,7 @@ public class ClasIoEventManager {
 			return _uniqueLundIds;
 		}
 
-		_uniqueLundIds = new ArrayList<>();
-
-		if (_currentEvent != null) {
-			// use any bank with a true pid column
-
-			String[] cbanks = _currentEvent.getBankList();
-			if (cbanks != null) {
-				for (String bankName : cbanks) {
-
-					if (bankName.contains("::Particle") || bankName.contains("::Lund")) {
-
-						if (!DataWarehouse.getInstance().bankContainsColumn(bankName, "pid")) {
-							continue;
-						}
-
-						//get the pid column
-						int pid[] = DataWarehouse.getInstance().getInt(bankName, "pid");
-						if ((pid != null) && (pid.length > 0)) {
-							for (int pdgid : pid) {
-								LundId lid = LundSupport.getInstance().get(pdgid);
-								if (lid != null) {
-									_uniqueLundIds.remove(lid);
-									_uniqueLundIds.add(lid);
-								}
-							}
-						}
-					}
-				}
-			}
-		} // currentevent != null
+		_uniqueLundIds = new ArrayList<>(EventParticleIds.getInstance().uniqueLundIds());
 
 		return _uniqueLundIds;
 	}
