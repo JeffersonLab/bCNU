@@ -877,9 +877,7 @@ public class ClasIoEventManager {
 		}
 
 		clearTrajectoriesWithoutNotification();
-		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
-			notifier.notifyListeners(new ClasIoEventNotification.SourceChanged(source));
-		}
+		notifyByPhase(new ClasIoEventNotification.SourceChanged(source));
 
 		Ced.getCed().fixTitle();
 	}
@@ -888,10 +886,7 @@ public class ClasIoEventManager {
 	private void notifyEventListeners(File file) {
 
 		clearTrajectoriesWithoutNotification();
-		for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
-			notifier.notifyListeners(
-					new ClasIoEventNotification.OpenedFile(file.getAbsolutePath()));
-		}
+		notifyByPhase(new ClasIoEventNotification.OpenedFile(file.getAbsolutePath()));
 
 		Ced.getCed().fixTitle();
 	}
@@ -915,15 +910,28 @@ public class ClasIoEventManager {
 				_uniqueLundIds = null;
 				Ced.getCed().setEventFilteringLabel(FilterManager.getInstance().isFilteringOn());
 
-				for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
-					notifier.notifyListeners(new ClasIoEventNotification.NewEvent(_currentEvent));
-				}
+				notifyByPhase(new ClasIoEventNotification.NewEvent(_currentEvent));
 				finalSteps();
 			}
 		} finally {
 			_updatingEventDisplay = false;
 		}
 
+	}
+
+	private void notifyByPhase(ClasIoEventNotification notification) {
+		for (ClasIoEventListenerPhase phase : ClasIoEventListenerPhase.values()) {
+			EventNotifier<ClasIoEventNotification> notifier = eventNotifiers.get(phase);
+			if (phase == ClasIoEventListenerPhase.VIEW) {
+				notifier.notifyListenersSafely(notification, (listener, exception) -> {
+					Log.getInstance().error("CLAS IO view listener failed: "
+							+ listener.getClass().getName());
+					Log.getInstance().exception(exception);
+				});
+			} else {
+				notifier.notifyListeners(notification);
+			}
+		}
 	}
 
 	public boolean isUpdatingEventDisplay() {
