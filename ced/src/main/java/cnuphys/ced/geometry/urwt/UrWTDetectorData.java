@@ -2,6 +2,7 @@ package cnuphys.ced.geometry.urwt;
 
 import java.awt.geom.Point2D;
 import java.util.List;
+import java.util.Objects;
 
 import org.jlab.detector.geant4.v2.MPGD.URWT.URWTStripFactory;
 import org.jlab.geom.prim.Line3D;
@@ -21,7 +22,7 @@ public class UrWTDetectorData {
 	public final int count;
 
 	// the strips
-	public Line3D[] strips;
+	public final Line3D[] strips;
 	
 	// the centroid of the detector, used for some calculations
 	private Point centroid;
@@ -33,7 +34,7 @@ public class UrWTDetectorData {
 	// flat array for efficient drawing in 2D with Java2D.
 	private Point2D.Double[] xyPoints;
 	
-	private double[] deltaZ = {-2.0, -1.0, 0.0, 1.0}; // for 3D drawing, the z offsets for the layers
+	private static final double[] DELTA_Z = {-2.0, -1.0, 0.0, 1.0};
 
 	/**
 	 * Some useful chamber data
@@ -44,12 +45,11 @@ public class UrWTDetectorData {
 	public UrWTDetectorData(URWTStripFactory factory, int sector, int layer) {
 
 		if ((sector < 1) || (sector > 6)) {
-			System.err.println("Bad sector in UrWT data: " + sector);
-			System.exit(0);
+			throw new IllegalArgumentException("URWT sector must be in [1, 6]: " + sector);
 		} else if ((layer < 1) || (layer > 4)) {
-			System.err.println("Bad layer in UrWT data: " + layer);
-			System.exit(0);
+			throw new IllegalArgumentException("URWT layer must be in [1, 4]: " + layer);
 		}
+		Objects.requireNonNull(factory, "URWT strip factory");
 
 		// these are 1-based, just like in the database
 		this.sector = sector;
@@ -57,6 +57,10 @@ public class UrWTDetectorData {
 
 		// the strip count
 		count = factory.getNComponents(sector, layer);
+		if (count < 1) {
+			throw new IllegalStateException("URWT strip factory returned no strips for sector " + sector
+					+ " layer " + layer);
+		}
 
 		// the strips
 		strips = new Line3D[count];
@@ -66,9 +70,8 @@ public class UrWTDetectorData {
 			strips[strip - 1] = factory.getStrip(sector, layer, strip);
 
 			if (strips[strip - 1] == null) {
-				System.err.println(
-						"strip factory returned null for sector " + sector + " layer " + layer + " strip " + strip);
-				System.exit(1);
+				throw new IllegalStateException("URWT strip factory returned null for sector " + sector
+						+ " layer " + layer + " strip " + strip);
 			}
 
 		}
@@ -77,8 +80,8 @@ public class UrWTDetectorData {
 		//for 3D drawing. 
 		convexHull = PlaneHullUtility.getHullIfCoplanar(strips, 1.0e-6);
 		if (convexHull == null) {
-			System.err.println(
-					"UrwtDetectorItem: Could not compute convex hull for sector " + sector + " layer " + layer);
+			throw new IllegalStateException(
+					"Could not compute URWT convex hull for sector " + sector + " layer " + layer);
 		}
 		
 		// offset the z coords of the strips for 3D drawing, so that the layers
@@ -86,7 +89,7 @@ public class UrWTDetectorData {
 		
 		for (int i = 0; i < convexHull.size(); i++) {
 			Point p = convexHull.get(i);
-			p.z += deltaZ[layer - 1];
+			p.z += DELTA_Z[layer - 1];
 		}		
 		
 		//get the xy points for 2D drawing
