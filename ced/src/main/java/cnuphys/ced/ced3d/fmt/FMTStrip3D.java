@@ -2,15 +2,13 @@ package cnuphys.ced.ced3d.fmt;
 
 import java.awt.Color;
 
-import org.jlab.io.base.DataEvent;
-
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
+import cnuphys.ced.alldata.FMTAdc;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.DetectorItem3D;
-import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.geometry.fmt.FMTGeometry;
 
 public class FMTStrip3D extends DetectorItem3D {
@@ -69,39 +67,14 @@ public class FMTStrip3D extends DetectorItem3D {
 	@Override
 	public void drawData(GLAutoDrawable drawable) {
 		// draw adc hits in red
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (dataEvent == null) {
-			return;
-		}
-
-		if (dataEvent.hasBank("FMT::adc")) {
-
-			short component[] = _dataWarehouse.getShort("FMT::adc", "component");
-			if (component != null) {
-				int count = component.length;
-				if (count > 0) {
-					Color color = X11Colors.getX11Color("orange", getVolumeAlpha());
-
-					byte layer[] = _dataWarehouse.getByte("FMT::adc", "layer");
-
-					for (int i = 0; i < count; i++) {
-
-						int lm1 = layer[i]-1;
-						int stripm1 = component[i]-1;
-						if ((lm1 == _layerId) && (stripm1 == _stripId)) {
-
-							Support3D.drawQuad(drawable, _coords, 0, 1, 2, 3, color, 1f, _frame);
-							Support3D.drawQuad(drawable, _coords, 3, 7, 6, 2, color, 1f, _frame);
-							Support3D.drawQuad(drawable, _coords, 0, 4, 7, 3, color, 1f, _frame);
-							Support3D.drawQuad(drawable, _coords, 0, 4, 5, 1, color, 1f, _frame);
-							Support3D.drawQuad(drawable, _coords, 1, 5, 6, 2, color, 1f, _frame);
-							Support3D.drawQuad(drawable, _coords, 4, 5, 6, 7, color, 1f, _frame);
-
-							return;
-						}
-					}
-				} //count > 0
-			}
+		if (FMTAdc.getInstance().hasHit(_layerId + 1, _stripId + 1)) {
+			Color color = X11Colors.getX11Color("orange", getVolumeAlpha());
+			Support3D.drawQuad(drawable, _coords, 0, 1, 2, 3, color, 1f, _frame);
+			Support3D.drawQuad(drawable, _coords, 3, 7, 6, 2, color, 1f, _frame);
+			Support3D.drawQuad(drawable, _coords, 0, 4, 7, 3, color, 1f, _frame);
+			Support3D.drawQuad(drawable, _coords, 0, 4, 5, 1, color, 1f, _frame);
+			Support3D.drawQuad(drawable, _coords, 1, 5, 6, 2, color, 1f, _frame);
+			Support3D.drawQuad(drawable, _coords, 4, 5, 6, 7, color, 1f, _frame);
 		}
 	}
 

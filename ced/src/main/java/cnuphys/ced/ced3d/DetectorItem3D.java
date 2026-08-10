@@ -5,7 +5,6 @@ import java.awt.Color;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
-import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
@@ -23,9 +22,6 @@ public abstract class DetectorItem3D extends Item3D {
 
 	// the event manager
 	protected ClasIoEventManager _eventManager = ClasIoEventManager.getInstance();
-
-	//the data warehouse
-	protected DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
 
 	protected PlainPanel3D _cedPanel3D;
 
