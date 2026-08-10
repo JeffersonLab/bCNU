@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import org.jlab.io.base.DataEvent;
 
+import cnuphys.bCNU.log.Log;
 import cnuphys.ced.alldata.MCParticles;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
@@ -18,7 +19,7 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 	private static volatile ClasIoMonteCarloView instance;
 
 	// one row for each reconstructed trajectory
-	private static Vector<TrajectoryRowData> _trajData = new Vector<>();
+	private static final Vector<TrajectoryRowData> _trajData = new Vector<>();
 
 
 	private ClasIoMonteCarloView() {
@@ -49,6 +50,7 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 	@Override
 	public void newClasIoEvent(DataEvent event) {
 		_trajectoryTable.clear(); // remove existing events
+		_trajData.clear();
 
 		if (!_eventManager.isAccumulating()) {
 
@@ -59,8 +61,6 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 			addTracks(_trajData, MCParticles.lund());
 
 			model.setData(_trajData);
-			model.fireTableDataChanged();
-			_trajectoryTable.repaint();
 			_trajectoryTable.repaint();
 		} // !accumulating
 	}
@@ -103,8 +103,8 @@ public class ClasIoMonteCarloView extends ClasIoTrajectoryInfoView {
 
 			}
 		} catch (Exception e) {
-			String warning = "[ClasIoMonteCarloEventView.addTracks] " + e.getMessage();
-			System.err.println(warning);
+			Log.getInstance().warning("Could not create Monte Carlo trajectories from " + particles.bankName());
+			Log.getInstance().exception(e);
 		}
 	}
 

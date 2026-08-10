@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import org.jlab.io.base.DataEvent;
 
+import cnuphys.bCNU.log.Log;
 import cnuphys.ced.alldata.CVTTracks;
 import cnuphys.ced.alldata.DCTracks;
 import cnuphys.ced.alldata.RECParticles;
@@ -18,7 +19,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 	private static volatile ClasIoReconEventView instance;
 
 	// one row for each reconstructed trajectory
-	private static Vector<TrajectoryRowData> _trajData = new Vector<>();
+	private static final Vector<TrajectoryRowData> _trajData = new Vector<>();
 
 	private ClasIoReconEventView() {
 		super("Reconstructed Tracks");
@@ -66,8 +67,6 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 			addCVTTracks(_trajData, CVTTracks.pass1());
 
 			model.setData(_trajData);
-			model.fireTableDataChanged();
-			_trajectoryTable.repaint();
 			_trajectoryTable.repaint();
 		} // !accumulating
 	}
@@ -87,7 +86,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 						tracks.bankName(), SwimType.RECONSWIM));
 			}
 		} catch (Exception e) {
-			System.err.println("[ClasIoReconEventView.addDCTracks] " + e.getMessage());
+			logTrackFailure("DC", tracks.bankName(), e);
 		}
 	}
 
@@ -120,8 +119,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 				}
 			}
 		} catch (Exception e) {
-			String warning = "[ClasIoReconEventView.addTracks] " + e.getMessage();
-			System.err.println(warning);
+			logTrackFailure("REC particle", RECParticles.BANK_NAME, e);
 		}
 	}
 
@@ -143,9 +141,13 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 						Math.toDegrees(theta), Math.toDegrees(phi0), 0, tracks.bankName(), SwimType.RECONSWIM));
 			}
 		} catch (Exception e) {
-			String warning = "[ClasIoReconEventView.addCVTTracks] " + e.getMessage();
-			System.err.println(warning);
+			logTrackFailure("CVT", tracks.bankName(), e);
 		}
+	}
+
+	private static void logTrackFailure(String kind, String bankName, Exception exception) {
+		Log.getInstance().warning("Could not create " + kind + " trajectories from " + bankName);
+		Log.getInstance().exception(exception);
 	}
 
 	@Override
