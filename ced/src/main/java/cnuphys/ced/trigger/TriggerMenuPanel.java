@@ -4,19 +4,13 @@ import java.awt.Dimension;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.RunTriggers;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
 import cnuphys.ced.clasio.IClasIoEventListener;
 
 public class TriggerMenuPanel extends TriggerPanel implements IClasIoEventListener {
-
-	// the data warehouse
-	private DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
-
-	// the bank name
-	private static String _bankName = "RUN::trigger";
 
 	public TriggerMenuPanel() {
 		super(true);
@@ -41,13 +35,9 @@ public class TriggerMenuPanel extends TriggerPanel implements IClasIoEventListen
 		} else { // single event
 			setBits(0, 0);
 
-			int idData[] = null;
-			int triggerData[] = null;
-
-			idData = _dataWarehouse.getInt(_bankName, "id");
-			if ((idData != null) && (idData.length > 0)) {
-				triggerData = _dataWarehouse.getInt(_bankName, "trigger");
-				setBits(idData[0], triggerData[0]);
+			RunTriggers triggers = RunTriggers.getInstance();
+			if (triggers.hasCompleteRow(0)) {
+				setBits(triggers.id(0), triggers.trigger(0));
 			}
 
 		}

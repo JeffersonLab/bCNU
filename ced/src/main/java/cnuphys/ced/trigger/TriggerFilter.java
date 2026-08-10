@@ -1,15 +1,9 @@
 package cnuphys.ced.trigger;
 
-import org.jlab.io.base.DataEvent;
-
-import cnuphys.ced.alldata.DataWarehouse;
-import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.alldata.RunTriggers;
 import cnuphys.ced.clasio.filter.AEventFilter;
 
 public class TriggerFilter extends AEventFilter {
-
-	//data warehouse
-	private DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
 
 	// the actual bits
 	private int _bits;
@@ -28,16 +22,8 @@ public class TriggerFilter extends AEventFilter {
 	@Override
 	public boolean pass() {
 
-		DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-		if ((event == null) || !event.hasBank("RUN::trigger")) {
-			return false;
-		}
-
-		int triggerData[] = _dataWarehouse.getInt("RUN::trigger", "trigger");
-
-		int triggerWord = triggerData[0];
-
-		return _type.matches(_bits, triggerWord);
+		RunTriggers triggers = RunTriggers.getInstance();
+		return triggers.hasTriggerRow(0) && _type.matches(_bits, triggers.trigger(0));
 	}
 
 	@Override

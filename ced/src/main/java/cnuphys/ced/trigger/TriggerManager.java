@@ -2,7 +2,7 @@ package cnuphys.ced.trigger;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.RunTriggers;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
@@ -11,14 +11,8 @@ import cnuphys.ced.clasio.filter.FilterManager;
 
 public class TriggerManager implements IClasIoEventListener {
 
-	//data warehouse
-	private DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
-
 	// singleton
 	private static volatile TriggerManager _instance;
-
-	// the bank name
-	private static String _bankName = "RUN::trigger";
 
 	// the trigger filter
 	private static TriggerFilter _filter;
@@ -80,9 +74,10 @@ public class TriggerManager implements IClasIoEventListener {
 			_id = null;
 			_trigger = null;
 
-			_id = _dataWarehouse.getInt(_bankName, "id");
+			RunTriggers triggers = RunTriggers.getInstance();
+			_id = triggers.ids();
 			if (_id != null) {
-				_trigger = _dataWarehouse.getInt(_bankName, "trigger");
+				_trigger = triggers.triggers();
 			}
 
 			TriggerDialog.getInstance().setCurrentEvent(_id, _trigger);
