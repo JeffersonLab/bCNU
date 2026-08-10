@@ -9,6 +9,9 @@ import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Random;
 
 import javax.swing.ButtonGroup;
@@ -258,7 +261,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	 * @return the cutoff accuracy in microns
 	 */
 	public double getAccuracy() {
-		_lastAccuracy = getGoodValue(_accuracy, _lastAccuracy);
+		_lastAccuracy = getGoodValue(_accuracy, _lastAccuracy, true);
 		return _lastAccuracy;
 	}
 
@@ -267,7 +270,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	 * @return the fixed z cutoff in cm
 	 */
 	public double getFixedZ() {
-		_lastFixedZ = getGoodValue(_fixedZ, _lastFixedZ);
+		_lastFixedZ = getGoodValue(_fixedZ, _lastFixedZ, false);
 		return _lastFixedZ;
 	}
 
@@ -276,7 +279,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	 * @return the fized rho in cm
 	 */
 	public double getFixedRho() {
-		_lastFixedRho = getGoodValue(_fixedRho, _lastFixedRho);
+		_lastFixedRho = getGoodValue(_fixedRho, _lastFixedRho, true);
 		return _lastFixedRho;
 	}
 
@@ -285,22 +288,20 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	 * @return max path length in cm
 	 */
 	public double getSmax() {
-		_lastSmax = getGoodValue(_sMax, _lastSmax);
+		_lastSmax = getGoodValue(_sMax, _lastSmax, true);
 		return _lastSmax;
 	}
 
 	//convenience method to get a good value or use the last good value
-	private double getGoodValue(LabeledTextField ltf, double lastVal) {
-		double val;
-
-		try {
-			val = Double.parseDouble(ltf.getText());
-		} catch (Exception e) {
-			val = lastVal;
-			ltf.setText(valStr(val));
+	private double getGoodValue(LabeledTextField ltf, double lastVal, boolean positive) {
+		OptionalDouble value = positive ? SwimInputValues.positiveDouble(ltf.getText())
+				: SwimInputValues.finiteDouble(ltf.getText());
+		if (value.isPresent()) {
+			return value.getAsDouble();
 		}
 
-		return val;
+		ltf.setText(valStr(lastVal));
+		return lastVal;
 
 	}
 
@@ -317,18 +318,14 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	 * @return how many swims
 	 */
 	public int getSwimCount() {
-
-		int count;
-
-		try {
-			count = Integer.parseInt(_swimCount.getText());
-		} catch (Exception e) {
-			count = _lastGoodSwimCount;
-			_swimCount.setText("" + count);
+		OptionalInt value = SwimInputValues.positiveInt(_swimCount.getText());
+		if (value.isPresent()) {
+			_lastGoodSwimCount = value.getAsInt();
+		} else {
+			_swimCount.setText(Integer.toString(_lastGoodSwimCount));
 		}
 
-		_lastGoodSwimCount = count;
-		return count;
+		return _lastGoodSwimCount;
 	}
 
 	/**
@@ -337,17 +334,10 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	 * @return the random number generator
 	 */
 	public Random getRand() {
-
-		long seed;
-
-		try {
-			seed = Long.parseLong(_randomSeed.getText());
-			if (seed < 1) {
-				seed = 0;
-			}
-		} catch (Exception e) {
-			seed = _lastRandomSeed;
-			_randomSeed.setText("" + seed);
+		OptionalLong value = SwimInputValues.randomSeed(_randomSeed.getText());
+		long seed = value.orElse(_lastRandomSeed);
+		if (value.isEmpty() || !Long.toString(seed).equals(_randomSeed.getText().trim())) {
+			_randomSeed.setText(Long.toString(seed));
 		}
 
 		if (seed != _lastRandomSeed) {
@@ -607,22 +597,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 
 	//convenience method to get the charge for the next swim
 	private int getCharge() {
-		if (_charge == CHARGE.NEGATIVE) {
-			return -1;
-		}
-		else if (_charge == CHARGE.NEGATIVE) {
-			return 1;
-		}
-		else {
-			double rval = _rand.nextDouble();
-			if (rval < 0.4) {
-				return -1;
-			} else if (rval > 0.6) {
-				return 1;
-			}
-			return 0;
-		}
-
+		return SwimInputValues.selectCharge(_charge, _rand.nextDouble());
 	}
 
 	//handle clear trajectories
@@ -657,6 +632,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 		double tolerance = 1.0e-8;
 
 		ICLAS12Swimmer swimmer = CedSwimmerFactory.create();
+		getRand();
 
 
 		for (int i = 0; i < getSwimCount(); i++) {

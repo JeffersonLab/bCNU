@@ -29,4 +29,23 @@ class SwimInputValuesTest {
 		assertFalse(SwimInputValues.isNonZeroVector(new double[] { 0.0, 0.0, 0.0 }));
 		assertFalse(SwimInputValues.isNonZeroVector(null));
 	}
+
+	@Test
+	void validatesSwimCountsAndNormalizesRandomSeeds() {
+		assertEquals(25, SwimInputValues.positiveInt("25").orElseThrow());
+		assertTrue(SwimInputValues.positiveInt("0").isEmpty());
+		assertTrue(SwimInputValues.positiveInt("-4").isEmpty());
+		assertEquals(1234L, SwimInputValues.randomSeed("1234").orElseThrow());
+		assertEquals(0L, SwimInputValues.randomSeed("-1").orElseThrow());
+		assertTrue(SwimInputValues.randomSeed("bad-seed").isEmpty());
+	}
+
+	@Test
+	void honorsFixedAndRandomChargeSelections() {
+		assertEquals(1, SwimInputValues.selectCharge(SwimmerControlPanel.CHARGE.POSITIVE, 0.0));
+		assertEquals(-1, SwimInputValues.selectCharge(SwimmerControlPanel.CHARGE.NEGATIVE, 1.0));
+		assertEquals(-1, SwimInputValues.selectCharge(SwimmerControlPanel.CHARGE.RANDOM, 0.2));
+		assertEquals(0, SwimInputValues.selectCharge(SwimmerControlPanel.CHARGE.RANDOM, 0.5));
+		assertEquals(1, SwimInputValues.selectCharge(SwimmerControlPanel.CHARGE.RANDOM, 0.8));
+	}
 }
