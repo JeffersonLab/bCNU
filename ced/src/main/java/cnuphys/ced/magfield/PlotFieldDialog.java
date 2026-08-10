@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import bCNU3D.DoubleFormat;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.CommonBorder;
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.magfield.FieldProbe;
 import cnuphys.magfield.MagneticFieldInitializationException;
@@ -292,7 +293,9 @@ public class PlotFieldDialog extends APlotDialog implements ActionListener {
 			_canvas.setDataSet(createDataSet());
 			_canvas.setWorldSystem();
 		} catch (DataSetException e) {
-			e.printStackTrace();
+			Log.getInstance().error("Could not clear the magnetic-field plot");
+			Log.getInstance().exception(e);
+			return;
 		}
 		_canvas.repaint();
 	}
@@ -366,7 +369,8 @@ public class PlotFieldDialog extends APlotDialog implements ActionListener {
 			try {
 				_canvas.getDataSet().addToCurve(hotIndex, val, mag);
 			} catch (DataSetException e) {
-				e.printStackTrace();
+				Log.getInstance().error("Could not add data to the magnetic-field plot");
+				Log.getInstance().exception(e);
 				break;
 			}
 		}
@@ -378,10 +382,12 @@ public class PlotFieldDialog extends APlotDialog implements ActionListener {
 
 	public static void main(String arg[]) {
 
+		// get the home directory
+		String homeDir = System.getProperty("user.home");
 		// String torusPath =
 		// "/Users/heddle/magfield/Jan_clas12TorusFull_2.00.dat";
-		String torusPath = "/Users/heddle/magfield/clas12TorusFull_2.00.dat";
-		String solenoidPath = "/Users/heddle/magfield/clas12-fieldmap-solenoid.dat";
+		String torusPath = homeDir + "/magfield/Symm_torus_r2501_phi16_z251_24Apr2018.dat";
+		String solenoidPath = homeDir + "/magfield/Symm_solenoid_r601_phi1_z1201_13June2018.dat";
 		try {
 			MagneticFields.getInstance().initializeMagneticFieldsFromPath(torusPath, solenoidPath);
 			MagneticFields.getInstance().setActiveField(FieldType.TORUS);
