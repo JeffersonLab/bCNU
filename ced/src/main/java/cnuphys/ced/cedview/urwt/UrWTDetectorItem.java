@@ -15,6 +15,7 @@ import cnuphys.bCNU.item.PolygonItem;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.URWTHits;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.urwt.UrWTGeometry;
@@ -199,30 +200,13 @@ public class UrWTDetectorItem extends PolygonItem {
 	
 	// helper to draw the hits
 	private void drawHits(Graphics g, IContainer container) {
-		DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (event == null) {
-			return;
-		}
-
-		byte sectors[] = _dataWarehouse.getByte("URWT::hits", "sector");
-
-		int count = (sectors == null) ? 0 : sectors.length;
-		if (count == 0) {
-			return;
-		}
-
-		byte layers[] = _dataWarehouse.getByte("URWT::hits", "layer");
-		short strips[] = _dataWarehouse.getShort("URWT::hits","strip");
-	
-		if (layers == null || strips == null) {
-			return;
-		}
+		URWTHits hits = URWTHits.getInstance();
 		
 		g.setColor(layerColors[layer-1]);
 		
-		for (int i = 0; i < count; i++) {
-			if (sectors[i] == this.sector && layers[i] == this.layer) {
-				projectStrip(container, strips[i]);
+		for (int i = 0; i < hits.count(); i++) {
+			if (hits.hasValidGeometry(i) && hits.sector(i) == sector && hits.layer(i) == layer) {
+				projectStrip(container, hits.strip(i));
 				g.drawLine(_pp1.x, _pp1.y, _pp2.x, _pp2.y);
 			}
 		}
@@ -356,32 +340,14 @@ public class UrWTDetectorItem extends PolygonItem {
 	private void hitFeedback(IContainer container, Point pp, List<String> feedbackStrings) {
 		UrWTXYView view = getView();
 		if (view.isSingleEventMode() && view.showLayer(layer)) {
-			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-			if (event == null) {
-				return;
-			}
-
-			byte sector[] = _dataWarehouse.getByte("URWT::hits", "sector");
-
-			int count = (sector == null) ? 0 : sector.length;
-			if (count == 0) {
-				return;
-			}
-
-			byte layer[] = _dataWarehouse.getByte("URWT::hits", "layer");
-			short strip[] = _dataWarehouse.getShort("URWT::hits","strip");
-		
-			if (layer == null || strip == null) {
-				return;
-			}
+			URWTHits hits = URWTHits.getInstance();
 			
-			for (int i = 0; i < count; i++) {
-				if (sector[i] == this.sector && layer[i] == this.layer) {
-					projectStrip(container, strip[i]);
+			for (int i = 0; i < hits.count(); i++) {
+				if (hits.hasValidGeometry(i) && hits.sector(i) == sector && hits.layer(i) == layer) {
+					projectStrip(container, hits.strip(i));
 					boolean hit = GraphicsUtilities.isPointOnLine(_pp1, _pp2, pp, HIT_TEST_TOLERANCE);
 					if (hit) {
-						feedbackStrings.add(String.format("hit sector %d layer %d strip %d", sector[i],
-								layer[i], strip[i]));
+						hits.addFeedback(i, feedbackStrings);
 					}
 				}
 			}

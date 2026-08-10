@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.util.List;
 
 import org.jlab.geom.prim.Line3D;
-import org.jlab.io.base.DataEvent;
-
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
@@ -14,7 +12,7 @@ import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.ced3d.util.DrawSupport;
 import cnuphys.ced.ced3d.util.Point;
 import cnuphys.ced.cedview.urwt.UrWTDetectorItem;
-import cnuphys.ced.clasio.ClasIoEventManager;
+import cnuphys.ced.alldata.URWTHits;
 import cnuphys.ced.geometry.urwt.UrWTDetectorData;
 import cnuphys.ced.geometry.urwt.UrWTGeometry;
 
@@ -92,31 +90,15 @@ public class UrWTDetectorItem3D extends DetectorItem3D {
 
 	@Override
 	public void drawData(GLAutoDrawable drawable) {
-			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-			if (event == null) {
-				return;
-			}
-
-			byte sector[] = _dataWarehouse.getByte("URWT::hits", "sector");
-
-			int count = (sector == null) ? 0 : sector.length;
-			if (count == 0) {
-				return;
-			}
-
-			byte layer[] = _dataWarehouse.getByte("URWT::hits", "layer");
-			short strip[] = _dataWarehouse.getShort("URWT::hits","strip");
+			URWTHits hits = URWTHits.getInstance();
 			
-			if (layer == null || strip == null) {
-				return;
-			}
-			
-			for (int i = 0; i < count; i++) {
-				if (!show()) {
-					continue;
-				}
+			if (!show()) return;
+
+			for (int i = 0; i < hits.count(); i++) {
+				if (!hits.hasValidGeometry(i)
+						|| hits.sector(i) != sector || hits.layer(i) != layer) continue;
 				
-				Line3D stripLine = UrWTGeometry.getStrip(sector[i], layer[i], strip[i]);
+				Line3D stripLine = UrWTGeometry.getStrip(hits.sector(i), hits.layer(i), hits.strip(i));
 				
 				float x1 = (float) stripLine.origin().x();
 				float y1 = (float) stripLine.origin().y();

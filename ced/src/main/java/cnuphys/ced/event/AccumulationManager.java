@@ -9,7 +9,7 @@ import org.jlab.io.base.DataEvent;
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
 import cnuphys.ced.alldata.AHDCAdc;
 import cnuphys.ced.alldata.ATOFTdc;
-import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.URWTHits;
 import cnuphys.ced.alldata.BSTAdc;
 import cnuphys.ced.alldata.ECalAdc;
 import cnuphys.ced.alldata.CNDAdc;
@@ -53,9 +53,6 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	// common colorscale
 	public static ColorScaleModel colorScaleModel = new ColorScaleModel(getAccumulationValues(),
 			ColorScaleModel.getSimpleMapColors(8));
-
-	//data warehouse used for some accumulations
-	private DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
 
 
 	// the singleton
@@ -832,21 +829,18 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	 * Accumulate data for the uRWT. Note: this uses the new accumulation strategy using the data warehouse.
 	 */
 	private void accumUrWT() {
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
+		URWTHits hits = URWTHits.getInstance();
 
-		if (dataEvent.hasBank("URWT::hits")) {
+		if (hits.count() > 0) {
 			
 			if (_UrWTAccumulatedData == null) {
 				// UrWT data
 				_UrWTAccumulatedData = new int[6][4][1485];
 			}
-			short strips[] = _dataWarehouse.getShort("URWT::hits", "strip");
-			byte sectors[] = _dataWarehouse.getByte("URWT::hits", "sector");
-			byte layers[] = _dataWarehouse.getByte("URWT::hits", "layer");
-	
-			int count = (strips == null) ? 0 :strips.length;
-			for (int i = 0; i < count; i++) {
-				_UrWTAccumulatedData[sectors[i]-1][layers[i]-1][strips[i]-1] += 1;
+			for (int i = 0; i < hits.count(); i++) {
+				if (hits.hasValidGeometry(i)) {
+					_UrWTAccumulatedData[hits.sector(i)-1][hits.layer(i)-1][hits.strip(i)-1] += 1;
+				}
 			}
 		}
 	}

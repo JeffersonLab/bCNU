@@ -32,6 +32,7 @@ import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.URWTHits;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.HexView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -304,17 +305,18 @@ public class UrWTXYView extends HexView {
 		}
 
 
-		if (dataEvent.hasBank("URWT::hits") && (_highlightData.hit >= 0)) {
+		URWTHits hits = URWTHits.getInstance();
+		if (hits.hasValidGeometry(_highlightData.hit)) {
 
 			int idx = _highlightData.hit; // 0 based
 
-			byte sector = _dataWarehouse.getByte("URWT::hits", "sector")[idx];
-			byte layer = _dataWarehouse.getByte("URWT::hits", "layer")[idx];
+			byte sector = hits.sector(idx);
+			byte layer = hits.layer(idx);
 
 			// are we showing that layer?
 			if (showLayer(layer)) {
 
-				short strip = _dataWarehouse.getShort("URWT::hits", "strip")[idx];
+				short strip = hits.strip(idx);
 
 				UrWTDetectorData data = UrWTGeometry.getDetectorData(sector, layer);
 				Line3D line = data.getStrip(strip);
