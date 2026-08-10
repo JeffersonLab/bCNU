@@ -4,11 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+
+import cnuphys.bCNU.log.Log;
 
 public class SerialIO {
 
@@ -19,38 +19,13 @@ public class SerialIO {
 	 * @return the deserialized object.
 	 */
 	public static Object serialRead(String fullfn) {
-
-		FileInputStream f = null;
-		ObjectInput s = null;
-		Object obj = null;
-
-		try {
-			f = new FileInputStream(fullfn);
-			s = new ObjectInputStream(f);
-			obj = s.readObject();
+		try (FileInputStream fileInput = new FileInputStream(fullfn);
+				ObjectInputStream objectInput = new ObjectInputStream(fileInput)) {
+			return objectInput.readObject();
 		} catch (Exception e) {
-			System.err.println("Exception in serialRead: " + e.getMessage());
+			logFailure("read serialized data from " + fullfn, e);
+			return null;
 		}
-
-		finally {
-			if (f != null) {
-
-				try {
-					f.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (s != null) {
-				try {
-					s.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return obj;
 	}
 
 	/**
@@ -60,41 +35,13 @@ public class SerialIO {
 	 * @return the deserialized object
 	 */
 	public static Object serialRead(byte[] bytes) {
-
-		ByteArrayInputStream f = null;
-
-		ObjectInput s = null;
-		Object obj = null;
-
-		try {
-			f = new ByteArrayInputStream(bytes);
-			s = new ObjectInputStream(f);
-			obj = s.readObject();
+		try (ByteArrayInputStream byteInput = new ByteArrayInputStream(bytes);
+				ObjectInputStream objectInput = new ObjectInputStream(byteInput)) {
+			return objectInput.readObject();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logFailure("read serialized data from a byte array", e);
+			return null;
 		}
-
-		finally {
-			if (f != null) {
-
-				try {
-					f.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (s != null) {
-				try {
-					s.close();
-				}
-
-				catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return obj;
 	}
 
 	/**
@@ -105,40 +52,12 @@ public class SerialIO {
 	 * @param fullfn the full path.
 	 */
 	public static void serialWrite(Serializable obj, String fullfn) {
-
-		FileOutputStream f = null;
-
-		ObjectOutput s = null;
-
-		try {
-			f = new FileOutputStream(fullfn);
-			s = new ObjectOutputStream(f);
-			s.writeObject(obj);
-			s.flush();
-		}
-
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-
-			if (f != null) {
-				try {
-					f.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (s != null) {
-
-				try {
-					s.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+		try (FileOutputStream fileOutput = new FileOutputStream(fullfn);
+				ObjectOutputStream objectOutput = new ObjectOutputStream(fileOutput)) {
+			objectOutput.writeObject(obj);
+			objectOutput.flush();
+		} catch (Exception e) {
+			logFailure("write serialized data to " + fullfn, e);
 		}
 	}
 
@@ -149,42 +68,19 @@ public class SerialIO {
 	 * @return the array of bytes.
 	 */
 	public static byte[] serialWrite(Serializable obj) {
-
-		ByteArrayOutputStream f = null;
-		ObjectOutput s = null;
-
-		byte[] bytes = null;
-
-		try {
-			f = new ByteArrayOutputStream();
-			s = new ObjectOutputStream(f);
-			s.writeObject(obj);
-			s.flush();
-
-			bytes = f.toByteArray();
+		try (ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+				ObjectOutputStream objectOutput = new ObjectOutputStream(byteOutput)) {
+			objectOutput.writeObject(obj);
+			objectOutput.flush();
+			return byteOutput.toByteArray();
+		} catch (Exception e) {
+			logFailure("write serialized data to a byte array", e);
+			return null;
 		}
+	}
 
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		finally {
-			if (f != null) {
-				try {
-					f.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (s != null) {
-				try {
-					s.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return bytes;
+	private static void logFailure(String operation, Exception exception) {
+		Log.getInstance().error("Could not " + operation);
+		Log.getInstance().exception(exception);
 	}
 }
