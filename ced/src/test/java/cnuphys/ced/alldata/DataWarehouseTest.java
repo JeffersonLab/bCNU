@@ -80,6 +80,24 @@ class DataWarehouseTest {
         assertNull(DataWarehouse.sortedCopy(null));
     }
 
+    @Test
+    void publishesCompleteSortedSchemaSnapshots() {
+        DataWarehouse warehouse = DataWarehouse.getInstance();
+        SchemaFactory schemas = new SchemaFactory();
+        schemas.addSchema(new Schema("RUN::config", 1, 1));
+        schemas.addSchema(new Schema("BMT::adc", 2, 1));
+
+        try {
+            warehouse.updateSchema(schemas);
+            assertArrayEquals(new String[] { "BMT::adc", "RUN::config" }, warehouse.getKnownBanks());
+
+            warehouse.updateSchema(new SchemaFactory());
+            assertArrayEquals(new String[0], warehouse.getKnownBanks());
+        } finally {
+            warehouse.updateSchema(null);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private static <T> T proxy(Class<T> type) {
         return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { type },

@@ -3,8 +3,8 @@ package cnuphys.ced.alldata;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
@@ -22,12 +22,12 @@ public class DataWarehouse implements IClasIoEventListener {
 	private static volatile DataWarehouse _instance;
 
 	// all the known banks in the current event
-	private ArrayList<String> _knownBanks = new ArrayList<>();
+	private volatile List<String> _knownBanks = List.of();
 	
-	private HashMap<String, Long> _seenBanks = new HashMap<>();
+	private final ConcurrentHashMap<String, Long> _seenBanks = new ConcurrentHashMap<>();
 
 	//the current schema factory (dictionary)
-	private SchemaFactory _schemaFactory;
+	private volatile SchemaFactory _schemaFactory;
 
 	// private constructor for singleton
 	private DataWarehouse() {
@@ -77,7 +77,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	private static final String[] TYPE_NAMES = { "Unknown", "byte", "short", "int", "float", "double", "string", "group", "long", "vector3f", "composite", "table", "branch"};
 
 	/** the column data used by the node panel */
-	private ArrayList<ColumnData> _columnData = new ArrayList<>();
+	private volatile List<ColumnData> _columnData = List.of();
 
 	/**
 	 * Public access to the singleton
@@ -138,25 +138,29 @@ public class DataWarehouse implements IClasIoEventListener {
 	public void updateSchema(SchemaFactory schemaFactory) {
 
 		_schemaFactory = schemaFactory;
-		_knownBanks.clear();
 		if (schemaFactory == null) {
+			_knownBanks = List.of();
 			return;
 		}
+
+		ArrayList<String> knownBanks = new ArrayList<>();
 
 		//schemas are banks
 		List<Schema> schemas = schemaFactory.getSchemaList();
 
 		// a schema is a bank
 		if (schemas == null || schemas.isEmpty()) {
+			_knownBanks = List.of();
 			return;
 		}
 
 		for (Schema schema : schemas) {
-			_knownBanks.add(schema.getName());
+			knownBanks.add(schema.getName());
 		}
 
         // sort the banks
-		_knownBanks.sort(null);
+		knownBanks.sort(null);
+		_knownBanks = List.copyOf(knownBanks);
 
 	}
 
@@ -384,9 +388,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	@Override
 	public void newClasIoEvent(DataEvent event) {
 
-
-		// create the column data
-		_columnData.clear();
+		ArrayList<ColumnData> columnData = new ArrayList<>();
 
 		int bankIndex = 0;
 		for (String bankName : _knownBanks) {
@@ -395,22 +397,18 @@ public class DataWarehouse implements IClasIoEventListener {
 		  	    String columnNames[] = bank.getColumnList();
 		  	    Arrays.sort(columnNames);
 				for (String columnName : columnNames) {
-					_columnData.add(new ColumnData(bankName, columnName, getType(bankName, columnName), bankIndex));
+					columnData.add(new ColumnData(bankName, columnName, getType(bankName, columnName), bankIndex));
 				}
 				bankIndex++;
 			}
 		}
+		_columnData = List.copyOf(columnData);
 		
 		//update seen banks
 		String[] banks = event.getBankList();
 		if (banks != null) {
 			for (String bank : banks) {
-				if (_seenBanks.get(bank) == null) {
-					_seenBanks.put(bank, 1L);
-				}
-				else {
-                    _seenBanks.put(bank, _seenBanks.get(bank) + 1L);
-				}
+				_seenBanks.merge(bank, 1L, Long::sum);
 			}
 		}
 
@@ -456,7 +454,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return the column data
 	 */
 	public ArrayList<ColumnData> getColumnData() {
-		return _columnData;
+		return new ArrayList<>(_columnData);
 	}
 	
 	/**
