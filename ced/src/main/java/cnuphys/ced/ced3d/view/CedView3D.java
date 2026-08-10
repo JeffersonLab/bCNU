@@ -69,7 +69,6 @@ public abstract class CedView3D extends PlainView3D
 	public void newClasIoEvent(DataEvent event) {
 		if (!_eventManager.isAccumulating()) {
 			fixTitle(event);
-			_panel3D.refreshQueued();
 		}
 	}
 
