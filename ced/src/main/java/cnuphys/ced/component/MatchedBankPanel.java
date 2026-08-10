@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import cnuphys.bCNU.graphics.component.CommonBorder;
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.TextUtilities;
 import cnuphys.bCNU.view.BaseView;
@@ -62,11 +63,7 @@ public class MatchedBankPanel extends JPanel {
 			@Override
 			public void keyReleased(KeyEvent kev) {
 				if (kev.getKeyCode() == KeyEvent.VK_ENTER) {
-					try {
-						stringToMatches();
-					} catch (Exception e) {
-
-					}
+					applyTextMatches();
 				}
 			}
 		};
@@ -75,11 +72,21 @@ public class MatchedBankPanel extends JPanel {
 		FocusAdapter focusAdapter = new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				stringToMatches();
+				applyTextMatches();
 			}
 
 		};
 		_matchTextArea.addFocusListener(focusAdapter);
+	}
+
+	private void applyTextMatches() {
+		try {
+			stringToMatches();
+		} catch (RuntimeException exception) {
+			Log.getInstance().error("Could not update matched bank columns");
+			Log.getInstance().exception(exception);
+			_matchTextArea.setText(matchesToString());
+		}
 	}
 
 
@@ -91,23 +98,24 @@ public class MatchedBankPanel extends JPanel {
 
 	//convert the string in the text area to an array of matches
 	private void stringToMatches() {
-		String s = _matchTextArea.getText();
-
-		//cant set to null
-		if (s == null) {
-			_matchTextArea.setText(matchesToString());
-			return;
-		}
-		s = s.replaceAll("\\s", "");
-
-		if (s.length() == 0) {
+		String[] matches = parseMatches(_matchTextArea.getText());
+		if (matches == null) {
 			_matchTextArea.setText(matchesToString());
 			return;
 		}
 
-		_bankMatcher.setBankMatches(TextUtilities.tokens(s, ","));
+		_bankMatcher.setBankMatches(matches);
 		_matchTextArea.setText(matchesToString());
 		_bankMatcher.writeCommonProperties();
+	}
+
+	static String[] parseMatches(String text) {
+		if (text == null) {
+			return null;
+		}
+
+		String compactText = text.replaceAll("\\s", "");
+		return compactText.isEmpty() ? null : TextUtilities.tokens(compactText, ",");
 	}
 
 	//convert the view matches to a comma separated string
