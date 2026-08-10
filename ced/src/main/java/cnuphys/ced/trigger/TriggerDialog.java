@@ -3,7 +3,6 @@ package cnuphys.ced.trigger;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -11,10 +10,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
-import cnuphys.bCNU.dialog.DialogUtilities;
 import cnuphys.ced.frame.Ced;
 
 public class TriggerDialog extends JDialog implements ActionListener {
@@ -23,9 +20,6 @@ public class TriggerDialog extends JDialog implements ActionListener {
 
 	// singleton
 	private static volatile TriggerDialog _instance;
-
-	// first display
-	private static boolean first = true;
 
 	// trigger panels
 	private TriggerPanel triggerPanels[];
@@ -46,8 +40,6 @@ public class TriggerDialog extends JDialog implements ActionListener {
 
 		setAlwaysOnTop(true);
 		pack();
-
-		DialogUtilities.upperRightComponent(this, 2, 0);
 	}
 
 	@Override
@@ -58,25 +50,7 @@ public class TriggerDialog extends JDialog implements ActionListener {
 
 	@Override
 	public void setVisible(boolean visible) {
-		if (first) {
-			Ced ced = Ced.getCed();
-			if (ced != null) {
-
-				Insets insets = ced.getInsets();
-				int tbHeight = insets.top;
-
-				JMenuBar mb = ced.getJMenuBar();
-
-				int mbHeight = mb.getBounds().height;
-
-				Point loc = getLocation();
-				loc.y += (tbHeight + mbHeight);
-				setLocation(loc);
-				loc = getLocation();
-
-			}
-			first = false;
-		}
+		if (visible && !isVisible()) setLocationRelativeTo(getOwner());
 		super.setVisible(visible);
 	}
 

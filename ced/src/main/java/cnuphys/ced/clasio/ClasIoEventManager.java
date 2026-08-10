@@ -11,17 +11,13 @@ import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
 
-import org.jlab.detector.decode.CLASDecoder4;
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.base.DataSource;
 import org.jlab.io.evio.EvioDataEvent;
 import org.jlab.io.evio.EvioETSource;
 import org.jlab.io.evio.EvioSource;
-import org.jlab.io.hipo.HipoDataEvent;
 import org.jlab.io.hipo.HipoDataSource;
-import org.jlab.jnp.hipo4.data.Event;
 import org.jlab.jnp.hipo4.data.SchemaFactory;
-import org.jlab.utils.system.ClasUtilsFile;
 
 import cnuphys.bCNU.application.Desktop;
 import cnuphys.bCNU.dialog.DialogUtilities;
@@ -59,12 +55,13 @@ public class ClasIoEventManager {
 	// connect to ring
 	public JButton _connectButton;
 
-	// decode evio to hipo
-	private CLASDecoder4 _decoder;
-	private SchemaFactory _schemaFactory;
+	// decode legacy EVIO events for the HIPO-based display accessors
+	private final EvioToHipoDecoder _evioDecoder = new EvioToHipoDecoder(
+			schemaFactory -> DataWarehouse.getInstance().updateSchema(schemaFactory));
 
 	// reset everytime hipo or evio file is opened
 	private volatile int _currentEventIndex;
+	private volatile boolean _sourceExhausted;
 
 	// sources of events (the type, not the actual source)
 	public enum EventSourceType {
@@ -351,8 +348,8 @@ public class ClasIoEventManager {
 
 
 		//let the data manager know
-		_schemaFactory = hipoSource.getReader().getSchemaFactory();
-		DataWarehouse.getInstance().updateSchema(_schemaFactory);
+		SchemaFactory schemaFactory = hipoSource.getReader().getSchemaFactory();
+		DataWarehouse.getInstance().updateSchema(schemaFactory);
 
 		//notify the listeners
 		notifyEventListeners(_currentHipoFile);
@@ -375,6 +372,7 @@ public class ClasIoEventManager {
 		_runData = RunData.empty();
 		_currentEvent = null;
 		_currentEventIndex = 0;
+		_sourceExhausted = false;
 	}
 
 	/**
@@ -565,6 +563,7 @@ public class ClasIoEventManager {
 	 * @return <code>true</code> if any next event control should be enabled.
 	 */
 	public boolean isNextOK() {
+		if (_sourceExhausted && !isSourceET()) return false;
 
 		boolean isOK = true;
 		EventSourceType estype = getEventSourceType();
@@ -591,6 +590,8 @@ public class ClasIoEventManager {
 	 * @return the number of remaining events
 	 */
 	public int getNumRemainingEvents() {
+		if (_sourceExhausted && !isSourceET()) return 0;
+
 		int numRemaining = 0;
 		EventSourceType estype = getEventSourceType();
 
@@ -642,30 +643,31 @@ public class ClasIoEventManager {
 		_allReconSwimmer = allSwimmer;
 	}
 
-	// decode an evio event to hipo
-	private HipoDataEvent decodeEvioToHipo(EvioDataEvent event) {
-
-		try {
-			if (_decoder == null) {
-				_schemaFactory = new SchemaFactory();
-
-				String dir = ClasUtilsFile.getResourceDir("CLAS12DIR", "etc/bankdefs/hipo4");
-				_schemaFactory.initFromDirectory(dir);
-				_decoder = new CLASDecoder4();
-				DataWarehouse.getInstance().updateSchema(_schemaFactory);
-			}
-			_decoder.initEvent(event);
-			Event dump = _decoder.getDataEvent();
-			HipoDataEvent hipoEvent = new HipoDataEvent(dump, _decoder.getSchemaFactory());
-			return hipoEvent;
-		}
-
-		catch (Exception e) {
-			Log.getInstance().error("Error decoding EVIO to HIPO: " + e.getMessage());
-			Log.getInstance().exception(e);
+	private DataEvent readNextDecodedEvent() {
+		if (_dataSource == null || (_sourceExhausted && !isSourceET())) return null;
+		if (!_dataSource.hasEvent()) {
+			markSourceExhausted();
 			return null;
 		}
 
+		DataEvent event;
+		try {
+			event = _dataSource.getNextEvent();
+		} catch (IndexOutOfBoundsException exception) {
+			markSourceExhausted();
+			Log.getInstance().warning("Event source reached an inconsistent end-of-file boundary at event "
+					+ _currentEventIndex);
+			return null;
+		}
+		if (event == null) {
+			markSourceExhausted();
+			return null;
+		}
+		return event instanceof EvioDataEvent evioEvent ? _evioDecoder.decode(evioEvent) : event;
+	}
+
+	private void markSourceExhausted() {
+		if (!isSourceET()) _sourceExhausted = true;
 	}
 
 	/**
@@ -693,15 +695,7 @@ public class ClasIoEventManager {
 
 			while (!done) {
 
-				if (_dataSource.hasEvent()) {
-					_currentEvent = _dataSource.getNextEvent();
-				} else {
-					_currentEvent = null;
-				}
-
-				if ((_currentEvent != null) && (_currentEvent instanceof EvioDataEvent)) {
-					_currentEvent = decodeEvioToHipo((EvioDataEvent) _currentEvent);
-				}
+				_currentEvent = readNextDecodedEvent();
 
 				done = (_currentEvent == null) || FilterManager.getInstance().pass();
 			}
@@ -732,11 +726,7 @@ public class ClasIoEventManager {
 
 			if (_dataSource.hasEvent()) {
 
-				_currentEvent = _dataSource.getNextEvent();
-
-				if ((_currentEvent != null) && (_currentEvent instanceof EvioDataEvent)) {
-					_currentEvent = decodeEvioToHipo((EvioDataEvent) _currentEvent);
-				}
+				_currentEvent = readNextDecodedEvent();
 
 				if (FilterManager.getInstance().pass()) {
 					_currentEventIndex++;
@@ -762,6 +752,8 @@ public class ClasIoEventManager {
 	 * @return <code>true</code> if another event is available
 	 */
 	public boolean hasEvent() {
+		if (_sourceExhausted && !isSourceET()) return false;
+
 		EventSourceType estype = getEventSourceType();
 		switch (estype) {
 		case HIPOFILE:
@@ -793,9 +785,9 @@ public class ClasIoEventManager {
 			boolean done = false;
 
 			while (!done && (_currentEventIndex < stopIndex)) {
-				if (_dataSource.hasEvent()) {
-					DataEvent event = _dataSource.getNextEvent();
-					if (FilterManager.getInstance().pass()) {
+				if (hasEvent()) {
+					_currentEvent = readNextDecodedEvent();
+					if (_currentEvent != null && FilterManager.getInstance().pass()) {
 						_currentEventIndex++;
 					}
 				}
@@ -835,6 +827,7 @@ public class ClasIoEventManager {
 				_dataSource.close();
 				_currentEvent = null;
 				_currentEventIndex = 0;
+				_sourceExhausted = false;
 				_dataSource.open(_currentHipoFile);
 				gotoEvent(eventNumber);
 			}
@@ -842,9 +835,10 @@ public class ClasIoEventManager {
 			break;
 
 		case EVIOFILE:
+			_sourceExhausted = false;
 			_currentEvent = _dataSource.gotoEvent(eventNumber);
 			if ((_currentEvent != null) && (_currentEvent instanceof EvioDataEvent)) {
-				_currentEvent = decodeEvioToHipo((EvioDataEvent)_currentEvent);
+				_currentEvent = _evioDecoder.decode((EvioDataEvent)_currentEvent);
 				_currentEventIndex = eventNumber;
 			}
 			break;
