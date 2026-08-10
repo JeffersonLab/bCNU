@@ -50,16 +50,11 @@ public final class DCHits {
     public byte leftRight(int row) { return bank().getByte("LR", row); }
     public int tdc(int row) { return bank().getInt("TDC", row); }
     public short clusterId(int row) { return bank().getShort("clusterID", row); }
-    public float trackDoca(int row) { return bank().getFloat("trkDoca", row); }
+    public float trackDoca(int row) { return optionalFloat("trkDoca", row); }
 
     /** Hit-based banks omit docaError, matching the old sentinel behavior. */
     public float docaError(int row) {
-        DataBank bank = bank();
-        try {
-            return bank.getFloat("docaError", row);
-        } catch (RuntimeException exception) {
-            return -1f;
-        }
+        return optionalFloat("docaError", row);
     }
 
     public int indexFromId(short wantedId) {
@@ -88,7 +83,21 @@ public final class DCHits {
     public void addFeedback(int row, List<String> feedback) {
         feedback.add(String.format("$red$%s sect %d supl %d  layer %d  wire %d", feedbackName,
                 sector(row), superlayer(row), layer(row), wire(row)));
+		float trkDoca = trackDoca(row);
+		if (trkDoca >= 0f) {
+			feedback.add(String.format("$red$trkDoca %.3f cm", trkDoca));
+		}
+		float error = docaError(row);
+		if (error >= 0f) {
+			feedback.add(String.format("$red$docaError %.3f cm", error));
+		}
     }
+
+	private float optionalFloat(String column, int row) {
+		DataBank bank = bank();
+		return (bank != null) && (row >= 0) && (row < bank.rows()) && DataWarehouse.hasColumn(bank, column)
+				? bank.getFloat(column, row) : -1f;
+	}
 
     private DataBank bank() { return bankSupplier.get(); }
 }
