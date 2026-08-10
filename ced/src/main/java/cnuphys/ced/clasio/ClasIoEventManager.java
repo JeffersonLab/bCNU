@@ -212,7 +212,7 @@ public class ClasIoEventManager {
 	 * @return
 	 */
 	public String currentInfoString() {
-		StringBuffer sb = new StringBuffer(256);
+		StringBuilder sb = new StringBuilder(256);
 
 		try {
 			if (_currentEvent != null) {
@@ -240,10 +240,10 @@ public class ClasIoEventManager {
 					break;
 				}
 			} else {
-				sb.append("No event loaded./n");
+				sb.append("No event loaded.\n");
 			}
 		} catch (Exception e) {
-			sb.append("Exception in currentInfoString: " + e.getMessage() + "/n");
+			sb.append("Exception in currentInfoString: " + e.getMessage() + "\n");
 		}
 
 		return sb.toString();

@@ -4,6 +4,7 @@ import java.util.TreeMap;
 
 import org.jlab.io.base.DataEvent;
 
+import cnuphys.bCNU.log.Log;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventListenerPhase;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
@@ -16,7 +17,7 @@ import cnuphys.ced.clasio.IClasIoEventListener;
 public class ScanManager implements IClasIoEventListener {
 
 	// event manager
-	private ClasIoEventManager _eventManager = ClasIoEventManager.getInstance();
+	private final ClasIoEventManager _eventManager = ClasIoEventManager.getInstance();
 
 	// singleton
 	private static volatile ScanManager _instance;
@@ -28,7 +29,7 @@ public class ScanManager implements IClasIoEventListener {
 	}
 
 	//the map. Keys are true even numbers, values are sequential numbers
-	private TreeMap<Integer, Integer> _map = new TreeMap<>();
+	private final TreeMap<Integer, Integer> _map = new TreeMap<>();
 
 	//return to the current event using index
 	public int _saveIndex = -1;
@@ -46,7 +47,7 @@ public class ScanManager implements IClasIoEventListener {
 			return;
 		}
 
-		System.err.println("Scanning to create true-sequential map");
+		Log.getInstance().info("Scanning event file to create true-to-sequential event map");
 
 		//hold the current index;
 
@@ -58,18 +59,22 @@ public class ScanManager implements IClasIoEventListener {
 		_saveIndex = _eventManager.getSequentialEventNumber();
 
 		_eventManager.setScanning(true);
+		try {
+			_eventManager.gotoEvent(1);
 
-		_eventManager.gotoEvent(1);
-
-		for (int i = 1; i < count; i++) {
-			_eventManager.getNextEvent();
-			if ((i % 100) == 0) {
-				System.err.println("Scanning " + i + "/" + count);
+			for (int i = 1; i < count; i++) {
+				_eventManager.getNextEvent();
+				if ((i % 100) == 0) {
+					Log.getInstance().info("Scanning events " + i + "/" + count);
+				}
 			}
+		} catch (RuntimeException e) {
+			_map.clear();
+			Log.getInstance().error("Could not create true-to-sequential event map");
+			Log.getInstance().exception(e);
+		} finally {
+			_eventManager.setScanning(false);
 		}
-
-		_eventManager.setScanning(false);
-	//	_eventManager.gotoEvent(_saveIndex);
 
 	}
 
@@ -79,7 +84,7 @@ public class ScanManager implements IClasIoEventListener {
 		Integer enumber = _map.get(trueEventNumber);
 
 		if (enumber == null) {
-			System.err.println("No event with true number " + trueEventNumber);
+			Log.getInstance().warning("No event with true number " + trueEventNumber);
 			_eventManager.gotoEvent(_saveIndex);
 			return;
 		}
