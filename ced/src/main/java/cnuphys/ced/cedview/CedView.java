@@ -1291,7 +1291,7 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 	 */
 	@Override
 	public void trajectoriesChanged() {
-		if (!_eventManager.isAccumulating() && isVisible()) {
+		if (!_eventManager.isAccumulating() && !_eventManager.isUpdatingEventDisplay() && isVisible()) {
 			refresh();
 		}
 	}

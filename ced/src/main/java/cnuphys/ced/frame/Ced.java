@@ -1037,6 +1037,16 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		System.out.println("**** Found CLAS12DIR [" + clas12dir + "]");
 	}
 
+	/** Repaint a completed event as one desktop-level update to preserve overlap ordering. */
+	public static void refreshEventDisplay() {
+		Runnable repaint = () -> Desktop.getInstance().repaint();
+		if (SwingUtilities.isEventDispatchThread()) {
+			repaint.run();
+		} else {
+			SwingUtilities.invokeLater(repaint);
+		}
+	}
+
 	/**
 	 * Get the geometry variation
 	 *

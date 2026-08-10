@@ -79,6 +79,7 @@ public class ClasIoEventManager {
 
 	// flag that set set to <code>true</code> if we are accumulating events
 	private boolean _accumulating = false;
+	private volatile boolean _updatingEventDisplay;
 
 	// flag that set set to <code>true</code> if we are quickly scanning events events
 	private boolean _scanning = false;
@@ -163,7 +164,7 @@ public class ClasIoEventManager {
 				else {
 					_runData.set();
 					notifyEventListeners();
-					Ced.refresh();
+					Ced.refreshEventDisplay();
 				}
 			}
 		} catch (Exception e) {
@@ -908,16 +909,25 @@ public class ClasIoEventManager {
 		}
 
 		boolean displayEvent = !isAccumulating() && !isScanning();
-		try (EventTrajectoryUpdate ignored = EventTrajectoryUpdate.begin(displayEvent)) {
-			_uniqueLundIds = null;
-			Ced.getCed().setEventFilteringLabel(FilterManager.getInstance().isFilteringOn());
+		_updatingEventDisplay = displayEvent;
+		try {
+			try (EventTrajectoryUpdate ignored = EventTrajectoryUpdate.begin(displayEvent)) {
+				_uniqueLundIds = null;
+				Ced.getCed().setEventFilteringLabel(FilterManager.getInstance().isFilteringOn());
 
-			for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
-				notifier.notifyListeners(new ClasIoEventNotification.NewEvent(_currentEvent));
+				for (EventNotifier<ClasIoEventNotification> notifier : eventNotifiers.values()) {
+					notifier.notifyListeners(new ClasIoEventNotification.NewEvent(_currentEvent));
+				}
+				finalSteps();
 			}
-			finalSteps();
+		} finally {
+			_updatingEventDisplay = false;
 		}
 
+	}
+
+	public boolean isUpdatingEventDisplay() {
+		return _updatingEventDisplay;
 	}
 
 	private static void clearTrajectoriesWithoutNotification() {
