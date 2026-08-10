@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
@@ -247,9 +246,8 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 	/**
 	 * Select and open an event file.
 	 *
-	 * @return the opened file reader, or <code>null</code>
 	 */
-	private static File openEventFile() {
+	private static void openEventFile() {
 
 		JFileChooser chooser = new JFileChooser(dataFilePath);
 		chooser.setSelectedFile(null);
@@ -257,6 +255,10 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 		int returnVal = chooser.showOpenDialog(Ced.getFrame());
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
+			if (!canOpenEventFile(file)) {
+				showOpenError(file, "The file does not exist or is not readable.");
+				return;
+			}
 			try {
 				dataFilePath = file.getPath();
 
@@ -265,14 +267,10 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 				} else if (_evioEventFileFilter.accept(file)) {
 					ClasIoEventManager.getInstance().openEvioEventFile(file);
 				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (IOException | RuntimeException e) {
+				showOpenError(file, e.getMessage());
 			}
 		}
-
-		return null;
 	}
 
 	/**
