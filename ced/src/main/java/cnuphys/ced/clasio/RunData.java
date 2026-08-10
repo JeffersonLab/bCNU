@@ -1,6 +1,6 @@
 package cnuphys.ced.clasio;
 
-import cnuphys.ced.alldata.DataWarehouse;
+import cnuphys.ced.alldata.RunConfig;
 import cnuphys.bCNU.log.Log;
 import cnuphys.magfield.MagneticFields;
 
@@ -12,11 +12,6 @@ import cnuphys.magfield.MagneticFields;
  */
 
 public class RunData {
-
-	//bank name
-	private static final String bankName = "RUN::config";
-	// data warehouse
-	private static DataWarehouse _dw = DataWarehouse.getInstance();
 
 	public int run = -1;
 	public int event;
@@ -38,36 +33,36 @@ public class RunData {
 	 */
 	public boolean set() {
 
-		boolean hasRunBank = _dw.hasBank("RUN::config");
-		if (!hasRunBank) {
+		RunConfig config = RunConfig.getInstance();
+		if (!config.hasUsableRow()) {
 			return false;
 		}
 
 		int oldRun = run;
 
 		try {
- 			run = safeInt("run");
+			run = config.run();
 			if (run < 0) {
 				return false;
 			}
 
-			event = safeInt("event");
+			event = config.event();
 
 			if (event < 0) {
 				return false;
 			}
 
-			trigger = safeLong("trigger");
-			timestamp = safeLong("timestamp");
-			type = safeByte("type");
-			mode = safeByte("mode");
+			trigger = config.trigger();
+			timestamp = config.timestamp();
+			type = config.type();
+			mode = config.mode();
 
-			solenoid = safeFloat("solenoid");
+			solenoid = config.solenoid();
 			if (Float.isNaN(solenoid)) {
 				return false;
 			}
 
-			torus = safeFloat("torus");
+			torus = config.torus();
 			if (Float.isNaN(torus)) {
 				return false;
 			}
@@ -83,39 +78,6 @@ public class RunData {
 		}
 
 		return false;
-	}
-
-	private long safeLong(String colName) {
-
-		long[] data = _dw.getLong(bankName, colName);
-		if ((data == null) || (data.length < 1)) {
-			return -1;
-		}
-		return data[0];
-	}
-
-	private int safeInt(String colName) {
-		int[] data = _dw.getInt(bankName, colName);
-		if ((data == null) || (data.length < 1)) {
-			return -1;
-		}
-		return data[0];
-	}
-
-	private byte safeByte(String colName) {
-		byte[] data = _dw.getByte(bankName, colName);
-		if ((data == null) || (data.length < 1)) {
-			return -1;
-		}
-		return data[0];
-	}
-
-	private float safeFloat(String colName) {
-		float[] data = _dw.getFloat(bankName, colName);
-		if ((data == null) || (data.length < 1)) {
-			return Float.NaN;
-		}
-		return data[0];
 	}
 
 	@Override
