@@ -1031,64 +1031,10 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 	// this is so we can find json files
 	private static void initClas12Dir() throws IOException {
-
-		// for running from runnable jar (for coatjava)
-		String clas12dir = System.getProperty("CLAS12DIR");
-
-		if (clas12dir == null) {
-			clas12dir = "coatjava";
-		}
-
-		_clasDir = new File(clas12dir);
-
-		if (_clasDir.exists() && _clasDir.isDirectory()) {
-			System.out.println("**** Found CLAS12DIR [" + _clasDir.getCanonicalPath() + "]");
-			System.setProperty("CLAS12DIR", clas12dir);
-			return;
-		} else {
-			System.out.println("**** Did not find CLAS12DIR [" + _clasDir.getCanonicalPath() + "]");
-		}
-
-		String cwd = Environment.getInstance().getCurrentWorkingDirectory();
-		clas12dir = cwd + "/../../../../../cnuphys/coatjava";
-		_clasDir = new File(clas12dir);
-
-		if (_clasDir.exists() && _clasDir.isDirectory()) {
-			System.out.println("**** Found CLAS12DIR [" + _clasDir.getCanonicalPath() + "]");
-			System.setProperty("CLAS12DIR", clas12dir);
-			return;
-		} else {
-			System.out.println("**** Did not find CLAS12DIR [" + _clasDir.getCanonicalPath() + "]");
-		}
-
-		clas12dir = cwd + "/../../../../../bCNU/coatjava";
-		_clasDir = new File(clas12dir);
-
-		if (_clasDir.exists() && _clasDir.isDirectory()) {
-			System.out.println("**** Found CLAS12DIR [" + _clasDir.getCanonicalPath() + "]");
-			System.setProperty("CLAS12DIR", clas12dir);
-			return;
-		} else {
-			System.out.println("**** Did not find CLAS12DIR [" + _clasDir.getCanonicalPath() + "]");
-		}
-
-		//one last try
-		clas12dir = System.getenv("CLAS12DIR");
-		if (clas12dir != null) {
-			System.out.println("Trying with environment variable CLAS12DIR = "  + clas12dir);
-			_clasDir = new File(clas12dir);
-			if (_clasDir.exists() && _clasDir.isDirectory()) {
-				System.out.println("**** Found CLAS12DIR [" + _clasDir.getCanonicalPath() + "]");
-				System.setProperty("CLAS12DIR", clas12dir);
-				return;
-			}
-			else {
-				System.out.println("**** Did not find CLAS12DIR [" + _clasDir.getCanonicalPath() + "]");
-			}
-		}
-
-
-		throw (new IOException("Could not locate the coatjava directory."));
+		_clasDir = Clas12ResourceLocator.locate();
+		String clas12dir = _clasDir.getCanonicalPath();
+		System.setProperty("CLAS12DIR", clas12dir);
+		System.out.println("**** Found CLAS12DIR [" + clas12dir + "]");
 	}
 
 	/**

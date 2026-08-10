@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 JARNAME="$SCRIPT_DIR/target/ced.jar"
-CLAS12_DIR="$SCRIPT_DIR/../coatjava"
+CLAS12_DIR="${CLAS12DIR:-$SCRIPT_DIR/../coatjava}"
 
 echo "CED jar: $JARNAME"
 echo "CLAS12DIR used by CED: $CLAS12_DIR"
