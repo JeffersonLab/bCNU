@@ -36,4 +36,14 @@ class ClasIoEventMenuTest {
 		assertEquals(2f, ClasIoEventMenu.normalizedEventPeriod("NaN", 2f));
 		assertEquals(2f, ClasIoEventMenu.normalizedEventPeriod("Infinity", 2f));
 	}
+
+	@Test
+	void acceptsOnlyPositiveEventNumbers() {
+		assertEquals(42, ClasIoEventMenu.positiveEventNumber(" 42 ").orElseThrow());
+		assertTrue(ClasIoEventMenu.positiveEventNumber(null).isEmpty());
+		assertTrue(ClasIoEventMenu.positiveEventNumber("").isEmpty());
+		assertTrue(ClasIoEventMenu.positiveEventNumber("0").isEmpty());
+		assertTrue(ClasIoEventMenu.positiveEventNumber("-1").isEmpty());
+		assertTrue(ClasIoEventMenu.positiveEventNumber("event").isEmpty());
+	}
 }

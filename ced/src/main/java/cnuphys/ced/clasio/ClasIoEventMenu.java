@@ -11,7 +11,9 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Hashtable;
+import java.util.OptionalInt;
 import java.util.Vector;
+import java.util.function.IntConsumer;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -24,6 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.MenuSelectionManager;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
 import org.jlab.io.base.DataEvent;
@@ -424,21 +427,7 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 
 		seqEvNum = new JTextField("1", 10);
 
-		KeyAdapter ka = new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent kev) {
-				if (kev.getKeyCode() == KeyEvent.VK_ENTER) {
-					MenuSelectionManager.defaultManager().clearSelectedPath();
-					try {
-						int enumber = Integer.parseInt(seqEvNum.getText());
-						_eventManager.gotoEvent(enumber);
-					} catch (Exception e) {
-
-					}
-				}
-			}
-		};
-		seqEvNum.addKeyListener(ka);
+		seqEvNum.addActionListener(event -> navigateToEnteredEvent(seqEvNum, _eventManager::gotoEvent));
 
 		sp.add(label);
 		sp.add(seqEvNum);
@@ -454,26 +443,33 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 
 		trueEvNum = new JTextField("1", 10);
 
-		KeyAdapter ka = new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent kev) {
-				if (kev.getKeyCode() == KeyEvent.VK_ENTER) {
-					MenuSelectionManager.defaultManager().clearSelectedPath();
-					try {
-						int trueNum = Integer.parseInt(trueEvNum.getText());
-						ScanManager.getInstance().gotoTrue(trueNum);
-					} catch (Exception e) {
-
-					}
-				}
-			}
-		};
-		trueEvNum.addKeyListener(ka);
+		trueEvNum.addActionListener(event ->
+				navigateToEnteredEvent(trueEvNum, ScanManager.getInstance()::gotoTrue));
 
 		sp.add(label);
 		sp.add(trueEvNum);
 		trueEvNum.setEnabled(false);
 		return sp;
+	}
+
+	private static void navigateToEnteredEvent(JTextField field, IntConsumer navigation) {
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+		OptionalInt eventNumber = positiveEventNumber(field.getText());
+		if (eventNumber.isPresent()) {
+			navigation.accept(eventNumber.getAsInt());
+		} else {
+			UIManager.getLookAndFeel().provideErrorFeedback(field);
+			field.selectAll();
+		}
+	}
+
+	static OptionalInt positiveEventNumber(String text) {
+		try {
+			int eventNumber = Integer.parseInt(text == null ? "" : text.trim());
+			return eventNumber > 0 ? OptionalInt.of(eventNumber) : OptionalInt.empty();
+		} catch (NumberFormatException exception) {
+			return OptionalInt.empty();
+		}
 	}
 
 
