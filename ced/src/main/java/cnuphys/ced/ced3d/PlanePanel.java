@@ -3,8 +3,8 @@ package cnuphys.ced.ced3d;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.FontMetrics;
+import java.util.OptionalDouble;
 
-import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -30,10 +30,9 @@ public class PlanePanel extends JPanel {
 
 
 	public PlanePanel() {
-		setLayout(new VerticalFlowLayout());
+		setLayout(new VerticalFlowLayout(true, 0));
 
 		add(normalPanel());
-		add(Box.createVerticalStrut(2));
 		add(pointPanel());
 
 		setBorder(new CommonBorder("Specify the plane (normal and point)"));
@@ -43,7 +42,7 @@ public class PlanePanel extends JPanel {
 	//the panel for the normal vector
 	private JPanel normalPanel() {
 		JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 0));
 
 		panel.add(fixedLabel("Normal (xyz)"));
 
@@ -61,7 +60,7 @@ public class PlanePanel extends JPanel {
 	private JPanel pointPanel() {
 		JPanel panel = new JPanel();
 
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 0));
 
 		panel.add(fixedLabel("Point (xyz)"));
 
@@ -123,17 +122,23 @@ public class PlanePanel extends JPanel {
 	 */
 	public double[] getNormal() {
 
+		double[] candidate = normal.clone();
 		for (int i = 0; i < 3; i++) {
-			try {
-				double val = Double.parseDouble(normalTF[i].getText());
-				normal[i] = val;
-			}
-			catch (Exception e) {
+			OptionalDouble value = SwimInputValues.finiteDouble(normalTF[i].getText());
+			if (value.isPresent()) {
+				candidate[i] = value.getAsDouble();
+			} else {
 				normalTF[i].setText(valStr(normal[i]));
-
 			}
 		}
 
+		if (SwimInputValues.isNonZeroVector(candidate)) {
+			normal = candidate;
+		} else {
+			for (int i = 0; i < 3; i++) {
+				normalTF[i].setText(valStr(normal[i]));
+			}
+		}
 
 		return normal;
 	}
@@ -145,11 +150,10 @@ public class PlanePanel extends JPanel {
 	public double[] getPoint() {
 
 		for (int i = 0; i < 3; i++) {
-			try {
-				double val = Double.parseDouble(pointTF[i].getText());
-				point[i] = val;
-			}
-			catch (Exception e) {
+			OptionalDouble value = SwimInputValues.finiteDouble(pointTF[i].getText());
+			if (value.isPresent()) {
+				point[i] = value.getAsDouble();
+			} else {
 				pointTF[i].setText(valStr(point[i]));
 			}
 		}

@@ -3,8 +3,8 @@ package cnuphys.ced.ced3d;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.FontMetrics;
+import java.util.OptionalDouble;
 
-import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -31,11 +31,10 @@ public class CylinderPanel extends JPanel {
 	private double radius = 168; //cm
 
 	public CylinderPanel() {
-		setLayout(new VerticalFlowLayout());
+		setLayout(new VerticalFlowLayout(true, 0));
 
 		add(p1Panel());
 		add(p2Panel());
-		add(Box.createVerticalStrut(4));
 		add(radiusPanel());
 
 		setBorder(new CommonBorder("Specify the cylinder (center line and radius)"));
@@ -45,7 +44,7 @@ public class CylinderPanel extends JPanel {
 	//the panel for the center line P1
 	private JPanel p1Panel() {
 		JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 0));
 
 		panel.add(fixedLabel("CL P1 (xyz)"));
 
@@ -62,7 +61,7 @@ public class CylinderPanel extends JPanel {
 	//the panel for the center line P2
 	private JPanel p2Panel() {
 		JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 0));
 
 		panel.add(fixedLabel("CL P2 (xyz)"));
 
@@ -81,7 +80,7 @@ public class CylinderPanel extends JPanel {
 	private JPanel radiusPanel() {
 		JPanel panel = new JPanel();
 
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 4, 0));
 
 		panel.add(fixedLabel("radius"));
 
@@ -158,13 +157,11 @@ public class CylinderPanel extends JPanel {
 	public double[] getCenterLineP1() {
 
 		for (int i = 0; i < 3; i++) {
-			try {
-				double val = Double.parseDouble(centerLineP1TF[i].getText());
-				centerLineP1[i] = val;
-			}
-			catch (Exception e) {
+			OptionalDouble value = SwimInputValues.finiteDouble(centerLineP1TF[i].getText());
+			if (value.isPresent()) {
+				centerLineP1[i] = value.getAsDouble();
+			} else {
 				centerLineP1TF[i].setText(valStr(centerLineP1[i]));
-
 			}
 		}
 
@@ -179,13 +176,11 @@ public class CylinderPanel extends JPanel {
 	public double[] getCenterLineP2() {
 
 		for (int i = 0; i < 3; i++) {
-			try {
-				double val = Double.parseDouble(centerLineP2TF[i].getText());
-				centerLineP2[i] = val;
-			}
-			catch (Exception e) {
+			OptionalDouble value = SwimInputValues.finiteDouble(centerLineP2TF[i].getText());
+			if (value.isPresent()) {
+				centerLineP2[i] = value.getAsDouble();
+			} else {
 				centerLineP2TF[i].setText(valStr(centerLineP2[i]));
-
 			}
 		}
 
@@ -198,13 +193,11 @@ public class CylinderPanel extends JPanel {
 	 * @returnthe radius of the cylinder
 	 */
 	public double getRadius() {
-		try {
-			double val = Double.parseDouble(radiusTF.getText());
-			radius = val;
-		}
-		catch (Exception e) {
+		OptionalDouble value = SwimInputValues.positiveDouble(radiusTF.getText());
+		if (value.isPresent()) {
+			radius = value.getAsDouble();
+		} else {
 			radiusTF.setText(valStr(radius));
-
 		}
 		return radius;
 	}

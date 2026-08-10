@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 
-import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -160,14 +159,13 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	//add the north component
 	private void addNorth() {
 		JPanel np = new JPanel();
-		np.setLayout(new VerticalFlowLayout());
+		np.setLayout(new VerticalFlowLayout(true, 0));
 
 		_magFieldLabel = new JLabel("Magnetic Field Configuration");
 		_magFieldLabel.setFont(Fonts.mediumBoldFont);
 		_magFieldLabel.setForeground(Color.red);
 
 		np.add(_magFieldLabel);
-		np.add(Box.createVerticalStrut(4));
 		setMagLabel();
 
 
@@ -216,7 +214,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 		//add the algorithm parameter panel
 		//and the plane and cylinder panels
 		JPanel sp = new JPanel();
-		sp.setLayout(new VerticalFlowLayout());
+		sp.setLayout(new VerticalFlowLayout(true, 0));
 
 		_planePanel = new PlanePanel();
 		_cylinderPanel = new CylinderPanel();
@@ -370,7 +368,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	private JPanel getRangePanel() {
 
 		JPanel p = new JPanel();
-		p.setLayout(new VerticalFlowLayout());
+		p.setLayout(new VerticalFlowLayout(true, 0));
 
 		for (int i = 0; i < 6; i++) {
 			_ranges[i] = createRange(_rangePrompts[i], _rangeUnits[i], _rangeMin[i], _rangeMax[i], p);
@@ -384,7 +382,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	//get the algorithm radio button panel
 	private JPanel getAlgRBPanel() {
 		JPanel p = new JPanel();
-		p.setLayout(new VerticalFlowLayout());
+		p.setLayout(new VerticalFlowLayout(true, 0));
 
 
 		ButtonGroup bg = new ButtonGroup();
@@ -406,7 +404,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
         p.add(cutoffPanel(), BorderLayout.CENTER);
 
         JPanel sp = new JPanel();
-        sp.setLayout(new VerticalFlowLayout());
+        sp.setLayout(new VerticalFlowLayout(true, 0));
 
         sp.add(getChargePanel());
         sp.add(getShowPanel());
@@ -486,7 +484,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 	//algorithm cutoffs
 	private JPanel cutoffPanel() {
 		JPanel p = new JPanel();
-		p.setLayout(new VerticalFlowLayout());
+		p.setLayout(new VerticalFlowLayout(true, 0));
 
 		FontMetrics fm = getFontMetrics(swimFont);
 		int width = fm.stringWidth("\"Swim to\" accuracy:");
