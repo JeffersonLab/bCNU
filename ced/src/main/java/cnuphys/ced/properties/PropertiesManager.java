@@ -3,6 +3,7 @@ package cnuphys.ced.properties;
 import java.io.File;
 import java.util.Properties;
 
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.util.Environment;
 import cnuphys.bCNU.util.SerialIO;
 
@@ -98,20 +99,22 @@ public class PropertiesManager {
 	 * Read the property from from the home directory.
 	 */
 	private void getPropertiesFromDisk() {
-		try {
-			String homeDir = Environment.getInstance().getHomeDirectory();
-			_upFile = new File(homeDir, ".ced.user.pref");
-			System.out.print("User pref file: " + _upFile.getPath() + "     ");
-			if (_upFile.exists()) {
-				_userPref = (Properties) SerialIO.serialRead(_upFile.getPath());
-				System.out.println("Read preferences");
-			} else {
-				_userPref = new Properties();
-				System.out.println("Could not read preferences");
-			}
-		} catch (Exception e) {
-			_userPref = new Properties();
-			System.out.println("Could not read preferences");
+		String homeDir = Environment.getInstance().getHomeDirectory();
+		_upFile = new File(homeDir, ".ced.user.pref");
+		_userPref = loadProperties(_upFile);
+	}
+
+	static Properties loadProperties(File preferenceFile) {
+		if ((preferenceFile == null) || !preferenceFile.isFile()) {
+			return new Properties();
 		}
+
+		Object savedPreferences = SerialIO.serialRead(preferenceFile.getPath());
+		if (savedPreferences instanceof Properties properties) {
+			return properties;
+		}
+
+		Log.getInstance().warning("Ignoring invalid CED preference file: " + preferenceFile.getPath());
+		return new Properties();
 	}
 }
