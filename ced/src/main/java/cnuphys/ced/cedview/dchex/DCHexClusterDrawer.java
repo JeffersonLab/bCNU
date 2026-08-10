@@ -153,7 +153,7 @@ public class DCHexClusterDrawer {
 			if ((wire[i] <= 0) || (layer[i] <= 0)) {
 				continue;
 			}
-			_view.getWirePolygon(sector, superlayer, layer[i], wire[i], wirePoly);
+			if (!_view.getWirePolygon(sector, superlayer, layer[i], wire[i], wirePoly)) continue;
 
 			Polygon poly = new Polygon();
 			for (int j = 0; j < 4; j++) {

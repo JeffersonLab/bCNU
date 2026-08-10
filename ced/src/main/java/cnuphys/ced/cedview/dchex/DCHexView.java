@@ -258,8 +258,10 @@ public class DCHexView extends HexView {
 	 * @param wire 1-based wire
 	 * @param poly the polygon to fill
 	 */
-	public void getWirePolygon(int sector, int superLayer, int layer, int wire, Point2D.Double[] poly) {
-		_superLayerItems[sector-1][superLayer - 1].getWirePolygon(layer, wire, poly);
+	public boolean getWirePolygon(int sector, int superLayer, int layer, int wire, Point2D.Double[] poly) {
+		if (sector < 1 || sector > _superLayerItems.length || superLayer < 1
+				|| superLayer > _superLayerItems[sector - 1].length) return false;
+		return _superLayerItems[sector - 1][superLayer - 1].getWirePolygon(layer, wire, poly);
 	}
 
 

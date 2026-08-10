@@ -357,7 +357,7 @@ public class DCHexSuperLayer extends PolygonItem {
 
 	// fill a wire polygon
 	private void fillWirePoly(Graphics g, IContainer container, int layer, int wire, Point pp, Color color) {
-		getWirePolygon(layer, wire, wirePoly);
+		if (!getWirePolygon(layer, wire, wirePoly)) return;
 
 		ppoly.reset();
 		for (int i = 0; i < 4; i++) {
@@ -434,9 +434,13 @@ public class DCHexSuperLayer extends PolygonItem {
 	 * @param wire the 1-based wire
 	 * @param wp will hold the world points of the wire
 	 */
-	public void getWirePolygon(int layer, int wire, Point2D.Double wp[]) {
+	public boolean getWirePolygon(int layer, int wire, Point2D.Double wp[]) {
+		if (layer < 1 || layer > _layerPolygons.length || wire < 1 || wire > 112
+				|| wp == null || wp.length < 4) return false;
+		for (int i = 0; i < 4; i++) {
+			if (wp[i] == null) return false;
+		}
 
-		try {
 		Point2D.Double poly[] = _layerPolygons[layer - 1];
 
 		double fract1 = (wire - 1) / 112.;
@@ -446,9 +450,7 @@ public class DCHexSuperLayer extends PolygonItem {
 		cut(poly[1], poly[2], fract2, wp[1]);
 		cut(poly[0], poly[3], fract2, wp[2]);
 		cut(poly[0], poly[3], fract1, wp[3]);
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
+		return true;
 	}
 
 	/**
@@ -572,7 +574,7 @@ public class DCHexSuperLayer extends PolygonItem {
 		Point pp = new Point();
 
 		for (int wire = 1; wire <= 112; wire++) {
-            getWirePolygon(layer, wire, wirePoly);
+			if (!getWirePolygon(layer, wire, wirePoly)) continue;
             poly.reset();
             for (int i = 0; i < 4; i++) {
                 container.worldToLocal(pp, wirePoly[i]);
