@@ -18,7 +18,6 @@ import javax.swing.table.TableColumn;
 import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.component.CommonBorder;
-import cnuphys.bCNU.util.Bits;
 import cnuphys.bCNU.util.FileUtilities;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.ced.alldata.DataWarehouse;
@@ -197,41 +196,15 @@ public class CedDataWindow extends CedWindow implements ActionListener, ItemList
 
 	// persist the visibility selections
 	private void writeVisibility() {
-		long val = 1;
-		for (int i = 0; i < Math.min(_cbarray.length, 63); i++) {
-			int bit = i + 1; // because of index column
-			if (_cbarray[i].isSelected()) {
-				val = Bits.setBitAtLocation(val, bit);
-			}
-		}
-
-		PropertiesManager.getInstance().putAndWrite(_bankName, "" + val);
+		PropertiesManager.getInstance().putAndWrite(_bankName,
+				Long.toString(ColumnVisibility.selectedMask(_cbarray)));
 	}
 
 	// get visibility from properties
 	private void readVisibility() {
 		String vs = PropertiesManager.getInstance().get(_bankName);
-		if (vs != null) {
-			try {
-				long val = Long.parseLong(vs);
-
-				for (int i = 0; i < Math.min(_cbarray.length, 63); i++) {
-					int bit = i + 1; // because of index column
-					if (!Bits.checkBitAtLocation(val, bit)) {
-						_cbarray[i].setSelected(false);
-						TableColumn column = _table.getColumnModel().getColumn(bit);
-						column.setMinWidth(0);
-						column.setMaxWidth(0);
-						column.setResizable(false);
-						column.setPreferredWidth(0);
-					} else {
-						_cbarray[i].setSelected(true);
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		ColumnVisibility.parseMask(vs)
+				.ifPresent(mask -> ColumnVisibility.applyMask(mask, _cbarray, _table.getColumnModel()));
 	} // readvis
 
 	/**
