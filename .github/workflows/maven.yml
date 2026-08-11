@@ -35,6 +35,13 @@ jobs:
           ref: CLAS12Swim-commons-math
           path: coatjava
 
+      - name: Check out MDI
+        uses: actions/checkout@v6
+        with:
+          repository: heddle/mdi
+          ref: develop
+          path: mdi
+
       - name: Set up Java 21 and Maven cache
         uses: actions/setup-java@v5
         with:
@@ -47,6 +54,11 @@ jobs:
             bCNU/bCNU3D/pom.xml
             bCNU/ced/pom.xml
             coatjava/pom.xml
+            mdi/pom.xml
+
+      - name: Install MDI
+        working-directory: mdi
+        run: mvn --batch-mode -DskipTests install
 
       - name: Install CED Maven prerequisites
         working-directory: bCNU
