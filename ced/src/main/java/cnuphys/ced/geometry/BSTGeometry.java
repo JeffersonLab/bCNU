@@ -1,6 +1,9 @@
 package cnuphys.ced.geometry;
 
 import java.awt.geom.Point2D;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +68,7 @@ public class BSTGeometry extends ACachedGeometry {
 
 	// read the bst geometry
 	private static void getBSTPanels() {
+		_bstXYpanelsLayers = new ArrayList<>();
 
 		// use the geometry service
 
@@ -96,6 +100,60 @@ public class BSTGeometry extends ACachedGeometry {
 
 			}
 		}
+	}
+
+	@Override
+	public boolean supportsCache() {
+		return true;
+	}
+
+	@Override
+	public void writeGeometry(DataOutput output) throws IOException {
+		output.writeInt(sectorsPerLayer.length);
+		output.writeInt(256);
+		for (int layer = 0; layer < sectorsPerLayer.length; layer++) {
+			output.writeInt(sectorsPerLayer[layer]);
+			for (int sector = 0; sector < sectorsPerLayer[layer]; sector++) {
+				for (int strip = 0; strip < 256; strip++) {
+					Line3d line = getStrip(sector, layer, strip);
+					writeVector(output, line.origin());
+					writeVector(output, line.end());
+				}
+			}
+		}
+	}
+
+	@Override
+	public void readGeometry(DataInput input) throws IOException {
+		int layers = input.readInt();
+		int strips = input.readInt();
+		if (layers != sectorsPerLayer.length || strips != 256) {
+			throw new IOException("Unexpected BST dimensions: " + layers + " layers, " + strips + " strips");
+		}
+		HashMap<String, Line3d> restored = new HashMap<>();
+		for (int layer = 0; layer < layers; layer++) {
+			int sectors = input.readInt();
+			if (sectors != sectorsPerLayer[layer]) {
+				throw new IOException("Unexpected BST sector count for layer " + layer + ": " + sectors);
+			}
+			for (int sector = 0; sector < sectors; sector++) {
+				for (int strip = 0; strip < strips; strip++) {
+					restored.put(hashKey(layer, sector, strip), new Line3d(readVector(input), readVector(input)));
+				}
+			}
+		}
+		_strips = restored;
+		getBSTPanels();
+	}
+
+	private static void writeVector(DataOutput output, Vector3d vector) throws IOException {
+		output.writeDouble(vector.x);
+		output.writeDouble(vector.y);
+		output.writeDouble(vector.z);
+	}
+
+	private static Vector3d readVector(DataInput input) throws IOException {
+		return new Vector3d(input.readDouble(), input.readDouble(), input.readDouble());
 	}
 
 	private static String hashKey(int layer, int sector, int strip) {
