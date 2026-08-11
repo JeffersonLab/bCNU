@@ -8,6 +8,7 @@ import org.jlab.geom.component.TrackerStrip;
 import org.jlab.geom.detector.fmt.FMTLayer;
 import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Point3D;
+import org.jlab.geom.prim.Transformation3D;
 
 /** Primitive FMT strip geometry retained by CED and stored in SQLite. */
 final class FMTLayerData {
@@ -16,12 +17,14 @@ final class FMTLayerData {
 	final int superlayer;
 	final int layer;
 	private final double[][] stripVertices;
+	private final double[][] localToGlobal;
 
 	FMTLayerData(FMTLayer source) {
 		sector = source.getSectorId();
 		superlayer = source.getSuperlayerId();
 		layer = source.getLayerId();
 		stripVertices = new double[source.getNumComponents()][24];
+		localToGlobal = sampleAffine(source.getTransformation());
 		for (int strip = 0; strip < stripVertices.length; strip++) {
 			TrackerStrip component = source.getComponent(strip);
 			for (int corner = 0; corner < 8; corner++) {
@@ -34,11 +37,13 @@ final class FMTLayerData {
 		}
 	}
 
-	private FMTLayerData(int sector, int superlayer, int layer, double[][] stripVertices) {
+	private FMTLayerData(int sector, int superlayer, int layer, double[][] stripVertices,
+			double[][] localToGlobal) {
 		this.sector = sector;
 		this.superlayer = superlayer;
 		this.layer = layer;
 		this.stripVertices = stripVertices;
+		this.localToGlobal = localToGlobal;
 	}
 
 	int stripCount() {
@@ -57,10 +62,22 @@ final class FMTLayerData {
 		}
 	}
 
+	void localToGlobal(float x, float y, float z, float[] global) {
+		for (int row = 0; row < 3; row++) {
+			global[row] = (float) (localToGlobal[row][0] * x + localToGlobal[row][1] * y
+					+ localToGlobal[row][2] * z + localToGlobal[row][3]);
+		}
+	}
+
 	void writeToCache(DataOutput output) throws IOException {
 		output.writeInt(sector);
 		output.writeInt(superlayer);
 		output.writeInt(layer);
+		for (double[] row : localToGlobal) {
+			for (double value : row) {
+				output.writeDouble(value);
+			}
+		}
 		output.writeInt(stripVertices.length);
 		for (double[] vertices : stripVertices) {
 			for (double coordinate : vertices) {
@@ -73,6 +90,12 @@ final class FMTLayerData {
 		int sector = input.readInt();
 		int superlayer = input.readInt();
 		int layer = input.readInt();
+		double[][] localToGlobal = new double[3][4];
+		for (double[] row : localToGlobal) {
+			for (int column = 0; column < row.length; column++) {
+				row[column] = input.readDouble();
+			}
+		}
 		int stripCount = input.readInt();
 		if (stripCount < 1 || stripCount > 10_000) {
 			throw new IOException("Invalid FMT strip count: " + stripCount);
@@ -83,7 +106,25 @@ final class FMTLayerData {
 				strip[coordinate] = input.readDouble();
 			}
 		}
-		return new FMTLayerData(sector, superlayer, layer, vertices);
+		return new FMTLayerData(sector, superlayer, layer, vertices, localToGlobal);
+	}
+
+	private static double[][] sampleAffine(Transformation3D transformation) {
+		Point3D origin = transformed(transformation, 0, 0, 0);
+		Point3D xAxis = transformed(transformation, 1, 0, 0);
+		Point3D yAxis = transformed(transformation, 0, 1, 0);
+		Point3D zAxis = transformed(transformation, 0, 0, 1);
+		return new double[][] {
+			{ xAxis.x() - origin.x(), yAxis.x() - origin.x(), zAxis.x() - origin.x(), origin.x() },
+			{ xAxis.y() - origin.y(), yAxis.y() - origin.y(), zAxis.y() - origin.y(), origin.y() },
+			{ xAxis.z() - origin.z(), yAxis.z() - origin.z(), zAxis.z() - origin.z(), origin.z() }
+		};
+	}
+
+	private static Point3D transformed(Transformation3D transformation, double x, double y, double z) {
+		Point3D point = new Point3D(x, y, z);
+		transformation.apply(point);
+		return point;
 	}
 
 	private static Point3D faceCenter(double[] vertices, int firstCorner) {

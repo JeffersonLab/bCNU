@@ -115,9 +115,28 @@ public class FMTGeometry extends ACachedGeometry {
 		fmtLayer.copyStripVertices(stripId, coords);
 	}
 
+	/** Transform a point from an FMT layer's local coordinates to CLAS coordinates. */
+	public static void localToGlobal(int layer, float x, float y, float z, float[] global) {
+		FMTLayerData fmtLayer = _fmtLayers.get(hash(0, 0, layer));
+		if (fmtLayer == null || global == null || global.length < 3) {
+			if (global != null && global.length >= 3) {
+				global[0] = Float.NaN;
+				global[1] = Float.NaN;
+				global[2] = Float.NaN;
+			}
+			return;
+		}
+		fmtLayer.localToGlobal(x, y, z, global);
+	}
+
 	@Override
 	public boolean supportsCache() {
 		return true;
+	}
+
+	@Override
+	public int getCacheFormatVersion() {
+		return 2;
 	}
 
 	@Override

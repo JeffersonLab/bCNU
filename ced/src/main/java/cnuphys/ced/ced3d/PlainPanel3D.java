@@ -145,6 +145,7 @@ public abstract class PlainPanel3D extends Panel3D {
 	public static final String SHOW_FMT_LAYER_6 = "FMT Layer 6";
 	public static final String SHOW_FMT_HITS = "FMT Recon Hits";
 	public static final String SHOW_FMT_CLUSTERS = "FMT Clusters";
+	public static final String SHOW_FMT_TRAJECTORIES = "FMT Trajectory";
 
 	public static final String SHOW_FMT_REGION_1 = "FMT Region 1";
 	public static final String SHOW_FMT_REGION_2 = "FMT Region 2";
@@ -893,6 +894,11 @@ public abstract class PlainPanel3D extends Panel3D {
 	/** Show reconstructed FMT cluster seed strips? */
 	public boolean showFMTClusters() {
 		return show(PlainPanel3D.SHOW_FMT_CLUSTERS);
+	}
+
+	/** Show FMT trajectory positions? */
+	public boolean showFMTTrajectories() {
+		return show(PlainPanel3D.SHOW_FMT_TRAJECTORIES);
 	}
 
 	/**
