@@ -147,10 +147,8 @@ public class SuperLayerDrawing {
 			}
 		}
 
-		// draw the hits if have data
-		if (ClasIoEventManager.getInstance().hasCurrentEvent()) {
-			drawHits(g, container, reallyClose, segmentsOnly);
-		}
+		// Accessors safely expose zero rows when no event is present.
+		drawHits(g, container, reallyClose, segmentsOnly);
 
 		// draw outer boundary again.
 		g.setColor(_iSupl.item().getStyle().getLineColor());
@@ -323,32 +321,28 @@ public class SuperLayerDrawing {
 	 */
 	private void drawSingleModeHits(Graphics g, IContainer container, boolean reallyClose, boolean segmentsOnly) {
 
-		if (ClasIoEventManager.getInstance().hasCurrentEvent()) {
+		if (!segmentsOnly) {
 
-			if (!segmentsOnly) {
+			Point pp = new Point();
 
-				Point pp = new Point();
+			boolean useOrderColoring = Ced.useOrderColoring;
 
-				boolean useOrderColoring = Ced.useOrderColoring;
-
-				for (int i = 0; i < _dcData.count(); i++) {
-					if ((_dcData.sector(i) == _iSupl.sector()) && (_dcData.superlayer(i) == _iSupl.superlayer())) {
-						drawBasicDCHit(g, container, _dcData.layerInSuperlayer(i), _dcData.wire(i), _dcData.isNoise(i), -1,
-								_dcData.order(i), useOrderColoring);
-						// just draw the wire again
-						drawOneWire(g, container, _dcData.layerInSuperlayer(i), _dcData.wire(i), reallyClose, pp);
-					}
+			for (int i = 0; i < _dcData.count(); i++) {
+				if ((_dcData.sector(i) == _iSupl.sector()) && (_dcData.superlayer(i) == _iSupl.superlayer())) {
+					drawBasicDCHit(g, container, _dcData.layerInSuperlayer(i), _dcData.wire(i), _dcData.isNoise(i), -1,
+							_dcData.order(i), useOrderColoring);
+					// just draw the wire again
+					drawOneWire(g, container, _dcData.layerInSuperlayer(i), _dcData.wire(i), reallyClose, pp);
 				}
-
 			}
-
-			// draw track based hits (docas) and segments
-			drawHitBasedSegments(g, container);
-			// drawTimeBasedHits(g, container);
-			drawTimeBasedSegments(g, container);
-			drawAIHitBasedSegments(g, container);
-			drawAITimeBasedSegments(g, container);
 		}
+
+		// draw track based hits (docas) and segments
+		drawHitBasedSegments(g, container);
+		// drawTimeBasedHits(g, container);
+		drawTimeBasedSegments(g, container);
+		drawAIHitBasedSegments(g, container);
+		drawAITimeBasedSegments(g, container);
 
 	}
 

@@ -16,7 +16,6 @@ import cnuphys.ced.alldata.ECalClusters;
 import cnuphys.ced.alldata.RecCalorimeter;
 import cnuphys.ced.alldata.DCHits;
 import cnuphys.ced.cedview.CedView;
-import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.frame.CedColors;
 import cnuphys.ced.geometry.ECGeometry;
 
@@ -51,10 +50,6 @@ public class ReconDrawer extends SectorViewDrawer {
 			return;
 		}
 		
-		if (!ClasIoEventManager.getInstance().hasCurrentEvent()) {
-			return;
-		}
-
 		// DC HB and TB Hits
 		drawDCReconAndDOCA(g, container);
 

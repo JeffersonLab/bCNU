@@ -35,7 +35,6 @@ import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.HexView;
 import cnuphys.ced.cedview.SwimTrajectoryDrawerXY;
-import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.common.FMTCrossDrawer;
 import cnuphys.ced.component.ControlPanel;
 import cnuphys.ced.component.DisplayBits;
@@ -287,36 +286,34 @@ public class DCXYView extends HexView {
 
 	private void drawHits(Graphics g, IContainer container) {
 
-		if (ClasIoEventManager.getInstance().hasCurrentEvent()) {
-			if (isSingleEventMode()) {
+		if (isSingleEventMode()) {
 
-				int count = _dcData.count();
-				if (count > 0) {
-					Graphics2D g2 = (Graphics2D) g;
-					Stroke oldStroke = g2.getStroke();
-					g2.setStroke(stroke);
+			int count = _dcData.count();
+			if (count > 0) {
+				Graphics2D g2 = (Graphics2D) g;
+				Stroke oldStroke = g2.getStroke();
+				g2.setStroke(stroke);
 
-					Point pp1 = new Point();
-					Point pp2 = new Point();
-					Point2D.Double wp1 = new Point2D.Double();
-					Point2D.Double wp2 = new Point2D.Double();
+				Point pp1 = new Point();
+				Point pp2 = new Point();
+				Point2D.Double wp1 = new Point2D.Double();
+				Point2D.Double wp2 = new Point2D.Double();
 
-					for (int i = 0; i < count; i++) {
-						int sect = _dcData.sector(i);
-						int supl = _dcData.superlayer(i);
-						int lay = _dcData.layerInSuperlayer(i);
-						int wire = _dcData.wire(i);
-						projectWire(g, container, sect, supl, lay, wire, wp1, wp2, pp1, pp2);
-						g.setColor(_wireColors[supl - 1]);
-						g.drawLine(pp1.x, pp1.y, pp2.x, pp2.y);
-					}
-
-					g2.setStroke(oldStroke);
+				for (int i = 0; i < count; i++) {
+					int sect = _dcData.sector(i);
+					int supl = _dcData.superlayer(i);
+					int lay = _dcData.layerInSuperlayer(i);
+					int wire = _dcData.wire(i);
+					projectWire(g, container, sect, supl, lay, wire, wp1, wp2, pp1, pp2);
+					g.setColor(_wireColors[supl - 1]);
+					g.drawLine(pp1.x, pp1.y, pp2.x, pp2.y);
 				}
 
-			} else {
-				drawAccumulatedHits(g, container);
+				g2.setStroke(oldStroke);
 			}
+
+		} else {
+			drawAccumulatedHits(g, container);
 		}
 	}
 
