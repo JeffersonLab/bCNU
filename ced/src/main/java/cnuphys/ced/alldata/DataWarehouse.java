@@ -112,12 +112,7 @@ public class DataWarehouse implements IClasIoEventListener {
 	 * @return <code>true</code> if the bank is in the curent event.
 	 */
 	public boolean isBankInCurrentEvent(String bankName) {
-		if ((bankName == null) || (_knownBanks == null)) {
-			return false;
-		}
-
-		int index = Collections.binarySearch(_knownBanks, bankName);
-		return index >= 0;
+		return hasBank(bankName);
 	}
 
 

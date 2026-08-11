@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ import org.jlab.io.base.DataEvent;
 import org.jlab.jnp.hipo4.data.Schema;
 import org.jlab.jnp.hipo4.data.SchemaFactory;
 import org.junit.jupiter.api.Test;
+
+import cnuphys.ced.clasio.ClasIoEventManager;
 
 class DataWarehouseTest {
 
@@ -40,6 +43,30 @@ class DataWarehouseTest {
         assertFalse(getBankCalled.get());
         assertSame(bank, DataWarehouse.findBank(event, "REC::Particle"));
     }
+
+	@Test
+	void currentEventMembershipDoesNotUseTheSchemaDictionary() throws Exception {
+		DataWarehouse warehouse = DataWarehouse.getInstance();
+		ClasIoEventManager manager = ClasIoEventManager.getInstance();
+		Field currentEvent = ClasIoEventManager.class.getDeclaredField("_currentEvent");
+		currentEvent.setAccessible(true);
+		Object previousEvent = currentEvent.get(manager);
+		DataEvent event = (DataEvent) Proxy.newProxyInstance(DataEvent.class.getClassLoader(),
+				new Class<?>[] { DataEvent.class }, (proxy, method, args) -> switch (method.getName()) {
+					case "hasBank" -> "REC::Particle".equals(args[0]);
+					case "getBank" -> proxy(DataBank.class);
+					default -> null;
+				});
+
+		try {
+			currentEvent.set(manager, event);
+			assertTrue(warehouse.isBankInCurrentEvent("REC::Particle"));
+			assertFalse(warehouse.isBankInCurrentEvent("FMT::Tracks"));
+			assertFalse(warehouse.isBankInCurrentEvent(null));
+		} finally {
+			currentEvent.set(manager, previousEvent);
+		}
+	}
 
     @Test
     void findsOnlyColumnsReportedByTheBank() {
