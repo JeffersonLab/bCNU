@@ -143,6 +143,7 @@ public abstract class PlainPanel3D extends Panel3D {
 	public static final String SHOW_FMT_LAYER_4 = "FMT Layer 4";
 	public static final String SHOW_FMT_LAYER_5 = "FMT Layer 5";
 	public static final String SHOW_FMT_LAYER_6 = "FMT Layer 6";
+	public static final String SHOW_FMT_HITS = "FMT Recon Hits";
 
 	public static final String SHOW_FMT_REGION_1 = "FMT Region 1";
 	public static final String SHOW_FMT_REGION_2 = "FMT Region 2";
@@ -881,6 +882,11 @@ public abstract class PlainPanel3D extends Panel3D {
 	 */
 	public boolean showFMTLayer6() {
 		return show(PlainPanel3D.SHOW_FMT_LAYER_6);
+	}
+
+	/** Show reconstructed FMT hits? */
+	public boolean showFMTHits() {
+		return show(PlainPanel3D.SHOW_FMT_HITS);
 	}
 
 	/**
