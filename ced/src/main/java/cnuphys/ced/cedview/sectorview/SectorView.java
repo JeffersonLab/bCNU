@@ -25,13 +25,10 @@ import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.item.ItemList;
-import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
-import cnuphys.bCNU.view.PlotView;
-import cnuphys.bCNU.view.ViewManager;
 import cnuphys.ced.alldata.DCHits;
 import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.cedview.CedView;
@@ -49,16 +46,7 @@ import cnuphys.ced.geometry.ftof.FTOFPanel;
 import cnuphys.ced.item.BeamLineItem;
 import cnuphys.ced.item.FTOFPanelItem;
 import cnuphys.ced.item.MagFieldItem;
-import cnuphys.CLAS12Swim.CLAS12Trajectory;
-import cnuphys.magfield.FieldProbe;
-import cnuphys.magfield.MagneticFields;
-import cnuphys.magfield.RotatedCompositeProbe;
-import cnuphys.splot.fit.FitType;
-import cnuphys.splot.pdata.DataSet;
-import cnuphys.splot.pdata.DataSetException;
-import cnuphys.splot.pdata.DataSetType;
-import cnuphys.splot.plot.PlotCanvas;
-import cnuphys.swim.SwimTrajectory;
+import cnuphys.ced.magfield.TrajectoryIntegralPlotter;
 import cnuphys.swim.SwimTrajectory2D;
 
 /**
@@ -105,9 +93,6 @@ public class SectorView extends SliceView implements ChangeListener {
 	//bank matches
 	private static String _defMatches[] = {"DC:", "HitBased", "TimeBased"};
 
-
-	private static Color plotColors[] = { X11Colors.getX11Color("Dark Red"), X11Colors.getX11Color("Dark Blue"),
-			X11Colors.getX11Color("Dark Green"), Color.black, Color.gray, X11Colors.getX11Color("wheat") };
 
 	// data containers
 	private static DCRawHits _dcData = DCRawHits.getInstance();
@@ -663,37 +648,7 @@ public class SectorView extends SliceView implements ChangeListener {
 						_controlPanel.getPhiSlider().setValue((int) sliderPhi);
 						getContainer().refresh();
 					} else if (source == integralItem) {
-						PlotView pview = Ced.getCed().getPlotView();
-						if (pview != null) {
-							PlotCanvas canvas = pview.getPlotCanvas();
-							try {
-								SwimTrajectory traj = traj2D.getTrajectory3D();
-								double[][] integral = fieldIntegralSamples(traj, FieldProbe.factory());
-
-								// do we already have data?
-								boolean havePlotData = canvas.getDataSet() != null && canvas.getDataSet().dataAdded();
-
-								if (!havePlotData) {
-									initPlot(canvas, traj2D);
-								} else { // have to add a curve
-									int curveCount = canvas.getDataSet().getCurveCount();
-									DataSet dataSet = canvas.getDataSet();
-									dataSet.addCurve("X", traj2D.summaryString() + " ["
-											+ MagneticFields.getInstance().getActiveFieldDescription() + "]");
-									for (double[] sample : integral) {
-										dataSet.addToCurve(curveCount, sample[0], sample[1]);
-									}
-									setCurveStyle(canvas, curveCount);
-
-								}
-
-								ViewManager.getInstance().setVisible(pview, true);
-								canvas.repaint();
-							} catch (DataSetException | RuntimeException e) {
-								Log.getInstance().error("Could not plot the trajectory magnetic-field integral");
-								Log.getInstance().exception(e);
-							}
-						} // pview not null
+						TrajectoryIntegralPlotter.show(traj2D);
 					} // integral
 				}
 			};
@@ -711,85 +666,6 @@ public class SectorView extends SliceView implements ChangeListener {
 		}
 
 		return false;
-	}
-
-	//initialize the bdl plot
-	private void initPlot(PlotCanvas canvas, SwimTrajectory2D traj2D) throws DataSetException {
-		SwimTrajectory traj = traj2D.getTrajectory3D();
-		double[][] integral = fieldIntegralSamples(traj, FieldProbe.factory());
-		DataSet dataSet = new DataSet(DataSetType.XYXY, "X",
-				traj2D.summaryString() + " [" + MagneticFields.getInstance().getActiveFieldDescription() + "]");
-
-		canvas.getParameters().setPlotTitle("Magnetic Field Integral");
-		canvas.getParameters().setXLabel("Path Length (m)");
-		canvas.getParameters().setYLabel("<html>" + UnicodeSupport.INTEGRAL + "|<bold>B</bold> " + UnicodeSupport.TIMES
-				+ " <bold>dL</bold>| kG-m");
-
-		for (double[] sample : integral) {
-			dataSet.add(sample[0], sample[1]);
-		}
-		canvas.setDataSet(dataSet);
-		setCurveStyle(canvas, 0);
-	}
-
-	private static double[][] fieldIntegralSamples(SwimTrajectory trajectory, FieldProbe probe) {
-		if (trajectory instanceof CLAS12Trajectory clas12Trajectory) {
-			return clas12FieldIntegralSamples(clas12Trajectory, probe);
-		}
-
-		trajectory.computeBDL(probe);
-		double[][] samples = new double[trajectory.size()][2];
-		for (int i = 0; i < trajectory.size(); i++) {
-			double[] state = trajectory.get(i);
-			samples[i][0] = state[SwimTrajectory.PATHLEN_IDX];
-			samples[i][1] = state[SwimTrajectory.BXDL_IDX];
-		}
-		return samples;
-	}
-
-	private static double[][] clas12FieldIntegralSamples(CLAS12Trajectory trajectory, FieldProbe probe) {
-		int count = Math.min(trajectory.size(), trajectory.getSSize());
-		double[][] samples = new double[count][2];
-		if (count == 0) return samples;
-
-		double integral = 0;
-		samples[0][0] = trajectory.getS(0);
-		for (int i = 1; i < count; i++) {
-			double[] previous = trajectory.get(i - 1);
-			double[] current = trajectory.get(i);
-			double dx = current[0] - previous[0];
-			double dy = current[1] - previous[1];
-			double dz = current[2] - previous[2];
-			float[] field = new float[3];
-			float x = (float) ((previous[0] + current[0]) * 0.5);
-			float y = (float) ((previous[1] + current[1]) * 0.5);
-			float z = (float) ((previous[2] + current[2]) * 0.5);
-			if (probe instanceof RotatedCompositeProbe rotatedProbe) {
-				rotatedProbe.field(GeometryManager.getSector(x, y), x, y, z, field);
-			} else {
-				probe.field(x, y, z, field);
-			}
-
-			double bx = field[1] * dz - field[2] * dy;
-			double by = field[2] * dx - field[0] * dz;
-			double bz = field[0] * dy - field[1] * dx;
-			integral += Math.sqrt(bx * bx + by * by + bz * bz);
-			samples[i][0] = trajectory.getS(i);
-			samples[i][1] = integral;
-		}
-		return samples;
-	}
-
-	//set the curve style
-	private void setCurveStyle(PlotCanvas canvas, int index) {
-		int cindex = index % plotColors.length;
-		canvas.getDataSet().getCurveStyle(index).setFitLineColor(plotColors[cindex]);
-		canvas.getDataSet().getCurveStyle(index).setBorderColor(plotColors[cindex]);
-		canvas.getDataSet().getCurveStyle(index).setFillColor(plotColors[cindex]);
-		canvas.getDataSet().getCurveStyle(index).setSymbolType(cnuphys.splot.style.SymbolType.X);
-		canvas.getDataSet().getCurveStyle(index).setSymbolSize(6);
-		canvas.getDataSet().getCurve(index).getFit().setFitType(FitType.CUBICSPLINE);
-
 	}
 
 	/**
