@@ -7,8 +7,6 @@ import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import org.jlab.geom.component.ScintillatorPaddle;
-
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.cedview.CedXYView;
 import cnuphys.ced.geometry.FTCALGeometry;
@@ -20,8 +18,6 @@ public class FTCalXYPolygon extends Polygon {
 	 */
 	public int paddleId;
 
-	private ScintillatorPaddle paddle;
-
 	/**
 	 * Create a XY Polygon for the CND
 	 *
@@ -29,10 +25,6 @@ public class FTCalXYPolygon extends Polygon {
 	 */
 	public FTCalXYPolygon(int paddleId) {
 		this.paddleId = paddleId;
-		paddle = FTCALGeometry.getPaddle(paddleId);
-
-		// System.err.println("PADDLE ID: " + paddleId + " good paddle: " +
-		// (paddle != null));
 	}
 
 	/**
@@ -44,8 +36,13 @@ public class FTCalXYPolygon extends Polygon {
 	public void draw(Graphics g, IContainer container) {
 		reset();
 		Point pp = new Point();
+		Point2D.Double[] corners = new Point2D.Double[4];
+		for (int i = 0; i < corners.length; i++) {
+			corners[i] = new Point2D.Double();
+		}
+		FTCALGeometry.paddleXYCorners(paddleId, corners);
 		for (int i = 0; i < 4; i++) {
-			container.worldToLocal(pp, paddle.getVolumePoint(i).x(), paddle.getVolumePoint(i).y());
+			container.worldToLocal(pp, corners[i].x, corners[i].y);
 			addPoint(pp.x, pp.y);
 		}
 
