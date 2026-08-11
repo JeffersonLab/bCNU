@@ -10,8 +10,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import org.jlab.geom.component.ScintillatorPaddle;
-
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.util.Fonts;
@@ -53,8 +51,6 @@ public class CNDXYPolygon extends Polygon {
 	int sector; // 1..24
 	int _leftRight; // 1..2
 
-	private ScintillatorPaddle paddle;
-
 	/**
 	 * Create a XY Polygon for the CND
 	 *
@@ -64,8 +60,6 @@ public class CNDXYPolygon extends Polygon {
 	public CNDXYPolygon(int layer, int paddleId) {
 		this.layer = layer;
 		this.paddleId = paddleId;
-		paddle = CNDGeometry.getPaddle(layer, paddleId);
-
 		int real[] = new int[3];
 		int geo[] = { 1, layer, paddleId };
 		CNDGeometry.geoTripletToRealTriplet(geo, real);
@@ -94,10 +88,15 @@ public class CNDXYPolygon extends Polygon {
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		reset();
+		Point2D.Double[] corners = new Point2D.Double[4];
+		for (int i = 0; i < corners.length; i++) {
+			corners[i] = new Point2D.Double();
+		}
+		CNDGeometry.paddleXYCorners(layer, paddleId, corners);
 
 		for (int i = 0; i < 4; i++) {
 			// convert cm to mm
-			wp[i] = new Point2D.Double(10 * paddle.getVolumePoint(i).x(), 10 * paddle.getVolumePoint(i).y());
+			wp[i] = new Point2D.Double(10 * corners[i].x, 10 * corners[i].y);
 			container.worldToLocal(pp, wp[i]);
 
 			addPoint(pp.x, pp.y);
