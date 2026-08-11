@@ -163,31 +163,41 @@ public class ClasIoPresentBankPanel extends JPanel {
 		removeAll();
 		repaint();
 
-		if (event != null) {
-			String[] allBanks = event.getBankList();
-			Arrays.sort(allBanks);
-			if (allBanks != null) {
+		String[] allBanks = sortedBankNames(event);
+		if (allBanks != null) {
 
-				//count the number of banks that match
-				//to see if we should used larger font
+			//count the number of banks that match
+			//to see if we should used larger font
 
-				int count = 0;
-				for (String s : allBanks) {
-					if (match(s)) {
-						count++;
-					}
+			int count = 0;
+			for (String s : allBanks) {
+				if (match(s)) {
+					count++;
 				}
+			}
 
-			    //now make the labels
-				boolean largerFont = (count < 17);
-				for (String s : allBanks) {
-					if (match(s)) {
-						makeLabel(s, largerFont);
-					}
+		    //now make the labels
+			boolean largerFont = (count < 17);
+			for (String s : allBanks) {
+				if (match(s)) {
+					makeLabel(s, largerFont);
 				}
 			}
 		}
 		repaint();
+	}
+
+	static String[] sortedBankNames(DataEvent event) {
+		if (event == null) {
+			return null;
+		}
+		String[] bankNames = event.getBankList();
+		if (bankNames == null) {
+			return null;
+		}
+		String[] sortedNames = bankNames.clone();
+		Arrays.sort(sortedNames);
+		return sortedNames;
 	}
 
 	/** Populate a newly created or reconfigured panel from the current event. */
