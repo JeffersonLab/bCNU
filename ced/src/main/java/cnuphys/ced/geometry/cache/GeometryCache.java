@@ -62,7 +62,7 @@ public final class GeometryCache {
 			cache.open();
 			for (IGeometryCache geometry : GEOMETRIES) {
 				if (cache.read(geometry)) {
-					System.out.println("Loaded " + geometry.getName() + " from geometry cache.");
+					System.out.println("Loaded " + displayName(geometry.getName()) + " geometry from cache.");
 				} else {
 					geometry.initializeUsingCCDB();
 					cache.write(geometry);
@@ -74,6 +74,10 @@ public final class GeometryCache {
 				geometry.initializeUsingCCDB();
 			}
 		}
+	}
+
+	static String displayName(String detectorName) {
+		return detectorName.replaceFirst("\\s*Geometry$", "");
 	}
 
 	/** Location of the per-user SQLite geometry cache. */
