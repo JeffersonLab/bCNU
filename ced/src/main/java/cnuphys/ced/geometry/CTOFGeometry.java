@@ -27,10 +27,7 @@ public class CTOFGeometry extends ACachedGeometry {
 	}
 
 	public void initializeUsingCCDB() {
-		System.out.println("\n=====================================");
-		System.out.println("===  CTOF Geometry Initialization ===");
-		System.out.println("===  WARNING: SIMPLE GEOMETRY ===");
-		System.out.println("=====================================");
+		System.out.println("CTOF uses simplified analytic geometry.");
 		initQuads();
 	}
 

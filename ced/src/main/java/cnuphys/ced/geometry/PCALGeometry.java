@@ -89,10 +89,6 @@ public class PCALGeometry extends ACachedGeometry {
 	@Override
 	public void initializeUsingCCDB() {
 
-		System.out.println("\n=====================================");
-		System.out.println("===  PCAL Geometry Initialization ===");
-		System.out.println("=====================================");
-
 		ConstantProvider ecDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.ECAL);
 		ECDetector clas_Cal_Detector = (new ECFactory()).createDetectorCLAS(ecDataProvider);
 

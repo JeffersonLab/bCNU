@@ -24,10 +24,6 @@ public class BMTGeometry extends ACachedGeometry {
 	 * Initialize the BMT Geometry
 	 */
 	public void initializeUsingCCDB() {
-		System.out.println("\n=====================================");
-		System.out.println("===  BMT Geometry Initialization  ===");
-		System.out.println("=====================================");
-
 		if (Ced.forVeronique()) {
 			ConstantsLoaderVZ.Load(11);
 		} else {

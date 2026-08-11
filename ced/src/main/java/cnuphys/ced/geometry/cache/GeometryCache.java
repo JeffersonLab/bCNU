@@ -66,12 +66,14 @@ public final class GeometryCache {
 				} else {
 					geometry.initializeUsingCCDB();
 					cache.write(geometry);
+					System.out.println("Initialized " + displayName(geometry.getName()) + " geometry from source.");
 				}
 			}
 		} catch (IOException | SQLException e) {
 			System.err.println("Geometry cache unavailable; initializing from CCDB: " + e.getMessage());
 			for (IGeometryCache geometry : GEOMETRIES) {
 				geometry.initializeUsingCCDB();
+				System.out.println("Initialized " + displayName(geometry.getName()) + " geometry from source.");
 			}
 		}
 	}

@@ -44,10 +44,6 @@ public class BSTGeometry extends ACachedGeometry {
 	@Override
 	public void initializeUsingCCDB() {
 
-		System.out.println("\n=====================================");
-		System.out.println("===  BST Geometry Initialization  ===");
-		System.out.println("=====================================");
-
 		String variationName = Ced.getGeometryVariation();
 		DatabaseConstantProvider cp = new DatabaseConstantProvider(11, variationName);
 

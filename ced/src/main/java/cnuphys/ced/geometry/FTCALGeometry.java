@@ -61,10 +61,6 @@ public class FTCALGeometry extends ACachedGeometry {
 	@Override
 	public void initializeUsingCCDB() {
 
-		System.out.println("\n=====================================");
-		System.out.println("=== FTCAL Geometry Initialization ===");
-		System.out.println("=====================================");
-
 		ConstantProvider ftCalDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.FTCAL);
 
 		FTCALFactory ftCalFactory = new FTCALFactory();

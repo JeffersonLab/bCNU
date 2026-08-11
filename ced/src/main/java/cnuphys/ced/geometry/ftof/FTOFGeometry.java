@@ -67,10 +67,6 @@ public class FTOFGeometry extends ACachedGeometry {
 	 */
 	@Override
 	public void initializeUsingCCDB() {
-		System.out.println("\n=====================================");
-		System.out.println("===  FTOF Geometry Initialization ===");
-		System.out.println("=====================================");
-
 		ConstantProvider tofDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.FTOF);
 
 		FTOFDetector ftofDetector = (new FTOFFactory()).createDetectorCLAS(tofDataProvider);

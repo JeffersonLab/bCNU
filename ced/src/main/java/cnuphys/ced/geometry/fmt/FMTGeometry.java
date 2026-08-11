@@ -38,10 +38,6 @@ public class FMTGeometry extends ACachedGeometry {
 	 */
 	@Override
 	public void initializeUsingCCDB() {
-		System.out.println("\n=======================================");
-		System.out.println("===  " + NAME + " Geometry Initialization ===");
-		System.out.println("=======================================");
-
 		String variation = Ced.getGeometryVariation();
 		ConstantProvider constantProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.FMT, 11,
 				variation);

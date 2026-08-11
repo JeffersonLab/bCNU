@@ -44,10 +44,6 @@ public class CNDGeometry extends ACachedGeometry {
 	@Override
 	public void initializeUsingCCDB() {
 
-		System.out.println("\n=====================================");
-		System.out.println("==== CND Geometry Initialization ====");
-		System.out.println("=====================================");
-
 		ConstantProvider cndDataProvider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.CND);
 
 		CNDFactory cndFactory = new CNDFactory();

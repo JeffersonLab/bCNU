@@ -62,10 +62,6 @@ public class AlertGeometry extends ACachedGeometry {
 	 */
 	@Override
 	public void initializeUsingCCDB() {
-		System.out.println("\n=======================================");
-		System.out.println("===  " + NAME + " Geometry Initialization ===");
-		System.out.println("=======================================");
-
 		String variationName = Ced.getGeometryVariation();
 		constantProvider = new DatabaseConstantProvider(11, variationName);
 		_dcLayers = new HashMap<>();
