@@ -1,6 +1,9 @@
 package cnuphys.ced.geometry;
 
 import java.awt.geom.Point2D;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.geom.base.ConstantProvider;
@@ -72,6 +75,10 @@ public class PCALGeometry extends ACachedGeometry {
 	private static ECLayer[] ecLayerLocal;
 	private static ECLayer[] ecLayer;
 
+	private static double[][][][] viewTriangles;
+	private static double[][][][][] stripVertices;
+	private static double[][][][][] projectionEdges;
+
 	public PCALGeometry() {
 		super("PCALGeometry");
 	}
@@ -115,7 +122,52 @@ public class PCALGeometry extends ACachedGeometry {
 
 		createTransformations();
 		getStripsAndTriangles();
+		captureDrawingGeometry();
 	} // initialize
+
+	private static void captureDrawingGeometry() {
+		viewTriangles = new double[6][3][3][3];
+		stripVertices = new double[6][3][68][8][3];
+		projectionEdges = new double[3][68][4][2][3];
+		for (int view = 0; view < 3; view++) {
+			ECLayer layer = ecLayer[view];
+			Triangle3D triangle = (Triangle3D) layer.getBoundary().face(0);
+			double dist = view * (_deltaK / 3.0);
+			double xt = dist * Math.sin(Math.toRadians(25));
+			double zt = dist * Math.cos(Math.toRadians(25));
+			for (int sector = 0; sector < 6; sector++) {
+				for (int point = 0; point < 3; point++) {
+					Point3D corner = new Point3D(triangle.point(point));
+					corner.translateXYZ(xt, 0, zt);
+					corner.rotateZ(Math.toRadians(60 * sector));
+					storePoint(viewTriangles[sector][view][point], corner);
+				}
+				for (int strip = 0; strip < PCAL_NUMSTRIP[view]; strip++) {
+					ScintillatorPaddle paddle = layer.getComponent(strip);
+					for (int cornerIndex = 0; cornerIndex < 8; cornerIndex++) {
+						Point3D corner = new Point3D(paddle.getVolumePoint(cornerIndex));
+						corner.translateXYZ(xt, 0, zt);
+						corner.rotateZ(Math.toRadians(60 * sector));
+						storePoint(stripVertices[sector][view][strip][cornerIndex], corner);
+					}
+				}
+			}
+			for (int strip = 0; strip < PCAL_NUMSTRIP[view]; strip++) {
+				ScintillatorPaddle paddle = layer.getComponent(strip);
+				for (int edge = 0; edge < 4; edge++) {
+					org.jlab.geom.prim.Line3D line = paddle.getVolumeEdge(6 + edge);
+					storePoint(projectionEdges[view][strip][edge][0], line.origin());
+					storePoint(projectionEdges[view][strip][edge][1], line.end());
+				}
+			}
+		}
+	}
+
+	private static void storePoint(double[] destination, Point3D point) {
+		destination[0] = point.x();
+		destination[1] = point.y();
+		destination[2] = point.z();
+	}
 
 	// create the transformations
 	private static void createTransformations() {
@@ -255,29 +307,11 @@ public class PCALGeometry extends ACachedGeometry {
 	 * @param coords will hold the corners as [x1, y1, z1, ..., x3, y3, z3]
 	 */
 	public static void getViewTriangle(int sector, int view, float coords[]) {
-		ECLayer ecLay = ecLayer[view - 1];
-		Triangle3D t3d = (Triangle3D) ecLay.getBoundary().face(0);
-
-		// translation
-
-		double delK = 14.94; // PCAL val
-		double dist = (view - 1) * (delK / 3);
-		double xt = dist * Math.sin(Math.toRadians(25));
-		double yt = 0;
-		double zt = dist * Math.cos(Math.toRadians(25));
-
 		for (int i = 0; i < 3; i++) {
 			int j = 3 * i;
-			Point3D corner = new Point3D(t3d.point(i));
-			corner.translateXYZ(xt, yt, zt);
-
-			if (sector > 1) {
-				corner.rotateZ(Math.toRadians(60 * (sector - 1)));
-			}
-
-			coords[j] = (float) corner.x();
-			coords[j + 1] = (float) corner.y();
-			coords[j + 2] = (float) corner.z();
+			coords[j] = (float) viewTriangles[sector - 1][view - 1][i][0];
+			coords[j + 1] = (float) viewTriangles[sector - 1][view - 1][i][1];
+			coords[j + 2] = (float) viewTriangles[sector - 1][view - 1][i][2];
 		}
 	}
 
@@ -290,34 +324,11 @@ public class PCALGeometry extends ACachedGeometry {
 	 * @param coords holds the eight corners as [x1, y1, z1..x8, y8, z8]
 	 */
 	public static void getStrip(int sector, int view, int strip, float coords[]) {
-		ECLayer ecLay = ecLayer[view - 1];
-		ScintillatorPaddle paddle = ecLay.getComponent(strip - 1);
-
-		Point3D v[] = new Point3D[8];
-
-		double delK = 14.94; // PCAL val
-
-		double dist = (view - 1) * (delK / 3);
-		double xt = dist * Math.sin(Math.toRadians(25));
-		double yt = 0;
-		double zt = dist * Math.cos(Math.toRadians(25));
-
-		for (int i = 0; i < 8; i++) {
-			v[i] = new Point3D(paddle.getVolumePoint(i));
-			v[i].translateXYZ(xt, yt, zt);
-		}
-
-		if (sector > 1) {
-			for (int i = 0; i < 8; i++) {
-				v[i].rotateZ(Math.toRadians(60 * (sector - 1)));
-			}
-		}
-
 		for (int i = 0; i < 8; i++) {
 			int j = 3 * i;
-			coords[j] = (float) v[i].x();
-			coords[j + 1] = (float) v[i].y();
-			coords[j + 2] = (float) v[i].z();
+			coords[j] = (float) stripVertices[sector - 1][view - 1][strip - 1][i][0];
+			coords[j + 1] = (float) stripVertices[sector - 1][view - 1][strip - 1][i][1];
+			coords[j + 2] = (float) stripVertices[sector - 1][view - 1][strip - 1][i][2];
 		}
 
 	}
@@ -396,9 +407,7 @@ public class PCALGeometry extends ACachedGeometry {
 	 */
 	public static boolean doesProjectedPolyFullyIntersect(int layer, int stripid, Plane3D projectionPlane) {
 
-		ECLayer ecLay = ecLayer[layer];
-		ScintillatorPaddle strip = ecLay.getComponent(stripid);
-		return GeometryManager.doesProjectedPolyIntersect(strip, projectionPlane, 6, 4);
+		return GeometryManager.doesProjectedPolyIntersect(projectionEdges[layer][stripid], projectionPlane);
 	}
 
 	/**
@@ -412,10 +421,8 @@ public class PCALGeometry extends ACachedGeometry {
 	 */
 	public static Point2D.Double[] getIntersections(int layer, int stripid, Plane3D projectionPlane, boolean offset) {
 
-		ECLayer ecLay = ecLayer[layer];
-		ScintillatorPaddle strip = ecLay.getComponent(stripid);
 		Point2D.Double wp[] = GeometryManager.allocate(4);
-		GeometryManager.getProjectedPolygon(strip, projectionPlane, 6, 4, wp, null);
+		GeometryManager.getProjectedPolygon(projectionEdges[layer][stripid], projectionPlane, wp, null);
 
 		// note reordering
 		Point2D.Double p2d[] = new Point2D.Double[4];
@@ -450,6 +457,118 @@ public class PCALGeometry extends ACachedGeometry {
 		start.y += dely;
 		end.x += delx;
 		end.y += dely;
+	}
+
+	@Override
+	public boolean supportsCache() {
+		return true;
+	}
+
+	@Override
+	public void writeGeometry(DataOutput output) throws IOException {
+		writePoint(output, new double[] {_r0.x(), _r0.y(), _r0.z()});
+		output.writeDouble(COSTHETA);
+		output.writeDouble(SINTHETA);
+		output.writeDouble(_slope);
+		writeAffine(output, _transformations.getLocalToSectorAffine());
+		writeAffine(output, _transformations.getSectorToLocalAffine());
+		for (int view = 0; view < 3; view++) {
+			output.writeInt(PCAL_NUMSTRIP[view]);
+			for (int strip = 0; strip < PCAL_NUMSTRIP[view]; strip++) {
+				for (int point = 0; point < 4; point++) {
+					Point3D p = _strips[view][strip][point];
+					writePoint(output, new double[] {p.x(), p.y(), p.z()});
+				}
+				for (int edge = 0; edge < 4; edge++) {
+					writePoint(output, projectionEdges[view][strip][edge][0]);
+					writePoint(output, projectionEdges[view][strip][edge][1]);
+				}
+			}
+		}
+		for (int sector = 0; sector < 6; sector++) {
+			for (int view = 0; view < 3; view++) {
+				for (int point = 0; point < 3; point++) {
+					writePoint(output, viewTriangles[sector][view][point]);
+				}
+				for (int strip = 0; strip < PCAL_NUMSTRIP[view]; strip++) {
+					for (int corner = 0; corner < 8; corner++) {
+						writePoint(output, stripVertices[sector][view][strip][corner]);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void readGeometry(DataInput input) throws IOException {
+		double[] r0 = readPoint(input);
+		_r0 = new Point3D(r0[0], r0[1], r0[2]);
+		COSTHETA = input.readDouble();
+		SINTHETA = input.readDouble();
+		_slope = input.readDouble();
+		_transformations = new Transformations(DetectorType.PCAL, readAffine(input), readAffine(input));
+		_strips = new Point3D[3][68][4];
+		projectionEdges = new double[3][68][4][2][3];
+		for (int view = 0; view < 3; view++) {
+			int count = input.readInt();
+			if (count != PCAL_NUMSTRIP[view]) {
+				throw new IOException("Unexpected PCAL strip count for view " + view + ": " + count);
+			}
+			for (int strip = 0; strip < count; strip++) {
+				for (int point = 0; point < 4; point++) {
+					double[] p = readPoint(input);
+					_strips[view][strip][point] = new Point3D(p[0], p[1], p[2]);
+				}
+				for (int edge = 0; edge < 4; edge++) {
+					projectionEdges[view][strip][edge][0] = readPoint(input);
+					projectionEdges[view][strip][edge][1] = readPoint(input);
+				}
+			}
+		}
+		viewTriangles = new double[6][3][3][3];
+		stripVertices = new double[6][3][68][8][3];
+		for (int sector = 0; sector < 6; sector++) {
+			for (int view = 0; view < 3; view++) {
+				for (int point = 0; point < 3; point++) {
+					viewTriangles[sector][view][point] = readPoint(input);
+				}
+				for (int strip = 0; strip < PCAL_NUMSTRIP[view]; strip++) {
+					for (int corner = 0; corner < 8; corner++) {
+						stripVertices[sector][view][strip][corner] = readPoint(input);
+					}
+				}
+			}
+		}
+		ecLayer = null;
+		ecLayerLocal = null;
+	}
+
+	private static void writeAffine(DataOutput output, double[][] affine) throws IOException {
+		for (double[] row : affine) {
+			for (double value : row) {
+				output.writeDouble(value);
+			}
+		}
+	}
+
+	private static double[][] readAffine(DataInput input) throws IOException {
+		double[][] affine = new double[3][4];
+		for (int row = 0; row < 3; row++) {
+			for (int column = 0; column < 4; column++) {
+				affine[row][column] = input.readDouble();
+			}
+		}
+		return affine;
+	}
+
+	private static void writePoint(DataOutput output, double[] point) throws IOException {
+		for (double value : point) {
+			output.writeDouble(value);
+		}
+	}
+
+	private static double[] readPoint(DataInput input) throws IOException {
+		return new double[] {input.readDouble(), input.readDouble(), input.readDouble()};
 	}
 
 }
