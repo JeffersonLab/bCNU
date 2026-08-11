@@ -311,14 +311,11 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 
 	//draw the hits in single eventmode
 	private void drawSingleModeHits(Graphics g, IContainer container) {
-		if (ClasIoEventManager.getInstance().hasCurrentEvent()) {
+		_dcHitDrawer.drawHits(g, container);
+		_tofHitDrawer.drawHits(g, container);
 
-			_dcHitDrawer.drawHits(g, container);
-			_tofHitDrawer.drawHits(g, container);
-
-			// overlay trajectories
-			_swimTrajectoryDrawer.draw(g, container);
-		}
+		// overlay trajectories
+		_swimTrajectoryDrawer.draw(g, container);
 
 	}
 

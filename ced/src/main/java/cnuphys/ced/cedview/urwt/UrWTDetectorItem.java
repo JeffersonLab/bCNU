@@ -113,12 +113,9 @@ public class UrWTDetectorItem extends PolygonItem {
 			return;
 		}
 
-		if (ClasIoEventManager.getInstance().hasCurrentEvent()) {
-
-			drawHits(g, container); // hits
-			drawClusters(g, container); // clusters
-			drawCrosses(g, container); // crosses
-		}
+		drawHits(g, container); // hits
+		drawClusters(g, container); // clusters
+		drawCrosses(g, container); // crosses
 	}
 	
 	
