@@ -13,14 +13,14 @@ import java.util.Collections;
 
 import javax.swing.JComponent;
 
+import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.component.CommonBorder;
+import cnuphys.bCNU.graphics.style.LineStyle;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.frame.CedColors;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundStyle;
-import cnuphys.splot.plot.GraphicsUtilities;
-import cnuphys.splot.style.LineStyle;
 
 @SuppressWarnings("serial")
 public class PIDLegend extends JComponent {

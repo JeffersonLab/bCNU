@@ -32,11 +32,11 @@ import javax.swing.filechooser.FileFilter;
 import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.component.TransparentPanel;
+import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.util.Environment;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.event.ScanManager;
 import cnuphys.ced.frame.Ced;
-import cnuphys.splot.plot.ImageManager;
 
 public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEventListener {
 

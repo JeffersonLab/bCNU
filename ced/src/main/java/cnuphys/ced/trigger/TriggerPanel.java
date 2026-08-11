@@ -21,10 +21,10 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
+import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.MathUtilities;
 import cnuphys.bCNU.util.X11Colors;
-import cnuphys.splot.plot.GraphicsUtilities;
 
 public class TriggerPanel extends JPanel {
 
