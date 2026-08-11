@@ -19,6 +19,9 @@ class ECGeometryCacheTest {
 		float[] triangle = new float[9];
 		ECGeometry.getViewTriangle(6, 2, 3, triangle);
 		assertTrue(Float.isFinite(triangle[0]));
+		float[] strip = new float[24];
+		ECGeometry.getStrip(6, 2, 3, 36, strip);
+		assertTrue(Float.isFinite(strip[0]));
 		assertEquals(36, ECGeometry.EC_NUMSTRIP);
 		assertTrue(Double.isFinite(ECGeometry.zFromX(ECGeometry.EC_OUTER, 0)));
 
@@ -57,6 +60,12 @@ class ECGeometryCacheTest {
 					for (int view = 0; view < 3; view++) {
 						for (int point = 0; point < 3; point++) {
 							writePoint(output, sector * 100_000.0 + plane * 10_000.0 + view * 1000.0 + point * 3.0);
+						}
+						for (int strip = 0; strip < 36; strip++) {
+							for (int corner = 0; corner < 8; corner++) {
+								writePoint(output, sector * 1_000_000.0 + plane * 100_000.0
+										+ view * 10_000.0 + strip * 100.0 + corner * 3.0);
+							}
 						}
 					}
 				}

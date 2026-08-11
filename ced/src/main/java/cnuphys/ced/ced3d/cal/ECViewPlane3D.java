@@ -10,7 +10,6 @@ import cnuphys.ced.alldata.ECalAdc;
 import cnuphys.ced.ced3d.DetectorItem3D;
 import cnuphys.ced.ced3d.PlainPanel3D;
 import cnuphys.ced.geometry.ECGeometry;
-import cnuphys.ced.geometry.PCALGeometry;
 
 public class ECViewPlane3D extends DetectorItem3D {
 
@@ -83,7 +82,7 @@ public class ECViewPlane3D extends DetectorItem3D {
 						int adc = ecADCData.adc(i);
 						int strip = ecADCData.strip(i);
 						Color color = ecADCData.adcColor(i);
-						PCALGeometry.getStrip(_sector, _view, strip, coords);
+						ECGeometry.getStrip(_sector, _plane, _view, strip, coords);
 						drawStrip(drawable, color, coords);
 					}
 				}

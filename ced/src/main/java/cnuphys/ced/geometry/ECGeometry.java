@@ -86,6 +86,7 @@ public class ECGeometry extends ACachedGeometry {
 	private static ECLayer[][] ecLayer;
 	private static double[][][][][] viewTriangles;
 	private static double[][][][][][] projectionEdges;
+	private static double[][][][][][] stripVertices;
 
 	public ECGeometry() {
 		super("ECGeometry");
@@ -140,6 +141,7 @@ public class ECGeometry extends ACachedGeometry {
 	private static void captureDrawingGeometry() {
 		viewTriangles = new double[6][2][3][3][3];
 		projectionEdges = new double[2][3][EC_NUMSTRIP][4][2][3];
+		stripVertices = new double[6][2][3][EC_NUMSTRIP][8][3];
 		for (int plane = 0; plane < 2; plane++) {
 			for (int view = 0; view < 3; view++) {
 				ECLayer layer = ecLayer[plane][view];
@@ -153,6 +155,15 @@ public class ECGeometry extends ACachedGeometry {
 						corner.translateXYZ(xt, 0, zt);
 						corner.rotateZ(Math.toRadians(60 * sector));
 						storePoint(viewTriangles[sector][plane][view][point], corner);
+					}
+					for (int strip = 0; strip < EC_NUMSTRIP; strip++) {
+						ScintillatorPaddle paddle = layer.getComponent(strip);
+						for (int cornerIndex = 0; cornerIndex < 8; cornerIndex++) {
+							Point3D corner = new Point3D(paddle.getVolumePoint(cornerIndex));
+							corner.translateXYZ(xt, 0, zt);
+							corner.rotateZ(Math.toRadians(60 * sector));
+							storePoint(stripVertices[sector][plane][view][strip][cornerIndex], corner);
+						}
 					}
 				}
 				for (int strip = 0; strip < EC_NUMSTRIP; strip++) {
@@ -429,6 +440,16 @@ public class ECGeometry extends ACachedGeometry {
 		}
 	}
 
+	/** Copy one EC strip solid for 3D drawing. All addresses are 1-based. */
+	public static void getStrip(int sector, int stack, int view, int strip, float[] coords) {
+		for (int corner = 0; corner < 8; corner++) {
+			int offset = corner * 3;
+			coords[offset] = (float) stripVertices[sector - 1][stack - 1][view - 1][strip - 1][corner][0];
+			coords[offset + 1] = (float) stripVertices[sector - 1][stack - 1][view - 1][strip - 1][corner][1];
+			coords[offset + 2] = (float) stripVertices[sector - 1][stack - 1][view - 1][strip - 1][corner][2];
+		}
+	}
+
 	/**
 	 *
 	 * @param superlayer      0, 1 (EC_INNER or EC_OUTER)
@@ -500,6 +521,11 @@ public class ECGeometry extends ACachedGeometry {
 	}
 
 	@Override
+	public int getCacheFormatVersion() {
+		return 2;
+	}
+
+	@Override
 	public void writeGeometry(DataOutput output) throws IOException {
 		for (int plane = 0; plane < 2; plane++) {
 			writePoint(output, new double[] {_r0[plane].x(), _r0[plane].y(), _r0[plane].z()});
@@ -529,6 +555,11 @@ public class ECGeometry extends ACachedGeometry {
 				for (int view = 0; view < 3; view++) {
 					for (int point = 0; point < 3; point++) {
 						writePoint(output, viewTriangles[sector][plane][view][point]);
+					}
+					for (int strip = 0; strip < EC_NUMSTRIP; strip++) {
+						for (int corner = 0; corner < 8; corner++) {
+							writePoint(output, stripVertices[sector][plane][view][strip][corner]);
+						}
 					}
 				}
 			}
@@ -568,11 +599,17 @@ public class ECGeometry extends ACachedGeometry {
 		SINTHETA = input.readDouble();
 		TANTHETA = input.readDouble();
 		viewTriangles = new double[6][2][3][3][3];
+		stripVertices = new double[6][2][3][EC_NUMSTRIP][8][3];
 		for (int sector = 0; sector < 6; sector++) {
 			for (int plane = 0; plane < 2; plane++) {
 				for (int view = 0; view < 3; view++) {
 					for (int point = 0; point < 3; point++) {
 						viewTriangles[sector][plane][view][point] = readPoint(input);
+					}
+					for (int strip = 0; strip < EC_NUMSTRIP; strip++) {
+						for (int corner = 0; corner < 8; corner++) {
+							stripVertices[sector][plane][view][strip][corner] = readPoint(input);
+						}
 					}
 				}
 			}
