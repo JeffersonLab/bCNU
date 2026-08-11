@@ -1,7 +1,13 @@
 package cnuphys.ced.ced3d.view;
 
+import java.awt.Toolkit;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+
 import org.jlab.io.base.DataEvent;
 
+import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.util.TextUtilities;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.cedview.CedView;
@@ -49,6 +55,24 @@ public abstract class CedView3D extends PlainView3D
 		Swimming.addSwimTrajectoryListener(this);
 
 		AccumulationManager.getInstance().addAccumulationListener(this);
+
+		addEventToolBar();
+	}
+
+	private void addEventToolBar() {
+		JButton nextEvent = new JButton("Next");
+		nextEvent.setToolTipText("Next Event");
+		nextEvent.addActionListener(event -> {
+			if (_eventManager.isNextOK()) {
+				_eventManager.getNextEvent();
+			} else {
+				Toolkit.getDefaultToolkit().beep();
+			}
+		});
+		GraphicsUtilities.setSizeMini(nextEvent);
+
+		getToolBar().add(Box.createHorizontalStrut(5), 0);
+		getToolBar().add(nextEvent, 0);
 	}
 
 	// make the 3d panel

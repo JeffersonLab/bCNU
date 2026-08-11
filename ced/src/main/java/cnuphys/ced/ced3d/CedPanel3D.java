@@ -1,16 +1,10 @@
 package cnuphys.ced.ced3d;
 
 import java.awt.BorderLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.ced.ced3d.view.PlainView3D;
-import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.component.MatchedBankPanel;
 
 public class CedPanel3D extends PlainPanel3D {
@@ -48,25 +42,6 @@ public class CedPanel3D extends PlainPanel3D {
 	protected void addNorth() {
 		JPanel np = new JPanel();
 		np.setLayout(new BorderLayout(20, 0));
-
-		JButton nextEvent;
-		ActionListener al = new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (ClasIoEventManager.getInstance().isNextOK()) {
-					ClasIoEventManager.getInstance().getNextEvent();
-				} else {
-					Toolkit.getDefaultToolkit().beep();
-				}
-			}
-
-		};
-		nextEvent = new JButton("Next");
-		nextEvent.setToolTipText("Next Event");
-		nextEvent.addActionListener(al);
-		GraphicsUtilities.setSizeMini(nextEvent);
-		np.add(nextEvent, BorderLayout.WEST);
 
 		_pidLegend = new PIDLegend(this);
 
