@@ -53,6 +53,8 @@ public class FMTPanel3D extends CedPanel3D {
 		TrajectoryDrawer3D trajDrawer = new TrajectoryDrawer3D(this);
 		addItem(trajDrawer);
 
+		addItem(new FMTCrossDrawer3D(this));
+
 		//the layers
 		for (int layer = 0; layer < 6; layer++) {
 			for (int strip = 0; strip < 1024; strip++) {
