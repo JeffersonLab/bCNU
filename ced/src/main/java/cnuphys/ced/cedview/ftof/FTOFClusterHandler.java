@@ -5,12 +5,9 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import org.jlab.io.base.DataEvent;
-
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.FTOFClusters;
-import cnuphys.ced.clasio.ClasIoEventManager;
 
 public class FTOFClusterHandler {
 
@@ -32,11 +29,6 @@ public class FTOFClusterHandler {
 	// draw the clusters
 	public void draw(Graphics g, IContainer container) {
 		if (_view.isSingleEventMode() && _view.showClusters()) {
-			DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-			if (event == null) {
-				return;
-			}
-
 			for (int i = 0; i < _clusterData.count(); i++) {
 				int panel = _clusterData.layer(i) - 1;
 				if (panel == _view.displayPanel()) {

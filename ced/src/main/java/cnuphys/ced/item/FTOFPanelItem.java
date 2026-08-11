@@ -33,9 +33,6 @@ public class FTOFPanelItem extends PolygonItem {
 	// the container sector view
 	private SectorView _view;
 
-	//the event manager
-	private ClasIoEventManager _eventManager = ClasIoEventManager.getInstance();
-
 	//data containers
 	private FTOFAdc _adcData = FTOFAdc.getInstance();
 	private FTOFClusters _clusterData = FTOFClusters.getInstance();
@@ -155,12 +152,6 @@ public class FTOFPanelItem extends PolygonItem {
 
 	//draw based on data in ADC bank
 	private void drawSingleModeADCBased(Graphics g, IContainer container) {
-
-		if (_eventManager.getCurrentEvent() == null) {
-			return;
-		}
-
-
 		byte sect = (byte) _sector; //1-based
 		byte layer = (byte) (_ftofPanel.getPanelType() + 1); //(now) 1-based
 
@@ -182,7 +173,7 @@ public class FTOFPanelItem extends PolygonItem {
 	//draw based on data in hits bank
 	private void drawSingleModeClusters(Graphics g, IContainer container) {
 
-		if ((_eventManager.getCurrentEvent() == null) || !_view.showClusters()) {
+		if (!_view.showClusters()) {
 			return;
 		}
 
@@ -207,7 +198,7 @@ public class FTOFPanelItem extends PolygonItem {
 	// draw based on data in hits bank
 	private void drawSingleModeHits(Graphics g, IContainer container) {
 
-		if ((_eventManager.getCurrentEvent() == null) || !_view.showReconHits()) {
+		if (!_view.showReconHits()) {
 			return;
 		}
 
@@ -349,11 +340,6 @@ public class FTOFPanelItem extends PolygonItem {
 				} // path contains wp
 			} // end wp != null
 		} // end for loop
-
-		//rest of feedback depends on having an event
-		if (_eventManager.getCurrentEvent() == null) {
-			return;
-		}
 
 		// hit feedback
 		if (_view.showReconHits()) {
