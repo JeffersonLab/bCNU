@@ -72,6 +72,7 @@ public abstract class PlainPanel3D extends Panel3D {
 	public static final String SHOW_CND_LAYER_1 = "CND Layer 1";
 	public static final String SHOW_CND_LAYER_2 = "CND Layer 2";
 	public static final String SHOW_CND_LAYER_3 = "CND Layer 3";
+	public static final String SHOW_CND_HITS = "CND Hits";
 
 	public static final String SHOW_TB_CROSS = "TB Cross";
 	public static final String SHOW_HB_CROSS = "HB Cross";
@@ -424,6 +425,15 @@ public abstract class PlainPanel3D extends Panel3D {
 	 */
 	public boolean showCNDLayer3() {
 		return showCND() && show(PlainPanel3D.SHOW_CND_LAYER_3);
+	}
+
+	/**
+	 * Show CND hits?
+	 *
+	 * @return {@code true} if CND hits should be drawn
+	 */
+	public boolean showCNDHits() {
+		return showCND() && show(PlainPanel3D.SHOW_CND_HITS);
 	}
 
 	/**
