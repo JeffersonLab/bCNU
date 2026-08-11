@@ -11,10 +11,7 @@ import org.jlab.geom.prim.Plane3D;
 import org.jlab.geom.prim.Point3D;
 import org.jlab.geom.prim.Vector3D;
 
-import cnuphys.ced.geometry.alert.AlertGeometry;
 import cnuphys.ced.geometry.cache.GeometryCache;
-import cnuphys.ced.geometry.fmt.FMTGeometry;
-import cnuphys.ced.geometry.urwt.UrWTGeometry;
 import cnuphys.swim.SwimTrajectory;
 
 public class GeometryManager {
@@ -46,48 +43,6 @@ public class GeometryManager {
 	 */
 	private GeometryManager() {
 		GeometryCache.initializeAllGeometry();
-
-		// HTCC Geometry
-//		HTCCGeometry.initialize();  (USING NEW CACHE SCHEME)
-
-		// LTCC Geometry
-//		LTCCGeometry.initialize();  (USING NEW CACHE SCHEME)
-
-		// DC Geometry
-	//	DCGeometry.initialize();  (USING NEW CACHE SCHEME)
-
-		// BMT geometry
-	//	BMTGeometry.initialize();  (USING NEW CACHE SCHEME)
-
-		// get the FTOF geometry
-	//	FTOFGeometry.initialize();  (USING NEW CACHE SCHEME)
-
-		// get the CTOF geometry
-	//	CTOFGeometry.initialize();  (USING NEW CACHE SCHEME)
-
-		// get the urwt geometry
-	//	UrWTGeometry.initialize(); (USING NEW CACHE SCHEME)
-
-		// get the alert geometry
-	//	AlertGeometry.initialize(); (USING NEW CACHE SCHEME)
-
-		// get the FMT geometry
-	//	FMTGeometry.initialize(); (USING NEW CACHE SCHEME)
-
-		// get BST data
-	//	BSTGeometry.initialize();  (USING NEW CACHE SCHEME)
-
-		// get EC data
-	//	ECGeometry.initialize(); (USING NEW CACHE SCHEME)
-
-		// get PCAL data
-	//	PCALGeometry.initialize();  (USING NEW CACHE SCHEME)
-
-		// CND data
-	//	CNDGeometry.initialize();    (USING NEW CACHE SCHEME)
-
-		// FTCal
-	//	FTCALGeometry.initialize();   (USING NEW CACHE SCHEME)
 	}
 
 	/**
