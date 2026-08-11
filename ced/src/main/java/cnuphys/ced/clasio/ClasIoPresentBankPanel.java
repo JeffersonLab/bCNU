@@ -190,6 +190,12 @@ public class ClasIoPresentBankPanel extends JPanel {
 		repaint();
 	}
 
+	/** Populate a newly created or reconfigured panel from the current event. */
+	public void refreshCurrentEvent() {
+		replaceBankLabels(_eventManager.getCurrentEvent());
+		update();
+	}
+
 	// must match
 	private boolean match(String s) {
 

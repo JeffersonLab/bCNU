@@ -105,8 +105,8 @@ public class MatchedBankPanel extends JPanel {
 		}
 
 		_bankMatcher.setBankMatches(matches);
-		_matchTextArea.setText(matchesToString());
 		_bankMatcher.writeCommonProperties();
+		update();
 	}
 
 	static String[] parseMatches(String text) {
@@ -126,6 +126,7 @@ public class MatchedBankPanel extends JPanel {
 
 	public void update() {
 		_matchTextArea.setText(matchesToString());
+		_presentBankPanel.refreshCurrentEvent();
 	}
 
 
