@@ -14,8 +14,6 @@ import cnuphys.ced.geometry.CTOFGeometry;
 import cnuphys.ced.geometry.DCGeometry;
 import cnuphys.ced.geometry.ECGeometry;
 import cnuphys.ced.geometry.FTCALGeometry;
-import cnuphys.ced.geometry.HTCCGeometry;
-import cnuphys.ced.geometry.LTCCGeometry;
 import cnuphys.ced.geometry.PCALGeometry;
 import cnuphys.ced.geometry.alert.AlertGeometry;
 import cnuphys.ced.geometry.fmt.FMTGeometry;
@@ -52,8 +50,6 @@ public final class GeometryCache {
 		new CTOFGeometry();
 		new FTCALGeometry();
 		new CNDGeometry();
-		new HTCCGeometry();
-		new LTCCGeometry();
 		new FTOFGeometry();
 		new PCALGeometry();
 		new ECGeometry();

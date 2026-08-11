@@ -3,9 +3,7 @@ package cnuphys.ced.geometry;
 import java.awt.geom.Point2D;
 
 
-import cnuphys.ced.geometry.cache.ACachedGeometry;
-
-public class HTCCGeometry extends ACachedGeometry {
+public final class HTCCGeometry {
 
 	// place holder hardwired simple geometry from Valery
 	private static final double _SIMPLETHICKNESS = 5; // cm fake thickness
@@ -13,16 +11,7 @@ public class HTCCGeometry extends ACachedGeometry {
 	private static final double _SIMPLEDELANGLE = 7.5; // degrees
 	private static final double _SIMPLERADIUS = 150; // cm
 
-	public HTCCGeometry() {
-        super("HTCCGeometry");
-    }
-	
-	@Override
-	public void initializeUsingCCDB() {
-		System.out.println("\n=====================================");
-		System.out.println("===  HTCC Geometry Initialization ===");
-		System.out.println("======== WARNING: SIMPLE GEOMETRY ====");
-		System.out.println("=====================================");
+	private HTCCGeometry() {
 	}
 
 	/**

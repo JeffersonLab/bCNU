@@ -3,9 +3,7 @@ package cnuphys.ced.geometry;
 import java.awt.geom.Point2D;
 
 
-import cnuphys.ced.geometry.cache.ACachedGeometry;
-
-public class LTCCGeometry extends ACachedGeometry {
+public final class LTCCGeometry {
 
 	// place holder hardwired simple geometry from Valery
 
@@ -37,16 +35,7 @@ public class LTCCGeometry extends ACachedGeometry {
 		_delY = (_yf - _yo) / 18.;
 	}
 
-	public LTCCGeometry() {
-		super("LTCCGeometry");
-	}
-
-	@Override
-	public void initializeUsingCCDB() {
-		System.out.println("\n=====================================");
-		System.out.println("===  LTCC Geometry Initialization ===");
-		System.out.println("======== WARNING: SIMPLE GEOMETRY ====");
-		System.out.println("=====================================");
+	private LTCCGeometry() {
 	}
 
 	/**
