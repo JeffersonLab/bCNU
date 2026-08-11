@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JDialog;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,29 +26,26 @@ import javax.swing.JTextField;
 import bCNU3D.DoubleFormat;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.CommonBorder;
-import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.magfield.FieldProbe;
 import cnuphys.magfield.MagneticFieldInitializationException;
 import cnuphys.magfield.MagneticFields;
 import cnuphys.magfield.MagneticFields.FieldType;
-import cnuphys.splot.example.APlotDialog;
-import cnuphys.splot.fit.FitType;
-import cnuphys.splot.pdata.DataColumn;
-import cnuphys.splot.pdata.DataSet;
-import cnuphys.splot.pdata.DataSetException;
-import cnuphys.splot.pdata.DataSetType;
-import cnuphys.splot.plot.PlotParameters;
-import cnuphys.splot.plot.X11Colors;
-import cnuphys.splot.style.SymbolType;
+import edu.cnu.mdi.graphics.style.IStyled;
+import edu.cnu.mdi.graphics.style.SymbolType;
+import edu.cnu.mdi.splot.fit.CurveDrawingMethod;
+import edu.cnu.mdi.splot.pdata.Curve;
+import edu.cnu.mdi.splot.pdata.PlotData;
+import edu.cnu.mdi.splot.pdata.PlotDataException;
+import edu.cnu.mdi.splot.pdata.PlotDataType;
+import edu.cnu.mdi.splot.plot.PlotCanvas;
+import edu.cnu.mdi.splot.plot.PlotPanel;
+import edu.cnu.mdi.splot.plot.PlotParameters;
 
 @SuppressWarnings("serial")
-public class PlotFieldDialog extends APlotDialog implements ActionListener {
+public class PlotFieldDialog extends JDialog implements ActionListener {
 
 	private static int _numPlotPoints = 50000;
-
-	private static Color[] _curveColors = { Color.black, X11Colors.getX11Color("dark red"),
-			X11Colors.getX11Color("dark blue"), Color.red, Color.green, Color.blue };
 
 	private static final int Z = 0;
 	private static final int RHO = 1;
@@ -83,6 +81,9 @@ public class PlotFieldDialog extends APlotDialog implements ActionListener {
 	// plot parameters
 	private PlotParameters _parameters;
 
+	private final PlotCanvas _canvas;
+	private final PlotData _plotData;
+
 	/**
 	 * Create the dialog for ploting the field
 	 *
@@ -90,66 +91,50 @@ public class PlotFieldDialog extends APlotDialog implements ActionListener {
 	 * @param modal  the usual meaning
 	 */
 	public PlotFieldDialog(JFrame parent, boolean modal) {
-		super(parent, "Magnetic Field Plotter", modal, null);
+		super(parent, "Magnetic Field Plotter", modal);
+		setDefaultCloseOperation(HIDE_ON_CLOSE);
+		setLayout(new BorderLayout());
 		setIconImage(ImageManager.cnuIcon.getImage());
-		_canvas.setPreferredSize(new Dimension(600, 600));
+
+		_plotData = createPlotData();
+		_canvas = new PlotCanvas(_plotData, "Magnetic Field", "z (cm)", "|B| (T)");
+		setPreferences();
+		addNorth();
+		PlotPanel plotPanel = new PlotPanel(_canvas);
+		plotPanel.setPreferredSize(new Dimension(600, 600));
+		add(plotPanel, BorderLayout.CENTER);
+		setJMenuBar(new JMenuBar());
 		pack();
+		setLocationRelativeTo(parent);
 	}
 
-	@Override
-	protected DataSet createDataSet() throws DataSetException {
-
-		DataSet ds = new DataSet(DataSetType.XYXY, getColumnNames());
-
-		DataColumn curve = ds.getCurve(0);
-		if (curve != null) {
-			curve.getFit().setFitType(FitType.CONNECT);
-			curve.getStyle().setSymbolType(SymbolType.NOSYMBOL);
-			curve.getStyle().setFitLineColor(_curveColors[0]);
-			curve.getStyle().setFitLineWidth(2f);
+	private static PlotData createPlotData() {
+		try {
+			PlotData data = new PlotData(PlotDataType.XYXY,
+					new String[] { getInitialCurveName() }, null);
+			configureCurve((Curve) data.getCurve(0));
+			return data;
 		}
-
-		return ds;
+		catch (PlotDataException exception) {
+			throw new IllegalStateException("Could not create the magnetic-field plot", exception);
+		}
 	}
 
-	@Override
-	protected String[] getColumnNames() {
-		String labels[] = { "Component", "|B| (1) " + MagneticFields.getInstance().getCurrentConfiguration() };
-		return labels;
+	private static String getInitialCurveName() {
+		return "|B| (1) " + MagneticFields.getInstance().getCurrentConfiguration();
 	}
 
-	@Override
-	protected String getXAxisLabel() {
-		return "z (cm)";
-	}
-
-	@Override
-	protected String getYAxisLabel() {
-		return "|B| (T)";
-	}
-
-	@Override
-	protected String getPlotTitle() {
-		return "Magnetic Field";
-	}
-
-	@Override
-	public void fillData() {
-	}
-
-	@Override
-	public void setPreferences() {
+	private void setPreferences() {
 		_parameters = _canvas.getParameters();
 		_parameters.setExtraDrawing(true);
-		_parameters.mustIncludeYZero(true);
+		_parameters.includeYZero(true);
 		_parameters.setMinExponentX(3);
 	}
 
 	/**
 	 * Add a north component
 	 */
-	@Override
-	protected void addNorth() {
+	private void addNorth() {
 		JPanel panel = new JPanel();
 
 		panel.setLayout(new BorderLayout(2, 2));
@@ -288,15 +273,10 @@ public class PlotFieldDialog extends APlotDialog implements ActionListener {
 
 	// clear all the plots
 	private void doClear() {
-
-		try {
-			_canvas.setDataSet(createDataSet());
-			_canvas.setWorldSystem();
-		} catch (DataSetException e) {
-			Log.getInstance().error("Could not clear the magnetic-field plot");
-			Log.getInstance().exception(e);
-			return;
-		}
+		_canvas.clearData();
+		_plotData.getFirstCurve().setVisible(false);
+		_parameters.setExtraStrings();
+		_canvas.setWorldSystem();
 		_canvas.repaint();
 	}
 
@@ -304,26 +284,10 @@ public class PlotFieldDialog extends APlotDialog implements ActionListener {
 	private void doPlot() {
 		// _canvas.getDataSet().clear();
 
-		// see if I have any curve slots avaiable
-		int curveCount = _canvas.getDataSet().getCurveCount();
-
-		int hotIndex = -1;
-		for (int i = 0; i < curveCount; i++) {
-			DataColumn curve = _canvas.getDataSet().getCurve(i);
-			if (curve.size() == 0) {
-				hotIndex = i;
-				break;
-			}
-		}
-		if (hotIndex < 0) {
-			hotIndex = curveCount;
-			DataColumn newCurve = _canvas.getDataSet().addCurve("Component",
-					"|B| (" + (hotIndex + 1) + ") " + MagneticFields.getInstance().getCurrentConfiguration());
-			newCurve.getFit().setFitType(FitType.CONNECT);
-			newCurve.getStyle().setSymbolType(SymbolType.NOSYMBOL);
-			newCurve.getStyle().setFitLineColor(_curveColors[hotIndex % _curveColors.length]);
-			newCurve.getStyle().setFitLineWidth(2f);
-		}
+		Curve curve = (Curve) _plotData.getFirstCurve();
+		curve.clearData();
+		curve.setName(getInitialCurveName());
+		curve.setVisible(true);
 
 		FieldProbe probe = FieldProbe.factory();
 
@@ -336,6 +300,8 @@ public class PlotFieldDialog extends APlotDialog implements ActionListener {
 		float z;
 		double phiRad;
 
+		double[] values = new double[_numPlotPoints];
+		double[] magnitudes = new double[_numPlotPoints];
 		for (int i = 0; i < _numPlotPoints; i++) {
 			double val = min + i * del;
 			double mag = 0;
@@ -366,18 +332,22 @@ public class PlotFieldDialog extends APlotDialog implements ActionListener {
 			}
 
 			mag = mag / 10; // to tesla
-			try {
-				_canvas.getDataSet().addToCurve(hotIndex, val, mag);
-			} catch (DataSetException e) {
-				Log.getInstance().error("Could not add data to the magnetic-field plot");
-				Log.getInstance().exception(e);
-				break;
-			}
+			values[i] = val;
+			magnitudes[i] = mag;
 		}
+		curve.addAll(values, magnitudes);
 
 		fixExtraStrings();
 		_canvas.setWorldSystem();
 		_canvas.repaint();
+	}
+
+	private static void configureCurve(Curve curve) {
+		curve.setCurveDrawingMethod(CurveDrawingMethod.CONNECT);
+		IStyled style = curve.getStyle();
+		style.setSymbolType(SymbolType.NOSYMBOL);
+		style.setLineColor(Color.BLACK);
+		style.setLineWidth(2f);
 	}
 
 	public static void main(String arg[]) {
