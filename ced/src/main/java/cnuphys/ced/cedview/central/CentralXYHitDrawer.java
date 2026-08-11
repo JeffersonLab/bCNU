@@ -23,7 +23,7 @@ import cnuphys.ced.geometry.BMTGeometry;
 import cnuphys.ced.geometry.BSTGeometry;
 import cnuphys.ced.geometry.BSTxyPanel;
 import cnuphys.ced.geometry.bmt.BMTSectorItem;
-import cnuphys.splot.plot.X11Colors;
+import cnuphys.bCNU.util.X11Colors;
 
 public class CentralXYHitDrawer extends CentralHitDrawer {
 

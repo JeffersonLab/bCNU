@@ -19,7 +19,7 @@ import cnuphys.ced.geometry.ECGeometry;
 import cnuphys.ced.geometry.GeometryManager;
 import cnuphys.ced.geometry.PCALGeometry;
 import cnuphys.ced.item.HexSectorItem;
-import cnuphys.splot.plot.X11Colors;
+import cnuphys.bCNU.util.X11Colors;
 
 public class PCALHexSectorItem extends HexSectorItem {
 

@@ -8,7 +8,7 @@ import java.awt.geom.Point2D;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.SymbolDraw;
 import cnuphys.ced.frame.CedColors;
-import cnuphys.splot.plot.X11Colors;
+import cnuphys.bCNU.util.X11Colors;
 
 public class DataDrawSupport {
 

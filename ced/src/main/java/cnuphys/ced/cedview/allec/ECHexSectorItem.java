@@ -18,7 +18,7 @@ import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.ECGeometry;
 import cnuphys.ced.geometry.GeometryManager;
 import cnuphys.ced.item.HexSectorItem;
-import cnuphys.splot.plot.X11Colors;
+import cnuphys.bCNU.util.X11Colors;
 
 /**
  * This is the "hex item" specific for EC views
