@@ -18,6 +18,11 @@ public class Transformations {
 	private Transformation3D _localToSector;
 	private Transformation3D _sectorToLocal;
 
+	// Explicit affine forms [output coordinate][x,y,z,translation]. These can be
+	// persisted without retaining or reconstructing the JLab geometry object graph.
+	private double[][] _localToSectorAffine;
+	private double[][] _sectorToLocalAffine;
+
 	public Transformations(DetectorType dtype) {
 		_detectorType = dtype;
 
@@ -48,6 +53,13 @@ public class Transformations {
 
 	}
 
+	/** Restore transformations from explicit affine coefficients. */
+	public Transformations(DetectorType dtype, double[][] localToSector, double[][] sectorToLocal) {
+		_detectorType = dtype;
+		_localToSectorAffine = copyAffine(localToSector);
+		_sectorToLocalAffine = copyAffine(sectorToLocal);
+	}
+
 	// init for cal superlayer = (0,1,2) for PCAL, EC_IN, EC_OUT
 	private void initCal(int superlayer) {
 		ConstantProvider provider = GeometryFactory.getConstants(org.jlab.detector.base.DetectorType.ECAL);
@@ -66,6 +78,8 @@ public class Transformations {
 
 		_localToSector = clas_ecLayerU.getTransformation();
 		_sectorToLocal = _localToSector.inverse();
+		_localToSectorAffine = sampleAffine(_localToSector);
+		_sectorToLocalAffine = sampleAffine(_sectorToLocal);
 	}
 
 	/**
@@ -75,7 +89,11 @@ public class Transformations {
 	 *            the sector system
 	 */
 	public void localToSector(Transformable txf) {
-		_localToSector.apply(txf);
+		if (txf instanceof Point3D point) {
+			apply(_localToSectorAffine, point);
+		} else {
+			_localToSector.apply(txf);
+		}
 	}
 
 	/**
@@ -85,7 +103,11 @@ public class Transformations {
 	 *            the local system
 	 */
 	public void sectorToLocal(Transformable txf) {
-		_sectorToLocal.apply(txf);
+		if (txf instanceof Point3D point) {
+			apply(_sectorToLocalAffine, point);
+		} else {
+			_sectorToLocal.apply(txf);
+		}
 	}
 
 	/**
@@ -96,7 +118,7 @@ public class Transformations {
 	 */
 	public void localToSector(Point3D localP, Point3D sectorP) {
 		sectorP.set(localP.x(), localP.y(), localP.z());
-		_localToSector.apply(sectorP);
+		apply(_localToSectorAffine, sectorP);
 	}
 
 	/**
@@ -107,7 +129,7 @@ public class Transformations {
 	 */
 	public void sectorToLocal(Point3D localP, Point3D sectorP) {
 		localP.set(sectorP.x(), sectorP.y(), sectorP.z());
-		_sectorToLocal.apply(localP);
+		apply(_sectorToLocalAffine, localP);
 	}
 
 	/**
@@ -141,5 +163,57 @@ public class Transformations {
 	 */
 	public DetectorType getDetectorType() {
 		return _detectorType;
+	}
+
+	public double[][] getLocalToSectorAffine() {
+		return copyAffine(_localToSectorAffine);
+	}
+
+	public double[][] getSectorToLocalAffine() {
+		return copyAffine(_sectorToLocalAffine);
+	}
+
+	private static double[][] sampleAffine(Transformation3D transformation) {
+		Point3D origin = transformed(transformation, 0, 0, 0);
+		Point3D xAxis = transformed(transformation, 1, 0, 0);
+		Point3D yAxis = transformed(transformation, 0, 1, 0);
+		Point3D zAxis = transformed(transformation, 0, 0, 1);
+		return new double[][] {
+			{ xAxis.x() - origin.x(), yAxis.x() - origin.x(), zAxis.x() - origin.x(), origin.x() },
+			{ xAxis.y() - origin.y(), yAxis.y() - origin.y(), zAxis.y() - origin.y(), origin.y() },
+			{ xAxis.z() - origin.z(), yAxis.z() - origin.z(), zAxis.z() - origin.z(), origin.z() }
+		};
+	}
+
+	private static Point3D transformed(Transformation3D transformation, double x, double y, double z) {
+		Point3D point = new Point3D(x, y, z);
+		transformation.apply(point);
+		return point;
+	}
+
+	private static void apply(double[][] affine, Point3D point) {
+		if (affine == null) {
+			throw new IllegalStateException("Transformation coefficients are unavailable");
+		}
+		double x = point.x();
+		double y = point.y();
+		double z = point.z();
+		point.set(affine[0][0] * x + affine[0][1] * y + affine[0][2] * z + affine[0][3],
+				affine[1][0] * x + affine[1][1] * y + affine[1][2] * z + affine[1][3],
+				affine[2][0] * x + affine[2][1] * y + affine[2][2] * z + affine[2][3]);
+	}
+
+	private static double[][] copyAffine(double[][] source) {
+		if (source == null || source.length != 3) {
+			throw new IllegalArgumentException("Affine transformation must have three rows");
+		}
+		double[][] copy = new double[3][4];
+		for (int row = 0; row < 3; row++) {
+			if (source[row] == null || source[row].length != 4) {
+				throw new IllegalArgumentException("Affine transformation rows must have four values");
+			}
+			System.arraycopy(source[row], 0, copy[row], 0, 4);
+		}
+		return copy;
 	}
 }
