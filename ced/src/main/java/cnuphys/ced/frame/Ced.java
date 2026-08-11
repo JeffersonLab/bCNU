@@ -75,6 +75,7 @@ import cnuphys.ced.component.DrawingLegendDialog;
 import cnuphys.ced.dcnoise.edit.NoiseParameterDialog;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.GeometryManager;
+import cnuphys.ced.geometry.cache.GeometryCache;
 import cnuphys.ced.magfield.PlotFieldDialog;
 import cnuphys.ced.noise.NoiseManager;
 import cnuphys.ced.properties.PropertiesManager;
@@ -710,6 +711,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		final JMenuItem memPlot = new JMenuItem("Memory Usage...");
 		final JMenuItem environ = new JMenuItem("Environment...");
 		final JMenuItem drawLeg = new JMenuItem("Drawing Symbology...");
+		final JMenuItem deleteGeometryCache = new JMenuItem("Delete Geometry Cache...");
 		ActionListener al = new ActionListener() {
 
 			@Override
@@ -737,6 +739,29 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 					DrawingLegendDialog.showDialog();
 				}
 
+				else if (source == deleteGeometryCache) {
+					int answer = JOptionPane.showConfirmDialog(Ced.this,
+							"Delete the local geometry cache?\n\n"
+							+ "CED will continue using its current geometry. The cache will be rebuilt\n"
+							+ "from authoritative sources the next time CED starts.",
+							"Delete Geometry Cache", JOptionPane.OK_CANCEL_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+					if (answer == JOptionPane.OK_OPTION) {
+						try {
+							boolean deleted = GeometryCache.deleteCache();
+							String message = deleted
+									? "The geometry cache was deleted. It will be rebuilt the next time CED starts."
+									: "No geometry cache was present to delete.";
+							JOptionPane.showMessageDialog(Ced.this, message, "Geometry Cache",
+									JOptionPane.INFORMATION_MESSAGE);
+						} catch (IOException exception) {
+							JOptionPane.showMessageDialog(Ced.this,
+									"Unable to delete the geometry cache:\n" + exception.getMessage(),
+									"Geometry Cache", JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				}
+
 			}
 
 		};
@@ -745,9 +770,12 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		environ.addActionListener(al);
 		memPlot.addActionListener(al);
 		drawLeg.addActionListener(al);
+		deleteGeometryCache.addActionListener(al);
 		omenu.add(environ);
 		omenu.add(memPlot);
 		omenu.add(drawLeg);
+		omenu.addSeparator();
+		omenu.add(deleteGeometryCache);
 
 	}
 

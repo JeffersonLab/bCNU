@@ -4,6 +4,9 @@ import cnuphys.ced.geometry.cache.ACachedGeometry;
 import cnuphys.ced.geometry.cache.GeometryCache;
 import cnuphys.ced.geometry.cache.IGeometryCache;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.awt.geom.Point2D;
 
 public class CTOFGeometry extends ACachedGeometry {
@@ -104,6 +107,48 @@ public class CTOFGeometry extends ACachedGeometry {
 		coords[i] = x;
 		coords[i + 1] = y;
 		coords[i + 2] = z;
+	}
+
+	@Override
+	public boolean supportsCache() {
+		return true;
+	}
+
+	@Override
+	public void readGeometry(DataInput input) throws IOException {
+		int paddleCount = input.readInt();
+		if (paddleCount != COUNT) {
+			throw new IOException("Expected " + COUNT + " CTOF paddles, found " + paddleCount);
+		}
+		Point2D.Double[][] quads = new Point2D.Double[COUNT][4];
+		for (int paddle = 0; paddle < COUNT; paddle++) {
+			int cornerCount = input.readInt();
+			if (cornerCount != 4) {
+				throw new IOException("Expected 4 CTOF corners, found " + cornerCount);
+			}
+			for (int corner = 0; corner < 4; corner++) {
+				quads[paddle][corner] = new Point2D.Double(input.readDouble(), input.readDouble());
+			}
+		}
+		_quads = quads;
+	}
+
+	@Override
+	public void writeGeometry(DataOutput output) throws IOException {
+		if (_quads == null || _quads.length != COUNT) {
+			throw new IOException("CTOF geometry is not initialized");
+		}
+		output.writeInt(COUNT);
+		for (Point2D.Double[] quad : _quads) {
+			if (quad == null || quad.length != 4) {
+				throw new IOException("Invalid CTOF paddle geometry");
+			}
+			output.writeInt(quad.length);
+			for (Point2D.Double point : quad) {
+				output.writeDouble(point.x);
+				output.writeDouble(point.y);
+			}
+		}
 	}
 
 }

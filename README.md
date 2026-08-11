@@ -12,9 +12,13 @@ Eclipse output directories. The reactor modules no longer carry Ant build
 files or nested Eclipse project metadata; import the root Maven reactor into
 an IDE instead.
 
-Geometry startup uses the authoritative CCDB initializers directly. The legacy
-Kryo cache and its checked-in binary artifacts have been removed pending a
-maintainable SQLite replacement.
+Geometry startup uses a per-user SQLite cache at
+`~/.ced/geometry-cache.sqlite`. Detector payloads use explicit primitive data
+rather than serialized Java object graphs. CED automatically recreates the
+cache when the CED version or requested geometry variation changes; it can
+also be removed manually with **Options > Delete Geometry Cache**. Detectors
+are being migrated incrementally and continue to use their authoritative CCDB
+initializer until they have an explicit cache representation.
 
 ## Prerequisite
 
