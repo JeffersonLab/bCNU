@@ -22,7 +22,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
-import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.component.rangeslider.RangeSlider;
 import cnuphys.bCNU.drawable.DrawableAdapter;
@@ -49,7 +48,6 @@ import cnuphys.ced.alldata.CTOFClusters;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.CedXYView;
 import cnuphys.ced.cedview.urwt.HighlightData;
-import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.component.ControlPanel;
 import cnuphys.ced.component.DisplayBits;
 import cnuphys.ced.frame.Ced;
@@ -283,72 +281,62 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 
 	// draw data selected hightlight data
 	private void drawDataSelectedHighlight(Graphics g, IContainer container) {
-
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (dataEvent == null) {
-			return;
-		}
-
 		if (showClusters()) {
-			drawHighlightClusters(g, container, dataEvent);
+			drawHighlightClusters(g, container);
 		}
 
 	}
 
 	// draw highlighted clusters
-	private void drawHighlightClusters(Graphics g, IContainer container, DataEvent dataEvent) {
+	private void drawHighlightClusters(Graphics g, IContainer container) {
 		// indices are zero based
-		if ((_bstHighlightData.cluster >= 0) && dataEvent.hasBank("BSTRec::Clusters")) {
+		if (_bstHighlightData.cluster >= 0) {
 			BSTClusters clusters = BSTClusters.getInstance();
 			int idx = _bstHighlightData.cluster; // 0 based
-			if (!clusters.hasRow(idx)) {
-				return;
+			if (clusters.hasRow(idx)) {
+				float x1 = clusters.x1(idx);
+				float y1 = clusters.y1(idx);
+				float x2 = clusters.x2(idx);
+				float y2 = clusters.y2(idx);
+
+				Point p1 = new Point();
+				Point p2 = new Point();
+
+				container.worldToLocal(p1, 10 * x1, 10 * y1);
+				container.worldToLocal(p2, 10 * x2, 10 * y2);
+
+				if (Ced.getCed().isConnectCluster()) {
+					g.setColor(Color.black);
+					g.drawLine(p1.x, p1.y, p2.x, p2.y);
+				}
+
+				DataDrawSupport.drawClusterHighlight(g, p1);
+				DataDrawSupport.drawClusterHighlight(g, p2);
 			}
-
-			float x1 = clusters.x1(idx);
-			float y1 = clusters.y1(idx);
-			float x2 = clusters.x2(idx);
-			float y2 = clusters.y2(idx);
-
-			Point p1 = new Point();
-			Point p2 = new Point();
-
-			container.worldToLocal(p1, 10 * x1, 10 * y1);
-			container.worldToLocal(p2, 10 * x2, 10 * y2);
-
-			if (Ced.getCed().isConnectCluster()) {
-				g.setColor(Color.black);
-				g.drawLine(p1.x, p1.y, p2.x, p2.y);
-			}
-
-			DataDrawSupport.drawClusterHighlight(g, p1);
-			DataDrawSupport.drawClusterHighlight(g, p2);
 		}
 
-		if ((_bmtHighlightData.cluster >= 0) && dataEvent.hasBank("BMTRec::Clusters")) {
+		if (_bmtHighlightData.cluster >= 0) {
 			BMTClusters clusters = BMTClusters.getInstance();
 			int idx = _bmtHighlightData.cluster; // 0 based
-			if (!clusters.hasRow(idx)) {
-				return;
+			if (clusters.hasRow(idx)) {
+				float x1 = clusters.x1(idx);
+				float y1 = clusters.y1(idx);
+				float x2 = clusters.x2(idx);
+				float y2 = clusters.y2(idx);
+				Point p1 = new Point();
+				Point p2 = new Point();
+
+				container.worldToLocal(p1, 10 * x1, 10 * y1);
+				container.worldToLocal(p2, 10 * x2, 10 * y2);
+
+				if (Ced.getCed().isConnectCluster()) {
+					g.setColor(Color.black);
+					g.drawLine(p1.x, p1.y, p2.x, p2.y);
+				}
+
+				DataDrawSupport.drawClusterHighlight(g, p1);
+				DataDrawSupport.drawClusterHighlight(g, p2);
 			}
-
-			float x1 = clusters.x1(idx);
-			float y1 = clusters.y1(idx);
-			float x2 = clusters.x2(idx);
-			float y2 = clusters.y2(idx);
-			Point p1 = new Point();
-			Point p2 = new Point();
-
-			container.worldToLocal(p1, 10 * x1, 10 * y1);
-			container.worldToLocal(p2, 10 * x2, 10 * y2);
-
-			if (Ced.getCed().isConnectCluster()) {
-				g.setColor(Color.black);
-				g.drawLine(p1.x, p1.y, p2.x, p2.y);
-			}
-
-			DataDrawSupport.drawClusterHighlight(g, p1);
-			DataDrawSupport.drawClusterHighlight(g, p2);
 		}
 
 	}
@@ -825,12 +813,13 @@ public class CentralXYView extends CedXYView implements ICentralXYView {
 	public void dataSelected(String bankName, int index) {
 
 		if ("BMT::adc".equals(bankName)) {
-		} else if ("BMTRec::Clusters".equals(bankName)) {
+		} else if (BMTClusters.getInstance().activeBankName().equals(bankName)) {
+			_bmtHighlightData.cluster = index;
 		} else if ("BMTRec::Crosses".equals(bankName)) {
 		} else if ("BMTRec::Hits".equals(bankName)) {
 			_bstHighlightData.hit = index;
 		} else if ("BST::adc".equals(bankName)) {
-		} else if ("BSTRec::Clusters".equals(bankName)) {
+		} else if (BSTClusters.getInstance().activeBankName().equals(bankName)) {
 			_bstHighlightData.cluster = index;
 		} else if ("BSTRec::Crosses".equals(bankName)) {
 			_bstHighlightData.cross = index;

@@ -11,8 +11,6 @@ import java.awt.Stroke;
 import java.awt.geom.Point2D.Double;
 import java.util.List;
 
-import org.jlab.io.base.DataEvent;
-
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.BMTClusters;
 import cnuphys.ced.alldata.BSTClusters;
@@ -63,11 +61,6 @@ public class ClusterDrawerXY extends CentralXYViewDrawer {
 	 * @param container the drawing container
 	 */
 	public void drawCNDClusters(Graphics g, IContainer container) {
-		DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (event == null) {
-			return;
-		}
-
 		CNDClusters cndClusterData = CNDClusters.getInstance();
 		int count = cndClusterData.count();
 		if (count > 0) {
@@ -95,11 +88,6 @@ public class ClusterDrawerXY extends CentralXYViewDrawer {
 		}
 
 
-		DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (event == null) {
-			return;
-		}
-
 		BSTClusters clusters = BSTClusters.getInstance();
 		int count = clusters.count();
 		if (count == 0) {
@@ -119,6 +107,7 @@ public class ClusterDrawerXY extends CentralXYViewDrawer {
 			}
 			DataDrawSupport.drawCluster(g, p1);
 			DataDrawSupport.drawCluster(g, p2);
+			clusters.setLocations(i, p1, p2);
 		}
 	}
 
@@ -135,11 +124,6 @@ public class ClusterDrawerXY extends CentralXYViewDrawer {
 		}
 
 		
-		DataEvent event = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (event == null) {
-			return;
-		}
-
 		BMTClusters clusters = BMTClusters.getInstance();
 		int count = clusters.count();
 		if (count == 0) {
@@ -159,6 +143,7 @@ public class ClusterDrawerXY extends CentralXYViewDrawer {
 			}
 			DataDrawSupport.drawCluster(g, p1);
 			DataDrawSupport.drawCluster(g, p2);
+			clusters.setLocations(i, p1, p2);
 		}
 	}
 
@@ -171,6 +156,22 @@ public class ClusterDrawerXY extends CentralXYViewDrawer {
 			if (cndClusterData.contains(i, screenPoint)) {
 				cndClusterData.addFeedback(i, feedbackStrings);
 				break;
+			}
+		}
+
+		BSTClusters bstClusters = BSTClusters.getInstance();
+		for (int i = 0; i < bstClusters.count(); i++) {
+			if (bstClusters.contains(i, screenPoint)) {
+				bstClusters.addFeedback(i, feedbackStrings);
+				return;
+			}
+		}
+
+		BMTClusters bmtClusters = BMTClusters.getInstance();
+		for (int i = 0; i < bmtClusters.count(); i++) {
+			if (bmtClusters.contains(i, screenPoint)) {
+				bmtClusters.addFeedback(i, feedbackStrings);
+				return;
 			}
 		}
 	}
