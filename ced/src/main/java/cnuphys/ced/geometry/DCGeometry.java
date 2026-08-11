@@ -1,6 +1,11 @@
 package cnuphys.ced.geometry;
 
 import java.awt.geom.Point2D;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.detector.geom.dc.DCGeantFactory;
@@ -183,6 +188,92 @@ public class DCGeometry extends ACachedGeometry {
 			return null;
 		}
 		return wires[superlayer - 1][layer - 1][wire - 1];
+	}
+
+	@Override
+	public boolean supportsCache() {
+		return true;
+	}
+
+	@Override
+	public void writeGeometry(DataOutput output) throws IOException {
+		output.writeInt(wires.length);
+		output.writeInt(wires[0].length);
+		output.writeInt(wires[0][0].length);
+		for (DriftChamberWire[][] superlayer : wires) {
+			for (DriftChamberWire[] layer : superlayer) {
+				for (DriftChamberWire wire : layer) {
+					writeWire(output, wire);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void readGeometry(DataInput input) throws IOException {
+		int superlayers = checkedDimension(input.readInt(), 6, "superlayer");
+		int layers = checkedDimension(input.readInt(), 6, "layer");
+		int wireCount = checkedDimension(input.readInt(), 112, "wire");
+		DriftChamberWire[][][] restored = new DriftChamberWire[superlayers][layers][wireCount];
+		minWireX = Double.POSITIVE_INFINITY;
+		maxWireX = Double.NEGATIVE_INFINITY;
+		for (int superlayer = 0; superlayer < superlayers; superlayer++) {
+			for (int layer = 0; layer < layers; layer++) {
+				for (int wire = 0; wire < wireCount; wire++) {
+					DriftChamberWire component = readWire(input);
+					restored[superlayer][layer][wire] = component;
+					updateWireXBounds(component.getLine());
+				}
+			}
+		}
+		wires = restored;
+	}
+
+	private static void writeWire(DataOutput output, DriftChamberWire wire) throws IOException {
+		output.writeInt(wire.getComponentId());
+		writePoint(output, wire.getMidpoint());
+		writePoint(output, wire.getLine().origin());
+		writePoint(output, wire.getLine().end());
+		for (int corner = 0; corner < 12; corner++) {
+			writePoint(output, wire.getVolumePoint(corner));
+		}
+	}
+
+	private static DriftChamberWire readWire(DataInput input) throws IOException {
+		int componentId = input.readInt();
+		Point3D midpoint = readPoint(input);
+		Line3D line = new Line3D(readPoint(input), readPoint(input));
+		List<Point3D> bottom = new ArrayList<>(6);
+		List<Point3D> top = new ArrayList<>(6);
+		for (int corner = 0; corner < 6; corner++) {
+			bottom.add(readPoint(input));
+		}
+		for (int corner = 0; corner < 6; corner++) {
+			top.add(readPoint(input));
+		}
+		return new DriftChamberWire(componentId, midpoint, line, false, bottom, top);
+	}
+
+	private static void writePoint(DataOutput output, Point3D point) throws IOException {
+		output.writeDouble(point.x());
+		output.writeDouble(point.y());
+		output.writeDouble(point.z());
+	}
+
+	private static Point3D readPoint(DataInput input) throws IOException {
+		return new Point3D(input.readDouble(), input.readDouble(), input.readDouble());
+	}
+
+	private static int checkedDimension(int actual, int expected, String description) throws IOException {
+		if (actual != expected) {
+			throw new IOException("Invalid DC " + description + " count: " + actual);
+		}
+		return actual;
+	}
+
+	private static void updateWireXBounds(Line3D line) {
+		minWireX = Math.min(minWireX, Math.min(line.origin().x(), line.end().x()));
+		maxWireX = Math.max(maxWireX, Math.max(line.origin().x(), line.end().x()));
 	}
 
 	/**
