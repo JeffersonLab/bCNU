@@ -7,6 +7,10 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -71,6 +75,59 @@ public class TOFLayer {
 		paddles = geoAlertTOFLayer.getAllComponents();
 
 		setLimitValues();
+	}
+
+	private TOFLayer(int sector, int superlayer, int layer, List<ScintillatorPaddle> paddles) {
+		this.sector = sector;
+		this.superlayer = superlayer;
+		this.layer = layer;
+		this.paddles = paddles;
+		numPaddles = paddles.size();
+		setLimitValues();
+	}
+
+	static TOFLayer readFromCache(DataInput input) throws IOException {
+		int sector = input.readInt();
+		int superlayer = input.readInt();
+		int layer = input.readInt();
+		int count = input.readInt();
+		if (count < 1 || count > 10_000) {
+			throw new IOException("Invalid ALERT TOF paddle count: " + count);
+		}
+		List<ScintillatorPaddle> paddles = new ArrayList<>(count);
+		for (int paddle = 0; paddle < count; paddle++) {
+			int componentId = input.readInt();
+			Point3D[] corners = new Point3D[8];
+			for (int corner = 0; corner < corners.length; corner++) {
+				corners[corner] = readPoint(input);
+			}
+			paddles.add(new ScintillatorPaddle(componentId, corners[0], corners[1], corners[2], corners[3],
+					corners[4], corners[5], corners[6], corners[7]));
+		}
+		return new TOFLayer(sector, superlayer, layer, paddles);
+	}
+
+	void writeToCache(DataOutput output) throws IOException {
+		output.writeInt(sector);
+		output.writeInt(superlayer);
+		output.writeInt(layer);
+		output.writeInt(numPaddles);
+		for (ScintillatorPaddle paddle : paddles) {
+			output.writeInt(paddle.getComponentId());
+			for (int corner = 0; corner < 8; corner++) {
+				writePoint(output, paddle.getVolumePoint(corner));
+			}
+		}
+	}
+
+	private static Point3D readPoint(DataInput input) throws IOException {
+		return new Point3D(input.readDouble(), input.readDouble(), input.readDouble());
+	}
+
+	private static void writePoint(DataOutput output, Point3D point) throws IOException {
+		output.writeDouble(point.x());
+		output.writeDouble(point.y());
+		output.writeDouble(point.z());
 	}
 
 	/**
