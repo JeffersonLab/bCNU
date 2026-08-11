@@ -1,6 +1,9 @@
 package cnuphys.ced.geometry;
 
 import java.awt.geom.Point2D;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.geom.base.ConstantProvider;
@@ -81,6 +84,8 @@ public class ECGeometry extends ACachedGeometry {
 	// layers in clas and local coordinates
 	private static ECLayer[][] ecLayerLocal;
 	private static ECLayer[][] ecLayer;
+	private static double[][][][][] viewTriangles;
+	private static double[][][][][][] projectionEdges;
 
 	public ECGeometry() {
 		super("ECGeometry");
@@ -129,7 +134,44 @@ public class ECGeometry extends ACachedGeometry {
 
 		createTransformations();
 		getStripsAndTriangles();
+		captureDrawingGeometry();
 	} // initialize
+
+	private static void captureDrawingGeometry() {
+		viewTriangles = new double[6][2][3][3][3];
+		projectionEdges = new double[2][3][EC_NUMSTRIP][4][2][3];
+		for (int plane = 0; plane < 2; plane++) {
+			for (int view = 0; view < 3; view++) {
+				ECLayer layer = ecLayer[plane][view];
+				Triangle3D triangle = (Triangle3D) layer.getBoundary().face(0);
+				double dist = view * (_deltaK[plane] / 3.0);
+				double xt = dist * Math.sin(Math.toRadians(25));
+				double zt = dist * Math.cos(Math.toRadians(25));
+				for (int sector = 0; sector < 6; sector++) {
+					for (int point = 0; point < 3; point++) {
+						Point3D corner = new Point3D(triangle.point(point));
+						corner.translateXYZ(xt, 0, zt);
+						corner.rotateZ(Math.toRadians(60 * sector));
+						storePoint(viewTriangles[sector][plane][view][point], corner);
+					}
+				}
+				for (int strip = 0; strip < EC_NUMSTRIP; strip++) {
+					ScintillatorPaddle paddle = layer.getComponent(strip);
+					for (int edge = 0; edge < 4; edge++) {
+						org.jlab.geom.prim.Line3D line = paddle.getVolumeEdge(6 + edge);
+						storePoint(projectionEdges[plane][view][strip][edge][0], line.origin());
+						storePoint(projectionEdges[plane][view][strip][edge][1], line.end());
+					}
+				}
+			}
+		}
+	}
+
+	private static void storePoint(double[] destination, Point3D point) {
+		destination[0] = point.x();
+		destination[1] = point.y();
+		destination[2] = point.z();
+	}
 
 	// create the transformations FOR INNER AND OUTER
 	private static void createTransformations() {
@@ -379,33 +421,11 @@ public class ECGeometry extends ACachedGeometry {
 			throw new RuntimeException("EC Geometry [getViewTriangle] stack must be 1 or 2");
 		}
 
-		ECLayer ecLay = ecLayer[stack - 1][view - 1];
-
-		// NOTE, each ec layer has one face, a triangle
-
-		Triangle3D t3d = (Triangle3D) ecLay.getBoundary().face(0);
-
-		// translation
-
-		double delK = _deltaK[stack - 1];
-
-		double dist = (view - 1) * (delK / 3);
-		double xt = dist * Math.sin(Math.toRadians(25));
-		double yt = 0;
-		double zt = dist * Math.cos(Math.toRadians(25));
-
 		for (int i = 0; i < 3; i++) {
 			int j = 3 * i;
-			Point3D corner = new Point3D(t3d.point(i));
-			corner.translateXYZ(xt, yt, zt);
-
-			if (sector > 1) {
-				corner.rotateZ(Math.toRadians(60 * (sector - 1)));
-			}
-
-			coords[j] = (float) corner.x();
-			coords[j + 1] = (float) corner.y();
-			coords[j + 2] = (float) corner.z();
+			coords[j] = (float) viewTriangles[sector - 1][stack - 1][view - 1][i][0];
+			coords[j + 1] = (float) viewTriangles[sector - 1][stack - 1][view - 1][i][1];
+			coords[j + 2] = (float) viewTriangles[sector - 1][stack - 1][view - 1][i][2];
 		}
 	}
 
@@ -420,9 +440,7 @@ public class ECGeometry extends ACachedGeometry {
 	public static boolean doesProjectedPolyFullyIntersect(int superlayer, int layer, int stripid,
 			Plane3D projectionPlane) {
 
-		ECLayer ecLay = ecLayer[superlayer][layer];
-		ScintillatorPaddle strip = ecLay.getComponent(stripid);
-		return GeometryManager.doesProjectedPolyIntersect(strip, projectionPlane, 6, 4);
+		return GeometryManager.doesProjectedPolyIntersect(projectionEdges[superlayer][layer][stripid], projectionPlane);
 	}
 
 	/**
@@ -438,11 +456,8 @@ public class ECGeometry extends ACachedGeometry {
 	public static Point2D.Double[] getIntersections(int superlayer, int layer, int stripid, Plane3D projectionPlane,
 			boolean offset) {
 
-		ECLayer ecLay = ecLayer[superlayer][layer];
-		ScintillatorPaddle strip = ecLay.getComponent(stripid);
-
 		Point2D.Double wp[] = GeometryManager.allocate(4);
-		boolean isects = GeometryManager.getProjectedPolygon(strip, projectionPlane, 6, 4, wp, null);
+		GeometryManager.getProjectedPolygon(projectionEdges[superlayer][layer][stripid], projectionPlane, wp, null);
 		
 
 		// note reordering
@@ -477,6 +492,121 @@ public class ECGeometry extends ACachedGeometry {
 		start.y += dely;
 		end.x += delx;
 		end.y += dely;
+	}
+
+	@Override
+	public boolean supportsCache() {
+		return true;
+	}
+
+	@Override
+	public void writeGeometry(DataOutput output) throws IOException {
+		for (int plane = 0; plane < 2; plane++) {
+			writePoint(output, new double[] {_r0[plane].x(), _r0[plane].y(), _r0[plane].z()});
+			output.writeDouble(_deltaK[plane]);
+			output.writeDouble(_slopes[plane]);
+			writeAffine(output, _transformations[plane].getLocalToSectorAffine());
+			writeAffine(output, _transformations[plane].getSectorToLocalAffine());
+			for (int view = 0; view < 3; view++) {
+				for (int strip = 0; strip < EC_NUMSTRIP; strip++) {
+					for (int point = 0; point < 4; point++) {
+						Point3D p = _strips[plane][view][strip][point];
+						writePoint(output, new double[] {p.x(), p.y(), p.z()});
+					}
+					for (int edge = 0; edge < 4; edge++) {
+						writePoint(output, projectionEdges[plane][view][strip][edge][0]);
+						writePoint(output, projectionEdges[plane][view][strip][edge][1]);
+					}
+				}
+			}
+		}
+		output.writeDouble(THETA);
+		output.writeDouble(COSTHETA);
+		output.writeDouble(SINTHETA);
+		output.writeDouble(TANTHETA);
+		for (int sector = 0; sector < 6; sector++) {
+			for (int plane = 0; plane < 2; plane++) {
+				for (int view = 0; view < 3; view++) {
+					for (int point = 0; point < 3; point++) {
+						writePoint(output, viewTriangles[sector][plane][view][point]);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void readGeometry(DataInput input) throws IOException {
+		_r0 = new Point3D[2];
+		_deltaK = new double[2];
+		_slopes = new double[2];
+		_transformations = new Transformations[2];
+		_strips = new Point3D[2][3][EC_NUMSTRIP][4];
+		projectionEdges = new double[2][3][EC_NUMSTRIP][4][2][3];
+		for (int plane = 0; plane < 2; plane++) {
+			double[] r0 = readPoint(input);
+			_r0[plane] = new Point3D(r0[0], r0[1], r0[2]);
+			_deltaK[plane] = input.readDouble();
+			_slopes[plane] = input.readDouble();
+			DetectorType type = (plane == EC_INNER) ? DetectorType.EC_INNER : DetectorType.EC_OUTER;
+			_transformations[plane] = new Transformations(type, readAffine(input), readAffine(input));
+			for (int view = 0; view < 3; view++) {
+				for (int strip = 0; strip < EC_NUMSTRIP; strip++) {
+					for (int point = 0; point < 4; point++) {
+						double[] p = readPoint(input);
+						_strips[plane][view][strip][point] = new Point3D(p[0], p[1], p[2]);
+					}
+					for (int edge = 0; edge < 4; edge++) {
+						projectionEdges[plane][view][strip][edge][0] = readPoint(input);
+						projectionEdges[plane][view][strip][edge][1] = readPoint(input);
+					}
+				}
+			}
+		}
+		THETA = input.readDouble();
+		COSTHETA = input.readDouble();
+		SINTHETA = input.readDouble();
+		TANTHETA = input.readDouble();
+		viewTriangles = new double[6][2][3][3][3];
+		for (int sector = 0; sector < 6; sector++) {
+			for (int plane = 0; plane < 2; plane++) {
+				for (int view = 0; view < 3; view++) {
+					for (int point = 0; point < 3; point++) {
+						viewTriangles[sector][plane][view][point] = readPoint(input);
+					}
+				}
+			}
+		}
+		ecLayer = null;
+		ecLayerLocal = null;
+	}
+
+	private static void writeAffine(DataOutput output, double[][] affine) throws IOException {
+		for (double[] row : affine) {
+			for (double value : row) {
+				output.writeDouble(value);
+			}
+		}
+	}
+
+	private static double[][] readAffine(DataInput input) throws IOException {
+		double[][] affine = new double[3][4];
+		for (int row = 0; row < 3; row++) {
+			for (int column = 0; column < 4; column++) {
+				affine[row][column] = input.readDouble();
+			}
+		}
+		return affine;
+	}
+
+	private static void writePoint(DataOutput output, double[] point) throws IOException {
+		for (double value : point) {
+			output.writeDouble(value);
+		}
+	}
+
+	private static double[] readPoint(DataInput input) throws IOException {
+		return new double[] {input.readDouble(), input.readDouble(), input.readDouble()};
 	}
 
 }
