@@ -1,11 +1,15 @@
 package cnuphys.ced.geometry.urwt;
 
 import java.awt.geom.Point2D;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
 import org.jlab.detector.geant4.v2.MPGD.URWT.URWTStripFactory;
 import org.jlab.geom.prim.Line3D;
+import org.jlab.geom.prim.Point3D;
 
 import cnuphys.ced.ced3d.util.PlaneHullUtility;
 import cnuphys.ced.ced3d.util.Point;
@@ -76,8 +80,33 @@ public class UrWTDetectorData {
 
 		}
 		
-		// compute the convex hull of the strip endpoints, which is used 
-		//for 3D drawing. 
+		initializeDerivedGeometry();
+	}
+
+	private UrWTDetectorData(int sector, int layer, Line3D[] strips) {
+		validateAddress(sector, layer);
+		this.sector = sector;
+		this.layer = layer;
+		this.strips = Objects.requireNonNull(strips, "URWT strips");
+		count = strips.length;
+		if (count < 1) {
+			throw new IllegalArgumentException("URWT detector must contain at least one strip");
+		}
+		initializeDerivedGeometry();
+	}
+
+	private static void validateAddress(int sector, int layer) {
+		if ((sector < 1) || (sector > UrWTGeometry.NUM_SECTORS)) {
+			throw new IllegalArgumentException("URWT sector must be in [1, 6]: " + sector);
+		}
+		if ((layer < 1) || (layer > UrWTGeometry.NUM_LAYERS)) {
+			throw new IllegalArgumentException("URWT layer must be in [1, 4]: " + layer);
+		}
+	}
+
+	private void initializeDerivedGeometry() {
+		// Compute the convex hull from the explicit strip endpoints rather than
+		// retaining any CCDB factory objects in the persistent representation.
 		convexHull = PlaneHullUtility.getHullIfCoplanar(strips, 1.0e-6);
 		if (convexHull == null) {
 			throw new IllegalStateException(
@@ -99,6 +128,41 @@ public class UrWTDetectorData {
 			xyPoints[i] = new Point2D.Double(p.x, p.y);
 		}
 
+	}
+
+	static UrWTDetectorData readFromCache(DataInput input) throws IOException {
+		int sector = input.readInt();
+		int layer = input.readInt();
+		int count = input.readInt();
+		if (count < 1 || count > 100_000) {
+			throw new IOException("Invalid URWT strip count: " + count);
+		}
+
+		Line3D[] strips = new Line3D[count];
+		for (int index = 0; index < count; index++) {
+			Point3D origin = new Point3D(input.readDouble(), input.readDouble(), input.readDouble());
+			Point3D end = new Point3D(input.readDouble(), input.readDouble(), input.readDouble());
+			strips[index] = new Line3D(origin, end);
+		}
+		try {
+			return new UrWTDetectorData(sector, layer, strips);
+		} catch (IllegalArgumentException | IllegalStateException exception) {
+			throw new IOException("Invalid cached URWT detector", exception);
+		}
+	}
+
+	void writeToCache(DataOutput output) throws IOException {
+		output.writeInt(sector);
+		output.writeInt(layer);
+		output.writeInt(count);
+		for (Line3D strip : strips) {
+			output.writeDouble(strip.origin().x());
+			output.writeDouble(strip.origin().y());
+			output.writeDouble(strip.origin().z());
+			output.writeDouble(strip.end().x());
+			output.writeDouble(strip.end().y());
+			output.writeDouble(strip.end().z());
+		}
 	}
 	
 	/**
@@ -144,7 +208,6 @@ public class UrWTDetectorData {
 	 */
 	public Line3D getStrip(int strip) {
 		if (strip < 1 || strip > count) {
-			System.err.println("Bad strip number: " + strip);
 			return null;
 		}
 		return strips[strip - 1];

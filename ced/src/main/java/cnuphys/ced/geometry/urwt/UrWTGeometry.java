@@ -1,17 +1,14 @@
 package cnuphys.ced.geometry.urwt;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import org.jlab.detector.geant4.v2.MPGD.URWT.URWTStripFactory;
 import org.jlab.geom.prim.Line3D;
 
 
 import cnuphys.bCNU.util.UnicodeSupport;
-import cnuphys.ced.ced3d.util.BoundingBox3D;
-import cnuphys.ced.ced3d.util.DrawSupport;
-import cnuphys.ced.ced3d.util.Plane;
-import cnuphys.ced.ced3d.util.Point;
 import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
@@ -55,6 +52,9 @@ public class UrWTGeometry extends ACachedGeometry {
 	 * @return the detector data
 	 */
 	public static UrWTDetectorData getDetectorData(int sector, int layer) {
+		if (sector < 1 || sector > NUM_SECTORS || layer < 1 || layer > NUM_LAYERS) {
+			return null;
+		}
 		return detectorData[sector - 1][layer - 1];
 	}
 
@@ -72,19 +72,54 @@ public class UrWTGeometry extends ACachedGeometry {
 		String variationName = Ced.getGeometryVariation();
 		
 		factory = new URWTStripFactory(11, variationName);
+		detectorData = new UrWTDetectorData[NUM_SECTORS][NUM_LAYERS];
 				
 		for (int sector = 1; sector <= NUM_SECTORS; sector++) {
 			for (int layer = 1; layer <= NUM_LAYERS; layer++) {
 				detectorData[sector - 1][layer - 1] = new UrWTDetectorData(factory, sector, layer);
-				int stripcount = detectorData[sector - 1][layer - 1].strips.length;
-				System.out.println("Sector " + sector + " Layer " + layer + " strip count = " + stripcount);
 			}
 		} // sector loop
+	}
 
+	@Override
+	public boolean supportsCache() {
+		return true;
+	}
 
-		for (int layer = 1; layer <= NUM_LAYERS; layer++) {
-			Plane plane = DrawSupport.findCommonPlane(detectorData[0][layer - 1].strips, 1e-6);
-			System.out.println("Layer " + layer + " plane: " + plane);
+	@Override
+	public void readGeometry(DataInput input) throws IOException {
+		int sectors = input.readInt();
+		int layers = input.readInt();
+		if (sectors != NUM_SECTORS || layers != NUM_LAYERS) {
+			throw new IOException("Unexpected URWT dimensions: " + sectors + " x " + layers);
+		}
+
+		UrWTDetectorData[][] restored = new UrWTDetectorData[NUM_SECTORS][NUM_LAYERS];
+		for (int sector = 1; sector <= NUM_SECTORS; sector++) {
+			for (int layer = 1; layer <= NUM_LAYERS; layer++) {
+				UrWTDetectorData data = UrWTDetectorData.readFromCache(input);
+				if (data.sector != sector || data.layer != layer) {
+					throw new IOException("Unexpected cached URWT detector address");
+				}
+				restored[sector - 1][layer - 1] = data;
+			}
+		}
+		detectorData = restored;
+		factory = null;
+	}
+
+	@Override
+	public void writeGeometry(DataOutput output) throws IOException {
+		output.writeInt(NUM_SECTORS);
+		output.writeInt(NUM_LAYERS);
+		for (int sector = 1; sector <= NUM_SECTORS; sector++) {
+			for (int layer = 1; layer <= NUM_LAYERS; layer++) {
+				UrWTDetectorData data = detectorData[sector - 1][layer - 1];
+				if (data == null) {
+					throw new IOException("Missing URWT detector " + sector + "/" + layer);
+				}
+				data.writeToCache(output);
+			}
 		}
 	}
 	
@@ -98,35 +133,8 @@ public class UrWTGeometry extends ACachedGeometry {
 	 * @return the strip
 	 */
 	public static Line3D getStrip(int sector, int layer, int strip) {
-		return detectorData[sector - 1][layer - 1].strips[strip - 1];
+		UrWTDetectorData data = getDetectorData(sector, layer);
+		return (data == null) ? null : data.getStrip(strip);
 	}
-
-
-	public static void main(String args[]) {
-		UrWTGeometry geometry = new UrWTGeometry();
-		geometry.initializeUsingCCDB();
-
-		List<Line3D[]> allLines = new ArrayList<>();
-		for (int sector = 1; sector <= NUM_SECTORS; sector++) {
-			for (int layer = 1; layer <= NUM_LAYERS; layer++) {
-				allLines.add(UrWTGeometry.detectorData[sector - 1][layer - 1].strips);
-			}
-		}
-		
-		//print all the centriods
-		for (int sector = 1; sector <= NUM_SECTORS; sector++) {
-			for (int layer = 1; layer <= NUM_LAYERS; layer++) {
-				Point centroid = UrWTGeometry.detectorData[sector - 1][layer - 1].getCentroid();
-				System.out.println("Sector " + sector + " Layer " + layer + " Centroid: " + centroid);
-			}
-		}
-		
-		BoundingBox3D box = DrawSupport.getBoundingBox(allLines);
-		System.out.println("Bounding Box: " + box);
-		
-
-	}
-	
-	
 
 }
