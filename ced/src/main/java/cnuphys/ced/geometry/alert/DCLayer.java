@@ -6,6 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.List;
 
 import org.jlab.geom.detector.alert.AHDC.AlertDCLayer;
@@ -80,10 +83,61 @@ public class DCLayer {
 			index++;
 		}
 
+		createWorkRectangles();
+	}
+
+	private DCLayer(int sector, int superlayer, int layer, Line3D[] wires) {
+		this.sector = sector;
+		this.superlayer = superlayer;
+		this.layer = layer;
+		this.wires = wires;
+		numWires = wires.length;
+		createWorkRectangles();
+	}
+
+	private void createWorkRectangles() {
 		_wrect = new Rectangle2D.Double[numWires];
- 		for (int wire = 0; wire < numWires; wire++) {
+		for (int wire = 0; wire < numWires; wire++) {
 			_wrect[wire] = new Rectangle2D.Double();
 		}
+	}
+
+	static DCLayer readFromCache(DataInput input) throws IOException {
+		int sector = input.readInt();
+		int superlayer = input.readInt();
+		int layer = input.readInt();
+		int count = input.readInt();
+		if (count < 1 || count > 10_000) {
+			throw new IOException("Invalid ALERT DC wire count: " + count);
+		}
+		Line3D[] wires = new Line3D[count];
+		for (int wire = 0; wire < count; wire++) {
+			Point3D origin = readPoint(input);
+			Point3D end = readPoint(input);
+			wires[wire] = new Line3D(origin, end);
+		}
+		return new DCLayer(sector, superlayer, layer, wires);
+	}
+
+	void writeToCache(DataOutput output) throws IOException {
+		output.writeInt(sector);
+		output.writeInt(superlayer);
+		output.writeInt(layer);
+		output.writeInt(numWires);
+		for (Line3D wire : wires) {
+			writePoint(output, wire.origin());
+			writePoint(output, wire.end());
+		}
+	}
+
+	private static Point3D readPoint(DataInput input) throws IOException {
+		return new Point3D(input.readDouble(), input.readDouble(), input.readDouble());
+	}
+
+	private static void writePoint(DataOutput output, Point3D point) throws IOException {
+		output.writeDouble(point.x());
+		output.writeDouble(point.y());
+		output.writeDouble(point.z());
 	}
 
 
