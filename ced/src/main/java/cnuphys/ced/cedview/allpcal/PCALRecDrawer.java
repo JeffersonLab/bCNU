@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jlab.geom.prim.Point3D;
-import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
@@ -31,9 +30,6 @@ public class PCALRecDrawer extends PCALViewDrawer {
 	//the EC data container
 	private static RecCalorimeter _pcReconData = RecCalorimeter.getInstance();
 
-	//the current event
-	private DataEvent _currentEvent;
-
 	// cached for feedback
 	private ArrayList<FBData> _fbData = new ArrayList<>();
 
@@ -47,12 +43,7 @@ public class PCALRecDrawer extends PCALViewDrawer {
 			return true;
 		}
 
-		_currentEvent = _eventManager.getCurrentEvent();
-		if ((_currentEvent == null) || !_currentEvent.hasBank("REC::Calorimeter")) {
-			return true;
-		}
-
-		return false;
+		return _pcReconData.count() == 0;
 	}
 
 	@Override
