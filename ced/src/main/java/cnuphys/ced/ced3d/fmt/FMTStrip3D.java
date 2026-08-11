@@ -7,6 +7,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import bCNU3D.Support3D;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.ced.alldata.FMTAdc;
+import cnuphys.ced.alldata.FMTClusters;
 import cnuphys.ced.alldata.FMTRecHits;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.DetectorItem3D;
@@ -60,11 +61,14 @@ public class FMTStrip3D extends DetectorItem3D {
 
 	@Override
 	public void drawData(GLAutoDrawable drawable) {
+		boolean clusterSeed = ((FMTPanel3D) _panel3D).showFMTClusters()
+				&& FMTClusters.getInstance().hasSeedStrip(_layerId + 1, _stripId + 1);
 		boolean reconstructedHit = ((FMTPanel3D) _panel3D).showFMTHits()
 				&& FMTRecHits.getInstance().hasHit(_layerId + 1, _stripId + 1);
 		boolean adcHit = FMTAdc.getInstance().hasHit(_layerId + 1, _stripId + 1);
-		if (reconstructedHit || adcHit) {
-			Color color = reconstructedHit ? Color.red : X11Colors.getX11Color("orange", getVolumeAlpha());
+		if (clusterSeed || reconstructedHit || adcHit) {
+			Color color = clusterSeed ? Color.magenta
+					: reconstructedHit ? Color.red : X11Colors.getX11Color("orange", getVolumeAlpha());
 			Support3D.drawQuad(drawable, _coords, 0, 1, 2, 3, color, 1f, _frame);
 			Support3D.drawQuad(drawable, _coords, 3, 7, 6, 2, color, 1f, _frame);
 			Support3D.drawQuad(drawable, _coords, 0, 4, 7, 3, color, 1f, _frame);
