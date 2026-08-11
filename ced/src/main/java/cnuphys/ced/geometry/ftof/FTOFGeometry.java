@@ -1,6 +1,9 @@
 package cnuphys.ced.geometry.ftof;
 
 import java.awt.geom.Point2D;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.geom.base.ConstantProvider;
@@ -22,6 +25,10 @@ import cnuphys.ced.geometry.GeometryManager;
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
 public class FTOFGeometry extends ACachedGeometry {
+	private static final int SECTOR_COUNT = 6;
+	private static final int PANEL_COUNT = 3;
+	private static final int CORNER_COUNT = 8;
+	private static final int PROJECTION_EDGE_COUNT = 4;
 
 	public static final int PANEL_1A = 0;
 	public static final int PANEL_1B = 1;
@@ -45,6 +52,11 @@ public class FTOFGeometry extends ACachedGeometry {
 	// ftof panels (one sector stored--in sector cs--all assumed to be the same)
 	private static FTOFPanel ftofPanel[] = new FTOFPanel[3];
 	private static String ftofNames[] = { "Panel 1A", "Panel 1B", "Panel 2" };
+
+	// Explicit runtime geometry, usable after the CCDB object graph is discarded.
+	private static double[][][][][] paddleCorners;
+	private static double[][][][][][] projectionEdges;
+	private static double[][][] paddleLengths;
 
 	public FTOFGeometry() {
 		super("FTOFGeometry");
@@ -72,19 +84,49 @@ public class FTOFGeometry extends ACachedGeometry {
 			}
 		}
 
+		capturePrimitiveGeometry();
 		createPanels();
 		createFacePlanes();
 	}
 
+	private static void capturePrimitiveGeometry() {
+		numPaddles = new int[PANEL_COUNT];
+		for (int panel = 0; panel < PANEL_COUNT; panel++) {
+			numPaddles[panel] = ftofLayers[0][panel].getNumComponents();
+		}
+		paddleCorners = new double[SECTOR_COUNT][PANEL_COUNT][][][];
+		projectionEdges = new double[SECTOR_COUNT][PANEL_COUNT][][][][];
+		paddleLengths = new double[SECTOR_COUNT][PANEL_COUNT][];
+		for (int sector = 0; sector < SECTOR_COUNT; sector++) {
+			for (int panel = 0; panel < PANEL_COUNT; panel++) {
+				int count = numPaddles[panel];
+				paddleCorners[sector][panel] = new double[count][CORNER_COUNT][3];
+				projectionEdges[sector][panel] = new double[count][PROJECTION_EDGE_COUNT][2][3];
+				paddleLengths[sector][panel] = new double[count];
+				for (int paddle = 0; paddle < count; paddle++) {
+					ScintillatorPaddle source = ftofLayers[sector][panel].getComponent(paddle);
+					for (int corner = 0; corner < CORNER_COUNT; corner++) {
+						copyPoint(source.getVolumePoint(corner), paddleCorners[sector][panel][paddle][corner]);
+					}
+					for (int edge = 0; edge < PROJECTION_EDGE_COUNT; edge++) {
+						Line3D line = source.getVolumeEdge(6 + edge);
+						copyPoint(line.origin(), projectionEdges[sector][panel][paddle][edge][0]);
+						copyPoint(line.end(), projectionEdges[sector][panel][paddle][edge][1]);
+					}
+					paddleLengths[sector][panel][paddle] = source.getLength();
+				}
+			}
+		}
+	}
+
+	private static void copyPoint(Point3D point, double[] destination) {
+		destination[0] = point.x();
+		destination[1] = point.y();
+		destination[2] = point.z();
+	}
+
 	private static void createPanels() {
-		// here superlayers are panels 1a, 1b, 2
-
-		numPaddles = new int[3];
 		for (int superLayer = 0; superLayer < 3; superLayer++) {
-
-			// there is only a layer 0
-			FTOFLayer ftofLayer = ftofLayers[0][superLayer];
-			numPaddles[superLayer] = ftofLayer.getNumComponents();
 			ftofPanel[superLayer] = new FTOFPanel(ftofNames[superLayer], numPaddles[superLayer]);
 		}
 	}
@@ -108,7 +150,7 @@ public class FTOFGeometry extends ACachedGeometry {
 		Point3D p2;
 		Point3D p3;
 
-		int numPaddle = ftofLayers[sect - 1][panel].getNumComponents();
+		int numPaddle = getNumPaddles(sect, panel);
 		frontFace(sect, panel, 1, corners);
 		Line3D line = new Line3D(corners[0], corners[3]);
 		p0 = new Point3D(line.midpoint());
@@ -171,19 +213,11 @@ public class FTOFGeometry extends ACachedGeometry {
 	 * @param coords   holds 8*3 = 24 values [x1, y1, z1, ..., x8, y8, z8]
 	 */
 	public static void paddleVertices(int sector, int panel, int paddleId, float[] coords) {
-
-		Point3D v[] = new Point3D[8];
-
-		ScintillatorPaddle paddle = getPaddle(sector, panel, paddleId);
-		for (int i = 0; i < 8; i++) {
-			v[i] = new Point3D(paddle.getVolumePoint(i));
-		}
-
 		for (int i = 0; i < 8; i++) {
 			int j = 3 * i;
-			coords[j] = (float) v[i].x();
-			coords[j + 1] = (float) v[i].y();
-			coords[j + 2] = (float) v[i].z();
+			coords[j] = (float) paddleCorners[sector - 1][panel][paddleId - 1][i][0];
+			coords[j + 1] = (float) paddleCorners[sector - 1][panel][paddleId - 1][i][1];
+			coords[j + 2] = (float) paddleCorners[sector - 1][panel][paddleId - 1][i][2];
 		}
 	}
 
@@ -196,11 +230,11 @@ public class FTOFGeometry extends ACachedGeometry {
 	 * @param corners  will contain the 4 corners of the front face
 	 */
 	public static void frontFace(int sector, int panel, int paddleId, Point3D corners[]) {
-		ScintillatorPaddle paddle = getPaddle(sector, panel, paddleId);
-		corners[0] = new Point3D(paddle.getVolumePoint(0));
-		corners[1] = new Point3D(paddle.getVolumePoint(1));
-		corners[2] = new Point3D(paddle.getVolumePoint(5));
-		corners[3] = new Point3D(paddle.getVolumePoint(4));
+		int[] indices = {0, 1, 5, 4};
+		for (int index = 0; index < indices.length; index++) {
+			double[] point = paddleCorners[sector - 1][panel][paddleId - 1][indices[index]];
+			corners[index] = new Point3D(point[0], point[1], point[2]);
+		}
 
 	}
 
@@ -268,7 +302,7 @@ public class FTOFGeometry extends ACachedGeometry {
 	 * @return the number of paddles
 	 */
 	public static int getNumPaddles(int sector, int panel) {
-		return ftofLayers[sector - 1][panel].getNumComponents();
+		return numPaddles[panel];
 	}
 
 	/**
@@ -281,19 +315,7 @@ public class FTOFGeometry extends ACachedGeometry {
 	public static boolean doesProjectedPolyFullyIntersect(int superlayer, int paddleid, Plane3D projectionPlane) {
 
 		// FTOFLayer ftofLayer = _clas_sector0.getSuperlayer(superlayer).getLayer(0);
-		FTOFLayer ftofLayer = ftofLayers[0][superlayer];
-		ScintillatorPaddle paddle = ftofLayer.getComponent(paddleid);
-		boolean isects = false;
-
-		try {
-			isects = GeometryManager.doesProjectedPolyIntersect(paddle, projectionPlane, 6, 4);
-		} catch (Exception e) {
-
-			System.err.println("Exception in FTOFGeometry doesProjectedPolyFullyIntersect");
-			System.err.println("panel: " + ftofNames[superlayer] + " paddleID: " + paddleid);
-		}
-
-		return isects;
+		return GeometryManager.doesProjectedPolyIntersect(projectionEdges[0][superlayer][paddleid], projectionPlane);
 	}
 
 	/**
@@ -305,9 +327,7 @@ public class FTOFGeometry extends ACachedGeometry {
 	 * @param projectionPlane the projection plane
 	 */
 	public static boolean getIntersections(int superlayer, int paddleid, Plane3D projectionPlane, Point2D.Double wp[]) {
-		FTOFLayer ftofLayer = ftofLayers[0][superlayer];
-		ScintillatorPaddle paddle = ftofLayer.getComponent(paddleid);
-		return GeometryManager.getProjectedPolygon(paddle, projectionPlane, 6, 4, wp, null);
+		return GeometryManager.getProjectedPolygon(projectionEdges[0][superlayer][paddleid], projectionPlane, wp, null);
 	}
 
 	/**
@@ -319,9 +339,7 @@ public class FTOFGeometry extends ACachedGeometry {
 	 */
 	public static double getLength(int superlayer, int paddleId) {
 //		FTOFLayer ftofLayer = _clas_sector0.getSuperlayer(superlayer).getLayer(0);
-		FTOFLayer ftofLayer = ftofLayers[0][superlayer];
-		ScintillatorPaddle paddle = ftofLayer.getComponent(paddleId);
-		return paddle.getLength();
+		return paddleLengths[0][superlayer][paddleId];
 	}
 
 	/**
@@ -336,6 +354,91 @@ public class FTOFGeometry extends ACachedGeometry {
 			length[i] = getLength(superlayer, i);
 		}
 		return length;
+	}
+
+	@Override
+	public boolean supportsCache() {
+		return true;
+	}
+
+	@Override
+	public void readGeometry(DataInput input) throws IOException {
+		int sectors = input.readInt();
+		int panels = input.readInt();
+		if (sectors != SECTOR_COUNT || panels != PANEL_COUNT) {
+			throw new IOException("Unexpected FTOF dimensions: " + sectors + " x " + panels);
+		}
+		int[] counts = new int[PANEL_COUNT];
+		for (int panel = 0; panel < PANEL_COUNT; panel++) {
+			counts[panel] = input.readInt();
+			if (counts[panel] < 1 || counts[panel] > 1_000) {
+				throw new IOException("Invalid FTOF paddle count: " + counts[panel]);
+			}
+		}
+		double[][][][][] corners = new double[SECTOR_COUNT][PANEL_COUNT][][][];
+		double[][][][][][] edges = new double[SECTOR_COUNT][PANEL_COUNT][][][][];
+		double[][][] lengths = new double[SECTOR_COUNT][PANEL_COUNT][];
+		for (int sector = 0; sector < SECTOR_COUNT; sector++) {
+			for (int panel = 0; panel < PANEL_COUNT; panel++) {
+				int count = counts[panel];
+				corners[sector][panel] = new double[count][CORNER_COUNT][3];
+				edges[sector][panel] = new double[count][PROJECTION_EDGE_COUNT][2][3];
+				lengths[sector][panel] = new double[count];
+				for (int paddle = 0; paddle < count; paddle++) {
+					for (int corner = 0; corner < CORNER_COUNT; corner++) {
+						readPoint(input, corners[sector][panel][paddle][corner]);
+					}
+					for (int edge = 0; edge < PROJECTION_EDGE_COUNT; edge++) {
+						readPoint(input, edges[sector][panel][paddle][edge][0]);
+						readPoint(input, edges[sector][panel][paddle][edge][1]);
+					}
+					lengths[sector][panel][paddle] = input.readDouble();
+				}
+			}
+		}
+		numPaddles = counts;
+		paddleCorners = corners;
+		projectionEdges = edges;
+		paddleLengths = lengths;
+		ftofLayers = null;
+		ftofSuperlayers = null;
+		createPanels();
+		createFacePlanes();
+	}
+
+	@Override
+	public void writeGeometry(DataOutput output) throws IOException {
+		output.writeInt(SECTOR_COUNT);
+		output.writeInt(PANEL_COUNT);
+		for (int count : numPaddles) {
+			output.writeInt(count);
+		}
+		for (int sector = 0; sector < SECTOR_COUNT; sector++) {
+			for (int panel = 0; panel < PANEL_COUNT; panel++) {
+				for (int paddle = 0; paddle < numPaddles[panel]; paddle++) {
+					for (int corner = 0; corner < CORNER_COUNT; corner++) {
+						writePoint(output, paddleCorners[sector][panel][paddle][corner]);
+					}
+					for (int edge = 0; edge < PROJECTION_EDGE_COUNT; edge++) {
+						writePoint(output, projectionEdges[sector][panel][paddle][edge][0]);
+						writePoint(output, projectionEdges[sector][panel][paddle][edge][1]);
+					}
+					output.writeDouble(paddleLengths[sector][panel][paddle]);
+				}
+			}
+		}
+	}
+
+	private static void readPoint(DataInput input, double[] point) throws IOException {
+		for (int coordinate = 0; coordinate < 3; coordinate++) {
+			point[coordinate] = input.readDouble();
+		}
+	}
+
+	private static void writePoint(DataOutput output, double[] point) throws IOException {
+		for (double coordinate : point) {
+			output.writeDouble(coordinate);
+		}
 	}
 
 	/**

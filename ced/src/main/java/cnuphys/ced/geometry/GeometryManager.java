@@ -410,6 +410,56 @@ public class GeometryManager {
 		return true;
 	}
 
+	/** Test intersections using explicit edge endpoints shaped [edge][endpoint][xyz]. */
+	public static boolean doesProjectedPolyIntersect(double[][][] edgeLines, Plane3D projectionPlane) {
+		if (edgeLines == null || projectionPlane == null) {
+			return false;
+		}
+		int intersectionCount = 0;
+		for (double[][] endpoints : edgeLines) {
+			Line3D line = primitiveLine(endpoints);
+			if (line != null) {
+				Point3D intersection = new Point3D();
+				projectionPlane.intersection(line, intersection);
+				if (lengthTest(line.length(), line.origin(), line.end(), intersection)) {
+					intersectionCount++;
+				}
+			}
+		}
+		return intersectionCount > 2;
+	}
+
+	/** Project explicit edge endpoints using the same convention as detector objects. */
+	public static boolean getProjectedPolygon(double[][][] edgeLines, Plane3D projectionPlane,
+			Point2D.Double[] wp, Point2D.Double centroid) {
+		if (edgeLines == null || projectionPlane == null || wp == null || wp.length < edgeLines.length) {
+			return false;
+		}
+		for (int index = 0; index < edgeLines.length; index++) {
+			Line3D line = primitiveLine(edgeLines[index]);
+			if (line == null) {
+				return false;
+			}
+			Point3D intersection = new Point3D();
+			projectionPlane.intersection(line, intersection);
+			wp[index].x = intersection.z();
+			wp[index].y = Math.hypot(intersection.x(), intersection.y());
+		}
+		if (centroid != null) {
+			average(wp, centroid);
+		}
+		return doesProjectedPolyIntersect(edgeLines, projectionPlane);
+	}
+
+	private static Line3D primitiveLine(double[][] endpoints) {
+		if (endpoints == null || endpoints.length != 2 || endpoints[0] == null || endpoints[1] == null
+				|| endpoints[0].length != 3 || endpoints[1].length != 3) {
+			return null;
+		}
+		return new Line3D(new Point3D(endpoints[0][0], endpoints[0][1], endpoints[0][2]),
+				new Point3D(endpoints[1][0], endpoints[1][1], endpoints[1][2]));
+	}
+
 	/**
 	 * See if the projected polygon intersects a plane
 	 *
