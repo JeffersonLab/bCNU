@@ -6,32 +6,40 @@ import java.util.function.Supplier;
 
 import org.jlab.io.base.DataBank;
 
-/** Read-through access to the current {@code FMTRec::Crosses} bank. */
+/** Read-through access to current or legacy reconstructed FMT crosses. */
 public final class FMTCrosses {
 
-    public static final String BANK_NAME = "FMTRec::Crosses";
+    public static final String BANK_NAME = "FMT::Crosses";
+    public static final String LEGACY_BANK_NAME = "FMTRec::Crosses";
     private static final FMTCrosses INSTANCE = new FMTCrosses(
             () -> DataWarehouse.getInstance().getBank(BANK_NAME),
+            () -> DataWarehouse.getInstance().getBank(LEGACY_BANK_NAME),
             () -> DataWarehouse.getInstance().getCurrentEvent());
 
     private final Supplier<DataBank> bankSupplier;
+    private final Supplier<DataBank> legacyBankSupplier;
     private final Supplier<Object> eventSupplier;
     private Object locationEvent;
     private Point[] locations;
 
-    private FMTCrosses(Supplier<DataBank> bankSupplier, Supplier<Object> eventSupplier) {
+    private FMTCrosses(Supplier<DataBank> bankSupplier, Supplier<DataBank> legacyBankSupplier,
+            Supplier<Object> eventSupplier) {
         this.bankSupplier = bankSupplier;
+        this.legacyBankSupplier = legacyBankSupplier;
         this.eventSupplier = eventSupplier;
     }
 
     static FMTCrosses forTesting(Supplier<DataBank> bankSupplier) {
         Object event = new Object();
-        return new FMTCrosses(bankSupplier, () -> event);
+        return new FMTCrosses(bankSupplier, () -> null, () -> event);
     }
 
     public static FMTCrosses getInstance() { return INSTANCE; }
     public int count() { DataBank bank = bank(); return bank == null ? 0 : bank.rows(); }
-    public short id(int row) { return bank().getShort("ID", row); }
+    public short id(int row) {
+        DataBank bank = bank();
+        return bank.getShort(DataWarehouse.hasColumn(bank, "index") ? "index" : "ID", row);
+    }
     public byte sector(int row) { return bank().getByte("sector", row); }
     public byte region(int row) { return bank().getByte("region", row); }
     public float x(int row) { return bank().getFloat("x", row); }
@@ -73,5 +81,8 @@ public final class FMTCrosses {
                 ux(row), uy(row), uz(row)));
     }
 
-    private DataBank bank() { return bankSupplier.get(); }
+    private DataBank bank() {
+        DataBank bank = bankSupplier.get();
+        return bank == null ? legacyBankSupplier.get() : bank;
+    }
 }

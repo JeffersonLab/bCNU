@@ -16,7 +16,7 @@ class FMTCrossesTest {
 
     @Test
     void readsCrossAndPreservesFeedbackAndLocation() {
-        FMTCrosses crosses = FMTCrosses.forTesting(FMTCrossesTest::bank);
+        FMTCrosses crosses = FMTCrosses.forTesting(() -> bank(false));
 
         assertEquals(1, crosses.count());
         assertEquals(7, crosses.id(0));
@@ -32,16 +32,27 @@ class FMTCrossesTest {
     }
 
     @Test
+    void readsModernIndexColumn() {
+        FMTCrosses crosses = FMTCrosses.forTesting(() -> bank(true));
+
+        assertEquals(1, crosses.count());
+        assertEquals(9, crosses.id(0));
+    }
+
+    @Test
     void missingBankHasNoRows() {
         assertEquals(0, FMTCrosses.forTesting(() -> null).count());
     }
 
-    private static DataBank bank() {
+    private static DataBank bank(boolean modern) {
         return (DataBank) Proxy.newProxyInstance(DataBank.class.getClassLoader(), new Class<?>[] { DataBank.class },
                 (proxy, method, args) -> switch (method.getName()) {
                     case "rows" -> 1;
+                    case "getColumnList" -> modern
+                            ? new String[] { "index", "sector", "region", "x", "y", "z", "err_x", "err_y", "err_z", "ux", "uy", "uz" }
+                            : new String[] { "ID", "sector", "region", "x", "y", "z", "err_x", "err_y", "err_z", "ux", "uy", "uz" };
                     case "getByte" -> "sector".equals(args[0]) ? (byte) 2 : (byte) 3;
-                    case "getShort" -> (short) 7;
+                    case "getShort" -> (short) (modern ? 9 : 7);
                     case "getFloat" -> switch ((String) args[0]) {
                         case "x" -> 12.5f;
                         case "y" -> -8.0f;
