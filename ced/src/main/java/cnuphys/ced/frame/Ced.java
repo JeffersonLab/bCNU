@@ -86,7 +86,6 @@ import cnuphys.ced.trigger.TriggerManager;
 import cnuphys.ced.trigger.TriggerMenuPanel;
 import cnuphys.magfield.MagneticFieldChangeListener;
 import cnuphys.magfield.MagneticFields;
-import cnuphys.splot.example.MemoryUsageDialog;
 import cnuphys.swim.SwimMenu;
 
 @SuppressWarnings("serial")

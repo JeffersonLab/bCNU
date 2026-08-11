@@ -26,6 +26,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.github.heddle</groupId>
+            <artifactId>mdi</artifactId>
+            <version>${mdi.version}</version>
+        </dependency>
+        <dependency>
             <groupId>cnuphys</groupId>
             <artifactId>snr</artifactId>
             <version>${cnuphys.legacy.version}</version>
