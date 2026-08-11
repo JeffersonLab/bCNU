@@ -35,9 +35,9 @@ public class ClasIoEventView extends BaseView {
 	// create the arguments for the base view constructor
 	private static Object[] createArgs() {
 		
-		double size[] = getSizeFromScreenFraction(0.8);
-		int width = (int) size[0];
-		int height = (int) (0.682*size[0]);
+		double size[] = getSizeFromScreenFraction(0.9);
+		int width = (int) (1.35 * size[0]);
+		int height = (int) (0.78 * size[1]);
 
 		
 		return new Object[] { PropertySupport.TITLE, "Current Event", PropertySupport.ICONIFIABLE, true,

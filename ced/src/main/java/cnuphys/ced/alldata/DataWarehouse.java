@@ -387,17 +387,21 @@ public class DataWarehouse implements IClasIoEventListener {
 
 	@Override
 	public void newClasIoEvent(DataEvent event) {
-
 		ArrayList<ColumnData> columnData = new ArrayList<>();
+		String[] banks = (event == null) ? null : sortedCopy(event.getBankList());
 
-		int bankIndex = 0;
-		for (String bankName : _knownBanks) {
-			DataBank bank = event.getBank(bankName);
-			if ((bank != null) && (event.hasBank(bankName))) {
-		  	    String columnNames[] = bank.getColumnList();
-		  	    Arrays.sort(columnNames);
-				for (String columnName : columnNames) {
-					columnData.add(new ColumnData(bankName, columnName, getType(bankName, columnName), bankIndex));
+		if (banks != null) {
+			int bankIndex = 0;
+			for (String bankName : banks) {
+				DataBank bank = findBank(event, bankName);
+				if (bank == null) {
+					continue;
+				}
+				String[] columnNames = sortedCopy(bank.getColumnList());
+				if (columnNames != null) {
+					for (String columnName : columnNames) {
+						columnData.add(new ColumnData(bankName, columnName, getType(bankName, columnName), bankIndex));
+					}
 				}
 				bankIndex++;
 			}
@@ -405,7 +409,6 @@ public class DataWarehouse implements IClasIoEventListener {
 		_columnData = List.copyOf(columnData);
 		
 		//update seen banks
-		String[] banks = event.getBankList();
 		if (banks != null) {
 			for (String bank : banks) {
 				_seenBanks.merge(bank, 1L, Long::sum);

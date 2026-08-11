@@ -1041,7 +1041,10 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	public void magneticFieldChanged() {
 //		Swimming.clearAllTrajectories();
 		fixTitle();
-		ClasIoEventManager.getInstance().reloadCurrentEvent();
+		ClasIoEventManager eventManager = ClasIoEventManager.getInstance();
+		if (!eventManager.isUpdatingEventDisplay()) {
+			eventManager.reloadCurrentEvent();
+		}
 	}
 
 	/**

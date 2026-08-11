@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jlab.io.base.DataBank;
@@ -96,6 +98,64 @@ class DataWarehouseTest {
         } finally {
             warehouse.updateSchema(null);
         }
+    }
+
+    @Test
+    void buildsColumnSnapshotFromOnlyBanksPresentInEvent() {
+        DataWarehouse warehouse = DataWarehouse.getInstance();
+        SchemaFactory schemas = new SchemaFactory();
+        Schema run = new Schema("RUN::config", 1, 1);
+        run.addEntry("event", "I", "event number");
+        Schema adc = new Schema("BMT::adc", 2, 1);
+        adc.addEntry("ADC", "I", "ADC value");
+        adc.addEntry("sector", "B", "sector number");
+        schemas.addSchema(run);
+        schemas.addSchema(adc);
+
+        String[] eventBanks = { "RUN::config", "BMT::adc" };
+        String[] adcColumns = { "sector", "ADC" };
+        List<String> requestedBanks = new ArrayList<>();
+        DataBank runBank = bank(new String[] { "event" });
+        DataBank adcBank = bank(adcColumns);
+        DataEvent event = (DataEvent) Proxy.newProxyInstance(DataEvent.class.getClassLoader(),
+                new Class<?>[] { DataEvent.class }, (proxy, method, args) -> switch (method.getName()) {
+                    case "getBankList" -> eventBanks;
+                    case "hasBank" -> List.of(eventBanks).contains(args[0]);
+                    case "getBank" -> {
+                        String name = (String) args[0];
+                        requestedBanks.add(name);
+                        yield "RUN::config".equals(name) ? runBank : adcBank;
+                    }
+                    default -> null;
+                });
+
+        try {
+            warehouse.updateSchema(schemas);
+            warehouse.newClasIoEvent(event);
+
+            assertEquals(List.of("BMT::adc", "RUN::config"), requestedBanks);
+            assertArrayEquals(new String[] { "RUN::config", "BMT::adc" }, eventBanks);
+            assertArrayEquals(new String[] { "sector", "ADC" }, adcColumns);
+            assertEquals(List.of("BMT::adc.ADC", "BMT::adc.sector", "RUN::config.event"),
+                    warehouse.getColumnData().stream().map(column -> column.fullName).toList());
+        } finally {
+            warehouse.updateSchema(null);
+        }
+    }
+
+    @Test
+    void clearsColumnSnapshotForNullEvent() {
+        DataWarehouse warehouse = DataWarehouse.getInstance();
+        warehouse.newClasIoEvent(null);
+        assertTrue(warehouse.getColumnData().isEmpty());
+    }
+
+    private static DataBank bank(String[] columns) {
+        return (DataBank) Proxy.newProxyInstance(DataBank.class.getClassLoader(),
+                new Class<?>[] { DataBank.class }, (proxy, method, args) -> switch (method.getName()) {
+                    case "getColumnList" -> columns;
+                    default -> null;
+                });
     }
 
     @SuppressWarnings("unchecked")

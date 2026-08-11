@@ -159,9 +159,15 @@ public class ClasIoEventManager {
                     ScanManager.getInstance().newClasIoEvent(_currentEvent);
                 }
 				else {
-					updateRunData();
-					notifyEventListeners();
-					Ced.refreshEventDisplay();
+					boolean wasUpdating = _updatingEventDisplay;
+					_updatingEventDisplay = true;
+					try {
+						updateRunData();
+						notifyEventListeners();
+						Ced.refreshEventDisplay();
+					} finally {
+						_updatingEventDisplay = wasUpdating;
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -897,6 +903,7 @@ public class ClasIoEventManager {
 		}
 
 		boolean displayEvent = !isAccumulating() && !isScanning();
+		boolean wasUpdating = _updatingEventDisplay;
 		_updatingEventDisplay = displayEvent;
 		try {
 			try (EventTrajectoryUpdate ignored = EventTrajectoryUpdate.begin(displayEvent)) {
@@ -907,7 +914,7 @@ public class ClasIoEventManager {
 				finalSteps();
 			}
 		} finally {
-			_updatingEventDisplay = false;
+			_updatingEventDisplay = wasUpdating;
 		}
 
 	}
