@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cnuphys.bCNU.log.Log;
 import cnuphys.ced.geometry.BMTGeometry;
 import cnuphys.ced.geometry.BSTGeometry;
 import cnuphys.ced.geometry.CNDGeometry;
@@ -70,7 +71,8 @@ public final class GeometryCache {
 				}
 			}
 		} catch (IOException | SQLException e) {
-			System.err.println("Geometry cache unavailable; initializing from CCDB: " + e.getMessage());
+			Log.getInstance().warning("Geometry cache unavailable; initializing from source");
+			Log.getInstance().exception(e);
 			for (IGeometryCache geometry : GEOMETRIES) {
 				geometry.initializeUsingCCDB();
 				System.out.println("Initialized " + displayName(geometry.getName()) + " geometry from source.");

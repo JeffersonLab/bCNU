@@ -14,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import cnuphys.bCNU.log.Log;
+
 /** SQLite storage for versioned, detector-specific primitive geometry payloads. */
 public final class SQLiteGeometryCache implements AutoCloseable {
 
@@ -70,7 +72,8 @@ public final class SQLiteGeometryCache implements AutoCloseable {
 				}
 			}
 		} catch (SQLException | IOException | RuntimeException e) {
-			System.err.println("Unable to read cached " + geometry.getName() + ": " + e.getMessage());
+			Log.getInstance().warning("Unable to read cached " + geometry.getName());
+			Log.getInstance().exception(e);
 			return false;
 		}
 	}
@@ -93,7 +96,8 @@ public final class SQLiteGeometryCache implements AutoCloseable {
 				return statement.executeUpdate() == 1;
 			}
 		} catch (SQLException | IOException | RuntimeException e) {
-			System.err.println("Unable to cache " + geometry.getName() + ": " + e.getMessage());
+			Log.getInstance().warning("Unable to cache " + geometry.getName());
+			Log.getInstance().exception(e);
 			return false;
 		}
 	}
