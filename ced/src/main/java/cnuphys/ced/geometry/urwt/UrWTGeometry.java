@@ -65,10 +65,6 @@ public class UrWTGeometry extends ACachedGeometry {
 	 */
 	@Override
 	public void initializeUsingCCDB() {
-		System.out.println("\n=======================================");
-		System.out.println("===  " + NAME + " Geometry Initialization ===");
-		System.out.println("=======================================");
-
 		String variationName = Ced.getGeometryVariation();
 		
 		factory = new URWTStripFactory(11, variationName);

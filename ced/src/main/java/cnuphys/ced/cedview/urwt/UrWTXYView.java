@@ -24,6 +24,7 @@ import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.drawable.IDrawable;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
@@ -347,7 +348,8 @@ public class UrWTXYView extends HexView {
 		Line3D line = data.getStrip(strip);
 
 		if (line == null) {
-			System.err.println(String.format("null strip in UrWTXYView projectStrip for [sector, layer, chamberStrip] = [%d, %d, %d]",
+			Log.getInstance().warning(String.format(
+					"Could not project μrWT strip [sector, layer, strip] = [%d, %d, %d]",
 					sector, layer, strip));
 			return;
 		}
@@ -482,7 +484,7 @@ public class UrWTXYView extends HexView {
 	 */
 	public HexSectorItem getHexSectorItem(int sector) {
 		if ((sector < 1) || (sector > 6)) {
-			System.err.println("Bad sector in DCXYView getHexSectorItem, sector = " + sector);
+			Log.getInstance().warning("Invalid μrWT sector in getHexSectorItem: " + sector);
 			return null;
 		}
 		return _hexItems[sector - 1];

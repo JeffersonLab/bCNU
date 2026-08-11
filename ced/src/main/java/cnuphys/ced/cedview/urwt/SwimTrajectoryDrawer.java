@@ -104,7 +104,6 @@ public class SwimTrajectoryDrawer extends ASwimTrajectoryDrawer {
 		boolean show = true;
 		String source = trajectory.getSource();
 
-	//	System.err.println("AST SOURCE: [" +  source + "]");
 
 		if (source != null) {
 			if (source.contains("HitBasedTrkg::HBTracks")) {
