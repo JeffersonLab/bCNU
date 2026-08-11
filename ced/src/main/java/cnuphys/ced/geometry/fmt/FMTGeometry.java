@@ -1,17 +1,21 @@
 package cnuphys.ced.geometry.fmt;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import org.jlab.detector.base.GeometryFactory;
 import org.jlab.geom.base.ConstantProvider;
-import org.jlab.geom.component.TrackerStrip;
 import org.jlab.geom.detector.fmt.FMTDetector;
 import org.jlab.geom.detector.fmt.FMTFactory;
 import org.jlab.geom.detector.fmt.FMTLayer;
 import org.jlab.geom.detector.fmt.FMTSector;
 import org.jlab.geom.detector.fmt.FMTSuperlayer;
-import org.jlab.geom.prim.Point3D;
+import org.jlab.geom.prim.Line3D;
 
 
 import cnuphys.ced.frame.Ced;
@@ -23,7 +27,7 @@ public class FMTGeometry extends ACachedGeometry {
 	public static String NAME = "FMT";
 
 	// the layer objects used for FMT geometry and drawing
-	private static HashMap<String, FMTLayer> _fmtLayers = new HashMap<>();
+	private static HashMap<String, FMTLayerData> _fmtLayers = new HashMap<>();
 
 	public FMTGeometry() {
 		super("FMT");
@@ -47,6 +51,7 @@ public class FMTGeometry extends ACachedGeometry {
 
 	// init the time of flight
 	private static void initialize(ConstantProvider cp) {
+		_fmtLayers = new HashMap<>();
 
 		FMTFactory fmtFactory = new FMTFactory();
 		FMTDetector fmtDetector = fmtFactory.createDetectorCLAS(cp);
@@ -66,17 +71,17 @@ public class FMTGeometry extends ACachedGeometry {
 				for (int layer = 0; layer < numlay; layer++) {
 					FMTLayer fmtLayer = fmtFactory.createLayer(cp, sect, superlayer, layer);
 
-					_fmtLayers.put(hash(sect, superlayer, layer), fmtLayer);
+					_fmtLayers.put(hash(sect, superlayer, layer), new FMTLayerData(fmtLayer));
 				}
 			}
 		}
 
 	}
 
-	public static TrackerStrip getStrip(int sector, int superlayer, int layer, int strip) {
-		FMTLayer fmtLayer = _fmtLayers.get(hash(sector, superlayer, layer));
-		if (fmtLayer != null) {
-			return fmtLayer.getComponent(strip);
+	public static Line3D getStripLine(int sector, int superlayer, int layer, int strip) {
+		FMTLayerData fmtLayer = _fmtLayers.get(hash(sector, superlayer, layer));
+		if (fmtLayer != null && strip >= 0 && strip < fmtLayer.stripCount()) {
+			return fmtLayer.stripLine(strip);
 		}
 		return null;
 	}
@@ -91,7 +96,7 @@ public class FMTGeometry extends ACachedGeometry {
 	 *
 	 * @return the collection of FMT layers
 	 */
-	public static Collection<FMTLayer> getAllFMTLayers() {
+	static Collection<FMTLayerData> getAllFMTLayers() {
 		return _fmtLayers.values();
 	}
 
@@ -106,19 +111,38 @@ public class FMTGeometry extends ACachedGeometry {
 	 */
 	public static void stripVertices(int sector, int superlayer, int layer, int stripId, float[] coords) {
 
-		Point3D v[] = new Point3D[8];
+		FMTLayerData fmtLayer = _fmtLayers.get(hash(sector, superlayer, layer));
+		fmtLayer.copyStripVertices(stripId, coords);
+	}
 
-		TrackerStrip strip = getStrip(sector, superlayer, layer, stripId);
-		for (int i = 0; i < 8; i++) {
-			v[i] = new Point3D(strip.getVolumePoint(i));
-		}
+	@Override
+	public boolean supportsCache() {
+		return true;
+	}
 
-		for (int i = 0; i < 8; i++) {
-			int j = 3 * i;
-			coords[j] = (float) v[i].x();
-			coords[j + 1] = (float) v[i].y();
-			coords[j + 2] = (float) v[i].z();
+	@Override
+	public void writeGeometry(DataOutput output) throws IOException {
+		ArrayList<FMTLayerData> layers = new ArrayList<>(_fmtLayers.values());
+		layers.sort(Comparator.comparingInt((FMTLayerData value) -> value.sector)
+				.thenComparingInt(value -> value.superlayer).thenComparingInt(value -> value.layer));
+		output.writeInt(layers.size());
+		for (FMTLayerData layer : layers) {
+			layer.writeToCache(output);
 		}
+	}
+
+	@Override
+	public void readGeometry(DataInput input) throws IOException {
+		int count = input.readInt();
+		if (count < 1 || count > 100) {
+			throw new IOException("Invalid FMT layer count: " + count);
+		}
+		HashMap<String, FMTLayerData> layers = new HashMap<>();
+		for (int index = 0; index < count; index++) {
+			FMTLayerData layer = FMTLayerData.readFromCache(input);
+			layers.put(hash(layer.sector, layer.superlayer, layer.layer), layer);
+		}
+		_fmtLayers = layers;
 	}
 
 	/**

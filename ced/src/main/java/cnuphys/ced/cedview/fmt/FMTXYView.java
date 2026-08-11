@@ -9,7 +9,6 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import org.jlab.geom.component.TrackerStrip;
 import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Plane3D;
 import org.jlab.geom.prim.Point3D;
@@ -187,8 +186,7 @@ public class FMTXYView extends CedXYView  {
 					continue;
 				}
 
-				TrackerStrip strip = FMTGeometry.getStrip(0, 0, layer, stripId);
-				Line3D line = strip.getLine();
+				Line3D line = FMTGeometry.getStripLine(0, 0, layer, stripId);
 					labToWorld(layer, line.origin(), wp0);
 				container.worldToLocal(p0, wp0);
 				g.fillOval(p0.x - 2, p0.y - 2, 4, 4);
