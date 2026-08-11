@@ -6,8 +6,6 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import org.jlab.io.base.DataEvent;
-
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.AHDCAdc;
 import cnuphys.ced.alldata.ADCSupport;
@@ -39,17 +37,11 @@ public class AlertDCHitDrawer {
 	 * @param container
 	 */
 	public void drawHits(Graphics g, IContainer container) {
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (dataEvent == null) {
-			return;
-		}
-
-		drawDCHits(g, container, dataEvent);
-
+		drawDCHits(g, container);
 	}
 
 	// draw the DC hits
-	private void drawDCHits(Graphics g, IContainer container, DataEvent dataEvent) {
+	private void drawDCHits(Graphics g, IContainer container) {
 
 		if (ClasIoEventManager.getInstance().isAccumulating()) {
 			return;
@@ -57,7 +49,7 @@ public class AlertDCHitDrawer {
 
 		int minADC = _view.getADCThreshold();
 		
-		if (dataEvent.hasBank(AHDCAdc.BANK_NAME) && _view.showADCHits()) {
+		if (_view.showADCHits()) {
 			AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
 
 			for (int i = 0; i < adcData.count(); i++) {
@@ -85,8 +77,8 @@ public class AlertDCHitDrawer {
 	 * @param container the container
 	 * @param index     the 0-based index of the hit
 	 */
-	public void drawHighlightHit(Graphics g, IContainer container, DataEvent dataEvent, int index) {
-		if (dataEvent.hasBank(AHDCAdc.BANK_NAME) && _view.showADCHits() && adcData.hasRow(index)) {
+	public void drawHighlightHit(Graphics g, IContainer container, int index) {
+		if (_view.showADCHits() && adcData.hasRow(index)) {
 			AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
 			adcGeom.fromDataNumbering(adcData.sector(index), adcData.layer(index), adcData.component(index),
 					adcData.order(index));
@@ -144,25 +136,21 @@ public class AlertDCHitDrawer {
 		}
 
 
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if ((dataEvent == null) || !dataEvent.hasBank(AHDCAdc.BANK_NAME)) {
+		if (adcData.count() == 0) {
 			return;
 		}
 
-		if (adcData.count() > 0) {
-			int maxADC = ADCSupport.getMaxADC(AHDCAdc.BANK_NAME);
-			feedbackStrings.add(String.format("max AHDC ADC in this event %d", maxADC));
-			AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
+		int maxADC = ADCSupport.getMaxADC(AHDCAdc.BANK_NAME);
+		feedbackStrings.add(String.format("max AHDC ADC in this event %d", maxADC));
+		AlertDCGeometryNumbering adcGeom = new AlertDCGeometryNumbering();
 
-			for (int i = 0; i < adcData.count(); i++) {
-				adcGeom.fromDataNumbering(adcData.sector(i), adcData.layer(i), adcData.component(i), adcData.order(i));
-				if (adcGeom.match(dcl) && dcl.wireContainsXY(adcData.component(i) - 1, wp)) {
-					adcData.addFeedback(i, feedbackStrings);
-					return;
-				}
+		for (int i = 0; i < adcData.count(); i++) {
+			adcGeom.fromDataNumbering(adcData.sector(i), adcData.layer(i), adcData.component(i), adcData.order(i));
+			if (adcGeom.match(dcl) && dcl.wireContainsXY(adcData.component(i) - 1, wp)) {
+				adcData.addFeedback(i, feedbackStrings);
+				return;
 			}
 		}
-
 	}
 	
 

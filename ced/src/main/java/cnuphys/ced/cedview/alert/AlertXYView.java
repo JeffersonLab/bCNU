@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.jlab.geom.prim.Plane3D;
-import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.component.rangeslider.RangeSlider;
 import cnuphys.bCNU.drawable.DrawableAdapter;
@@ -297,19 +296,14 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 	//draw data selected highlighted data
 	private void drawDataSelectedHighlight(Graphics g, IContainer container) {
 
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (dataEvent == null) {
-			return;
-		}
-
 		//adc data
 		if (this.showADCHits()) {
-			if (dataEvent.hasBank("AHDC::adc") && (_highlightDataAHDC.hit >= 0)) {
-				_dcHitDrawer.drawHighlightHit(g, container, dataEvent, _highlightDataAHDC.hit);
+			if (_highlightDataAHDC.hit >= 0) {
+				_dcHitDrawer.drawHighlightHit(g, container, _highlightDataAHDC.hit);
 			}
 
-			if (dataEvent.hasBank("ATOF::tdc") && (_highlightDataATOF.hit >= 0)) {
-				_tofHitDrawer.drawHighlightHit(g, container, dataEvent, _highlightDataATOF.hit);
+			if (_highlightDataATOF.hit >= 0) {
+				_tofHitDrawer.drawHighlightHit(g, container, _highlightDataATOF.hit);
 			}
 		}
 	}	//indices are zero based

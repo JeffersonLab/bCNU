@@ -7,7 +7,6 @@ import java.awt.geom.Point2D;
 import java.util.List;
 
 import org.jlab.geom.component.ScintillatorPaddle;
-import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.ced.alldata.ATOFTdc;
@@ -44,18 +43,13 @@ public class AlertTOFHitDrawer {
 			return;
 		}
 
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (dataEvent == null) {
-			return;
-		}
-
-		drawTOFHits(g, container, dataEvent);
+		drawTOFHits(g, container);
 
 	}
 
 	// draw the TOF hits
-	private void drawTOFHits(Graphics g, IContainer container, DataEvent dataEvent) {
-		if (dataEvent.hasBank(ATOFTdc.BANK_NAME) && _view.showADCHits()) {
+	private void drawTOFHits(Graphics g, IContainer container) {
+		if (_view.showADCHits()) {
 			AlertTOFGeometryNumbering tdcGeom = new AlertTOFGeometryNumbering();
 
 			for (int i = 0; i < tdcData.count(); i++) {
@@ -83,8 +77,8 @@ public class AlertTOFHitDrawer {
 	 * @param container the container
 	 * @param index     the 0-based index of the hit
 	 */
-	public void drawHighlightHit(Graphics g, IContainer container, DataEvent dataEvent, int index) {
-		if (dataEvent.hasBank(ATOFTdc.BANK_NAME) && _view.showADCHits() && tdcData.hasRow(index)) {
+	public void drawHighlightHit(Graphics g, IContainer container, int index) {
+		if (_view.showADCHits() && tdcData.hasRow(index)) {
 			AlertTOFGeometryNumbering tdcGeom = new AlertTOFGeometryNumbering();
 			if (!tdcGeom.fromHipoNumbering(tdcData.sector(index), tdcData.layer(index), tdcData.component(index),
 					tdcData.order(index))) return;
@@ -162,8 +156,7 @@ public class AlertTOFHitDrawer {
 			return;
 		}
 
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if ((dataEvent == null) || !dataEvent.hasBank(ATOFTdc.BANK_NAME)) {
+		if (tdcData.count() == 0) {
 			return;
 		}
 
