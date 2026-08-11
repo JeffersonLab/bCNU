@@ -19,7 +19,6 @@ import javax.swing.border.Border;
 
 import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Point3D;
-import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.drawable.IDrawable;
@@ -36,7 +35,6 @@ import cnuphys.ced.alldata.URWTClusters;
 import cnuphys.ced.alldata.URWTCrosses;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.HexView;
-import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.component.ControlPanel;
 import cnuphys.ced.component.DisplayBits;
 import cnuphys.ced.geometry.GeometryManager;
@@ -266,12 +264,6 @@ public class UrWTXYView extends HexView {
 
 	//draw data selected highlighted data
 	private void drawDataSelectedHighlight(Graphics g, IContainer container) {
-
-		DataEvent dataEvent = ClasIoEventManager.getInstance().getCurrentEvent();
-		if (dataEvent == null) {
-			return;
-		}
-
 		//indices are zero based
 
 		URWTClusters clusters = URWTClusters.getInstance();
