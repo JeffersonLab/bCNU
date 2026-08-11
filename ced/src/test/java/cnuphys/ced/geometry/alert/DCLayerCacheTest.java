@@ -27,6 +27,21 @@ class DCLayerCacheTest {
 		assertEquals(createPayload().length, saved.size());
 	}
 
+	@Test
+	void restoresEmptyCcdbLayer() throws Exception {
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		try (DataOutputStream output = new DataOutputStream(bytes)) {
+			output.writeInt(0);
+			output.writeInt(1);
+			output.writeInt(2);
+			output.writeInt(0);
+		}
+
+		DCLayer layer = DCLayer.readFromCache(
+				new DataInputStream(new ByteArrayInputStream(bytes.toByteArray())));
+		assertEquals(0, layer.numWires);
+	}
+
 	private static byte[] createPayload() throws Exception {
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		try (DataOutputStream output = new DataOutputStream(bytes)) {

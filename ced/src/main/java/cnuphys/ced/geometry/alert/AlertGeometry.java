@@ -4,6 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +68,8 @@ public class AlertGeometry extends ACachedGeometry {
 
 		String variationName = Ced.getGeometryVariation();
 		constantProvider = new DatabaseConstantProvider(11, variationName);
+		_dcLayers = new HashMap<>();
+		_tofLayers = new HashMap<>();
 
 		initializeDC(constantProvider);
 		initializeTOF(constantProvider);
@@ -178,9 +185,11 @@ public class AlertGeometry extends ACachedGeometry {
 			}
 		}
 
-		// get the sector boundries
-		// and tofSectorLabelPoint
+		createTOFSectorBoundaries();
+	}
 
+	private static void createTOFSectorBoundaries() {
+		tofSectorXY = new Point2D.Double[15][16];
 		for (int sect = 0; sect < 15; sect++) {
 			ScintillatorPaddle p0 = getPaddle(sect, 0, 0, 0);
 			ScintillatorPaddle p1 = getPaddle(sect, 0, 1, 0);
@@ -209,6 +218,58 @@ public class AlertGeometry extends ACachedGeometry {
 			tofSectorXY[sect][15] = getCorner(p7, 1);
 		}
 
+	}
+
+	@Override
+	public boolean supportsCache() {
+		return true;
+	}
+
+	@Override
+	public void writeGeometry(DataOutput output) throws IOException {
+		ArrayList<DCLayer> dcLayers = new ArrayList<>(_dcLayers.values());
+		dcLayers.sort(Comparator.comparingInt((DCLayer value) -> value.sector)
+				.thenComparingInt(value -> value.superlayer).thenComparingInt(value -> value.layer));
+		output.writeInt(dcLayers.size());
+		for (DCLayer layer : dcLayers) {
+			layer.writeToCache(output);
+		}
+
+		ArrayList<TOFLayer> tofLayers = new ArrayList<>(_tofLayers.values());
+		tofLayers.sort(Comparator.comparingInt((TOFLayer value) -> value.sector)
+				.thenComparingInt(value -> value.superlayer).thenComparingInt(value -> value.layer));
+		output.writeInt(tofLayers.size());
+		for (TOFLayer layer : tofLayers) {
+			layer.writeToCache(output);
+		}
+	}
+
+	@Override
+	public void readGeometry(DataInput input) throws IOException {
+		int dcCount = checkedCount(input.readInt(), "ALERT DC layer");
+		HashMap<String, DCLayer> dcLayers = new HashMap<>();
+		for (int index = 0; index < dcCount; index++) {
+			DCLayer layer = DCLayer.readFromCache(input);
+			dcLayers.put(hash(layer.sector, layer.superlayer, layer.layer), layer);
+		}
+
+		int tofCount = checkedCount(input.readInt(), "ALERT TOF layer");
+		HashMap<String, TOFLayer> tofLayers = new HashMap<>();
+		for (int index = 0; index < tofCount; index++) {
+			TOFLayer layer = TOFLayer.readFromCache(input);
+			tofLayers.put(hash(layer.sector, layer.superlayer, layer.layer), layer);
+		}
+		_dcLayers = dcLayers;
+		_tofLayers = tofLayers;
+		constantProvider = null;
+		createTOFSectorBoundaries();
+	}
+
+	private static int checkedCount(int count, String description) throws IOException {
+		if (count < 0 || count > 100_000) {
+			throw new IOException("Invalid " + description + " count: " + count);
+		}
+		return count;
 	}
 
 	/**

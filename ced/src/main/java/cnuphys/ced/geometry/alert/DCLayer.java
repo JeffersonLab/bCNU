@@ -107,7 +107,7 @@ public class DCLayer {
 		int superlayer = input.readInt();
 		int layer = input.readInt();
 		int count = input.readInt();
-		if (count < 1 || count > 10_000) {
+		if (count < 0 || count > 10_000) {
 			throw new IOException("Invalid ALERT DC wire count: " + count);
 		}
 		Line3D[] wires = new Line3D[count];
