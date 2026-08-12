@@ -17,10 +17,6 @@ import cnuphys.ced.clasio.ClasIoEventManager;
 
 public class BeamLineItem extends BaseBeamLineItem {
 
-	// target icon
-	// private static final ImageIcon _targetIcon = ImageManager.getInstance()
-	// .loadImageIcon("images/target.gif");
-
 	/**
 	 * Create a beamline item which is a glorified line.
 	 *
