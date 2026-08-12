@@ -16,7 +16,7 @@ import cnuphys.bCNU.dialog.SimpleDialog;
 import cnuphys.bCNU.dialog.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.CommonBorder;
-import cnuphys.bCNU.util.Environment;
+import edu.cnu.mdi.util.Environment;
 
 @SuppressWarnings("serial")
 public class ConnectETDialog extends SimpleDialog {
