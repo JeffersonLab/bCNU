@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
-import cnuphys.bCNU.dialog.DialogUtilities;
+import edu.cnu.mdi.dialog.DialogUtils;
 import cnuphys.bCNU.dialog.SimpleDialog;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.graphics.component.IpField;
@@ -25,7 +25,7 @@ public class ETDialog extends SimpleDialog {
 	private JTextField _fileName;
 
 	// reason the dialog was closed
-	private int _reason = DialogUtilities.CANCEL_RESPONSE;
+	private int _reason = DialogUtils.CANCEL_RESPONSE;
 
 	/**
 	 * Create the panel for selected
@@ -83,8 +83,8 @@ public class ETDialog extends SimpleDialog {
 	/*
 	 * Returns the reason that the dialog was closed
 	 *
-	 * @return <code>DialogUtilities.OK_RESPONSE</code> or
-	 * <code>DialogUtilities.CANCEL_RESPONSE</code>
+	 * @return <code>DialogUtils.OK_RESPONSE</code> or
+	 * <code>DialogUtils.CANCEL_RESPONSE</code>
 	 */
 	public int reason() {
 		return _reason;
@@ -93,7 +93,7 @@ public class ETDialog extends SimpleDialog {
 	@Override
 	public void handleCommand(String command) {
 		if ("Connect".equals(command)) {
-			_reason = DialogUtilities.OK_RESPONSE;
+			_reason = DialogUtils.OK_RESPONSE;
 		}
 		setVisible(false);
 	}

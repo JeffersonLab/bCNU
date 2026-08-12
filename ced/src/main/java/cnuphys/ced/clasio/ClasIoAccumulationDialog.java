@@ -19,7 +19,7 @@ import javax.swing.SwingWorker;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.dialog.DialogUtilities;
+import edu.cnu.mdi.dialog.DialogUtils;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.CommonBorder;
@@ -36,7 +36,7 @@ public class ClasIoAccumulationDialog extends JDialog {
 	public static final int MAXACCUMULATIONCOUNT = 1000000;
 
 	// why the dialog closed.
-	private int _reason = DialogUtilities.CANCEL_RESPONSE;
+	private int _reason = DialogUtils.CANCEL_RESPONSE;
 
 	// if checked, clear existing accumulated data before new accumulation
 	private JCheckBox _clearButton;
@@ -84,7 +84,7 @@ public class ClasIoAccumulationDialog extends JDialog {
 		WindowAdapter wa = new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent we) {
-				doClose(DialogUtilities.CANCEL_RESPONSE);
+				doClose(DialogUtils.CANCEL_RESPONSE);
 			}
 		};
 		addWindowListener(wa);
@@ -105,7 +105,7 @@ public class ClasIoAccumulationDialog extends JDialog {
 
 		// add the clear toggle
 		_clearButton = new JCheckBox(" Clear accumulated data ", lastState);
-		box.add(DialogUtilities.paddedPanel(20, 6, _clearButton));
+		box.add(DialogUtils.paddedPanel(20, 6, _clearButton));
 
 		// path label
 
@@ -123,11 +123,11 @@ public class ClasIoAccumulationDialog extends JDialog {
 			_totalLabel.setText("Total number: 0");
 			_remainingLabel.setText("Remaining: 0");
 		}
-		subBox.add(DialogUtilities.paddedPanel(6, 6, _pathLabel));
-		subBox.add(DialogUtilities.paddedPanel(6, 6, _totalLabel));
-		subBox.add(DialogUtilities.paddedPanel(6, 6, _remainingLabel));
+		subBox.add(DialogUtils.paddedPanel(6, 6, _pathLabel));
+		subBox.add(DialogUtils.paddedPanel(6, 6, _totalLabel));
+		subBox.add(DialogUtils.paddedPanel(6, 6, _remainingLabel));
 		subBox.setBorder(new CommonBorder("Event File"));
-		box.add(DialogUtilities.paddedPanel(6, 6, subBox));
+		box.add(DialogUtils.paddedPanel(6, 6, subBox));
 
 		// accumulation panel
 		box.add(accumulationPanel(_numRemaining > 0));
@@ -141,7 +141,7 @@ public class ClasIoAccumulationDialog extends JDialog {
 		};
 		_progressBar.setStringPainted(true);
 
-		box.add(DialogUtilities.paddedPanel(20, 6, _progressBar));
+		box.add(DialogUtils.paddedPanel(20, 6, _progressBar));
 
 		// add the completed composite box
 		add(box, BorderLayout.NORTH);
@@ -189,15 +189,15 @@ public class ClasIoAccumulationDialog extends JDialog {
 				String command = e.getActionCommand();
 
 				if (ButtonPanel.OK_LABEL.equals(command)) {
-					doClose(DialogUtilities.OK_RESPONSE);
+					doClose(DialogUtils.OK_RESPONSE);
 				}
 
 				else if (ButtonPanel.CANCEL_LABEL.equals(command)) {
-					doClose(DialogUtilities.CANCEL_RESPONSE);
+					doClose(DialogUtils.CANCEL_RESPONSE);
 				}
 
 				else if (ButtonPanel.APPLY_LABEL.equals(command)) {
-					doClose(DialogUtilities.APPLY_RESPONSE);
+					doClose(DialogUtils.APPLY_RESPONSE);
 				}
 
 			}
@@ -212,11 +212,11 @@ public class ClasIoAccumulationDialog extends JDialog {
 	private void doClose(int reason) {
 		_reason = reason;
 
-		if (reason == DialogUtilities.OK_RESPONSE) {
+		if (reason == DialogUtils.OK_RESPONSE) {
 
 			// if number field was not enabled treat as cancel.
 			if (!_numberField.isEnabled()) {
-				_reason = DialogUtilities.CANCEL_RESPONSE;
+				_reason = DialogUtils.CANCEL_RESPONSE;
 				AccumulationManager.getInstance().notifyListeners(AccumulationManager.ACCUMULATION_CANCELLED);
 				setVisible(false);
 				return;
@@ -234,7 +234,7 @@ public class ClasIoAccumulationDialog extends JDialog {
 				count = Math.min(count, MAXACCUMULATIONCOUNT);
 				count = Math.min(count, _numRemaining - 1);
 				if (count < 1) {
-					_reason = DialogUtilities.CANCEL_RESPONSE;
+					_reason = DialogUtils.CANCEL_RESPONSE;
 					AccumulationManager.getInstance().notifyListeners(AccumulationManager.ACCUMULATION_CANCELLED);
 					setVisible(false);
 					return;
@@ -242,7 +242,7 @@ public class ClasIoAccumulationDialog extends JDialog {
 				startAccumulation(count);
 				lastCount = count;
 			} catch (Exception e) {
-				_reason = DialogUtilities.CANCEL_RESPONSE;
+				_reason = DialogUtils.CANCEL_RESPONSE;
 			}
 
 		} // ok
@@ -317,7 +317,7 @@ public class ClasIoAccumulationDialog extends JDialog {
 	/**
 	 * Why the dialog closed.
 	 *
-	 * @return either DialogUtilities.OK_RESPONSE or DialogUtilities.CANCEL_RESPONSE
+	 * @return either DialogUtils.OK_RESPONSE or DialogUtils.CANCEL_RESPONSE
 	 */
 	public int getReason() {
 		return _reason;

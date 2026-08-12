@@ -2,7 +2,7 @@ package cnuphys.ced.component;
 
 import java.awt.Component;
 
-import cnuphys.bCNU.dialog.DialogUtilities;
+import edu.cnu.mdi.dialog.DialogUtils;
 import cnuphys.bCNU.dialog.SimpleDialog;
 
 public class DrawingLegendDialog extends SimpleDialog {
@@ -40,7 +40,7 @@ public class DrawingLegendDialog extends SimpleDialog {
 		}
 
 		if (!_dialog.isVisible()) {
-			DialogUtilities.centerDialog(_dialog);
+			DialogUtils.centerDialog(_dialog);
 		}
 		_dialog.setVisible(true);
 	}

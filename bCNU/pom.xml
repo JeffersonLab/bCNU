@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.github.heddle</groupId>
+            <artifactId>mdi</artifactId>
+            <version>${mdi.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.jlab.coat</groupId>
             <artifactId>coat-libs</artifactId>
             <version>${coat-libs.version}</version>

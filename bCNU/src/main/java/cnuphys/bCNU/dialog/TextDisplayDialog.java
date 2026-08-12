@@ -10,6 +10,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.dialog.DialogUtils;
 
 public class TextDisplayDialog extends SimpleDialog {
 
@@ -36,7 +37,7 @@ public class TextDisplayDialog extends SimpleDialog {
 		_textArea.setFont(_font);
 
 		setSize(WIDTH, HEIGHT);
-		DialogUtilities.centerDialog(this);
+		DialogUtils.centerDialog(this);
 	}
 
 	/**

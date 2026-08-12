@@ -20,7 +20,7 @@ import org.jlab.io.hipo.HipoDataSource;
 import org.jlab.jnp.hipo4.data.SchemaFactory;
 
 import cnuphys.bCNU.application.Desktop;
-import cnuphys.bCNU.dialog.DialogUtilities;
+import edu.cnu.mdi.dialog.DialogUtils;
 import cnuphys.bCNU.graphics.component.IpField;
 import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
@@ -443,7 +443,7 @@ public class ClasIoEventManager {
 		}
 		_etDialog.setVisible(true);
 
-		if (_etDialog.reason() == DialogUtilities.OK_RESPONSE) {
+		if (_etDialog.reason() == DialogUtils.OK_RESPONSE) {
 			String machine = _etDialog.getMachine();
 			String etFile = _etDialog.getFile();
 			String station = _etDialog.getStation();

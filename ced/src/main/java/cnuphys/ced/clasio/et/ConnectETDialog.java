@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
-import cnuphys.bCNU.dialog.DialogUtilities;
+import edu.cnu.mdi.dialog.DialogUtils;
 import cnuphys.bCNU.dialog.SimpleDialog;
 import edu.cnu.mdi.component.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.ImageManager;
@@ -30,7 +30,7 @@ public class ConnectETDialog extends SimpleDialog {
 	private static String[] closeoutButtons = { "Connect", "Cancel" };
 
 	// reason the dialog was closed
-	private int _reason = DialogUtilities.CANCEL_RESPONSE;
+	private int _reason = DialogUtils.CANCEL_RESPONSE;
 
 	// text fields
 	private JTextField _stationTF;
@@ -181,8 +181,8 @@ public class ConnectETDialog extends SimpleDialog {
 	/*
 	 * Returns the reason that the dialog was closed
 	 *
-	 * @return <code>DialogUtilities.OK_RESPONSE</code> or
-	 * <code>DialogUtilities.CANCEL_RESPONSE</code>
+	 * @return <code>DialogUtils.OK_RESPONSE</code> or
+	 * <code>DialogUtils.CANCEL_RESPONSE</code>
 	 */
 	public int reason() {
 		return _reason;
@@ -191,7 +191,7 @@ public class ConnectETDialog extends SimpleDialog {
 	@Override
 	public void handleCommand(String command) {
 		if ("Connect".equals(command)) {
-			_reason = DialogUtilities.OK_RESPONSE;
+			_reason = DialogUtils.OK_RESPONSE;
 		}
 		setVisible(false);
 	}

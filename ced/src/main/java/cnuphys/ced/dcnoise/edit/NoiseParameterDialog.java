@@ -18,7 +18,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import cnuphys.bCNU.dialog.DialogUtilities;
+import edu.cnu.mdi.dialog.DialogUtils;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.CommonBorder;
@@ -65,7 +65,7 @@ public class NoiseParameterDialog extends JDialog {
 	private JSpinner _shiftSpinner[][];
 
 	// why the dialog closed.
-	private int _reason = DialogUtilities.CANCEL_RESPONSE;
+	private int _reason = DialogUtils.CANCEL_RESPONSE;
 
 	/**
 	 * Create a dialog for editing the noise parameters. There is just one set of
@@ -80,7 +80,7 @@ public class NoiseParameterDialog extends JDialog {
 		WindowAdapter wa = new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent we) {
-				doClose(DialogUtilities.CANCEL_RESPONSE);
+				doClose(DialogUtils.CANCEL_RESPONSE);
 			}
 		};
 		addWindowListener(wa);
@@ -118,7 +118,7 @@ public class NoiseParameterDialog extends JDialog {
 		// add combo for selected superlayer
 		createSuperLayerComboBox();
 		_superLayerComboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-		box.add(DialogUtilities.paddedPanel(20, 6, _superLayerComboBox));
+		box.add(DialogUtils.paddedPanel(20, 6, _superLayerComboBox));
 
 		// add the main parameter panel
 		box.add(Box.createVerticalStrut(6));
@@ -191,7 +191,7 @@ public class NoiseParameterDialog extends JDialog {
 		Box box = Box.createVerticalBox();
 
 		createMissingLayerComboBox();
-		box.add(DialogUtilities.paddedPanel(20, 6, _missingLayerComboBox));
+		box.add(DialogUtils.paddedPanel(20, 6, _missingLayerComboBox));
 		box.add(Box.createVerticalStrut(6));
 
 		Box hbox = Box.createHorizontalBox();
@@ -290,15 +290,15 @@ public class NoiseParameterDialog extends JDialog {
 				String command = e.getActionCommand();
 
 				if (ButtonPanel.OK_LABEL.equals(command)) {
-					doClose(DialogUtilities.OK_RESPONSE);
+					doClose(DialogUtils.OK_RESPONSE);
 				}
 
 				else if (ButtonPanel.CANCEL_LABEL.equals(command)) {
-					doClose(DialogUtilities.CANCEL_RESPONSE);
+					doClose(DialogUtils.CANCEL_RESPONSE);
 				}
 
 				else if (ButtonPanel.APPLY_LABEL.equals(command)) {
-					doClose(DialogUtilities.APPLY_RESPONSE);
+					doClose(DialogUtils.APPLY_RESPONSE);
 				}
 
 			}
@@ -313,11 +313,11 @@ public class NoiseParameterDialog extends JDialog {
 	private void doClose(int reason) {
 		_reason = reason;
 
-		if (reason == DialogUtilities.CANCEL_RESPONSE) {
+		if (reason == DialogUtils.CANCEL_RESPONSE) {
 			setVisible(false);
 		}
 
-		if ((reason == DialogUtilities.OK_RESPONSE) || (reason == DialogUtilities.APPLY_RESPONSE)) {
+		if ((reason == DialogUtils.OK_RESPONSE) || (reason == DialogUtils.APPLY_RESPONSE)) {
 			// copy from clone to real data--all sectors the same
 
 			for (int sector = 0; sector < 6; sector++) {
@@ -328,7 +328,7 @@ public class NoiseParameterDialog extends JDialog {
 			}
 			Ced.refresh();
 
-			if (reason == DialogUtilities.OK_RESPONSE) {
+			if (reason == DialogUtils.OK_RESPONSE) {
 				setVisible(false);
 			}
 			ClasIoEventManager.getInstance().reloadCurrentEvent();
@@ -338,7 +338,7 @@ public class NoiseParameterDialog extends JDialog {
 	/**
 	 * Why the dialog closed.
 	 *
-	 * @return either DialogUtilities.OK_RESPONSE or DialogUtilities.CANCEL_RESPONSE
+	 * @return either DialogUtils.OK_RESPONSE or DialogUtils.CANCEL_RESPONSE
 	 */
 	public int getReason() {
 		return _reason;

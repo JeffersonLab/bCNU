@@ -22,6 +22,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import cnuphys.bCNU.graphics.ImageManager;
+import edu.cnu.mdi.dialog.DialogUtils;
 
 /**
  * A simple dialog template. The dialog is given a Border layout, and component
@@ -118,7 +119,7 @@ public class SimpleDialog extends JDialog implements ActionListener {
 		addMenus();
 
 		sizeDialog();
-		DialogUtilities.centerDialog(this);
+		DialogUtils.centerDialog(this);
 	}
 
 	/**
