@@ -9,6 +9,7 @@ import org.jlab.io.base.DataEvent;
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
 import cnuphys.bCNU.log.Log;
 import cnuphys.ced.alldata.AHDCAdc;
+import cnuphys.ced.alldata.AdcColorScale;
 import cnuphys.ced.alldata.ATOFTdc;
 import cnuphys.ced.alldata.URWTHits;
 import cnuphys.ced.alldata.BSTAdc;
@@ -52,8 +53,7 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	public static final int ACCUMULATION_CLEAR = 2;
 
 	// common colorscale
-	public static ColorScaleModel colorScaleModel = new ColorScaleModel(getAccumulationValues(),
-			ColorScaleModel.getSimpleMapColors(8));
+	public static ColorScaleModel colorScaleModel = AdcColorScale.getInstance();
 
 
 	// the singleton
@@ -1147,27 +1147,6 @@ public class AccumulationManager implements IAccumulator, IClasIoEventListener, 
 	@Override
 	public void changedEventSource(ClasIoEventManager.EventSourceType source) {
 		clear();
-	}
-
-	/**
-	 * Get the values array for the color scale. Note the range is 0..1 so use
-	 * fraction of max value to get color
-	 *
-	 * @return the values array.
-	 */
-	private static double getAccumulationValues()[] {
-
-		int len = ColorScaleModel.getSimpleMapColors(8).length + 1;
-
-		double values[] = new double[len];
-
-		double min = 0.0;
-		double max = 1.0;
-		double del = (max - min) / (values.length - 1);
-		for (int i = 0; i < values.length; i++) {
-			values[i] = i * del;
-		}
-		return values;
 	}
 
 	/**

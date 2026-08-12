@@ -19,12 +19,14 @@ import cnuphys.ced.cedview.magfieldview.MagfieldView;
 import cnuphys.ced.cedview.sectorview.SectorView;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.component.MagFieldDisplayArray;
+import cnuphys.ced.common.ScientificColorScales;
 import cnuphys.magfield.FieldProbe;
 import cnuphys.magfield.GridCoordinate;
 import cnuphys.magfield.MagneticFieldChangeListener;
 import cnuphys.magfield.MagneticFields;
 import cnuphys.magfield.Solenoid;
 import cnuphys.magfield.Torus;
+import edu.cnu.mdi.ui.colors.ScientificColorMap;
 
 /**
  * This is a magnetic field item. It is restricted to live only on sector views.
@@ -400,23 +402,7 @@ public class MagFieldItem extends AItem implements MagneticFieldChangeListener {
 	}
 
 	private static double[] getGradientValues() {
-		int len = getGradientColors().length + 1;
-
-		double min = 0.0;
-		double max = 15; // T/m
-		double del = (max - min) / (len - 1);
-		double values[] = new double[len];
-		values[0] = min;
-		values[len - 1] = max;
-		for (int i = 1; i < len - 1; i++) {
-			// double speedup = 5.0;
-			double speedup = 6.0;
-			values[i] = min + (max - min) * Math.exp(-i * del * speedup / max);
-
-			// double x = (Math.PI * i) / (2.0 * (values.length - 1));
-			// values[i] = min + (max - min) * (1.0 - Math.cos(x));
-		}
-		return values;
+		return getNonlinearValues(getGradientColors().length + 1, 15.0);
 	}
 
 	/**
@@ -426,23 +412,8 @@ public class MagFieldItem extends AItem implements MagneticFieldChangeListener {
 	 */
 	private static double[] getTorusValues() {
 
-		int len = getTorusColors().length + 1;
-
-		double values[] = new double[len];
-	//	double min = 0.05;
-		double min = 0;
 		double max = MagneticFields.getInstance().maxFieldMagnitude() / 10.0;
-		double del = (max - min) / (len - 1);
-
-		values[0] = min;
-		values[len - 1] = max;
-
-		for (int i = 1; i < len - 1; i++) {
-			// double speedup = 5.0;
-			double speedup = 6.0;
-			values[i] = min + (max - min) * Math.exp(-i * del * speedup / max);
-		}
-		return values;
+		return getNonlinearValues(getTorusColors().length + 1, max);
 	}
 
 	/**
@@ -452,35 +423,27 @@ public class MagFieldItem extends AItem implements MagneticFieldChangeListener {
 	 */
 	private static double[] getSolenoidValues() {
 
-		int len = getSolenoidColors().length + 1;
-
-		double values[] = new double[len];
-//		double min = 0.1;
-		double min = 0;
 		double max = MagneticFields.getInstance().maxFieldMagnitude() / 10.0;
-		// double del = (max-min)/(values.length-1);
+		return getNonlinearValues(getSolenoidColors().length + 1, max);
+	}
 
-		values[0] = min;
-		values[len - 1] = max;
+	private static double[] getNonlinearValues(int length, double max) {
+		double[] values = new double[length];
+		if (max <= 0.0) {
+			return values;
+		}
 
-		for (int i = 1; i < len - 1; i++) {
-			// values[i] = i*del;
-			// use nonlinear cosine scale
-			// double x = (Math.PI * i) / (2.0 * (values.length - 1));
-			// values[i] = min + (max - min) * (1.0 - Math.cos(x));
-
-			double del = (max - min) / (len - 1);
-			double speedup = 6.0;
-			values[i] = min + (max - min) * Math.exp(-i * del * speedup / max);
-
-			// double x = (Math.PI * i) / (2.0 * (values.length - 1));
-			// values[i] = min + (max - min) * (1.0 - Math.cos(x));
+		double speedup = 6.0;
+		double denominator = Math.expm1(speedup);
+		for (int i = 1; i < length; i++) {
+			double fraction = (double) i / (length - 1);
+			values[i] = max * Math.expm1(speedup * fraction) / denominator;
 		}
 		return values;
 	}
 
 	private static Color[] getGradientColors() {
-		return getTorusColors();
+		return ScientificColorScales.sample(ScientificColorMap.VIRIDIS);
 	}
 
 
@@ -490,34 +453,7 @@ public class MagFieldItem extends AItem implements MagneticFieldChangeListener {
 	 * @return the color array for the plot.
 	 */
 	private static Color[] getTorusColors() {
-
-		int r[] = { 255, 216, 176, 106, 37, 132, 193, 255, 255, 255, 255, 127 };
-		int g[] = { 255, 239, 224, 193, 162, 155, 205, 255, 191, 128, 0, 0 };
-		int b[] = { 255, 242, 230, 136, 42, 51, 25, 0, 0, 0, 0, 127 };
-
-		int n = r.length;
-		int nm1 = n - 1;
-
-		double f = 1.0 / n;
-
-		int colorlen = nm1 * n + 1;
-		Color colors[] = new Color[colorlen];
-
-		int k = 0;
-		for (int i = 0; i < nm1; i++) {
-			for (int j = 0; j < n; j++) {
-				int rr = r[i] + (int) (j * f * (r[i + 1] - r[i]));
-				int gg = g[i] + (int) (j * f * (g[i + 1] - g[i]));
-				int bb = b[i] + (int) (j * f * (b[i + 1] - b[i]));
-
-				colors[k] = new Color(rr, gg, bb);
-				k++;
-			}
-		}
-
-		colors[nm1 * n] = new Color(r[nm1], g[nm1], b[nm1]);
-
-		return colors;
+		return ScientificColorScales.sample(ScientificColorMap.VIRIDIS);
 	}
 
 	/**
@@ -526,35 +462,7 @@ public class MagFieldItem extends AItem implements MagneticFieldChangeListener {
 	 * @return the color array for the plot.
 	 */
 	private static Color[] getSolenoidColors() {
-
-		int r[] = { 255, 106, 37, 132, 255, 255, 255, 127 };
-		int g[] = { 255, 193, 162, 155, 255, 128, 0, 0 };
-		int b[] = { 255, 136, 42, 51, 0, 0, 0, 127 };
-
-		int n = r.length;
-		int nm1 = n - 1;
-
-		double f = 1.0 / n;
-
-		int colorlen = nm1 * n + 1;
-		Color colors[] = new Color[colorlen];
-
-		int k = 0;
-		for (int i = 0; i < nm1; i++) {
-			for (int j = 0; j < n; j++) {
-				int rr = r[i] + (int) (j * f * (r[i + 1] - r[i]));
-				int gg = g[i] + (int) (j * f * (g[i + 1] - g[i]));
-				int bb = b[i] + (int) (j * f * (b[i + 1] - b[i]));
-
-				colors[k] = new Color(rr, gg, bb);
-
-				k++;
-			}
-		}
-
-		colors[nm1 * n] = new Color(r[nm1], g[nm1], b[nm1]);
-
-		return colors;
+		return ScientificColorScales.sample(ScientificColorMap.VIRIDIS);
 	}
 
 	@Override

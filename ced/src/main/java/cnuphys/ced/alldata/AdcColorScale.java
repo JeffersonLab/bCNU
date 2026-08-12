@@ -1,6 +1,8 @@
 package cnuphys.ced.alldata;
 
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
+import cnuphys.ced.common.ScientificColorScales;
+import edu.cnu.mdi.ui.colors.ScientificColorMap;
 
 public class AdcColorScale extends ColorScaleModel {
 
@@ -8,7 +10,7 @@ public class AdcColorScale extends ColorScaleModel {
 	private static volatile AdcColorScale _instance;
 
 	private AdcColorScale() {
-		super(getScaleValues(), ColorScaleModel.getSimpleMapColors(8));
+		super(getScaleValues(), getScaleColors());
 	}
 
 	public static AdcColorScale getInstance() {
@@ -30,7 +32,7 @@ public class AdcColorScale extends ColorScaleModel {
 	 */
 	private static double[] getScaleValues() {
 
-		int len = ColorScaleModel.getSimpleMapColors(8).length + 1;
+		int len = getScaleColors().length + 1;
 
 		double values[] = new double[len];
 
@@ -41,6 +43,10 @@ public class AdcColorScale extends ColorScaleModel {
 			values[i] = i * del;
 		}
 		return values;
+	}
+
+	private static java.awt.Color[] getScaleColors() {
+		return ScientificColorScales.sample(ScientificColorMap.TURBO);
 	}
 
 
