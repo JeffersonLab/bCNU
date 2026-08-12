@@ -15,7 +15,7 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.container.ScaleDrawer;
 import cnuphys.bCNU.graphics.style.LineStyle;
 import cnuphys.bCNU.item.YouAreHereItem;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.ced.cedview.sectorview.DisplaySectors;
 import cnuphys.ced.geometry.GeometryManager;
 import cnuphys.ced.geometry.util.VectorSupport;
@@ -485,13 +485,13 @@ public abstract class SliceView extends CedView {
 		// get absolute phi
 		double absphi = getAbsolutePhi(container, pp, wp);
 
-		String rtp = CedView.rThetaPhi + " (" + valStr(r, 2) + "cm, " + valStr(theta, 2) + UnicodeSupport.DEGREE + ", "
-				+ valStr(absphi, 2) + UnicodeSupport.DEGREE + ")";
+		String rtp = CedView.rThetaPhi + " (" + valStr(r, 2) + "cm, " + valStr(theta, 2) + UnicodeUtils.DEGREE + ", "
+				+ valStr(absphi, 2) + UnicodeUtils.DEGREE + ")";
 		feedbackStrings.add(rtp);
 
 		// cylindrical coordinates which are just the world coordinates!
 		String rzp = CedView.rhoZPhi + " (" + valStr(rho, 2) + "cm, " + valStr(z, 2) + "cm , " + valStr(absphi, 2)
-				+ UnicodeSupport.DEGREE + ")";
+				+ UnicodeUtils.DEGREE + ")";
 		feedbackStrings.add(rzp);
 
 		// sector coordinates

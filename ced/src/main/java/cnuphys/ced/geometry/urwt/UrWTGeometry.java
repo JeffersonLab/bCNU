@@ -8,7 +8,7 @@ import org.jlab.detector.geant4.v2.MPGD.URWT.URWTStripFactory;
 import org.jlab.geom.prim.Line3D;
 
 
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.cache.ACachedGeometry;
 
@@ -29,7 +29,7 @@ public class UrWTGeometry extends ACachedGeometry {
 	public static final int NUM_LAYERS = 4;
 
 	// the name of the detector
-	public static String NAME = UnicodeSupport.SMALL_MU + "rWT";
+	public static String NAME = UnicodeUtils.SMALL_MU + "rWT";
 
 
 	// the strip factory

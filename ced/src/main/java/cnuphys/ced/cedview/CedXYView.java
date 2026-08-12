@@ -20,7 +20,7 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.style.LineStyle;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.Point2DSupport;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import edu.cnu.mdi.ui.colors.X11Colors;
 
 public abstract class CedXYView extends CedView implements ILabCoordinates{
@@ -236,7 +236,7 @@ public abstract class CedXYView extends CedView implements ILabCoordinates{
 				"radius " + DoubleFormat.doubleFormat(Math.hypot(worldPoint.x, worldPoint.y), 2) + " " + units,
 				feedbackStrings);
 		double phi = Math.toDegrees(Math.atan2(worldPoint.y, worldPoint.x));
-		fbString("yellow", "phi " + DoubleFormat.doubleFormat(phi, 2) + UnicodeSupport.DEGREE, feedbackStrings);
+		fbString("yellow", "phi " + DoubleFormat.doubleFormat(phi, 2) + UnicodeUtils.DEGREE, feedbackStrings);
 
 	}
 

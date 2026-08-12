@@ -18,7 +18,7 @@ import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.ced3d.view.PlainView3D;
 
@@ -152,10 +152,10 @@ public abstract class PlainPanel3D extends Panel3D {
 	public static final String SHOW_FMT_REGION_3 = "FMT Region 3";
 	public static final String SHOW_FMT_REGION_4 = "FMT Region 4";
 
-	public static final String SHOW_URWT_LAYER_1 = UnicodeSupport.SMALL_MU +  "RWT Layer 1";
-	public static final String SHOW_URWT_LAYER_2 = UnicodeSupport.SMALL_MU +  "RWT Layer 2";
-	public static final String SHOW_URWT_LAYER_3 = UnicodeSupport.SMALL_MU +  "RWT Layer 3";
-	public static final String SHOW_URWT_LAYER_4 = UnicodeSupport.SMALL_MU +  "RWT Layer 4";
+	public static final String SHOW_URWT_LAYER_1 = UnicodeUtils.SMALL_MU +  "RWT Layer 1";
+	public static final String SHOW_URWT_LAYER_2 = UnicodeUtils.SMALL_MU +  "RWT Layer 2";
+	public static final String SHOW_URWT_LAYER_3 = UnicodeUtils.SMALL_MU +  "RWT Layer 3";
+	public static final String SHOW_URWT_LAYER_4 = UnicodeUtils.SMALL_MU +  "RWT Layer 4";
 
 	// Check box array
 	protected CheckBoxArray _checkBoxArray;

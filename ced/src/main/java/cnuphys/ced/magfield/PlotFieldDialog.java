@@ -26,7 +26,7 @@ import javax.swing.JTextField;
 import bCNU3D.DoubleFormat;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.CommonBorder;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.magfield.FieldProbe;
 import cnuphys.magfield.MagneticFieldInitializationException;
 import cnuphys.magfield.MagneticFields;
@@ -56,9 +56,9 @@ public class PlotFieldDialog extends JDialog implements ActionListener {
 
 	// the default fixed values and ranges
 
-	private static String sPHI = UnicodeSupport.SMALL_PHI;
-	private static String sRHO = UnicodeSupport.SMALL_RHO;
-	private static String sDEG = UnicodeSupport.DEGREE;
+	private static String sPHI = UnicodeUtils.SMALL_PHI;
+	private static String sRHO = UnicodeUtils.SMALL_RHO;
+	private static String sDEG = UnicodeUtils.DEGREE;
 
 	// the x axis labels
 	private static String _xLabels[] = { "z (cm) ", sRHO + " (cm) ", sPHI + " (deg)" };

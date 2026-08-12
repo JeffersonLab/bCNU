@@ -22,7 +22,7 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.item.YouAreHereItem;
 import cnuphys.bCNU.util.PropertySupport;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.CTOFAdc;
 import cnuphys.ced.alldata.CTOFClusters;
@@ -445,8 +445,8 @@ public class AlertXYView extends CedXYView implements ILabCoordinates, ICentralX
 			double theta = Math.toDegrees(Math.acos(z / r));
 			double phi = Math.toDegrees(Math.atan2(wp.y, wp.x));
 
-			String fbs = String.format("(z, %s, %s ) = (%-6.2f mm, %-6.2f, %-6.2f)", UnicodeSupport.SMALL_THETA,
-					UnicodeSupport.SMALL_PHI, z, theta, phi);
+			String fbs = String.format("(z, %s, %s ) = (%-6.2f mm, %-6.2f, %-6.2f)", UnicodeUtils.SMALL_THETA,
+					UnicodeUtils.SMALL_PHI, z, theta, phi);
 			feedbackStrings.add(fbs);
 		} else {
 			feedbackStrings.add("z: " + getFixedZ() + " mm");

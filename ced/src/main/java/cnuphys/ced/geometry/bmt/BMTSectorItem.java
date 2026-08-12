@@ -17,7 +17,7 @@ import cnuphys.bCNU.graphics.style.IStyled;
 import cnuphys.bCNU.item.DonutItem;
 import cnuphys.bCNU.item.ItemList;
 import edu.cnu.mdi.ui.fonts.Fonts;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.FeedbackRect;
 import cnuphys.ced.geometry.BMTGeometry;
@@ -306,8 +306,8 @@ public class BMTSectorItem extends DonutItem {
 
 			feedbackStrings.add("$lawn green$inner radius " + getInnerRadius() + "mm");
 			feedbackStrings.add(
-					"$lawn green$startAngle " + DoubleFormat.doubleFormat(getStartAngle(), 1) + UnicodeSupport.DEGREE
-							+ " endAngle " + DoubleFormat.doubleFormat(getEndAngle(), 1) + UnicodeSupport.DEGREE);
+					"$lawn green$startAngle " + DoubleFormat.doubleFormat(getStartAngle(), 1) + UnicodeUtils.DEGREE
+							+ " endAngle " + DoubleFormat.doubleFormat(getEndAngle(), 1) + UnicodeUtils.DEGREE);
 			feedbackStrings.add("$lawn green$number of strips " + getNumStrips());
 		}
 	}

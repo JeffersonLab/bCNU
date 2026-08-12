@@ -26,7 +26,7 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.util.PropertySupport;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.DCHits;
@@ -632,10 +632,10 @@ public class SectorView extends SliceView implements ChangeListener {
 			}
 
 			final JMenuItem rotateItem = new JMenuItem(
-					"Rotate to match trajectory " + UnicodeSupport.SMALL_PHI + ": " + valStr(desiredPhi, 3));
+					"Rotate to match trajectory " + UnicodeUtils.SMALL_PHI + ": " + valStr(desiredPhi, 3));
 
-			final JMenuItem integralItem = new JMenuItem("<html>Plot  " + UnicodeSupport.INTEGRAL + "|<bold>B</bold> "
-					+ UnicodeSupport.TIMES + " <bold>dL</bold>|");
+			final JMenuItem integralItem = new JMenuItem("<html>Plot  " + UnicodeUtils.INTEGRAL + "|<bold>B</bold> "
+					+ UnicodeUtils.TIMES + " <bold>dL</bold>|");
 
 			ActionListener al = new ActionListener() {
 

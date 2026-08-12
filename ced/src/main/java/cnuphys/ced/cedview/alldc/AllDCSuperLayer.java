@@ -18,7 +18,7 @@ import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.RectangleItem;
 import edu.cnu.mdi.ui.fonts.Fonts;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DCRawHits;
 import cnuphys.ced.alldata.DCHits;
@@ -501,8 +501,8 @@ public class AllDCSuperLayer extends RectangleItem {
 				double phi = (_sector - 1) * 60.0;
 
 				String rtp = "approx " + CedView.rThetaPhi + " " + DoubleFormat.doubleFormat(r, 1) + "cm, "
-						+ DoubleFormat.doubleFormat(theta, 1) + UnicodeSupport.DEGREE + ", "
-						+ DoubleFormat.doubleFormat(phi, 1) + UnicodeSupport.DEGREE;
+						+ DoubleFormat.doubleFormat(theta, 1) + UnicodeUtils.DEGREE + ", "
+						+ DoubleFormat.doubleFormat(phi, 1) + UnicodeUtils.DEGREE;
 				feedbackStrings.add(rtp);
 
 			}

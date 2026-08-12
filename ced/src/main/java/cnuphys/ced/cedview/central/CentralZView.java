@@ -32,7 +32,7 @@ import cnuphys.bCNU.graphics.world.WorldPolygon;
 import cnuphys.bCNU.item.ItemList;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.BSTRecHits;
@@ -674,11 +674,11 @@ public class CentralZView extends CedView implements ChangeListener, ILabCoordin
 
 		String xyz = "xyz " + vecStr(labX, labY, labZ) + " mm";
 
-		String rtp = CedView.rThetaPhi + " (" + valStr(r, 2) + " mm, " + valStr(theta, 2) + UnicodeSupport.DEGREE + ", "
-				+ valStr(_phi, 2) + UnicodeSupport.DEGREE + ")";
+		String rtp = CedView.rThetaPhi + " (" + valStr(r, 2) + " mm, " + valStr(theta, 2) + UnicodeUtils.DEGREE + ", "
+				+ valStr(_phi, 2) + UnicodeUtils.DEGREE + ")";
 
 		String rzp = CedView.rhoZPhi + " (" + valStr(labRho, 2) + " mm, " + valStr(labZ, 2) + " mm , " + valStr(_phi, 2)
-				+ UnicodeSupport.DEGREE + ")";
+				+ UnicodeUtils.DEGREE + ")";
 
 		feedbackStrings.add(xyz);
 		feedbackStrings.add(rtp);

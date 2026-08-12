@@ -1,7 +1,7 @@
 package cnuphys.ced.ced3d.view;
 
 import cnuphys.bCNU.util.PropertySupport;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.bCNU.view.ViewConfiguration;
 import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.ced3d.CedPanel3D;
@@ -18,7 +18,7 @@ public class UrwtView3D extends CedView3D {
 	private static final float thetaz = 90f;
 
 	// view title
-	private static final String TITLE = UnicodeSupport.SMALL_MU + "RWT 3D View";
+	private static final String TITLE = UnicodeUtils.SMALL_MU + "RWT 3D View";
 
 	public UrwtView3D() {
 		super(TITLE, thetax, thetay, thetaz, xdist, ydist, zdist);

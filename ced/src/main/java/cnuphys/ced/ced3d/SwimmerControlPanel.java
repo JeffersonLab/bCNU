@@ -30,7 +30,7 @@ import cnuphys.bCNU.component.VariableRange;
 import cnuphys.bCNU.dialog.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import edu.cnu.mdi.ui.fonts.Fonts;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.ced.ced3d.view.SwimmingTestView3D;
 import cnuphys.ced.swim.CedSwimmerFactory;
 import cnuphys.magfield.MagneticFieldChangeListener;
@@ -85,11 +85,11 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 
 	//labels for ranges
 	private String[] _rangePrompts = {"p from",
-			"x" + UnicodeSupport.SUBZERO + " from",
-			"y" + UnicodeSupport.SUBZERO + " from",
-			"z" + UnicodeSupport.SUBZERO + " from",
-			UnicodeSupport.SMALL_THETA + " from",
-			UnicodeSupport.SMALL_PHI + " from"};
+			"x" + UnicodeUtils.SUB0 + " from",
+			"y" + UnicodeUtils.SUB0 + " from",
+			"z" + UnicodeUtils.SUB0 + " from",
+			UnicodeUtils.SMALL_THETA + " from",
+			UnicodeUtils.SMALL_PHI + " from"};
 	private String[] _rangeUnits = {"GeV/c", "cm", "cm", "cm", "deg", "deg"};
 
 	//the min and max for the ranges
@@ -372,7 +372,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 		ButtonGroup bg = new ButtonGroup();
 		_standardRB   = createRadioButton("Standard swim to sMax", _algorithm == SWIM_ALGORITHM.STANDARD, bg, p);
 		_fixedZRB     = createRadioButton("Swim to a fixed z", _algorithm == SWIM_ALGORITHM.FIXEDZ, bg, p);
-		_fixedRhoRB   = createRadioButton("Swim to a fixed " + UnicodeSupport.SMALL_RHO, _algorithm == SWIM_ALGORITHM.FIXEDRHO, bg, p);
+		_fixedRhoRB   = createRadioButton("Swim to a fixed " + UnicodeUtils.SMALL_RHO, _algorithm == SWIM_ALGORITHM.FIXEDRHO, bg, p);
 		_toPlaneRB    = createRadioButton("Swim to a plane", _algorithm == SWIM_ALGORITHM.TOPLANE, bg, p);
 		_toCylinderRB = createRadioButton("Swim to a cylinder", _algorithm == SWIM_ALGORITHM.TOCYLINDER, bg, p);
 
@@ -474,7 +474,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 		int width = fm.stringWidth("\"Swim to\" accuracy:");
 
 		//accuracy
-		_accuracy = createTextField("\"swim to\" accuracy:", UnicodeSupport.SMALL_MU + "m", valStr(_lastAccuracy), width, p);
+		_accuracy = createTextField("\"swim to\" accuracy:", UnicodeUtils.SMALL_MU + "m", valStr(_lastAccuracy), width, p);
 
 		//max path length
 		_sMax = createTextField("Max path length:", "cm", valStr(_lastSmax), width, p);
@@ -483,7 +483,7 @@ public class SwimmerControlPanel extends JPanel implements ActionListener, Magne
 		_fixedZ = createTextField("Fixed z cutoff:", "cm", valStr(_lastFixedZ), width, p);
 
 		//fixed rho
-		_fixedRho = createTextField("Fixed " + UnicodeSupport.SMALL_RHO + " cutoff:", "cm", valStr(_lastFixedRho), width, p);
+		_fixedRho = createTextField("Fixed " + UnicodeUtils.SMALL_RHO + " cutoff:", "cm", valStr(_lastFixedRho), width, p);
 
 		return p;
 	}

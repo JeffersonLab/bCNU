@@ -23,7 +23,7 @@ import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.graphics.component.SimpleScrollableTextArea;
 import cnuphys.bCNU.util.Bits;
 import edu.cnu.mdi.ui.fonts.Fonts;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.alert.AlertProjectionPanel;
 import cnuphys.ced.cedview.alert.AlertXYView;
@@ -486,10 +486,10 @@ public class ControlPanel extends JPanel implements ChangeListener {
 		box.add(_phiSlider);
 
 		if (isBig) {
-			box.setBorder(new CommonBorder(UnicodeSupport.SMALL_PHI + " (deg)"));
+			box.setBorder(new CommonBorder(UnicodeUtils.SMALL_PHI + " (deg)"));
 		} else {
 			box.setBorder(new CommonBorder(
-					UnicodeSupport.CAPITAL_DELTA + UnicodeSupport.SMALL_PHI + " relative to midplane (deg)"));
+					UnicodeUtils.CAPITAL_DELTA + UnicodeUtils.SMALL_PHI + " relative to midplane (deg)"));
 		}
 		return box;
 	}

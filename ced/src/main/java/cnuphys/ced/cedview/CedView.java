@@ -37,7 +37,7 @@ import cnuphys.bCNU.graphics.toolbar.UserToolBarComponent;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.ping.IPing;
 import cnuphys.bCNU.util.TextUtilities;
-import cnuphys.bCNU.util.UnicodeSupport;
+import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.ViewManager;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -105,24 +105,24 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 	/**
 	 * A string that has r-theta-phi using unicode greek characters
 	 */
-	public static final String rThetaPhi = "r" + UnicodeSupport.THINSPACE + UnicodeSupport.SMALL_THETA
-			+ UnicodeSupport.THINSPACE + UnicodeSupport.SMALL_PHI;
+	public static final String rThetaPhi = "r" + UnicodeUtils.THINSPACE + UnicodeUtils.SMALL_THETA
+			+ UnicodeUtils.THINSPACE + UnicodeUtils.SMALL_PHI;
 
 	/**
 	 * A string that has rho-theta-phi using unicode greek characters
 	 */
-	public static final String rhoZPhi = UnicodeSupport.SMALL_RHO + UnicodeSupport.THINSPACE + "z"
-			+ UnicodeSupport.THINSPACE + UnicodeSupport.SMALL_PHI;
+	public static final String rhoZPhi = UnicodeUtils.SMALL_RHO + UnicodeUtils.THINSPACE + "z"
+			+ UnicodeUtils.THINSPACE + UnicodeUtils.SMALL_PHI;
 
 	/**
 	 * A string that has xyz with small spaces
 	 */
-	public static final String xyz = "x" + UnicodeSupport.THINSPACE + "y" + UnicodeSupport.THINSPACE + "z";
+	public static final String xyz = "x" + UnicodeUtils.THINSPACE + "y" + UnicodeUtils.THINSPACE + "z";
 
 	/**
 	 * A string that has rho-phi using unicode greek characters for hex views
 	 */
-	public static final String rhoPhi = UnicodeSupport.SMALL_RHO + UnicodeSupport.THINSPACE + UnicodeSupport.SMALL_PHI;
+	public static final String rhoPhi = UnicodeUtils.SMALL_RHO + UnicodeUtils.THINSPACE + UnicodeUtils.SMALL_PHI;
 
 	/**
 	 * Name for the detector layer.
