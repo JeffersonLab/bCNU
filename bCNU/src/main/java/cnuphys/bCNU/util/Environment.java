@@ -13,12 +13,9 @@ import java.lang.management.ThreadMXBean;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
@@ -58,9 +55,6 @@ public final class Environment {
 	// the host IP address
 	private String _hostAddress;
 
-	// png image writer, if there is one
-	private ImageWriter _pngWriter;
-
 	// the application name
 	private String _applicationName;
 
@@ -97,14 +91,6 @@ public final class Environment {
 
 		// screen information
 		getScreenInformation();
-
-		// any png image writers?
-		Iterator<ImageWriter> iterator = ImageIO.getImageWritersByFormatName("png");
-		if ((iterator == null) || !iterator.hasNext()) {
-			System.err.println("no png writer");
-		} else {
-			_pngWriter = iterator.next(); // take the first
-		}
 
 		// read the preferences if the file exists
 		File pfile = this.getPreferencesFile();
@@ -311,13 +297,6 @@ public final class Environment {
 	}
 
 	/**
-	 * @return the pngWriter
-	 */
-	public ImageWriter getPngWriter() {
-		return _pngWriter;
-	}
-
-	/**
 	 * Get the application name. This is the simple part of the name of the class
 	 * with the main metho. That is, if the main method is in
 	 * com.yomama.yopapa.Dude, this returns "dude" (converts to lower case.)
@@ -433,7 +412,7 @@ public final class Environment {
 		if (s == null) {
 			return null;
 		}
-		String tokens[] = FileUtilities.tokens(s, LISTSEP);
+		String tokens[] = edu.cnu.mdi.util.TextUtils.tokens(s, LISTSEP);
 
 		if ((tokens == null) || (tokens.length < 1)) {
 			return null;
@@ -559,7 +538,7 @@ public final class Environment {
 	public String[] splitPath(String classPath) {
 		String cp = new String(classPath);
 		cp = cp.replace(".", File.separator);
-		return FileUtilities.tokens(cp, File.pathSeparator);
+		return edu.cnu.mdi.util.TextUtils.tokens(cp, File.pathSeparator);
 	}
 
 	public GraphicsDevice[] getGraphicsDevices() {
@@ -607,8 +586,6 @@ public final class Environment {
 		sb.append("Dots per Inch: " + _dotsPerInch + "\n");
 		sb.append("Dots per Centimeter: " + DoubleFormat.doubleFormat(getDotsPerCentimeter(), 2) + "\n");
 		sb.append("Resolution Scale Factor: " + DoubleFormat.doubleFormat(getResolutionScaleFactor(), 2) + "\n");
-		sb.append("PNG Writer: " + ((_pngWriter == null) ? "none" : _pngWriter) + "\n");
-
 		sb.append("Monitors:\n");
 		GraphicsDevice[] devices = getGraphicsDevices();
 		if (devices != null) {

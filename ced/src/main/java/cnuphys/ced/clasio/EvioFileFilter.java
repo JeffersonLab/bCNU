@@ -4,8 +4,6 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
-import cnuphys.bCNU.util.FileUtilities;
-
 public class EvioFileFilter extends FileFilter {
 
 	@Override
@@ -14,7 +12,7 @@ public class EvioFileFilter extends FileFilter {
 			if (f.isDirectory()) {
 				return true;
 			}
-			String bname = FileUtilities.bareName(f.getPath(), true);
+			String bname = f.getName();
 			return bname.toLowerCase().contains(".evio");
 		}
 		return false;

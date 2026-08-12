@@ -18,7 +18,7 @@ import javax.swing.table.TableColumn;
 import org.jlab.io.base.DataEvent;
 
 import edu.cnu.mdi.component.CommonBorder;
-import cnuphys.bCNU.util.FileUtilities;
+import edu.cnu.mdi.util.TextUtils;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
@@ -127,7 +127,7 @@ public class CedDataWindow extends CedWindow implements ActionListener, ItemList
 			String maskName = PropertiesManager.getInstance().get(_bankName);
 			String tokens[] = null;
 			if (maskName != null) {
-				tokens = FileUtilities.tokens(maskName, ":");
+				tokens = TextUtils.tokens(maskName, ":");
 			}
 
 			for (int i = 0; i < columns.length; i++) {

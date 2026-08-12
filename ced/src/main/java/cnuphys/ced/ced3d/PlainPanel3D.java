@@ -14,7 +14,6 @@ import com.jogamp.opengl.awt.GLJPanel;
 import bCNU3D.Panel3D;
 import edu.cnu.mdi.component.checkboxarray.CheckBoxArray;
 import edu.cnu.mdi.component.VerticalFlowLayout;
-import cnuphys.bCNU.graphics.GraphicsUtilities;
 import edu.cnu.mdi.component.CommonBorder;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
@@ -263,13 +262,6 @@ public abstract class PlainPanel3D extends Panel3D {
 	 */
 	public JPanel getEastPanel() {
 		return _eastPanel;
-	}
-
-	/**
-	 * Snapshot of the panel.
-	 */
-	public void snapshot() {
-		GraphicsUtilities.saveAsPng(this);
 	}
 
 	// a fixed fraction of the screen

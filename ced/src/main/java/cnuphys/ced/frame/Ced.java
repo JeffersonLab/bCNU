@@ -36,7 +36,6 @@ import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.menu.MenuManager;
 import cnuphys.bCNU.ping.Ping;
 import cnuphys.bCNU.util.Environment;
-import cnuphys.bCNU.util.FileUtilities;
 import cnuphys.bCNU.util.PropertySupport;
 import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.bCNU.view.BaseView;
@@ -1145,8 +1144,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 			e1.printStackTrace();
 		}
 
-		FileUtilities.setDefaultDir("data");
-
 //process command args
 		if ((arg != null) && (arg.length > 0)) {
 			int len = arg.length;
@@ -1157,7 +1154,8 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 				if (arg[i].equalsIgnoreCase("-p")) {
 					if (i < lm1) {
 						i++;
-						FileUtilities.setDefaultDir(arg[i]);
+						// Retained for command-line compatibility; file dialogs now remember
+						// their own last-used directories through MDI.
 					}
 				} else if (arg[i].contains("EXP")) {
 					_experimental = true;
