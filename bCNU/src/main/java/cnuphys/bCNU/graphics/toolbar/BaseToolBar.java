@@ -105,9 +105,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	// create an ellipse
 	private EllipseButton _ellipseButton;
 
-	// add text to the view
-	private TextButton _textButton;
-
 	// pan the view
 	private PanButton _panButton;
 
@@ -229,11 +226,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 			_cpButton = new ControlPanelButton(_container);
 		}
 
-		// check if drawing tools are requested
-		if (notNothing && Bits.checkBit(bits, TEXTBUTTON)) {
-			_textButton = new TextButton(_container);
-		}
-
 		if (notNothing && Bits.checkBit(bits, ELLIPSEBUTTON)) {
 			_ellipseButton = new EllipseButton(_container);
 		}
@@ -282,7 +274,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 		add(_ellipseButton);
 		add(_polygonButton);
 		add(_polylineButton);
-		add(_textButton);
 		add(_deleteButton);
 
 		if (_cloneButton != null) {
@@ -376,9 +367,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 		}
 		if (_polylineButton != null) {
 			_polylineButton.setEnabled(enabled);
-		}
-		if (_textButton != null) {
-			_textButton.setEnabled(enabled);
 		}
 	}
 
@@ -531,15 +519,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	 */
 	public RefreshButton getRefreshButton() {
 		return _refreshButton;
-	}
-
-	/**
-	 * Get the toolbar's text button.
-	 *
-	 * @return the toolbar's text button.
-	 */
-	public TextButton getTextButton() {
-		return _textButton;
 	}
 
 	/**
