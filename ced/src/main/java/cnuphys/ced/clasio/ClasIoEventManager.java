@@ -21,7 +21,7 @@ import org.jlab.jnp.hipo4.data.SchemaFactory;
 
 import cnuphys.bCNU.application.Desktop;
 import edu.cnu.mdi.dialog.DialogUtils;
-import cnuphys.bCNU.graphics.component.IpField;
+import edu.cnu.mdi.component.IpField;
 import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.magneticfield.swim.ISwimAll;
 import cnuphys.bCNU.threading.EventNotifier;
