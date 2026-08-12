@@ -25,7 +25,7 @@ import javax.swing.SwingConstants;
 import cnuphys.CLAS12Swim.CLAS12SwimResult;
 import cnuphys.CLAS12Swim.ICLAS12Swimmer;
 import cnuphys.CLAS12Swim.geometry.Plane;
-import cnuphys.bCNU.component.LabeledTextField;
+import edu.cnu.mdi.component.LabeledTextField;
 import cnuphys.ced.component.VariableRange;
 import cnuphys.bCNU.dialog.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.component.CommonBorder;
