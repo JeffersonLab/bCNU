@@ -2,6 +2,7 @@ package cnuphys.ced.clasio;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -11,13 +12,13 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.component.ActionLabel;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.VirtualView;
 import cnuphys.ced.alldata.DataWarehouse;
@@ -27,6 +28,7 @@ import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
 import cnuphys.ced.clasio.table.NodeTable;
 import cnuphys.ced.component.IBankMatching;
 import cnuphys.ced.frame.Ced;
+import edu.cnu.mdi.ui.fonts.Fonts;
 
 /**
  * Panel that shows which banks are present in an event
@@ -45,7 +47,7 @@ public class ClasIoPresentBankPanel extends JPanel {
 	private static DataWarehouse _dataWarehouse = DataWarehouse.getInstance();
 
 	// hash table
-	private Hashtable<String, ActionLabel> _alabels = new Hashtable<>(193);
+	private Hashtable<String, BankLabel> _alabels = new Hashtable<>(193);
 
 	// the node table
 	private NodeTable _nodeTable;
@@ -238,7 +240,7 @@ public class ClasIoPresentBankPanel extends JPanel {
 
 		for (String s : allBanks) {
 
-			ActionLabel alabel = _alabels.get(s);
+			BankLabel alabel = _alabels.get(s);
 
 			if (alabel != null) {
 
@@ -249,8 +251,8 @@ public class ClasIoPresentBankPanel extends JPanel {
 	}
 
 	// convenience method to make a button
-	private ActionLabel makeLabel(final String label, boolean largerFont) {
-		final ActionLabel alabel = new ActionLabel(label, false, largerFont);
+	private BankLabel makeLabel(final String label, boolean largerFont) {
+		final BankLabel alabel = new BankLabel(label, largerFont);
 		alabel.setOpaque(true);
 
 		MouseListener ml = new MouseListener() {
@@ -324,6 +326,27 @@ public class ClasIoPresentBankPanel extends JPanel {
 			_scrollPane = new JScrollPane(this);
 		}
 		return _scrollPane;
+	}
+
+	private static final class BankLabel extends JLabel {
+
+		private final Font enabledFont;
+		private final Font disabledFont;
+
+		private BankLabel(String text, boolean largerFont) {
+			super(text);
+			int size = largerFont ? 10 : 8;
+			enabledFont = Fonts.commonFont(Font.ITALIC, size);
+			disabledFont = Fonts.commonFont(Font.BOLD, size);
+			setEnabled(false);
+		}
+
+		@Override
+		public void setEnabled(boolean enabled) {
+			super.setEnabled(enabled);
+			setFont(enabled ? enabledFont : disabledFont);
+			setForeground(enabled ? Color.red : Color.gray);
+		}
 	}
 
 }
