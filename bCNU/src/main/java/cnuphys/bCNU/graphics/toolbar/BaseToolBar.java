@@ -39,13 +39,12 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 	public static final int USERCOMPONENT      = 0400; // user (app) provides drawing
 	public static final int MAGNIFYBUTTON      = 010000;
 
-	public static final int NOZOOM             = 020000;
 	public static final int CLONEBUTTON        = 040000;
 
 	// used to eliminate some basic buttons
 	public static final int CENTERBUTTON       = 040000000;
 
-	public static final int EVERYTHING = 07777777777 & ~NOZOOM & ~CLONEBUTTON;
+	public static final int EVERYTHING = RANGEBUTTON | TEXTFIELD | USERCOMPONENT | MAGNIFYBUTTON | CENTERBUTTON;
 
 	/**
 	 * Text field used for messages
@@ -130,13 +129,10 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 	 */
 	protected void makeButtons(int bits) {
 
-		if (!Bits.checkBit(bits, NOZOOM)) {
-			_zoomInButton = new ZoomInButton(_container);
-			_zoomOutButton = new ZoomOutButton(_container);
-
-			_worldButton = new WorldButton(_container);
-			_boxZoomButton = new BoxZoomButton(_container);
-		}
+		_zoomInButton = new ZoomInButton(_container);
+		_zoomOutButton = new ZoomOutButton(_container);
+		_worldButton = new WorldButton(_container);
+		_boxZoomButton = new BoxZoomButton(_container);
 		_refreshButton = new RefreshButton(_container);
 		if (Bits.checkBit(bits, CENTERBUTTON)) {
 			_centerButton = new CenterButton(_container);
