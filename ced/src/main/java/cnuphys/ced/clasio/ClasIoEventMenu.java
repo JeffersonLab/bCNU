@@ -31,7 +31,6 @@ import javax.swing.filechooser.FileFilter;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.component.TransparentPanel;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.util.Environment;
 import cnuphys.ced.event.AccumulationManager;
@@ -421,7 +420,7 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 
 	// create the goto sequential event widget
 	private JPanel createGotoSequentialPanel() {
-		JPanel sp = new TransparentPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+		JPanel sp = createTransparentFlowPanel();
 
 		JLabel label = new JLabel("Go to Sequential Event: ");
 
@@ -437,7 +436,7 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 
 	// create the goto true event widget
 	private JPanel createGotoTruePanel() {
-		JPanel sp = new TransparentPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+		JPanel sp = createTransparentFlowPanel();
 
 		JLabel label = new JLabel("Go to True Event: ");
 
@@ -470,6 +469,13 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 		} catch (NumberFormatException exception) {
 			return OptionalInt.empty();
 		}
+	}
+
+	private static JPanel createTransparentFlowPanel() {
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+		panel.setOpaque(false);
+		panel.setBackground(null);
+		return panel;
 	}
 
 
@@ -519,7 +525,7 @@ public class ClasIoEventMenu extends JMenu implements ActionListener, IClasIoEve
 
 	// create the event every so many seconds widget
 	private JPanel createEventPeriodPanel() {
-		JPanel sp = new TransparentPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+		JPanel sp = createTransparentFlowPanel();
 
 		_periodEvent = new JCheckBox("Auto Next-Event Every ");
 
