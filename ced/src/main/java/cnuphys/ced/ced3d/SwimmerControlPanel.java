@@ -27,7 +27,7 @@ import cnuphys.CLAS12Swim.ICLAS12Swimmer;
 import cnuphys.CLAS12Swim.geometry.Plane;
 import edu.cnu.mdi.component.LabeledTextField;
 import cnuphys.ced.component.VariableRange;
-import cnuphys.bCNU.dialog.VerticalFlowLayout;
+import edu.cnu.mdi.component.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import edu.cnu.mdi.util.UnicodeUtils;

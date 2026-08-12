@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import cnuphys.bCNU.dialog.VerticalFlowLayout;
+import edu.cnu.mdi.component.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 
 /**

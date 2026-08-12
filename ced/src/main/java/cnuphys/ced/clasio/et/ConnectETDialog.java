@@ -13,7 +13,7 @@ import javax.swing.border.Border;
 
 import cnuphys.bCNU.dialog.DialogUtilities;
 import cnuphys.bCNU.dialog.SimpleDialog;
-import cnuphys.bCNU.dialog.VerticalFlowLayout;
+import edu.cnu.mdi.component.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import edu.cnu.mdi.util.Environment;

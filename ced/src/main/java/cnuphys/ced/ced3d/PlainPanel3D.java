@@ -13,7 +13,7 @@ import com.jogamp.opengl.awt.GLJPanel;
 
 import bCNU3D.Panel3D;
 import edu.cnu.mdi.component.checkboxarray.CheckBoxArray;
-import cnuphys.bCNU.dialog.VerticalFlowLayout;
+import edu.cnu.mdi.component.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import edu.cnu.mdi.ui.fonts.Fonts;
