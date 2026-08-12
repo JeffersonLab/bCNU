@@ -37,7 +37,7 @@ import cnuphys.bCNU.util.Environment;
 import cnuphys.bCNU.util.FileUtilities;
 import cnuphys.bCNU.util.Jar;
 import cnuphys.bCNU.util.PropertySupport;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.ViewManager;
 import cnuphys.bCNU.view.VirtualView;

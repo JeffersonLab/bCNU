@@ -3,7 +3,7 @@ package cnuphys.bCNU.graphics.colorscale;
 import java.awt.Color;
 import java.util.Arrays;
 
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 
 /**
  * Used for color scales, such as on magnetic field plots

@@ -7,7 +7,7 @@ import java.awt.geom.Point2D;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 
 public class BaseBeamLineItem extends LineItem {
 

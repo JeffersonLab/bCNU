@@ -10,7 +10,7 @@ import java.awt.Point;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
 
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import edu.cnu.mdi.ui.fonts.Fonts;
 
 /** Floating trajectory feedback shown while the pointer hovers over a track. */

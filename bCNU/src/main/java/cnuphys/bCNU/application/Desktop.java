@@ -28,7 +28,7 @@ import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.ping.IPing;
 import cnuphys.bCNU.ping.Ping;
 import cnuphys.bCNU.util.Environment;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 
 /**

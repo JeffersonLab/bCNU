@@ -8,7 +8,7 @@ import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import javax.swing.text.SimpleAttributeSet;
 
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import edu.cnu.mdi.component.TextPaneScrollPane;
 
 /**

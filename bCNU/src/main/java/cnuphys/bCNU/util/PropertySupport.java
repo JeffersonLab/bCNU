@@ -1,5 +1,7 @@
 package cnuphys.bCNU.util;
 
+import edu.cnu.mdi.ui.colors.X11Colors;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Rectangle2D;
