@@ -1,13 +1,14 @@
 package cnuphys.ced.clasio.datatable;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import javax.swing.table.DefaultTableModel;
 
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
 
 import edu.cnu.mdi.format.DoubleFormat;
-import cnuphys.bCNU.util.ArrayIndexSorter;
-import cnuphys.bCNU.util.PrimitiveArrayToWrapper;
 import cnuphys.ced.alldata.DataWarehouse;
 
 public class BankTableModel extends DefaultTableModel {
@@ -126,27 +127,27 @@ public class BankTableModel extends DefaultTableModel {
 			switch (type) {
 			case DataWarehouse.INT8:
 				byte ba[] = _dataWarehouse.getByte(_bankName, columnName);
-				newIndex = ArrayIndexSorter.sortIndices(PrimitiveArrayToWrapper.toWrapper(ba), _ascending);
+				newIndex = sortIndices(ba.length, (i, j) -> Byte.compare(ba[i], ba[j]));
 				break;
 			case DataWarehouse.INT16:
 				short sa[] = _dataWarehouse.getShort(_bankName, columnName);
-				newIndex = ArrayIndexSorter.sortIndices(PrimitiveArrayToWrapper.toWrapper(sa), _ascending);
+				newIndex = sortIndices(sa.length, (i, j) -> Short.compare(sa[i], sa[j]));
 				break;
 			case DataWarehouse.INT32:
 				int ia[] = _dataWarehouse.getInt(_bankName, columnName);
-				newIndex = ArrayIndexSorter.sortIndices(PrimitiveArrayToWrapper.toWrapper(ia), _ascending);
+				newIndex = sortIndices(ia.length, (i, j) -> Integer.compare(ia[i], ia[j]));
 				break;
 			case DataWarehouse.INT64:
 				long la[] = _dataWarehouse.getLong(_bankName, columnName);
-				newIndex = ArrayIndexSorter.sortIndices(PrimitiveArrayToWrapper.toWrapper(la), _ascending);
+				newIndex = sortIndices(la.length, (i, j) -> Long.compare(la[i], la[j]));
 				break;
 			case DataWarehouse.FLOAT32:
 		        float fa[] = _dataWarehouse.getFloat(_bankName, columnName);
-				newIndex = ArrayIndexSorter.sortIndices(PrimitiveArrayToWrapper.toWrapper(fa), _ascending);
+				newIndex = sortIndices(fa.length, (i, j) -> Float.compare(fa[i], fa[j]));
 				break;
 			case DataWarehouse.FLOAT64:
 				double da[] = _dataWarehouse.getDouble(_bankName, columnName);
-				newIndex = ArrayIndexSorter.sortIndices(PrimitiveArrayToWrapper.toWrapper(da), _ascending);
+				newIndex = sortIndices(da.length, (i, j) -> Double.compare(da[i], da[j]));
 				break;
 			default:
 				break;
@@ -158,6 +159,16 @@ public class BankTableModel extends DefaultTableModel {
 
 		}
 		fireTableDataChanged();
+	}
+
+	private int[] sortIndices(int size, Comparator<Integer> comparator) {
+		Integer[] indices = new Integer[size];
+		for (int i = 0; i < size; i++) {
+			indices[i] = i;
+		}
+
+		Arrays.sort(indices, _ascending ? comparator : comparator.reversed());
+		return Arrays.stream(indices).mapToInt(Integer::intValue).toArray();
 	}
 
 	/**
