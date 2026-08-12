@@ -8,8 +8,8 @@ import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import javax.swing.text.SimpleAttributeSet;
 
-import cnuphys.bCNU.graphics.component.TextPaneScrollPane;
 import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.component.TextPaneScrollPane;
 
 /**
  * A FeedbackPane for displaying mouse over feedback
