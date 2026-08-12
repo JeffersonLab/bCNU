@@ -25,9 +25,7 @@ public class DemoApp extends BaseMDIApplication {
 	/**
 	 * Constructor (private--used to create singleton)
 	 *
-	 * @param keyVals an optional variable length list of attributes in type-value
-	 *                pairs. For example, AttributeType.NAME, "my application",
-	 *                AttributeType.CENTER, true, etc.
+	 * @param keyVals an optional variable length list of property key-value pairs
 	 */
 	private DemoApp(Object... keyVals) {
 		super(keyVals);

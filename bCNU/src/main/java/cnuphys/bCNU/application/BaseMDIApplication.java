@@ -19,12 +19,8 @@ import cnuphys.bCNU.view.ViewManager;
 
 /**
  * This is the basic "desktop frame" for a MDI application. The constructor
- * takes a variable length list of arguments which should be name-value pairs of
- * attributes. The attributes can be standard attributes, or user defined
- * attributes. All attributes are optional, and attributes can be provided in
- * any order.
- *
- * @see cnuphys.bCNU.attributes.Attributes
+ * takes a variable length list of arguments which should be property key-value
+ * pairs. All properties are optional and can be provided in any order.
  *
  * @author heddle
  *
@@ -34,7 +30,7 @@ import cnuphys.bCNU.view.ViewManager;
 public class BaseMDIApplication extends JFrame {
 
 	/**
-	 * Attributes created from the variable length arguments.
+	 * Properties created from the variable length arguments.
 	 */
 	protected Properties _properties;
 
@@ -44,9 +40,7 @@ public class BaseMDIApplication extends JFrame {
 	/**
 	 * Constructor
 	 *
-	 * @param keyVals an optional variable length list of attributes in type-value
-	 *                pairs. For example, AttributeType.NAME, "my application",
-	 *                AttributeType.CENTER, true, etc.
+	 * @param keyVals an optional variable length list of property key-value pairs
 	 */
 	protected BaseMDIApplication(Object... keyVals) {
 
