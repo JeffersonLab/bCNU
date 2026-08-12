@@ -96,8 +96,8 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 	protected Mode _mode = Mode.SINGLE_EVENT;
 
 	// basic toolbar bits
-	protected static final int TOOLBARBITS = BaseToolBar.NODRAWING & ~BaseToolBar.TEXTFIELD
-			& ~BaseToolBar.CONTROLPANELBUTTON & ~BaseToolBar.RECTGRIDBUTTON & ~BaseToolBar.TEXTBUTTON
+	protected static final int TOOLBARBITS = BaseToolBar.EVERYTHING & ~BaseToolBar.TEXTFIELD
+			& ~BaseToolBar.CONTROLPANELBUTTON & ~BaseToolBar.RECTGRIDBUTTON
 			& ~BaseToolBar.DELETEBUTTON;
 
 	protected static final int NORANGETOOLBARBITS = TOOLBARBITS & ~BaseToolBar.RANGEBUTTON;

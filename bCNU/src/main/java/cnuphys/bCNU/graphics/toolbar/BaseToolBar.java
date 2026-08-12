@@ -28,10 +28,6 @@ import cnuphys.bCNU.util.Fonts;
 @SuppressWarnings("serial")
 public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMotionListener {
 
-	public static final int TEXTBUTTON         = 02;
-	public static final int RECTANGLEBUTTON    = 04;
-	public static final int POLYGONBUTTON      = 010;
-	public static final int LINEBUTTON         = 020;
 	public static final int RANGEBUTTON        = 040;
 	public static final int DELETEBUTTON       = 0100;
 	public static final int TEXTFIELD          = 0200;
@@ -50,15 +46,8 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	// used to eliminate some basic buttons
 	public static final int CENTERBUTTON       = 040000000;
 
-	public static final int DRAWING = TEXTBUTTON + RECTANGLEBUTTON + POLYGONBUTTON + LINEBUTTON;
-
 	public static final int EVERYTHING = 07777777777 & ~NOZOOM & ~CLONEBUTTON & ~PANBUTTON & ~UNDOZOOMBUTTON & ~RECTGRIDBUTTON;
 	public static final int STANDARD = EVERYTHING & ~CONTROLPANELBUTTON & ~USERCOMPONENT & ~CLONEBUTTON;
-
-	public static final int NODRAWING = EVERYTHING & ~DRAWING;
-
-	// only the text button
-	public static final int TEXTDRAWING = STANDARD & ~DRAWING + TEXTBUTTON & ~RANGEBUTTON;
 
 	// nobuttons!
 	public static final int NOTHING = 017777777777;
@@ -101,17 +90,8 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	// pan the view
 	private PanButton _panButton;
 
-	// create a polygon
-	private PolygonButton _polygonButton;
-
 	// range (u r here) button
 	private RangeButton _rangeButton;
-
-	// draw a world rectangle
-	private RectangleButton _rectangleButton;
-
-	// draw a world line
-	private LineButton _lineButton;
 
 	// delete selected items
 	private DeleteButton _deleteButton;
@@ -213,18 +193,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 			_cpButton = new ControlPanelButton(_container);
 		}
 
-		if (notNothing && Bits.checkBit(bits, RECTANGLEBUTTON)) {
-			_rectangleButton = new RectangleButton(_container);
-		}
-
-		if (notNothing && Bits.checkBit(bits, LINEBUTTON)) {
-			_lineButton = new LineButton(_container);
-		}
-
-		if (notNothing && Bits.checkBit(bits, POLYGONBUTTON)) {
-			_polygonButton = new PolygonButton(_container);
-		}
-
 		// add the pointer button and make it the default
 		add(_pointerButton);
 
@@ -243,9 +211,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 		add(_worldButton);
 		add(_rangeButton);
 		add(_refreshButton);
-		add(_rectangleButton);
-		add(_lineButton);
-		add(_polygonButton);
 		add(_deleteButton);
 
 		if (_cloneButton != null) {
@@ -281,8 +246,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 			add(_userComponent);
 		}
 
-		enableDrawingButtons(true);
-
 		// set the default button to on
 		if (getDefaultToggleButton() != null) {
 			resetDefaultSelection();
@@ -313,23 +276,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 			_textField.setText("");
 		} else {
 			_textField.setText(text);
-		}
-	}
-
-	/**
-	 * Enable/disable the drawing buttons
-	 *
-	 * @param enabled the desired stated.
-	 */
-	public void enableDrawingButtons(boolean enabled) {
-		if (_rectangleButton != null) {
-			_rectangleButton.setEnabled(enabled);
-		}
-		if (_lineButton != null) {
-			_lineButton.setEnabled(enabled);
-		}
-		if (_polygonButton != null) {
-			_polygonButton.setEnabled(enabled);
 		}
 	}
 
@@ -413,39 +359,12 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	}
 
 	/**
-	 * Get the toolbar's polygon button.
-	 *
-	 * @return the toolbar's polygon button.
-	 */
-	public PolygonButton getPolygonButton() {
-		return _polygonButton;
-	}
-
-	/**
 	 * Get the toolbar's range button.
 	 *
 	 * @return the toolbar's range button.
 	 */
 	public RangeButton getRangeButton() {
 		return _rangeButton;
-	}
-
-	/**
-	 * Get the toolbar's rectangle button.
-	 *
-	 * @return the toolbar's rectangle button.
-	 */
-	public RectangleButton getRectangleButton() {
-		return _rectangleButton;
-	}
-
-	/**
-	 * Get the toolbar's line button.
-	 *
-	 * @return the toolbar's line button.
-	 */
-	public LineButton getLineButton() {
-		return _lineButton;
 	}
 
 	/**
