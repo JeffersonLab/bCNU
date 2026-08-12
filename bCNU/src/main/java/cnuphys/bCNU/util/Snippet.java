@@ -1,6 +1,7 @@
 package cnuphys.bCNU.util;
 
 import edu.cnu.mdi.ui.fonts.Fonts;
+import edu.cnu.mdi.util.UnicodeUtils;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -140,7 +141,7 @@ public class Snippet {
 	public static ArrayList<Snippet> getSnippets(Font baseFont, String cstr, Component component) {
 
 		// first replace all special characters
-		cstr = UnicodeSupport.specialCharReplace(cstr);
+		cstr = UnicodeUtils.specialCharReplace(cstr);
 
 		if ((baseFont == null) || (cstr == null) || (component == null)) {
 			return null;
