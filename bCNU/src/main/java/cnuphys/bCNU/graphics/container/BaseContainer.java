@@ -823,8 +823,6 @@ public class BaseContainer extends JComponent
 			if (_feedbackControl != null) {
 				_feedbackControl.updateFeedback(mouseEvent, wp, dragging);
 			}
-		} else if (mtb == _toolBar.getPanButton()) { // pan active
-			// do nothing
 		} else { // default case
 			wp = getLocation(mouseEvent);
 			getToolBar().setText(Point2DSupport.toString(wp));

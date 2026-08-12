@@ -31,22 +31,18 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	public static final int RANGEBUTTON        = 040;
 	public static final int TEXTFIELD          = 0200;
 	public static final int USERCOMPONENT      = 0400; // user (app) provides drawing
-	public static final int CONTROLPANELBUTTON = 01000; // toggle control panel
 	public static final int MAGNIFYBUTTON      = 010000;
 
 	public static final int NOZOOM             = 020000;
 	public static final int CLONEBUTTON        = 040000;
-
-	public static final int PANBUTTON          = 0100000;
-	public static final int UNDOZOOMBUTTON     = 0100000;
 
 	public static final int RECTGRIDBUTTON     = 01000000;
 
 	// used to eliminate some basic buttons
 	public static final int CENTERBUTTON       = 040000000;
 
-	public static final int EVERYTHING = 07777777777 & ~NOZOOM & ~CLONEBUTTON & ~PANBUTTON & ~UNDOZOOMBUTTON & ~RECTGRIDBUTTON;
-	public static final int STANDARD = EVERYTHING & ~CONTROLPANELBUTTON & ~USERCOMPONENT & ~CLONEBUTTON;
+	public static final int EVERYTHING = 07777777777 & ~NOZOOM & ~CLONEBUTTON & ~RECTGRIDBUTTON;
+	public static final int STANDARD = EVERYTHING & ~USERCOMPONENT & ~CLONEBUTTON;
 
 	// nobuttons!
 	public static final int NOTHING = 017777777777;
@@ -64,9 +60,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 
 	// Zoom out by a fixed percentage
 	private ZoomOutButton _zoomOutButton;
-
-	// undo last zoom
-	private UndoZoomButton _undoZoomButton;
 
 	// refresh the container
 	private RefreshButton _refreshButton;
@@ -86,14 +79,8 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	// center the view
 	private CenterButton _centerButton;
 
-	// pan the view
-	private PanButton _panButton;
-
 	// range (u r here) button
 	private RangeButton _rangeButton;
-
-	// toggle control panel
-	private ControlPanelButton _cpButton;
 
 	// the owner container
 	private IContainer _container;
@@ -148,19 +135,12 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 				_zoomInButton = new ZoomInButton(_container);
 				_zoomOutButton = new ZoomOutButton(_container);
 
-				if (Bits.checkBit(bits, UNDOZOOMBUTTON)) {
-					_undoZoomButton = new UndoZoomButton(_container);
-				}
 				_worldButton = new WorldButton(_container);
 				_boxZoomButton = new BoxZoomButton(_container);
 			}
 			_refreshButton = new RefreshButton(_container);
 			if (Bits.checkBit(bits, CENTERBUTTON)) {
 				_centerButton = new CenterButton(_container);
-			}
-
-			if (Bits.checkBit(bits, PANBUTTON)) {
-				_panButton = new PanButton(_container);
 			}
 
 			if (Bits.checkBit(bits, CLONEBUTTON)) {
@@ -180,10 +160,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 		_pointerButton = new PointerButton(_container);
 		// }
 
-		if (notNothing && Bits.checkBit(bits, CONTROLPANELBUTTON)) {
-			_cpButton = new ControlPanelButton(_container);
-		}
-
 		// add the pointer button and make it the default
 		add(_pointerButton);
 
@@ -191,12 +167,9 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 			setDefaultToggleButton(_pointerButton);
 		}
 
-		add(_cpButton, false); // false to prevent it joining button group
 		add(_boxZoomButton);
 		add(_zoomInButton);
 		add(_zoomOutButton);
-		add(_undoZoomButton);
-		add(_panButton);
 		add(_magnifyButton);
 		add(_centerButton);
 		add(_worldButton);
@@ -312,24 +285,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	}
 
 	/**
-	 * Get the toolbar's control panel button.
-	 *
-	 * @return the toolbar's control panel button.
-	 */
-	public ControlPanelButton getControlPanelButton() {
-		return _cpButton;
-	}
-
-	/**
-	 * Get the toolbar's pan button.
-	 *
-	 * @return the toolbar's pan button.
-	 */
-	public PanButton getPanButton() {
-		return _panButton;
-	}
-
-	/**
 	 * Get the toolbar's point button.
 	 *
 	 * @return the toolbar's pointer button.
@@ -354,15 +309,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	 */
 	public RefreshButton getRefreshButton() {
 		return _refreshButton;
-	}
-
-	/**
-	 * Get the toolbar's undozoom button.
-	 *
-	 * @return the toolbar's undozoom button.
-	 */
-	public UndoZoomButton getUndoZoomButton() {
-		return _undoZoomButton;
 	}
 
 	/**
