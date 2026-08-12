@@ -18,7 +18,7 @@ import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.ced.alldata.ColumnData;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 
 /**
  * A table for the node data

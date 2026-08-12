@@ -9,7 +9,7 @@ import java.util.List;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.alldata.CherenkovAdc;
 import cnuphys.ced.alldata.CherenkovTdc;
 import cnuphys.ced.alldata.DataDrawSupport;

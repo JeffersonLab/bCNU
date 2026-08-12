@@ -11,7 +11,7 @@ import javax.swing.border.Border;
 import javax.swing.table.TableCellRenderer;
 
 import cnuphys.bCNU.util.Fonts;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 
 public class HeaderRenderer extends JTextField implements TableCellRenderer {
 

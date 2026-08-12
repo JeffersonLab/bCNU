@@ -21,7 +21,7 @@ import cnuphys.bCNU.graphics.style.LineStyle;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.util.Point2DSupport;
 import cnuphys.bCNU.util.UnicodeSupport;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 
 public abstract class CedXYView extends CedView implements ILabCoordinates{
 

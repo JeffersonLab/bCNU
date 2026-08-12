@@ -18,7 +18,7 @@ import javax.swing.border.BevelBorder;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.SymbolDraw;
 import cnuphys.bCNU.graphics.style.LineStyle;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.frame.CedColors;
 

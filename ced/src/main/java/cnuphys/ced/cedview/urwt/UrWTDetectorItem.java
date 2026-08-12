@@ -10,7 +10,7 @@ import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.PolygonItem;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.URWTHits;
 import cnuphys.ced.alldata.URWTClusters;
@@ -38,7 +38,7 @@ public class UrWTDetectorItem extends PolygonItem {
 	//layer colors
 	public static Color layerColors[] = {
 			X11Colors.getX11Color("Dark Blue"),
-			X11Colors.getX11Color("Web Green"),
+			X11Colors.getX11Color("green"),
 			X11Colors.getX11Color("Dark Red"),
 			X11Colors.getX11Color("coral"),
 
@@ -47,7 +47,7 @@ public class UrWTDetectorItem extends PolygonItem {
 	//layer colors
 	public static Color layerAlphaColors[] = {
 			X11Colors.getX11Color("Dark Blue", 30),
-			X11Colors.getX11Color("Web Green", 30),
+			X11Colors.getX11Color("green", 30),
 			X11Colors.getX11Color("Dark Red", 30),
 			X11Colors.getX11Color("coral", 30),
 

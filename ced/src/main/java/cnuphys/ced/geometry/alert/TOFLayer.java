@@ -19,7 +19,7 @@ import org.jlab.geom.detector.alert.ATOF.AlertTOFLayer;
 import org.jlab.geom.prim.Point3D;
 
 import cnuphys.bCNU.graphics.container.IContainer;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.cedview.alert.AlertXYView;
 
 public class TOFLayer {

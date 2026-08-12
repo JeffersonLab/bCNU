@@ -24,7 +24,7 @@ import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.splashscreen.SplashWindow;
 import cnuphys.bCNU.util.Fonts;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 
 @SuppressWarnings("serial")
 public class SplashWindowCED extends JWindow {

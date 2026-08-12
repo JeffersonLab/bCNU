@@ -24,7 +24,7 @@ import cnuphys.bCNU.graphics.style.LineStyle;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.util.MathUtilities;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DCSegments;
 import cnuphys.ced.alldata.DCHits;

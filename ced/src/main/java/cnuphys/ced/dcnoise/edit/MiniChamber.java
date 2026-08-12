@@ -8,7 +8,7 @@ import java.awt.Rectangle;
 import javax.swing.JComponent;
 
 import cnuphys.bCNU.graphics.GraphicsUtilities;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.geometry.GeoConstants;
 import cnuphys.snr.NoiseReductionParameters;
 

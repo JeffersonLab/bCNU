@@ -9,7 +9,7 @@ import javax.swing.AbstractButton;
 import cnuphys.bCNU.component.checkboxarray.CheckBoxArray;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.util.Bits;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.cedview.CedView;
 
 public class GeoDisplayArray extends CheckBoxArray implements ItemListener {

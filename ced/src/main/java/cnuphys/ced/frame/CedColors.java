@@ -2,7 +2,7 @@ package cnuphys.ced.frame;
 
 import java.awt.Color;
 
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 
 public class CedColors {
 

@@ -3,7 +3,7 @@ package cnuphys.ced.ced3d;
 import java.awt.Color;
 import java.awt.Font;
 
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.ced3d.cal.ECViewPlane3D;
 import cnuphys.ced.ced3d.cal.PCALViewPlane3D;
 import cnuphys.ced.ced3d.ftof.FTOF3D;

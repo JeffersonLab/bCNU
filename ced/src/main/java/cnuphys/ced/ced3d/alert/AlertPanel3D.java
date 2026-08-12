@@ -4,7 +4,7 @@ package cnuphys.ced.ced3d.alert;
 import java.awt.Color;
 import java.awt.Font;
 
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.ced3d.TrajectoryDrawer3D;
 import cnuphys.ced.ced3d.view.CedView3D;

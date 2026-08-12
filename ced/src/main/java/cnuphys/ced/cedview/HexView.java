@@ -16,7 +16,7 @@ import org.jlab.geom.prim.Vector3D;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.util.Fonts;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 
 @SuppressWarnings("serial")
 public abstract class HexView extends CedView {

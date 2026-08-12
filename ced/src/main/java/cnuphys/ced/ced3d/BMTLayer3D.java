@@ -5,7 +5,7 @@ import java.awt.Color;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import bCNU3D.Support3D;
-import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.alldata.BMTAdc;
 import cnuphys.ced.alldata.CentralCrosses;
 import cnuphys.ced.geometry.BMTGeometry;
