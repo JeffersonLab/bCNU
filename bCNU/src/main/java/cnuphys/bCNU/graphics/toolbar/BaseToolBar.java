@@ -29,7 +29,6 @@ import cnuphys.bCNU.util.Fonts;
 public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMotionListener {
 
 	public static final int RANGEBUTTON        = 040;
-	public static final int DELETEBUTTON       = 0100;
 	public static final int TEXTFIELD          = 0200;
 	public static final int USERCOMPONENT      = 0400; // user (app) provides drawing
 	public static final int CONTROLPANELBUTTON = 01000; // toggle control panel
@@ -92,9 +91,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 
 	// range (u r here) button
 	private RangeButton _rangeButton;
-
-	// delete selected items
-	private DeleteButton _deleteButton;
 
 	// toggle control panel
 	private ControlPanelButton _cpButton;
@@ -184,11 +180,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 		_pointerButton = new PointerButton(_container);
 		// }
 
-		if (notNothing && Bits.checkBit(bits, DELETEBUTTON)) {
-			_deleteButton = new DeleteButton(_container);
-			_deleteButton.setEnabled(false);
-		}
-
 		if (notNothing && Bits.checkBit(bits, CONTROLPANELBUTTON)) {
 			_cpButton = new ControlPanelButton(_container);
 		}
@@ -211,8 +202,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 		add(_worldButton);
 		add(_rangeButton);
 		add(_refreshButton);
-		add(_deleteButton);
-
 		if (_cloneButton != null) {
 			add(Box.createHorizontalStrut(8));
 		}
@@ -320,15 +309,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	 */
 	public CenterButton getCenterButton() {
 		return _centerButton;
-	}
-
-	/**
-	 * Get the toolbar's delete button.
-	 *
-	 * @return the toolbar's delete button.
-	 */
-	public DeleteButton getDeleteButton() {
-		return _deleteButton;
 	}
 
 	/**
@@ -599,16 +579,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	@Override
 	public ToolBarToggleButton getActiveButton() {
 		return (ToolBarToggleButton) super.getActiveButton();
-	}
-
-	/**
-	 * Called after each item event to give the toolbar a chance to reflect the
-	 * correct state.
-	 */
-	public void checkButtonState() {
-		if (_deleteButton != null) {
-			_deleteButton.setEnabled(_container.anySelectedItems());
-		}
 	}
 
 	/**

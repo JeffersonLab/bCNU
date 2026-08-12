@@ -97,8 +97,7 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 
 	// basic toolbar bits
 	protected static final int TOOLBARBITS = BaseToolBar.EVERYTHING & ~BaseToolBar.TEXTFIELD
-			& ~BaseToolBar.CONTROLPANELBUTTON & ~BaseToolBar.RECTGRIDBUTTON
-			& ~BaseToolBar.DELETEBUTTON;
+			& ~BaseToolBar.CONTROLPANELBUTTON & ~BaseToolBar.RECTGRIDBUTTON;
 
 	protected static final int NORANGETOOLBARBITS = TOOLBARBITS & ~BaseToolBar.RANGEBUTTON;
 

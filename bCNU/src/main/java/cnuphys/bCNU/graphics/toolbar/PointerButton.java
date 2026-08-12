@@ -278,7 +278,6 @@ public class PointerButton extends ToolBarToggleButton implements IRubberbanded 
 		if ((item != null) && (!item.isLocked())) {
 			item.getItemList().selectItem(item, true);
 		}
-		container.getToolBar().checkButtonState();
 		container.setDirty(true);
 		container.refresh();
 	}
@@ -302,7 +301,6 @@ public class PointerButton extends ToolBarToggleButton implements IRubberbanded 
 				}
 			}
 		}
-		container.getToolBar().checkButtonState();
 		container.refresh();
 	}
 }

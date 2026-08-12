@@ -728,9 +728,6 @@ public class BaseContainer extends JComponent
 	 */
 	@Override
 	public void mouseReleased(MouseEvent mouseEvent) {
-		if (_toolBar != null) {
-			_toolBar.checkButtonState();
-		}
 	}
 
 	/**
