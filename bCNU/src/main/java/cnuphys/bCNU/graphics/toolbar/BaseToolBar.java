@@ -6,17 +6,24 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Enumeration;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 
 import cnuphys.bCNU.component.MagnifyWindow;
 import cnuphys.bCNU.graphics.container.IContainer;
+import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.util.Bits;
 import cnuphys.bCNU.util.Fonts;
 
@@ -25,7 +32,7 @@ import cnuphys.bCNU.util.Fonts;
  *
  */
 @SuppressWarnings("serial")
-public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMotionListener {
+public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionListener {
 
 	public static final int RANGEBUTTON        = 040;
 	public static final int TEXTFIELD          = 0200;
@@ -80,6 +87,10 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 
 	// user component
 	private UserToolBarComponent _userComponent;
+
+	private final ButtonGroup _buttonGroup = new ButtonGroup();
+
+	private final ActionListener _toggleActionListener = event -> activeToggleButtonChanged();
 
 	/**
 	 * Create a toolbar with all the buttons.
@@ -143,16 +154,10 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 			_magnifyButton = new MagnifyButton(_container);
 		}
 
-		// if (Bits.checkBit(bits, POINTERBUTTON)) {
 		_pointerButton = new PointerButton(_container);
-		// }
 
 		// add the pointer button and make it the default
 		add(_pointerButton);
-
-		if (_pointerButton != null) {
-			setDefaultToggleButton(_pointerButton);
-		}
 
 		add(_boxZoomButton);
 		add(_zoomInButton);
@@ -195,12 +200,16 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 			add(_userComponent);
 		}
 
-		// set the default button to on
-		if (getDefaultToggleButton() != null) {
-			resetDefaultSelection();
-	//		getDefaultToggleButton().setSelected(true);
-		}
+		resetDefaultSelection();
 
+	}
+
+	public void add(JToggleButton toggleButton) {
+		if (toggleButton != null) {
+			super.add(toggleButton);
+			_buttonGroup.add(toggleButton);
+			toggleButton.addActionListener(_toggleActionListener);
+		}
 	}
 
 	@Override
@@ -231,16 +240,10 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	/**
 	 * Reset the default toggle button selection
 	 */
-	@Override
 	public void resetDefaultSelection() {
-		super.resetDefaultSelection();
-		ToolBarToggleButton defaultButton = (ToolBarToggleButton) getDefaultToggleButton();
-
-		if (defaultButton != null) {
-			defaultButton.setSelected(true);
-			_container.getComponent().setCursor(defaultButton.canvasCursor());
-	//		defaultButton.requestFocus();
-		}
+		_pointerButton.doClick();
+		_pointerButton.setSelected(true);
+		_container.getComponent().setCursor(_pointerButton.canvasCursor());
 	}
 
 	/**
@@ -422,9 +425,18 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	 *
 	 * @return the active toggle button.
 	 */
-	@Override
 	public ToolBarToggleButton getActiveButton() {
-		return (ToolBarToggleButton) super.getActiveButton();
+		try {
+			for (Enumeration<AbstractButton> buttons = _buttonGroup.getElements(); buttons.hasMoreElements();) {
+				AbstractButton button = buttons.nextElement();
+				if (button.isSelected()) {
+					return (ToolBarToggleButton) button;
+				}
+			}
+		} catch (RuntimeException e) {
+			Log.getInstance().exception(e);
+		}
+		return null;
 	}
 
 	/**
@@ -439,7 +451,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	/**
 	 * The active toggle button has changed
 	 */
-	@Override
 	protected void activeToggleButtonChanged() {
 		if (getActiveButton() != _magnifyButton) {
 			MagnifyWindow.closeMagnifyWindow();
