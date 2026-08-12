@@ -21,7 +21,7 @@ import cnuphys.bCNU.graphics.colorscale.ColorModelPanel;
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
 import edu.cnu.mdi.component.CommonBorder;
 import edu.cnu.mdi.component.SimpleScrollableTextArea;
-import cnuphys.bCNU.util.Bits;
+import edu.cnu.mdi.util.Bits;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.ced.cedview.CedView;
@@ -162,7 +162,7 @@ public class ControlPanel extends JPanel implements ChangeListener {
 		_northBox.add(_tabbedPane);
 
 		// Feedback Pane initialization
-		if (Bits.checkBit(controlPanelBits, FEEDBACK)) {
+		if (Bits.check(controlPanelBits, FEEDBACK)) {
 			_feedbackPane = new FeedbackPane();
 			view.getContainer().setFeedbackPane(_feedbackPane);
 		}
@@ -222,14 +222,14 @@ public class ControlPanel extends JPanel implements ChangeListener {
 	private JTabbedPane addTabbedPane(CedView view, int controlPanelBits, int displayArrayBits) {
 
 		// dc noise control?
-		if (Bits.checkBit(controlPanelBits, NOISECONTROL)) {
+		if (Bits.check(controlPanelBits, NOISECONTROL)) {
 			_noisePanel = new NoisePanel(_view);
 		}
 
 		// mag field
 
 		JPanel magFieldPanel = null;
-		if (Bits.checkBit(displayArrayBits, DisplayBits.MAGFIELD)) {
+		if (Bits.check(displayArrayBits, DisplayBits.MAGFIELD)) {
 			magFieldPanel = new JPanel();
 
 			JPanel panel = new JPanel();
@@ -239,7 +239,7 @@ public class ControlPanel extends JPanel implements ChangeListener {
 			_magFieldDisplayArray = new MagFieldDisplayArray(_view, displayArrayBits);
 			magFieldPanel.add(_magFieldDisplayArray, BorderLayout.NORTH);
 
-			if (Bits.checkBit(controlPanelBits, FIELDLEGEND)) {
+			if (Bits.check(controlPanelBits, FIELDLEGEND)) {
 				ColorModelLegend legend;
 				int gap = 30;
 				if (_view instanceof CentralZView) {
@@ -261,25 +261,25 @@ public class ControlPanel extends JPanel implements ChangeListener {
 		}
 
 		// options
-		if ((Bits.checkBit(controlPanelBits, DISPLAYARRAY)) && (displayArrayBits != 0)) {
+		if ((Bits.check(controlPanelBits, DISPLAYARRAY)) && (displayArrayBits != 0)) {
 			_displayArray = new DisplayArray(_view, displayArrayBits, _nc, _hgap);
 		}
 
 		// phi slider
 
 		Box phiSlider = null;
-		if (Bits.checkBit(controlPanelBits, PHISLIDER)) {
-			boolean isBig = Bits.checkBit(controlPanelBits, PHI_SLIDER_BIG);
+		if (Bits.check(controlPanelBits, PHISLIDER)) {
+			boolean isBig = Bits.check(controlPanelBits, PHI_SLIDER_BIG);
 			phiSlider = createPhiSlider(isBig);
 		}
 
-		if (Bits.checkBit(controlPanelBits, TRAJCUTOFF)) {
+		if (Bits.check(controlPanelBits, TRAJCUTOFF)) {
 			int maxPath = _view.getTrajMaxPathlength();
 			_trajRangeSlider = new RangeSlider(0, maxPath, maxPath, maxPath/5, maxPath/10, false);
 			_trajRangeSlider.setBorder(new CommonBorder("Trajectory Pathlength Cutoff"));
 		}
 		
-		if (Bits.checkBit(controlPanelBits, MINADCCUTOFF)) {
+		if (Bits.check(controlPanelBits, MINADCCUTOFF)) {
 			int minADC = _view.getMinADC();
 			_minADCRangeSlider = new RangeSlider(0, 2000, minADC, 400, 200, false);
 			_minADCRangeSlider.setBorder(new CommonBorder("Minimum ADC Cutoff"));
@@ -287,13 +287,13 @@ public class ControlPanel extends JPanel implements ChangeListener {
 		
 
 		// alert dc projections
-		if (Bits.checkBit(controlPanelBits, ALERTDC)) {
+		if (Bits.check(controlPanelBits, ALERTDC)) {
 			if (_view instanceof AlertXYView) {
 				_alertDCPanel = new AlertProjectionPanel((AlertXYView)view);
 			}
 		}
 
-		if (Bits.checkBit(controlPanelBits, MATCHINGBANKSPANEL)) {
+		if (Bits.check(controlPanelBits, MATCHINGBANKSPANEL)) {
 			_matchedBankPanel = new MatchedBankPanel(view, view);
 		}
 
@@ -350,7 +350,7 @@ public class ControlPanel extends JPanel implements ChangeListener {
 		_displayArray.setBorder(new CommonBorder("Visibility"));
 		sp.add(_displayArray);
 
-		if (Bits.checkBit(controlPanelBits, ALLDCDISPLAYPANEL)) {
+		if (Bits.check(controlPanelBits, ALLDCDISPLAYPANEL)) {
 			_allDCDisplayPanel = new AllDCDisplayPanel(_view);
 			sp.add(_allDCDisplayPanel);
 		}
@@ -365,14 +365,14 @@ public class ControlPanel extends JPanel implements ChangeListener {
 		// accumulation
 
 
-		if (Bits.checkBit(controlPanelBits, ACCUMULATIONLEGEND)) {
+		if (Bits.check(controlPanelBits, ACCUMULATIONLEGEND)) {
 			_colorPanel = new ColorModelPanel(_view, AccumulationManager.colorScaleModel, 160,
 					"Relative Accumulation or ADC Value", 10, false, true);
 			sp.add(_colorPanel);
 		}
 
 		// adc threshold
-		if (Bits.checkBit(controlPanelBits, ADCTHRESHOLDSLIDER)) {
+		if (Bits.check(controlPanelBits, ADCTHRESHOLDSLIDER)) {
 			sp.add(createAdcThresholdSlider());
 		}
 		return sp;

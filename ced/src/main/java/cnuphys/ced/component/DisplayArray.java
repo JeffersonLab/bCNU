@@ -7,7 +7,7 @@ import java.awt.event.ItemListener;
 import javax.swing.AbstractButton;
 
 import edu.cnu.mdi.component.checkboxarray.CheckBoxArray;
-import cnuphys.bCNU.util.Bits;
+import edu.cnu.mdi.util.Bits;
 import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.cedview.CedView;
 
@@ -306,7 +306,7 @@ public class DisplayArray extends CheckBoxArray implements ItemListener {
 		_view = view;
 		
 		//four layers of urwt?
-		if (Bits.checkBit(bits, DisplayBits.URWTLAYERS)) {
+		if (Bits.check(bits, DisplayBits.URWTLAYERS)) {
 			_layer1Button = add(LAYER_1_LABEL, true, true, this, _buttonColor).getCheckBox();
 			_layer2Button = add(LAYER_2_LABEL, true, true, this, _buttonColor).getCheckBox();
 			_layer3Button = add(LAYER_3_LABEL, true, true, this, _buttonColor).getCheckBox();
@@ -315,7 +315,7 @@ public class DisplayArray extends CheckBoxArray implements ItemListener {
 
 		//tof panels?
 
-		if (Bits.checkBit(bits, DisplayBits.TOFPANELS)) {
+		if (Bits.check(bits, DisplayBits.TOFPANELS)) {
 			_pan1aButton = add(PAN1A_LABEL, true, true, TOFPANEL_BUTTONGROUP, this, X11Colors.getX11Color("navy"))
 					.getCheckBox();
 
@@ -329,7 +329,7 @@ public class DisplayArray extends CheckBoxArray implements ItemListener {
 
 
 		// innerouter?
-		if (Bits.checkBit(bits, DisplayBits.INNEROUTER)) {
+		if (Bits.check(bits, DisplayBits.INNEROUTER)) {
 			_innerButton = add(INNER_LABEL, true, true, INNEROUTER_BUTTONGROUP, this, X11Colors.getX11Color("navy"))
 					.getCheckBox();
 
@@ -337,14 +337,14 @@ public class DisplayArray extends CheckBoxArray implements ItemListener {
 					.getCheckBox();
 		}
 
-		if (Bits.checkBit(bits, DisplayBits.UVWSTRIPS)) {
+		if (Bits.check(bits, DisplayBits.UVWSTRIPS)) {
 			_uButton = add(U_LABEL, true, true, this, Color.black).getCheckBox();
 			_vButton = add(V_LABEL, true, true, this, Color.black).getCheckBox();
 			_wButton = add(W_LABEL, true, true, this, Color.black).getCheckBox();
 		}
 
 		// accumulation?
-		if (Bits.checkBit(bits, DisplayBits.ACCUMULATION)) {
+		if (Bits.check(bits, DisplayBits.ACCUMULATION)) {
 			_singleEventButton = add(SINGLEEVENT_LABEL, view.isSingleEventMode(), true, ACCUMULATED_BUTTONGROUP, this,
 					X11Colors.getX11Color("teal")).getCheckBox();
 
@@ -354,7 +354,7 @@ public class DisplayArray extends CheckBoxArray implements ItemListener {
 		}
 
 		// DOCA Option?
-		if (Bits.checkBit(bits, DisplayBits.DOCA)) {
+		if (Bits.check(bits, DisplayBits.DOCA)) {
 			_trkDocaButton = add(NODOCA_LABEL, false, true, DOCA_BUTTONGROUP, this, X11Colors.getX11Color("dark green"))
 					.getCheckBox();
 
@@ -370,108 +370,108 @@ public class DisplayArray extends CheckBoxArray implements ItemListener {
 		}
 
 		// display mc truth?
-		if (Bits.checkBit(bits, DisplayBits.MCTRUTH)) {
+		if (Bits.check(bits, DisplayBits.MCTRUTH)) {
 			_mcTruthButton = add(MCTRUTH_LABEL, true, true, this, Color.black).getCheckBox();
 		}
 
 		// cosmics?
-		if (Bits.checkBit(bits, DisplayBits.COSMICS)) {
+		if (Bits.check(bits, DisplayBits.COSMICS)) {
 			_cosmicButton = add(COSMIC_LABEL, true, true, this, Color.black).getCheckBox();
 		}
 
 		// global hit based data
-		if (Bits.checkBit(bits, DisplayBits.GLOBAL_HB)) {
+		if (Bits.check(bits, DisplayBits.GLOBAL_HB)) {
 			_showHBButton = add(GLOBAL_HB_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// global time based data
-		if (Bits.checkBit(bits, DisplayBits.GLOBAL_TB)) {
+		if (Bits.check(bits, DisplayBits.GLOBAL_TB)) {
 			_showTBButton = add(GLOBAL_TB_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// global hit based AI data
-		if (Bits.checkBit(bits, DisplayBits.GLOBAL_AIHB)) {
+		if (Bits.check(bits, DisplayBits.GLOBAL_AIHB)) {
 			_showAIHBButton = add(GLOBAL_AIHB_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// global time based AI data
-		if (Bits.checkBit(bits, DisplayBits.GLOBAL_AITB)) {
+		if (Bits.check(bits, DisplayBits.GLOBAL_AITB)) {
 			_showAITBButton = add(GLOBAL_AITB_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// reonstructed crosses?
-		if (Bits.checkBit(bits, DisplayBits.CROSSES)) {
+		if (Bits.check(bits, DisplayBits.CROSSES)) {
 			_crossButton = add(CROSS_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// dc reonstructed hits?
-		if (Bits.checkBit(bits, DisplayBits.DC_HITS)) {
+		if (Bits.check(bits, DisplayBits.DC_HITS)) {
 			_dcHitsButton = add(DC_HIT_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// dc reonstructed hits?
-		if (Bits.checkBit(bits, DisplayBits.RECCAL)) {
+		if (Bits.check(bits, DisplayBits.RECCAL)) {
 			_recCalButton = add(RECCAL_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// mag field grid?
-		if (Bits.checkBit(bits, DisplayBits.MAGGRID)) {
+		if (Bits.check(bits, DisplayBits.MAGGRID)) {
 			_magGridButton = add(MAGGRID_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// reconstructed dc segments?
-		if (Bits.checkBit(bits, DisplayBits.SEGMENTS)) {
+		if (Bits.check(bits, DisplayBits.SEGMENTS)) {
 			_segmentButton = add(SEGMENT_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// other (not DC) reconstructed hits
-		if (Bits.checkBit(bits, DisplayBits.RECONHITS)) {
+		if (Bits.check(bits, DisplayBits.RECONHITS)) {
 			_reconHitButton = add(RECON_HIT_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
-		if (Bits.checkBit(bits, DisplayBits.CVTRECTRACKS)) {
+		if (Bits.check(bits, DisplayBits.CVTRECTRACKS)) {
 			_cvtRecTrackButton = add(CVTREC_TRACK_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
-		if (Bits.checkBit(bits, DisplayBits.CVTRECTRAJ)) {
+		if (Bits.check(bits, DisplayBits.CVTRECTRAJ)) {
 			_cvtRecTrajButton = add(CVTREC_TRAJ_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
-		if (Bits.checkBit(bits, DisplayBits.CVTRECKFTRAJ)) {
+		if (Bits.check(bits, DisplayBits.CVTRECKFTRAJ)) {
 			_cvtRecKFTrajButton = add(CVTRECKF_TRAJ_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
-		if (Bits.checkBit(bits, DisplayBits.CVTP1TRACKS)) {
+		if (Bits.check(bits, DisplayBits.CVTP1TRACKS)) {
 			_cvtP1TrackButton = add(CVTP1_TRACK_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
-		if (Bits.checkBit(bits, DisplayBits.CVTP1TRAJ)) {
+		if (Bits.check(bits, DisplayBits.CVTP1TRAJ)) {
 			_cvtP1TrajButton = add(CVTP1_TRAJ_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// ADC hits
-		if (Bits.checkBit(bits, DisplayBits.ADCDATA)) {
+		if (Bits.check(bits, DisplayBits.ADCDATA)) {
 			_adcHitButton = add(GLOBAL_ADC_DATA_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		//sector change markers
-		if (Bits.checkBit(bits, DisplayBits.SECTORCHANGE)) {
+		if (Bits.check(bits, DisplayBits.SECTORCHANGE)) {
 			_sectorChangeButton = add(SECTORCHANGE_LABEL, false, true, this, _buttonColor).getCheckBox();
 		}
 
 		// fmt crosses
-		if (Bits.checkBit(bits, DisplayBits.FMTCROSSES)) {
+		if (Bits.check(bits, DisplayBits.FMTCROSSES)) {
 			_fmtCrossButton = add(FMTCROSS_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 		// REC Particles
-		if (Bits.checkBit(bits, DisplayBits.RECPART)) {
+		if (Bits.check(bits, DisplayBits.RECPART)) {
 			_recPartButton = add(RECPART_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 
 
 		// reconstructed clusters
-		if (Bits.checkBit(bits, DisplayBits.CLUSTERS)) {
+		if (Bits.check(bits, DisplayBits.CLUSTERS)) {
 			_clusterButton = add(CLUSTER_LABEL, true, true, this, _buttonColor).getCheckBox();
 		}
 

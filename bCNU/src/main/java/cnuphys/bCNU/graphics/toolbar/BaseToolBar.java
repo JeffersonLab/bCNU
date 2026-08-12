@@ -24,7 +24,7 @@ import javax.swing.JToolBar;
 import cnuphys.bCNU.component.MagnifyWindow;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.log.Log;
-import cnuphys.bCNU.util.Bits;
+import edu.cnu.mdi.util.Bits;
 import cnuphys.bCNU.util.Fonts;
 
 /**
@@ -114,21 +114,21 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 		_boxZoomButton = new BoxZoomButton(_container);
 		RefreshButton refreshButton = new RefreshButton(_container);
 		CenterButton centerButton = null;
-		if (Bits.checkBit(bits, CENTERBUTTON)) {
+		if (Bits.check(bits, CENTERBUTTON)) {
 			centerButton = new CenterButton(_container);
 		}
 
 		CloneButton cloneButton = null;
-		if (Bits.checkBit(bits, CLONEBUTTON)) {
+		if (Bits.check(bits, CLONEBUTTON)) {
 			cloneButton = new CloneButton(_container);
 		}
 
 		RangeButton rangeButton = null;
-		if (Bits.checkBit(bits, RANGEBUTTON)) {
+		if (Bits.check(bits, RANGEBUTTON)) {
 			rangeButton = new RangeButton(_container);
 		}
 
-		if (Bits.checkBit(bits, MAGNIFYBUTTON)) {
+		if (Bits.check(bits, MAGNIFYBUTTON)) {
 			_magnifyButton = new MagnifyButton(_container);
 		}
 
@@ -158,7 +158,7 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 
 		// add the text field?
 
-		if (Bits.checkBit(bits, TEXTFIELD)) {
+		if (Bits.check(bits, TEXTFIELD)) {
 
 			_textField = new JTextField(" ");
 
@@ -178,7 +178,7 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 
 		// if user component, add last
 
-		if (Bits.checkBit(bits, USERCOMPONENT)) {
+		if (Bits.check(bits, USERCOMPONENT)) {
 			addSeparator();
 			_userComponent = new UserToolBarComponent(_container);
 			add(_userComponent);

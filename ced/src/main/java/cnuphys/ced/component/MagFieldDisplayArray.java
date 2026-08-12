@@ -8,7 +8,7 @@ import javax.swing.AbstractButton;
 
 import edu.cnu.mdi.component.checkboxarray.CheckBoxArray;
 import edu.cnu.mdi.component.CommonBorder;
-import cnuphys.bCNU.util.Bits;
+import edu.cnu.mdi.util.Bits;
 import cnuphys.ced.cedview.CedView;
 
 /**
@@ -120,7 +120,7 @@ public class MagFieldDisplayArray extends CheckBoxArray implements ItemListener 
 		_view = view;
 
 		// display magnetic field?
-		if (Bits.checkBit(bits, DisplayBits.MAGFIELD)) {
+		if (Bits.check(bits, DisplayBits.MAGFIELD)) {
 			_noMagButton = add(NOFIELD_LABEL, _magFieldDisplayOption == NOMAGDISPLAY, true, MAGFIELD_BUTTONGROUP, this,
 					Color.black).getCheckBox();
 

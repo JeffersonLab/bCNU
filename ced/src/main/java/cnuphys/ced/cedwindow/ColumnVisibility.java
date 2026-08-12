@@ -6,7 +6,7 @@ import javax.swing.JCheckBox;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import cnuphys.bCNU.util.Bits;
+import edu.cnu.mdi.util.Bits;
 
 final class ColumnVisibility {
 
@@ -21,7 +21,7 @@ final class ColumnVisibility {
 	static long selectedMask(boolean[] selected) {
 		long mask = 1;
 		for (int i = 0; i < Math.min(selected.length, 63); i++) {
-			if (selected[i]) mask = Bits.setBitAtLocation(mask, i + 1);
+			if (selected[i]) mask = Bits.setAt(mask, i + 1);
 		}
 		return mask;
 	}
@@ -45,7 +45,7 @@ final class ColumnVisibility {
 	}
 
 	static boolean isVisible(long mask, int checkBoxIndex) {
-		return Bits.checkBitAtLocation(mask, checkBoxIndex + 1);
+		return Bits.checkAt(mask, checkBoxIndex + 1);
 	}
 
 	private static void hide(TableColumn column) {

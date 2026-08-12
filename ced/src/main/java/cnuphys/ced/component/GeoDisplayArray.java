@@ -8,7 +8,7 @@ import javax.swing.AbstractButton;
 
 import edu.cnu.mdi.component.checkboxarray.CheckBoxArray;
 import edu.cnu.mdi.component.CommonBorder;
-import cnuphys.bCNU.util.Bits;
+import edu.cnu.mdi.util.Bits;
 import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.cedview.CedView;
 
@@ -80,43 +80,43 @@ public class GeoDisplayArray extends CheckBoxArray implements ItemListener {
 			super(nc, hgap, -2);
 			_view = view;
 
-			if (Bits.checkBit(bits, GeoDisplayBits.REGION_1)) {
+			if (Bits.check(bits, GeoDisplayBits.REGION_1)) {
 				_showRegion1 = add(REGION_1, true, true, this, _buttonColor).getCheckBox();
 			}
 
-			if (Bits.checkBit(bits, GeoDisplayBits.REGION_2)) {
+			if (Bits.check(bits, GeoDisplayBits.REGION_2)) {
 				_showRegion2 = add(REGION_2, true, true, this, _buttonColor).getCheckBox();
 			}
 
-			if (Bits.checkBit(bits, GeoDisplayBits.REGION_3)) {
+			if (Bits.check(bits, GeoDisplayBits.REGION_3)) {
 				_showRegion3 = add(REGION_3, true, true, this, _buttonColor).getCheckBox();
 			}
 
-			if (Bits.checkBit(bits, GeoDisplayBits.REGION_4)) {
+			if (Bits.check(bits, GeoDisplayBits.REGION_4)) {
 				_showRegion4 = add(REGION_4, true, true, this, _buttonColor).getCheckBox();
 			}
 
-			if (Bits.checkBit(bits, GeoDisplayBits.LAYER_1)) {
+			if (Bits.check(bits, GeoDisplayBits.LAYER_1)) {
 				_showLayer1 = add(LAYER_1, true, true, this, _buttonColor).getCheckBox();
 			}
 
-			if (Bits.checkBit(bits, GeoDisplayBits.LAYER_2)) {
+			if (Bits.check(bits, GeoDisplayBits.LAYER_2)) {
 				_showLayer2 = add(LAYER_2, true, true, this, _buttonColor).getCheckBox();
 			}
 
-			if (Bits.checkBit(bits, GeoDisplayBits.LAYER_3)) {
+			if (Bits.check(bits, GeoDisplayBits.LAYER_3)) {
 				_showLayer3 = add(LAYER_3, true, true, this, _buttonColor).getCheckBox();
 			}
 
-			if (Bits.checkBit(bits, GeoDisplayBits.LAYER_4)) {
+			if (Bits.check(bits, GeoDisplayBits.LAYER_4)) {
 				_showLayer4 = add(LAYER_4, true, true, this, _buttonColor).getCheckBox();
 			}
 
-			if (Bits.checkBit(bits, GeoDisplayBits.LAYER_5)) {
+			if (Bits.check(bits, GeoDisplayBits.LAYER_5)) {
 				_showLayer5 = add(LAYER_5, true, true, this, _buttonColor).getCheckBox();
 			}
 
-			if (Bits.checkBit(bits, GeoDisplayBits.LAYER_6)) {
+			if (Bits.check(bits, GeoDisplayBits.LAYER_6)) {
 				_showLayer6 = add(LAYER_6, true, true, this, _buttonColor).getCheckBox();
 			}
 
