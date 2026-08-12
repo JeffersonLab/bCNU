@@ -8,7 +8,6 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 
 import cnuphys.bCNU.log.Log;
 
@@ -36,39 +35,6 @@ public class CommonToolBar extends JToolBar {
 	 * Creates a new tool bar; orientation defaults to <code>HORIZONTAL</code>.
 	 */
 	public CommonToolBar() {
-		this("ToolBar", SwingConstants.HORIZONTAL);
-	}
-
-	/**
-	 * Creates a new tool bar with the specified name. The name is used as the title
-	 * of the undocked tool bar. The default orientation is <code>HORIZONTAL</code>.
-	 *
-	 * @param name the name of the tool bar
-	 */
-	public CommonToolBar(String name) {
-		this(name, SwingConstants.HORIZONTAL);
-	}
-
-	/**
-	 * Creates a new tool bar with the specified orientation. The orientation must
-	 * be either <code>HORIZONTAL</code> or <code>VERTICAL</code>.
-	 *
-	 * @param orientation
-	 */
-	public CommonToolBar(int orientation) {
-		this("ToolBar", orientation);
-	}
-
-	/**
-	 * Creates a new tool bar with a specified name and orientation. All other
-	 * constructors call this constructor.
-	 *
-	 * @param name        the name of the tool bar
-	 * @param orientation the initial orientation -- it must be either
-	 *                    <code>HORIZONTAL</code> or <code>VERTICAL</code>
-	 */
-	public CommonToolBar(String name, int orientation) {
-		super(name, orientation);
 	}
 
 	/**
@@ -120,21 +86,6 @@ public class CommonToolBar extends JToolBar {
 			_buttonGroup.add(toggleButton);
 			toggleButton.addActionListener(_toggleActionListener);
 
-		}
-	}
-
-	/**
-	 * remove a toggle button from the toolbar.
-	 *
-	 * @param toggleButton the button to remove.
-	 */
-	public void remove(JToggleButton toggleButton) {
-		if (toggleButton != null) {
-			super.remove(toggleButton);
-
-			if (_buttonGroup != null) {
-				_buttonGroup.remove(toggleButton);
-			}
 		}
 	}
 
