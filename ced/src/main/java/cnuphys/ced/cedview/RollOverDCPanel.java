@@ -1,15 +1,17 @@
 package cnuphys.ced.cedview;
 
 import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
 
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
-import cnuphys.bCNU.component.IRollOverListener;
-import cnuphys.bCNU.component.RollOverPanel;
 import edu.cnu.mdi.ui.fonts.Fonts;
 
-public class RollOverDCPanel extends RollOverPanel implements IRollOverListener {
+public class RollOverDCPanel extends JPanel {
 
 
 	//rollover colors
@@ -47,17 +49,38 @@ public class RollOverDCPanel extends RollOverPanel implements IRollOverListener 
 	 * @param labels the labels
 	 */
 	public RollOverDCPanel(CedView view, String title, int numCols) {
-		super(title, numCols, Fonts.mediumFont, inactiveFG, inactiveBG, roLabels);
 		this.view = view;
-		addRollOverListener(this);
+
+		int numRows = 1 + (roLabels.length - 1) / numCols;
+		setLayout(new GridLayout(numRows, numCols, 4, 4));
+		for (String text : roLabels) {
+			addLabel(text);
+		}
 	}
 
+	private void addLabel(String text) {
+		JLabel label = new JLabel(text, SwingConstants.CENTER);
+		label.setOpaque(true);
+		label.setFont(Fonts.mediumFont);
+		label.setForeground(inactiveFG);
+		label.setBackground(inactiveBG);
+		label.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent event) {
+				rollOverMouseEnter(label);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent event) {
+				rollOverMouseExit(label, event);
+			}
+		});
+		add(label);
+	}
 
     //handle rollover events
 
-
-	@Override
-	public void RollOverMouseEnter(JLabel label, MouseEvent e) {
+	private void rollOverMouseEnter(JLabel label) {
 
 		String text = label.getText();
 		if (text.contains(HB_ROLLOVER)) {
@@ -79,8 +102,7 @@ public class RollOverDCPanel extends RollOverPanel implements IRollOverListener 
 		view.refresh();
 	}
 
-	@Override
-	public void RollOverMouseExit(JLabel label, MouseEvent e) {
+	private void rollOverMouseExit(JLabel label, MouseEvent e) {
 
 		if (e.isAltDown() || e.isControlDown() || e.isMetaDown()) {
 			return;
