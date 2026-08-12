@@ -18,7 +18,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import cnuphys.bCNU.dialog.ButtonPanel;
 import cnuphys.bCNU.dialog.DialogUtilities;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.ImageManager;
@@ -28,6 +27,7 @@ import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.GeoConstants;
 import cnuphys.ced.noise.NoiseManager;
 import cnuphys.snr.NoiseReductionParameters;
+import edu.cnu.mdi.dialog.ButtonPanel;
 
 @SuppressWarnings("serial")
 public class NoiseParameterDialog extends JDialog {

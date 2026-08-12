@@ -19,7 +19,6 @@ import javax.swing.SwingWorker;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.dialog.ButtonPanel;
 import cnuphys.bCNU.dialog.DialogUtilities;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.ImageManager;
@@ -27,6 +26,7 @@ import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.log.Log;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.frame.Ced;
+import edu.cnu.mdi.dialog.ButtonPanel;
 
 public class ClasIoAccumulationDialog extends JDialog {
 
