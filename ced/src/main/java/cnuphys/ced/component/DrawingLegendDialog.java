@@ -3,7 +3,7 @@ package cnuphys.ced.component;
 import java.awt.Component;
 
 import edu.cnu.mdi.dialog.DialogUtils;
-import cnuphys.bCNU.dialog.SimpleDialog;
+import edu.cnu.mdi.dialog.SimpleDialog;
 
 public class DrawingLegendDialog extends SimpleDialog {
 

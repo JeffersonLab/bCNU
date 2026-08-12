@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 import edu.cnu.mdi.dialog.DialogUtils;
-import cnuphys.bCNU.dialog.SimpleDialog;
+import edu.cnu.mdi.dialog.SimpleDialog;
 import edu.cnu.mdi.component.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.component.CommonBorder;

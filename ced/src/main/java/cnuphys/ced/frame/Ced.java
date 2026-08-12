@@ -28,7 +28,7 @@ import javax.swing.SwingUtilities;
 import cnuphys.bCNU.application.BaseMDIApplication;
 import cnuphys.bCNU.application.Desktop;
 import cnuphys.bCNU.component.MagnifyWindow;
-import cnuphys.bCNU.dialog.TextDisplayDialog;
+import edu.cnu.mdi.dialog.TextDisplayDialog;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.menu.MenuManager;

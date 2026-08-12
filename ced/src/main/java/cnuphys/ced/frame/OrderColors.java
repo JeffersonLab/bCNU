@@ -9,7 +9,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import cnuphys.bCNU.dialog.SimpleDialog;
+import edu.cnu.mdi.dialog.SimpleDialog;
 import cnuphys.bCNU.log.Log;
 import edu.cnu.mdi.ui.colors.X11Colors;
 import edu.cnu.mdi.ui.colors.IColorChangeListener;

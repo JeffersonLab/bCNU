@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import cnuphys.bCNU.dialog.SimpleDialog;
+import edu.cnu.mdi.dialog.SimpleDialog;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import edu.cnu.mdi.ui.fonts.Fonts;
 
