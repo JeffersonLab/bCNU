@@ -16,7 +16,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JTextField;
 
 import cnuphys.bCNU.component.MagnifyWindow;
-import cnuphys.bCNU.drawable.IDrawable;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.util.Bits;
 import cnuphys.bCNU.util.Fonts;
@@ -245,94 +244,12 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	}
 
 	/**
-	 * Get the button used for a box (rubberband) zoom.
-	 *
-	 * @return the button used for a box (rubberband) zoom.
-	 */
-	public BoxZoomButton getBoxZoomButton() {
-		return _boxZoomButton;
-	}
-
-	/**
-	 * Get the button used for magnification.
-	 *
-	 * @return the button used for magnification.
-	 */
-	public MagnifyButton getMagnifyButton() {
-		return _magnifyButton;
-	}
-
-
-	/**
-	 * Get the button used for recentering.
-	 *
-	 * @return the button used for recentering.
-	 */
-	public CenterButton getCenterButton() {
-		return _centerButton;
-	}
-
-	/**
 	 * Get the toolbar's point button.
 	 *
 	 * @return the toolbar's pointer button.
 	 */
 	public PointerButton getPointerButton() {
 		return _pointerButton;
-	}
-
-	/**
-	 * Get the toolbar's range button.
-	 *
-	 * @return the toolbar's range button.
-	 */
-	public RangeButton getRangeButton() {
-		return _rangeButton;
-	}
-
-	/**
-	 * Get the toolbar's refresh button.
-	 *
-	 * @return the toolbar's refresh button.
-	 */
-	public RefreshButton getRefreshButton() {
-		return _refreshButton;
-	}
-
-	/**
-	 * Get the toolbar's world (default world zoom) button.
-	 *
-	 * @return the toolbar's world button.
-	 */
-	public WorldButton getWorldButton() {
-		return _worldButton;
-	}
-
-	/**
-	 * Get the toolbar's clone button.
-	 *
-	 * @return the toolbar's zoom-in button.
-	 */
-	public CloneButton getCloneButton() {
-		return _cloneButton;
-	}
-
-	/**
-	 * Get the toolbar's zoom-in button.
-	 *
-	 * @return the toolbar's zoom-in button.
-	 */
-	public ZoomInButton getZoomInButton() {
-		return _zoomInButton;
-	}
-
-	/**
-	 * Get the toolbar's zoom-out button.
-	 *
-	 * @return the toolbar's zoom-out button.
-	 */
-	public ZoomOutButton getZoomOutButton() {
-		return _zoomOutButton;
 	}
 
 	/**
@@ -522,24 +439,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	 */
 	public UserToolBarComponent getUserComponent() {
 		return _userComponent;
-	}
-
-	/**
-	 * Set the drawable for the user component (if there is a user component).
-	 *
-	 * @param drawable the drawable to use.
-	 */
-	public void setUserComponentDrawable(IDrawable drawable) {
-		if (_userComponent != null) {
-			_userComponent.setUserDraw(drawable);
-		}
-	}
-
-	/**
-	 * @return the _textField
-	 */
-	public JTextField getTextField() {
-		return _textField;
 	}
 
 	/**
