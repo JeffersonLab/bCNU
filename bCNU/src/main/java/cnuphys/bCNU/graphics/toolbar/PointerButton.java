@@ -71,7 +71,6 @@ public class PointerButton extends ToolBarToggleButton implements IRubberbanded 
 		// use a custom cursor
 		xhot = 3;
 		yhot = 1;
-		// customCursorImageFile = "images/pointercursor.gif";
 
 	}
 
