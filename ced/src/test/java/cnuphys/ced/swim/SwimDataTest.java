@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import cnuphys.CLAS12Swim.CLAS12Swimmer;
-import cnuphys.adaptiveSwim.SwimType;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
@@ -26,7 +25,7 @@ class SwimDataTest {
     void rejectsMissingRequiredObjects() {
         assertFalse(data(null, SwimData.TrajectoryType.MC, 900.0, 0.001, 1.0e-6).isValid());
         assertFalse(data(new TrajectoryRowData(1, null, 0.0, 0.0, 0.0, 1000.0,
-                45.0, 0.0, 0, "test", SwimType.MCSWIM),
+                45.0, 0.0, 0, "test"),
                 SwimData.TrajectoryType.MC, 900.0, 0.001, 1.0e-6).isValid());
         assertFalse(data(row(0.0, 0.0, 0.0, 1000.0, 45.0, 0.0),
                 null, 900.0, 0.001, 1.0e-6).isValid());
@@ -61,6 +60,6 @@ class SwimDataTest {
             double theta, double phi) {
         LundId electron = LundSupport.getInstance().get(11);
         return new TrajectoryRowData(1, electron, x, y, z, momentum, theta, phi,
-                0, "test", SwimType.MCSWIM);
+                0, "test");
     }
 }

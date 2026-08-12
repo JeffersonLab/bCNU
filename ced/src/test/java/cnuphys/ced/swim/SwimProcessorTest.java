@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import cnuphys.CLAS12Swim.CLAS12Swimmer;
-import cnuphys.adaptiveSwim.SwimType;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
@@ -37,7 +36,7 @@ class SwimProcessorTest {
 
     @Test
     void routesMonteCarloTrajectoryAndCopiesMetadata() {
-        TrajectoryRowData row = row("MC::Particle", SwimType.MCSWIM);
+        TrajectoryRowData row = row("MC::Particle");
 
         assertTrue(new SwimProcessor(data(row, SwimData.TrajectoryType.MC)).process());
 
@@ -48,7 +47,7 @@ class SwimProcessorTest {
 
     @Test
     void routesReconstructedTrajectoryAndCopiesMetadata() {
-        TrajectoryRowData row = row("REC::Particle", SwimType.RECONSWIM);
+        TrajectoryRowData row = row("REC::Particle");
 
         assertTrue(new SwimProcessor(data(row, SwimData.TrajectoryType.RECON)).process());
 
@@ -59,7 +58,7 @@ class SwimProcessorTest {
 
     @Test
     void omitsUnsuccessfulSwimsFromTrajectoryRegistries() {
-        TrajectoryRowData belowMinimumMomentum = row("MC::Particle", SwimType.MCSWIM, 0.001);
+        TrajectoryRowData belowMinimumMomentum = row("MC::Particle", 0.001);
 
         assertFalse(new SwimProcessor(data(belowMinimumMomentum, SwimData.TrajectoryType.MC)).process());
 
@@ -80,14 +79,14 @@ class SwimProcessorTest {
         return new SwimData(row, type, 10.0, 0.01, 1.0e-9, swimmer);
     }
 
-    private static TrajectoryRowData row(String source, SwimType swimType) {
-        return row(source, swimType, 1000.0);
+    private static TrajectoryRowData row(String source) {
+        return row(source, 1000.0);
     }
 
-    private static TrajectoryRowData row(String source, SwimType swimType, double momentum) {
+    private static TrajectoryRowData row(String source, double momentum) {
         LundId electron = LundSupport.getInstance().get(11);
         return new TrajectoryRowData(1, electron, 0.0, 0.0, 0.0,
-                momentum, 90.0, 0.0, 0, source, swimType);
+                momentum, 90.0, 0.0, 0, source);
     }
 
     private static void assertMetadata(TrajectoryRowData row, SwimTrajectory trajectory) {

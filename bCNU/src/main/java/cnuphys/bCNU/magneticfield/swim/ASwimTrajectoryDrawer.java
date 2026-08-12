@@ -84,7 +84,7 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 					// give a chance to veto a trajectory, e.g. no chance it
 					// will appear on this view (for example)
 					if (!veto(trajectory)) {
-						_trajectories2D.add(new SwimTrajectory2D(trajectory, this, zEffect));
+						_trajectories2D.add(projectedTrajectory(trajectory));
 					}
 				}
 			}
@@ -102,7 +102,7 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 					// will
 					// appear on this view (for example)
 					if (!veto(trajectory)) {
-						_trajectories2D.add(new SwimTrajectory2D(trajectory, this, zEffect));
+						_trajectories2D.add(projectedTrajectory(trajectory));
 					}
 				}
 			}
@@ -116,13 +116,31 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 
 				for (SwimTrajectory trajectory : trajectories) {
 					if (!veto(trajectory)) {
-						_trajectories2D.add(new SwimTrajectory2D(trajectory, this, zEffect));
+						_trajectories2D.add(projectedTrajectory(trajectory));
 					}
 				}
 			}
 		}
 
 		drawTrajectories(g, container);
+	}
+
+	private SwimTrajectory2D projectedTrajectory(SwimTrajectory trajectory) {
+		double scale = coordinateScale(trajectory);
+		return new SwimTrajectory2D(trajectory, (point, projected) -> {
+			double[] normalized = point;
+			if (scale != 1.0) {
+				normalized = point.clone();
+				normalized[0] *= scale;
+				normalized[1] *= scale;
+				normalized[2] *= scale;
+			}
+			project(normalized, projected);
+		});
+	}
+
+	private static double coordinateScale(SwimTrajectory trajectory) {
+		return "cnuphys.CLAS12Swim.CLAS12Trajectory".equals(trajectory.getClass().getName()) ? 1.0 : 100.0;
 	}
 
 	protected void drawTrajectories(Graphics g, IContainer container) {
@@ -173,7 +191,7 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 		Point pp = new Point();
 		for (int idx : indices) {
 
-			double r = traj3D.getR(idx);
+			double r = coordinateScale(traj3D) * traj3D.getR(idx);
 			if (r > _minMarkR) {
 				Point2D.Double wp = trajectory.getPath()[idx];
 				container.worldToLocal(pp, wp);
@@ -297,7 +315,7 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 	 */
 	private void zEffectDrawSwimTrajectory(Graphics g, IContainer container, SwimTrajectory2D trajectory, Color color) {
  
-		double zValues[] = trajectory.getZValues();
+		double zValues[] = zValues(trajectory.getTrajectory3D());
 		if (zValues == null) {
 			plainDrawSwimTrajectory(g, container, trajectory, color);
 			return; // no z effect
@@ -378,6 +396,20 @@ public abstract class ASwimTrajectoryDrawer extends DrawableAdapter implements I
 
 		g2.setStroke(oldStroke);
 
+	}
+
+	private static double[] zValues(SwimTrajectory trajectory) {
+		if (trajectory == null || trajectory.isEmpty()) {
+			return null;
+		}
+
+		double scale = coordinateScale(trajectory);
+		double[] zValues = new double[trajectory.size()];
+		int index = 0;
+		for (double[] point : trajectory) {
+			zValues[index++] = scale * point[2];
+		}
+		return zValues;
 	}
 		
 	

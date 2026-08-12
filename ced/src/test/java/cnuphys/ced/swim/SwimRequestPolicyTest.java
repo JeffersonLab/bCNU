@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
-import cnuphys.adaptiveSwim.SwimType;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundSupport;
 import cnuphys.lund.TrajectoryRowData;
@@ -42,6 +41,6 @@ class SwimRequestPolicyTest {
     private static TrajectoryRowData row(LundId lundId, double x, double y, double z,
             double momentum, double theta, double phi) {
         return new TrajectoryRowData(1, lundId, x, y, z, momentum, theta, phi,
-                0, "test", SwimType.MCSWIM);
+                0, "test");
     }
 }

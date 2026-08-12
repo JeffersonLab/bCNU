@@ -32,16 +32,6 @@
         </dependency>
         <dependency>
             <groupId>cnuphys</groupId>
-            <artifactId>snr</artifactId>
-            <version>${cnuphys.legacy.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cnuphys</groupId>
-            <artifactId>swimmer</artifactId>
-            <version>${cnuphys.legacy.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cnuphys</groupId>
             <artifactId>clas12-swimmer</artifactId>
             <version>${clas12-swimmer.experimental.version}</version>
             <exclusions>
@@ -56,9 +46,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.jlab.clas</groupId>
+            <groupId>org.jlab.coat</groupId>
             <artifactId>coat-libs</artifactId>
-            <version>${coat-libs.legacy.version}</version>
+            <version>${coat-libs.version}</version>
         </dependency>
         <dependency>
             <groupId>org.xerial</groupId>

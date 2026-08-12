@@ -16,19 +16,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>cnuphys</groupId>
-            <artifactId>magfield</artifactId>
-            <version>${cnuphys.legacy.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cnuphys</groupId>
-            <artifactId>swimmer</artifactId>
-            <version>${cnuphys.legacy.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cnuphys</groupId>
-            <artifactId>splot</artifactId>
-            <version>${cnuphys.legacy.version}</version>
+            <groupId>org.jlab.coat</groupId>
+            <artifactId>coat-libs</artifactId>
+            <version>${coat-libs.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

@@ -48,38 +48,34 @@ Build CED with Java 21 and Maven 3.9 or newer. The Maven validation phase
 checks both versions and stops with a clear error before compilation when the
 wrong toolchain is active.
 
-The coatjava aggregate JAR is intentionally not published to Maven Central.
-The cnuphys libraries also come from the coatjava source checkout. Install all
-of these prerequisites before the first build with:
+The official coatjava aggregate JAR is intentionally not published to Maven
+Central. This repository bundles `coat-libs-14.1.2.jar`, including the
+production cnuphys libraries. Install it and the experimental Commons Math
+swimmer before the first build with:
 
 ```bash
 ./scripts/bootstrap-maven-dependencies.sh
 ```
 
-CED currently keeps its established coatjava 13.7.1-compatible swimmer while
-loading the experimental Commons Math swimmer from a separate Maven artifact.
-The script therefore expects two coatjava checkouts beside this repository.
-Pin the legacy worktree to the last CED-compatible baseline; the upstream
-13.7.1 tag does not contain the trajectory-drawing API used by this CED tree:
+The script expects the `CLAS12Swim-commons-math` coatjava checkout beside this
+repository. That branch supplies only the additive experimental
+`cnuphys:clas12-swimmer` artifact; the production cnuphys classes come from the
+bundled official aggregate JAR:
 
 ```bash
-git -C ../coatjava worktree add --detach ../coatjava-13.7.1 7a073f9a4
 ./scripts/bootstrap-maven-dependencies.sh
 ```
 
-By default, `../coatjava-13.7.1` supplies the production cnuphys artifacts and
-`../coatjava` supplies `cnuphys:clas12-swimmer` from the
-`CLAS12Swim-commons-math` branch. Override those locations when necessary:
+Override the experimental checkout location when necessary:
 
 ```bash
-COATJAVA_LEGACY_HOME=/path/to/coatjava-13.7.1 \
 COATJAVA_EXPERIMENTAL_HOME=/path/to/coatjava-experimental \
 ./scripts/bootstrap-maven-dependencies.sh
 ```
 
-The experimental artifact is additive; it does not replace the production
-`cnuphys:swimmer` dependency. This bootstrap will disappear as the legacy
-libraries are replaced by MDI.
+The experimental artifact is additive and its transitive production swimmer
+and magnetic-field dependencies are excluded so they do not duplicate classes
+already present in `coat-libs`.
 
 ## Build
 

@@ -21,13 +21,6 @@ jobs:
         with:
           path: bCNU
 
-      - name: Check out CED-compatible coatjava baseline
-        uses: actions/checkout@v6
-        with:
-          repository: JeffersonLab/coatjava
-          ref: 7a073f9a4da66f585fcf8a205d43b3882354d7ac
-          path: coatjava-13.7.1
-
       - name: Check out experimental Commons Math swimmer
         uses: actions/checkout@v6
         with:

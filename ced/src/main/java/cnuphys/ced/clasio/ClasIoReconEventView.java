@@ -1,6 +1,5 @@
 package cnuphys.ced.clasio;
 
-import cnuphys.adaptiveSwim.SwimType;
 import java.util.Vector;
 
 import org.jlab.io.base.DataEvent;
@@ -81,7 +80,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 
 				data.add(new TrajectoryRowData(tracks.id(i), tracks.lundId(i), tracks.vx(i), tracks.vy(i),
 						tracks.vz(i), 1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(),
-						tracks.status(i), tracks.bankName(), SwimType.RECONSWIM));
+						tracks.status(i), tracks.bankName()));
 		}, (row, exception) -> logTrackFailure("DC", tracks.bankName(), row, exception));
 	}
 
@@ -108,7 +107,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 					// note conversions to degrees and MeV
 					TrajectoryRowData row = new TrajectoryRowData(0, lid, xo, yo, zo,
 							1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(),
-							particles.status(i), RECParticles.BANK_NAME, SwimType.RECONSWIM);
+							particles.status(i), RECParticles.BANK_NAME);
 					data.add(row);
 		}, (row, exception) -> logTrackFailure("REC particle", RECParticles.BANK_NAME, row, exception));
 	}
@@ -130,7 +129,7 @@ public class ClasIoReconEventView extends ClasIoTrajectoryInfoView {
 
 				data.add(new TrajectoryRowData(tracks.id(i), tracks.lundId(i), xo, yo, tracks.z0(i),
 						1000 * direction.momentum(), direction.thetaDegrees(), direction.phiDegrees(), 0,
-						tracks.bankName(), SwimType.RECONSWIM));
+						tracks.bankName()));
 		}, (row, exception) -> logTrackFailure("CVT", tracks.bankName(), row, exception));
 	}
 
