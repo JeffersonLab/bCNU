@@ -8,6 +8,7 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
+import javax.swing.JToggleButton;
 
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.container.IContainer;
@@ -18,7 +19,7 @@ import cnuphys.bCNU.menu.ViewPopupMenu;
 import cnuphys.bCNU.view.BaseView;
 
 @SuppressWarnings("serial")
-public class ToolBarToggleButton extends CommonToolBarToggleButton {
+public class ToolBarToggleButton extends JToggleButton {
 
 	/**
 	 * preferred size. Default, for whatever reason, will be 24x24.
@@ -116,6 +117,30 @@ public class ToolBarToggleButton extends CommonToolBarToggleButton {
 //		}
 	}
 
+	public void mouseDragged(MouseEvent mouseEvent) {
+	}
+
+	public void mouseMoved(MouseEvent mouseEvent) {
+	}
+
+	public void mouseClicked(MouseEvent mouseEvent) {
+	}
+
+	public void mouseDoubleClicked(MouseEvent mouseEvent) {
+	}
+
+	public void mousePressed(MouseEvent mouseEvent) {
+	}
+
+	public void mouseExited(MouseEvent mouseEvent) {
+	}
+
+	public void mouseEntered(MouseEvent mouseEvent) {
+	}
+
+	public void mouseReleased(MouseEvent mouseEvent) {
+	}
+
 	/**
 	 * Get the preferred size.
 	 *
@@ -132,7 +157,6 @@ public class ToolBarToggleButton extends CommonToolBarToggleButton {
 	 * @return The cursor appropriate when the mouse is in the container. The
 	 *         default will be a cross hair.
 	 */
-	@Override
 	public Cursor canvasCursor() {
 
 		if (!triedOnce) {
@@ -161,7 +185,6 @@ public class ToolBarToggleButton extends CommonToolBarToggleButton {
 	}
 
 	// mouse press platform's popup trigger
-	@Override
 	public void popupTrigger(MouseEvent mouseEvent) {
 
 		BaseView view = getView();
