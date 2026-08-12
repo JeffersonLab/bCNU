@@ -8,10 +8,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
-import cnuphys.bCNU.dialog.ColorDialog;
-import cnuphys.bCNU.dialog.DialogUtilities;
-import cnuphys.bCNU.dialog.IColorChangeListener;
+import edu.cnu.mdi.ui.colors.ColorDialog;
+import edu.cnu.mdi.ui.colors.IColorChangeListener;
 
 
 public class ColorOption extends JComponent {
@@ -53,12 +53,11 @@ public class ColorOption extends JComponent {
 			public void mousePressed(MouseEvent e) {
 
 				if (e.isControlDown() || e.isMetaDown()) {
-					ColorDialog cd = new ColorDialog(_currentColor, false, false);
+					Color selectedColor = ColorDialog.showDialog(SwingUtilities.getWindowAncestor(cl),
+							_currentColor, false, false);
 
-					cd.setVisible(true);
-
-					if (cd.getAnswer() == DialogUtilities.OK_RESPONSE) {
-						_currentColor = cd.getColor();
+					if (!selectedColor.equals(_currentColor)) {
+						_currentColor = selectedColor;
 						cl.repaint();
 						_colorChangeListener.colorChanged(cl, getColor());
 					}

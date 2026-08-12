@@ -9,10 +9,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import cnuphys.bCNU.dialog.IColorChangeListener;
 import cnuphys.bCNU.dialog.SimpleDialog;
 import cnuphys.bCNU.log.Log;
 import edu.cnu.mdi.ui.colors.X11Colors;
+import edu.cnu.mdi.ui.colors.IColorChangeListener;
 import cnuphys.ced.properties.PropertiesManager;
 
 public class OrderColors extends SimpleDialog implements IColorChangeListener {
