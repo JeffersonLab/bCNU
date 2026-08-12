@@ -28,7 +28,6 @@ import cnuphys.bCNU.util.Fonts;
 @SuppressWarnings("serial")
 public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMotionListener {
 
-	public static final int ELLIPSEBUTTON      = 01;
 	public static final int TEXTBUTTON         = 02;
 	public static final int RECTANGLEBUTTON    = 04;
 	public static final int POLYGONBUTTON      = 010;
@@ -38,8 +37,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	public static final int TEXTFIELD          = 0200;
 	public static final int USERCOMPONENT      = 0400; // user (app) provides drawing
 	public static final int CONTROLPANELBUTTON = 01000; // toggle control panel
-	public static final int RADARCBUTTON       = 02000;
-	public static final int POLYLINEBUTTON     = 04000;
 	public static final int MAGNIFYBUTTON      = 010000;
 
 	public static final int NOZOOM             = 020000;
@@ -53,8 +50,7 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	// used to eliminate some basic buttons
 	public static final int CENTERBUTTON       = 040000000;
 
-	public static final int DRAWING = ELLIPSEBUTTON + TEXTBUTTON + RECTANGLEBUTTON + POLYGONBUTTON + LINEBUTTON
-			+ RADARCBUTTON + POLYLINEBUTTON;
+	public static final int DRAWING = TEXTBUTTON + RECTANGLEBUTTON + POLYGONBUTTON + LINEBUTTON;
 
 	public static final int EVERYTHING = 07777777777 & ~NOZOOM & ~CLONEBUTTON & ~PANBUTTON & ~UNDOZOOMBUTTON & ~RECTGRIDBUTTON;
 	public static final int STANDARD = EVERYTHING & ~CONTROLPANELBUTTON & ~USERCOMPONENT & ~CLONEBUTTON;
@@ -102,26 +98,17 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	// center the view
 	private CenterButton _centerButton;
 
-	// create an ellipse
-	private EllipseButton _ellipseButton;
-
 	// pan the view
 	private PanButton _panButton;
 
 	// create a polygon
 	private PolygonButton _polygonButton;
 
-	// create a polygon
-	private PolylineButton _polylineButton;
-
 	// range (u r here) button
 	private RangeButton _rangeButton;
 
 	// draw a world rectangle
 	private RectangleButton _rectangleButton;
-
-	// draw a world rad arc
-	private RadArcButton _radarcButton;
 
 	// draw a world line
 	private LineButton _lineButton;
@@ -226,16 +213,8 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 			_cpButton = new ControlPanelButton(_container);
 		}
 
-		if (notNothing && Bits.checkBit(bits, ELLIPSEBUTTON)) {
-			_ellipseButton = new EllipseButton(_container);
-		}
-
 		if (notNothing && Bits.checkBit(bits, RECTANGLEBUTTON)) {
 			_rectangleButton = new RectangleButton(_container);
-		}
-
-		if (notNothing && Bits.checkBit(bits, RADARCBUTTON)) {
-			_radarcButton = new RadArcButton(_container);
 		}
 
 		if (notNothing && Bits.checkBit(bits, LINEBUTTON)) {
@@ -244,10 +223,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 
 		if (notNothing && Bits.checkBit(bits, POLYGONBUTTON)) {
 			_polygonButton = new PolygonButton(_container);
-		}
-
-		if (notNothing && Bits.checkBit(bits, POLYLINEBUTTON)) {
-			_polylineButton = new PolylineButton(_container);
 		}
 
 		// add the pointer button and make it the default
@@ -269,11 +244,8 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 		add(_rangeButton);
 		add(_refreshButton);
 		add(_rectangleButton);
-		add(_radarcButton);
 		add(_lineButton);
-		add(_ellipseButton);
 		add(_polygonButton);
-		add(_polylineButton);
 		add(_deleteButton);
 
 		if (_cloneButton != null) {
@@ -350,23 +322,14 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	 * @param enabled the desired stated.
 	 */
 	public void enableDrawingButtons(boolean enabled) {
-		if (_ellipseButton != null) {
-			_ellipseButton.setEnabled(enabled);
-		}
 		if (_rectangleButton != null) {
 			_rectangleButton.setEnabled(enabled);
-		}
-		if (_radarcButton != null) {
-			_radarcButton.setEnabled(enabled);
 		}
 		if (_lineButton != null) {
 			_lineButton.setEnabled(enabled);
 		}
 		if (_polygonButton != null) {
 			_polygonButton.setEnabled(enabled);
-		}
-		if (_polylineButton != null) {
-			_polylineButton.setEnabled(enabled);
 		}
 	}
 
@@ -432,15 +395,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	}
 
 	/**
-	 * Get the toolbar's ellipse button.
-	 *
-	 * @return the toolbar's ellipse button.
-	 */
-	public EllipseButton getEllipseButton() {
-		return _ellipseButton;
-	}
-
-	/**
 	 * Get the toolbar's pan button.
 	 *
 	 * @return the toolbar's pan button.
@@ -468,15 +422,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	}
 
 	/**
-	 * Get the toolbar's polyline button.
-	 *
-	 * @return the toolbar's polyline button.
-	 */
-	public PolylineButton getPolylineButton() {
-		return _polylineButton;
-	}
-
-	/**
 	 * Get the toolbar's range button.
 	 *
 	 * @return the toolbar's range button.
@@ -492,15 +437,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	 */
 	public RectangleButton getRectangleButton() {
 		return _rectangleButton;
-	}
-
-	/**
-	 * Get the toolbar's radarc button.
-	 *
-	 * @return the toolbar's radarc button.
-	 */
-	public RadArcButton getRadArcButton() {
-		return _radarcButton;
 	}
 
 	/**
