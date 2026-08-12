@@ -31,6 +31,11 @@
             <version>${mdi.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>${commons-math3.version}</version>
+        </dependency>
+        <dependency>
             <groupId>cnuphys</groupId>
             <artifactId>clas12-swimmer</artifactId>
             <version>${clas12-swimmer.experimental.version}</version>

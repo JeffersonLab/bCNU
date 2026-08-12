@@ -27,6 +27,7 @@
         <junit.version>5.12.2</junit.version>
         <jogl.version>2.6.0</jogl.version>
         <sqlite.jdbc.version>3.53.1.0</sqlite.jdbc.version>
+        <commons-math3.version>3.6.1</commons-math3.version>
         <mdi.version>1.2.2-SNAPSHOT</mdi.version>
         <coat-libs.version>14.1.2</coat-libs.version>
         <clas12-swimmer.experimental.version>14.1.2-SNAPSHOT</clas12-swimmer.experimental.version>
