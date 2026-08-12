@@ -15,7 +15,7 @@ import bCNU3D.Panel3D;
 import edu.cnu.mdi.component.checkboxarray.CheckBoxArray;
 import edu.cnu.mdi.component.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
 import edu.cnu.mdi.util.UnicodeUtils;

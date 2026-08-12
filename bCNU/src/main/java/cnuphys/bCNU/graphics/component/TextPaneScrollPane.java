@@ -15,6 +15,7 @@ import javax.swing.text.StyledDocument;
 import cnuphys.bCNU.format.DateString;
 import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.util.X11Colors;
+import edu.cnu.mdi.component.CommonBorder;
 
 @SuppressWarnings("serial")
 public class TextPaneScrollPane extends JScrollPane {

@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 import adapter3D.KeyboardLabel;
 import bCNU3D.Panel3D;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 
 @SuppressWarnings("serial")
 public class KeyboardLegend extends JPanel {

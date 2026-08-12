@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 import cnuphys.bCNU.format.DoubleFormat;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.bCNU.util.Fonts;
 
 /**

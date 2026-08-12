@@ -7,7 +7,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.ced.alldata.DataWarehouse;
 
 /**

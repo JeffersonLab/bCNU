@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import edu.cnu.mdi.component.VerticalFlowLayout;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 
 /**
  * Used to define a plane for the swimmer

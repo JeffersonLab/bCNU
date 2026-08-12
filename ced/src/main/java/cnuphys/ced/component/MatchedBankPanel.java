@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.bCNU.log.Log;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.TextUtilities;

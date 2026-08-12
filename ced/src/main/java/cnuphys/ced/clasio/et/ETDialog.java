@@ -13,7 +13,7 @@ import javax.swing.border.Border;
 
 import edu.cnu.mdi.dialog.DialogUtils;
 import edu.cnu.mdi.dialog.SimpleDialog;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.bCNU.graphics.component.IpField;
 
 public class ETDialog extends SimpleDialog {

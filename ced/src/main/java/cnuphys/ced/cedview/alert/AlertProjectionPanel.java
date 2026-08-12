@@ -18,7 +18,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import edu.cnu.mdi.component.VerticalFlowLayout;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import edu.cnu.mdi.ui.fonts.Fonts;
 
 public class AlertProjectionPanel extends JPanel {

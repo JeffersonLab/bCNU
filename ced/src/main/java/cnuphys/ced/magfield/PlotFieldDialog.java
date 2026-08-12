@@ -25,7 +25,7 @@ import javax.swing.JTextField;
 
 import bCNU3D.DoubleFormat;
 import cnuphys.bCNU.graphics.ImageManager;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.magfield.FieldProbe;
 import cnuphys.magfield.MagneticFieldInitializationException;

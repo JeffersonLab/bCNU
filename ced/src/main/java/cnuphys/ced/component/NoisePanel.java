@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import edu.cnu.mdi.component.VerticalFlowLayout;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.ced.cedview.CedView;
 
 @SuppressWarnings("serial")

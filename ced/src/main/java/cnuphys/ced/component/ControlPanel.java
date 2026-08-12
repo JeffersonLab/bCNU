@@ -19,7 +19,7 @@ import cnuphys.bCNU.feedback.FeedbackPane;
 import cnuphys.bCNU.graphics.colorscale.ColorModelLegend;
 import cnuphys.bCNU.graphics.colorscale.ColorModelPanel;
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.bCNU.graphics.component.SimpleScrollableTextArea;
 import cnuphys.bCNU.util.Bits;
 import edu.cnu.mdi.ui.fonts.Fonts;

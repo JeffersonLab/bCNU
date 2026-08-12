@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import edu.cnu.mdi.component.EnumComboBox;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import edu.cnu.mdi.ui.fonts.Fonts;
 
 public class BitEditor extends JPanel implements ActionListener {

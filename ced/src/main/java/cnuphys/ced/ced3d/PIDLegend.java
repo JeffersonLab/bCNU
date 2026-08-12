@@ -14,7 +14,7 @@ import java.util.Collections;
 import javax.swing.JComponent;
 
 import cnuphys.bCNU.graphics.GraphicsUtilities;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.bCNU.graphics.style.LineStyle;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.ced.clasio.ClasIoEventManager;

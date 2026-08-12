@@ -18,7 +18,7 @@ import javax.swing.table.TableColumn;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.bCNU.util.FileUtilities;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.PropertySupport;

@@ -21,7 +21,7 @@ import javax.swing.event.ChangeListener;
 import edu.cnu.mdi.dialog.DialogUtils;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.ImageManager;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.GeoConstants;

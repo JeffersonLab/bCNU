@@ -15,7 +15,7 @@ import edu.cnu.mdi.dialog.DialogUtils;
 import edu.cnu.mdi.dialog.SimpleDialog;
 import edu.cnu.mdi.component.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.ImageManager;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import edu.cnu.mdi.util.Environment;
 
 @SuppressWarnings("serial")

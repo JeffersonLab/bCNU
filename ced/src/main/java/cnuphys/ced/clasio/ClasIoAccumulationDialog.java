@@ -22,7 +22,7 @@ import org.jlab.io.base.DataEvent;
 import edu.cnu.mdi.dialog.DialogUtils;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.ImageManager;
-import cnuphys.bCNU.graphics.component.CommonBorder;
+import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.bCNU.log.Log;
 import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.frame.Ced;
