@@ -1138,7 +1138,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		
 		System.out.println("Screen scale factor: " + Environment.getDisplayScaleFactor());
 
-		Environment.setLookAndFeel();
+		CedLookAndFeel.install();
 		System.setProperty("sun.java2d.opengl", "true");
 
 
