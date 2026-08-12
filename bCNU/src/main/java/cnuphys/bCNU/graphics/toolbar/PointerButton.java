@@ -245,16 +245,6 @@ public class PointerButton extends ToolBarToggleButton implements IRubberbanded 
 	}
 
 	/**
-	 * Handle a mouse button 3 event.
-	 *
-	 * @param mouseEvent the causal event
-	 */
-	@Override
-	public void mouseButton3Click(MouseEvent mouseEvent) {
-		System.err.println("MB3 CLICK POINTERBUTTON");
-	}
-
-	/**
 	 * Select items based on a click.
 	 *
 	 * @param item       if not null, we clicked on this item. If null, we clicked

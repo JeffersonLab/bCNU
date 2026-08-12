@@ -160,15 +160,6 @@ public class ToolBarToggleButton extends CommonToolBarToggleButton {
 		}
 	}
 
-	/**
-	 * Handle a mouse button 3 event.
-	 *
-	 * @param mouseEvent the causal event
-	 */
-	@Override
-	public void mouseButton3Click(MouseEvent mouseEvent) {
-	}
-
 	// mouse press platform's popup trigger
 	@Override
 	public void popupTrigger(MouseEvent mouseEvent) {

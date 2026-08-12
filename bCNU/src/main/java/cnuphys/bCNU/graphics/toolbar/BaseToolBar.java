@@ -273,17 +273,12 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 		}
 
 		boolean mb1 = (mouseEvent.getButton() == MouseEvent.BUTTON1) && !mouseEvent.isControlDown();
-		boolean mb3 = (mouseEvent.getButton() == MouseEvent.BUTTON3)
-				|| ((mouseEvent.getButton() == MouseEvent.BUTTON1) && mouseEvent.isControlDown());
-
 		if (mb1) {
 			if (mouseEvent.getClickCount() == 1) { // single click
 				mtb.mouseClicked(mouseEvent);
 			} else { // double (or more) clicks
 				mtb.mouseDoubleClicked(mouseEvent);
 			}
-		} else if (mb3) {
-			// mtb.mouseButton3Click(mouseEvent);
 		}
 
 	}

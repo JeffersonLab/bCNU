@@ -9,20 +9,6 @@ import javax.swing.JToggleButton;
 public class CommonToolBarToggleButton extends JToggleButton {
 
 	/**
-	 * The active toggle button has changed
-	 */
-	protected void activeToggleButtonChanged() {
-	}
-
-	/**
-	 * Handle a single click
-	 *
-	 * @param mouseEvent the causal event
-	 */
-	public void handleSingleClick(MouseEvent mouseEvent) {
-	}
-
-	/**
 	 * Handle a mouse dragged (on the map canvas) event (if this tool is active)
 	 *
 	 * @param mouseEvent the causal event
@@ -52,14 +38,6 @@ public class CommonToolBarToggleButton extends JToggleButton {
 	 * @param mouseEvent the causal event
 	 */
 	public void mouseDoubleClicked(MouseEvent mouseEvent) {
-	}
-
-	/**
-	 * Handle a mouse button 3 event.
-	 *
-	 * @param mouseEvent the causal event
-	 */
-	public void mouseButton3Click(MouseEvent mouseEvent) {
 	}
 
 	/**
