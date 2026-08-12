@@ -2,8 +2,6 @@ package cnuphys.ced.cedview.sectorview;
 
 import java.util.EnumMap;
 
-import cnuphys.bCNU.component.EnumComboBox;
-
 public enum DisplaySectors {
 	SECTORS14, SECTORS25, SECTORS36;
 
@@ -50,16 +48,6 @@ public enum DisplaySectors {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Obtain a combo box of choices.
-	 *
-	 * @param defaultChoice the default selection
-	 * @return
-	 */
-	public static EnumComboBox getComboBox(DisplaySectors defaultChoice) {
-		return new EnumComboBox(names, defaultChoice);
 	}
 
 }

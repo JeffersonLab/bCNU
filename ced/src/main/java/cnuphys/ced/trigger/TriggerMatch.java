@@ -2,7 +2,7 @@ package cnuphys.ced.trigger;
 
 import java.util.EnumMap;
 
-import cnuphys.bCNU.component.EnumComboBox;
+import edu.cnu.mdi.component.EnumComboBox;
 
 public enum TriggerMatch {
 
@@ -67,7 +67,7 @@ public enum TriggerMatch {
 	 * @param defaultChoice
 	 * @return the combo box of match choices
 	 */
-	public static EnumComboBox getComboBox(TriggerMatch defaultChoice) {
-		return new EnumComboBox(names, defaultChoice);
+	public static EnumComboBox<TriggerMatch> getComboBox(TriggerMatch defaultChoice) {
+		return new EnumComboBox<>(TriggerMatch.class, defaultChoice, null, TriggerMatch::getName);
 	}
 }

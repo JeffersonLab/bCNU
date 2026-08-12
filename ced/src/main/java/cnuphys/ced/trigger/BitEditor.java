@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import cnuphys.bCNU.component.EnumComboBox;
+import edu.cnu.mdi.component.EnumComboBox;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import edu.cnu.mdi.ui.fonts.Fonts;
 
@@ -19,7 +19,7 @@ public class BitEditor extends JPanel implements ActionListener {
 
 	private TriggerPanel _trigPanel;
 	private JLabel _descriptionLabel;
-	private EnumComboBox _matchCombo;
+	private EnumComboBox<TriggerMatch> _matchCombo;
 
 	public BitEditor() {
 		setLayout(new BorderLayout(0, 6));
@@ -84,7 +84,7 @@ public class BitEditor extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object source = e.getSource();
 		if (source == _matchCombo) {
-			TriggerMatch pattern = (TriggerMatch) _matchCombo.getSelectedEnum();
+			TriggerMatch pattern = _matchCombo.getSelectedEnum();
 			TriggerManager.getInstance().getTriggerFilter().setType(pattern);
 			_descriptionLabel.setText(pattern.getDescription());
 		}

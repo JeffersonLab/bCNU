@@ -2,8 +2,6 @@ package cnuphys.bCNU.graphics.style;
 
 import java.util.EnumMap;
 
-import cnuphys.bCNU.component.EnumComboBox;
-
 public enum SymbolType {
 	NOSYMBOL, SQUARE, CIRCLE, CROSS, UPTRIANGLE, DOWNTRIANGLE, X, DAVID, DIAMOND, STAR;
 
@@ -58,13 +56,4 @@ public enum SymbolType {
 		return null;
 	}
 
-	/**
-	 * Obtain a combo box of choices.
-	 *
-	 * @param defaultChoice
-	 * @return the combo box of symbol choices
-	 */
-	public static EnumComboBox getComboBox(SymbolType defaultChoice) {
-		return new EnumComboBox(names, defaultChoice);
-	}
 }
