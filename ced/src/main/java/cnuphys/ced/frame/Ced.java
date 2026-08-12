@@ -29,7 +29,6 @@ import cnuphys.bCNU.application.BaseMDIApplication;
 import cnuphys.bCNU.application.Desktop;
 import cnuphys.bCNU.component.MagnifyWindow;
 import cnuphys.bCNU.dialog.TextDisplayDialog;
-import cnuphys.bCNU.fortune.FortuneManager;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.log.Log;
 import cnuphys.bCNU.menu.MenuManager;
@@ -42,7 +41,6 @@ import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.ViewManager;
 import cnuphys.bCNU.view.VirtualView;
-import cnuphys.bCNU.wordle.Wordle;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.ced3d.view.AlertView3D;
 import cnuphys.ced.ced3d.view.CentralView3D;
@@ -130,7 +128,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private ColorMenu _colorMenu;
 
 	// weird menu
-	private JMenu _weirdMenu;
 
 	// warning label that filtering is active
 	private JLabel _filterLabel;
@@ -555,37 +552,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		MenuManager.getInstance().addMenu(magMenu);
 	}
 
-	// add some fun stuff
-
-	private void addWeirdMenu(JMenu menu) {
-		String weirdTitle = "w" + "\u018e" + "i" + "\u1d19" + "d";
-		_weirdMenu = new JMenu(weirdTitle);
-
-		final JMenuItem wordleItem = new JMenuItem("Wordle...");
-		final JMenuItem fortuneItem = new JMenuItem("Fortune...");
-
-		ActionListener al1 = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Object source = e.getSource();
-
-				if (source == wordleItem) {
-					Wordle.getInstance().setVisible(true);
-				} else if (source == fortuneItem) {
-					FortuneManager.getInstance().showDialog();
-				} 
-			}
-		};
-
-		wordleItem.addActionListener(al1);
-		fortuneItem.addActionListener(al1);
-		_weirdMenu.add(wordleItem);
-		_weirdMenu.add(fortuneItem);
-
-		menu.add(_weirdMenu, 0);
-
-	}
-
 	// add to the file menu
 	private void addToSwimMenu() {
 	}
@@ -617,8 +583,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		defConItem.addActionListener(al1);
 //		fmenu.add(defConItem, 6);
 		fmenu.add(defConItem, 0);
-
-		addWeirdMenu(fmenu);
 
 		JMenuItem aboutItem = new JMenuItem("About ced...");
 		ActionListener al0 = new ActionListener() {
@@ -1175,25 +1139,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		// create a console log listener
 		// Log.getInstance().addLogListener(new ConsoleLogListener());
 
-		// splash frame
-		final SplashWindowCED splashWindow = new SplashWindowCED("ced", null, 920, release);
-
-		// now make the frame visible, in the AWT thread
-		try {
-			EventQueue.invokeAndWait(new Runnable() {
-
-				@Override
-				public void run() {
-					splashWindow.setVisible(true);
-				}
-
-			});
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
 //process command args
 		if ((arg != null) && (arg.length > 0)) {
 			int len = arg.length;
@@ -1240,7 +1185,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 			@Override
 			public void run() {
 				getInstance();
-				splashWindow.setVisible(false);
 				getCed().setVisible(true);
 				getCed().fixTitle();
 
