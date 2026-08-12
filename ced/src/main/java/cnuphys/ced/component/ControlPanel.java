@@ -20,7 +20,7 @@ import cnuphys.bCNU.graphics.colorscale.ColorModelLegend;
 import cnuphys.bCNU.graphics.colorscale.ColorModelPanel;
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
 import edu.cnu.mdi.component.CommonBorder;
-import cnuphys.bCNU.graphics.component.SimpleScrollableTextArea;
+import edu.cnu.mdi.component.SimpleScrollableTextArea;
 import cnuphys.bCNU.util.Bits;
 import edu.cnu.mdi.ui.fonts.Fonts;
 import edu.cnu.mdi.util.UnicodeUtils;
