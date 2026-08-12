@@ -140,15 +140,21 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 		add(_boxZoomButton);
 		add(zoomInButton);
 		add(zoomOutButton);
-		add(_magnifyButton);
-		add(centerButton);
+		if (_magnifyButton != null) {
+			add(_magnifyButton);
+		}
+		if (centerButton != null) {
+			add(centerButton);
+		}
 		add(worldButton);
-		add(rangeButton);
+		if (rangeButton != null) {
+			add(rangeButton);
+		}
 		add(refreshButton);
 		if (cloneButton != null) {
 			add(Box.createHorizontalStrut(8));
+			add(cloneButton);
 		}
-		add(cloneButton);
 
 		// add the text field?
 
@@ -188,14 +194,6 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 			_buttonGroup.add(toggleButton);
 			toggleButton.addActionListener(_toggleActionListener);
 		}
-	}
-
-	@Override
-	public Component add(Component c) {
-		if (c == null) {
-			return null;
-		}
-		return super.add(c);
 	}
 
 	/**
