@@ -9,7 +9,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import cnuphys.bCNU.component.TextAreaWriter;
 import cnuphys.bCNU.util.Fonts;
 
 public class TextDisplayDialog extends SimpleDialog {
@@ -20,9 +19,6 @@ public class TextDisplayDialog extends SimpleDialog {
 	private static final int HEIGHT = 900;
 
 	private static final Font _font = Fonts.defaultMono;
-
-	// the writer
-	private TextAreaWriter _writer;
 
 	// the text area
 	private JTextArea _textArea;
@@ -39,8 +35,6 @@ public class TextDisplayDialog extends SimpleDialog {
 		_textArea.setLineWrap(false);
 		_textArea.setFont(_font);
 
-		_writer = new TextAreaWriter(_textArea);
-
 		setSize(WIDTH, HEIGHT);
 		DialogUtilities.centerDialog(this);
 	}
@@ -52,15 +46,6 @@ public class TextDisplayDialog extends SimpleDialog {
 	 */
 	public void setText(String text) {
 		_textArea.setText(text);
-	}
-
-	/**
-	 * Get the Writer object that writes to the text area
-	 *
-	 * @return the writer
-	 */
-	public TextAreaWriter getWriter() {
-		return _writer;
 	}
 
 	/**
