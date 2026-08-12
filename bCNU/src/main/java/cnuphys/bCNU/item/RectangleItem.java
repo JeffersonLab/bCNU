@@ -5,7 +5,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
-import cnuphys.bCNU.util.Point2DSupport;
+import edu.cnu.mdi.util.Point2DSupport;
 
 public class RectangleItem extends PolygonItem {
 

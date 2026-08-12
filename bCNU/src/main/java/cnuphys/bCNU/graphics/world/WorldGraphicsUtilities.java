@@ -22,7 +22,7 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.style.IStyled;
 import cnuphys.bCNU.graphics.style.LineStyle;
 import cnuphys.bCNU.util.MathUtilities;
-import cnuphys.bCNU.util.Point2DSupport;
+import edu.cnu.mdi.util.Point2DSupport;
 import cnuphys.bCNU.util.TextUtilities;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundStyle;
