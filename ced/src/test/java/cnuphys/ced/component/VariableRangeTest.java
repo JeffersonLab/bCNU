@@ -1,4 +1,4 @@
-package cnuphys.bCNU.component;
+package cnuphys.ced.component;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

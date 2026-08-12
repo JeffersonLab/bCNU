@@ -1,4 +1,4 @@
-package cnuphys.bCNU.component;
+package cnuphys.ced.component;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
