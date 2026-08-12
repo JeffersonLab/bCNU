@@ -51,21 +51,6 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 	 */
 	private JTextField _textField;
 
-	// the clone button
-	private CloneButton _cloneButton;
-
-	// Zoom int by a fixed percentage
-	private ZoomInButton _zoomInButton;
-
-	// Zoom out by a fixed percentage
-	private ZoomOutButton _zoomOutButton;
-
-	// refresh the container
-	private RefreshButton _refreshButton;
-
-	// zoom to whole world
-	private WorldButton _worldButton;
-
 	// default pointer tool
 	private PointerButton _pointerButton;
 
@@ -74,12 +59,6 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 
 	// magnifying glass
 	private MagnifyButton _magnifyButton;
-
-	// center the view
-	private CenterButton _centerButton;
-
-	// range (u r here) button
-	private RangeButton _rangeButton;
 
 	// the owner container
 	private IContainer _container;
@@ -129,21 +108,24 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 	 */
 	protected void makeButtons(int bits) {
 
-		_zoomInButton = new ZoomInButton(_container);
-		_zoomOutButton = new ZoomOutButton(_container);
-		_worldButton = new WorldButton(_container);
+		ZoomInButton zoomInButton = new ZoomInButton(_container);
+		ZoomOutButton zoomOutButton = new ZoomOutButton(_container);
+		WorldButton worldButton = new WorldButton(_container);
 		_boxZoomButton = new BoxZoomButton(_container);
-		_refreshButton = new RefreshButton(_container);
+		RefreshButton refreshButton = new RefreshButton(_container);
+		CenterButton centerButton = null;
 		if (Bits.checkBit(bits, CENTERBUTTON)) {
-			_centerButton = new CenterButton(_container);
+			centerButton = new CenterButton(_container);
 		}
 
+		CloneButton cloneButton = null;
 		if (Bits.checkBit(bits, CLONEBUTTON)) {
-			_cloneButton = new CloneButton(_container);
+			cloneButton = new CloneButton(_container);
 		}
 
+		RangeButton rangeButton = null;
 		if (Bits.checkBit(bits, RANGEBUTTON)) {
-			_rangeButton = new RangeButton(_container);
+			rangeButton = new RangeButton(_container);
 		}
 
 		if (Bits.checkBit(bits, MAGNIFYBUTTON)) {
@@ -156,17 +138,17 @@ public class BaseToolBar extends JToolBar implements MouseListener, MouseMotionL
 		add(_pointerButton);
 
 		add(_boxZoomButton);
-		add(_zoomInButton);
-		add(_zoomOutButton);
+		add(zoomInButton);
+		add(zoomOutButton);
 		add(_magnifyButton);
-		add(_centerButton);
-		add(_worldButton);
-		add(_rangeButton);
-		add(_refreshButton);
-		if (_cloneButton != null) {
+		add(centerButton);
+		add(worldButton);
+		add(rangeButton);
+		add(refreshButton);
+		if (cloneButton != null) {
 			add(Box.createHorizontalStrut(8));
 		}
-		add(_cloneButton);
+		add(cloneButton);
 
 		// add the text field?
 
