@@ -106,7 +106,6 @@ public class DrawingContainer extends BaseContainer {
 		localToWorld(pc, wpc);
 		localToWorld(p1, wp1);
 		return new RadArcItem(itemList, wpc, wp1, arcAngle);
-		// return new ArcItem(layer, wpc, wp1, arcAngle);
 	}
 
 	/**

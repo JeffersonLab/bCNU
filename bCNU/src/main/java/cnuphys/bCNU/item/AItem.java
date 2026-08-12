@@ -34,7 +34,7 @@ import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
 
 /**
- * This is the base class for custom items that are rendered on an AContainer.
+ * This is the base class for custom items that are rendered in an IContainer.
  *
  * @author heddle
  *

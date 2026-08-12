@@ -38,7 +38,6 @@ import cnuphys.bCNU.item.AItem;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.YouAreHereItem;
 import cnuphys.bCNU.log.Log;
-import cnuphys.bCNU.util.FilteredStackTraceException;
 import cnuphys.bCNU.util.Point2DSupport;
 import cnuphys.bCNU.view.BaseView;
 

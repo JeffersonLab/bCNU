@@ -26,10 +26,10 @@ public enum ResizePolicy {
 	 * Returns the enum value from the name.
 	 *
 	 * @param name the name to match.
-	 * @return the <code>FillStyle</code> that corresponds to the name. Returns
+	 * @return the <code>ResizePolicy</code> that corresponds to the name. Returns
 	 *         <code>null</code> if no match is found. Note it will check (case
 	 *         insensitive) both the map and the <code>name()</code> result, thus
-	 *         "Solid" or "SOLID" or "SoLiD" will return the <code>SOLID</code>
+	 *         "Normal" or "NORMAL" or "NoRmAl" will return the <code>NORMAL</code>
 	 *         value.
 	 */
 	public static ResizePolicy getValue(String name) {
