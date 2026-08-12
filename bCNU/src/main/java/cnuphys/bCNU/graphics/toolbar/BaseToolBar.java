@@ -25,7 +25,7 @@ import cnuphys.bCNU.component.MagnifyWindow;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.log.Log;
 import edu.cnu.mdi.util.Bits;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 
 /**
  * @author heddle

@@ -13,7 +13,7 @@ import java.awt.geom.Point2D;
 
 import cnuphys.bCNU.drawable.DrawableAdapter;
 import edu.cnu.mdi.format.DoubleFormat;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 
 /**
  * @author heddle

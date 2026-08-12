@@ -303,7 +303,7 @@ public class ControlPanel extends JPanel implements ChangeListener {
 		}
 
 		JTabbedPane tabbedPane = new JTabbedPane();
-		tabbedPane.setFont(Fonts.smallFont);
+		tabbedPane.setFont(Fonts.mediumFont);
 
 		if (daPanel != null) {
 			tabbedPane.add(daPanel, "display");

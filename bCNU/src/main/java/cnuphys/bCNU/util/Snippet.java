@@ -1,5 +1,7 @@
 package cnuphys.bCNU.util;
 
+import edu.cnu.mdi.ui.fonts.Fonts;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;

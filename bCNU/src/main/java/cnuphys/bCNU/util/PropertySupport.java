@@ -1,6 +1,7 @@
 package cnuphys.bCNU.util;
 
 import edu.cnu.mdi.ui.colors.X11Colors;
+import edu.cnu.mdi.ui.fonts.Fonts;
 
 import java.awt.Color;
 import java.awt.Font;

@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import edu.cnu.mdi.component.CommonBorder;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 
 /**
  * @author heddle

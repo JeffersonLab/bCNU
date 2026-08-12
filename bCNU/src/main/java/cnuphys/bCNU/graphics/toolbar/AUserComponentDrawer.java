@@ -12,7 +12,7 @@ import java.util.Collections;
 
 import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.graphics.container.IContainer;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundStyle;
