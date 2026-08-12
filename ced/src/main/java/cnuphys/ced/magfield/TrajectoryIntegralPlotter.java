@@ -1,23 +1,13 @@
 package cnuphys.ced.magfield;
 
-import java.awt.Color;
-
 import cnuphys.CLAS12Swim.CLAS12Trajectory;
 import cnuphys.bCNU.log.Log;
-import cnuphys.bCNU.util.UnicodeSupport;
-import cnuphys.bCNU.util.X11Colors;
-import cnuphys.bCNU.view.PlotView;
 import cnuphys.bCNU.view.ViewManager;
 import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.GeometryManager;
 import cnuphys.magfield.FieldProbe;
 import cnuphys.magfield.MagneticFields;
 import cnuphys.magfield.RotatedCompositeProbe;
-import cnuphys.splot.fit.FitType;
-import cnuphys.splot.pdata.DataSet;
-import cnuphys.splot.pdata.DataSetException;
-import cnuphys.splot.pdata.DataSetType;
-import cnuphys.splot.plot.PlotCanvas;
 import cnuphys.swim.SwimTrajectory;
 import cnuphys.swim.SwimTrajectory2D;
 
@@ -27,60 +17,25 @@ import cnuphys.swim.SwimTrajectory2D;
  */
 public final class TrajectoryIntegralPlotter {
 
-	private static final Color[] PLOT_COLORS = {
-			X11Colors.getX11Color("Dark Red"), X11Colors.getX11Color("Dark Blue"),
-			X11Colors.getX11Color("Dark Green"), Color.black, Color.gray,
-			X11Colors.getX11Color("wheat")
-	};
-
 	private TrajectoryIntegralPlotter() {
 	}
 
 	/** Add the trajectory to the shared field-integral plot and show it. */
 	public static void show(SwimTrajectory2D trajectory2D) {
-		PlotView plotView = Ced.getCed().getPlotView();
+		TrajectoryIntegralPlotView plotView = Ced.getCed().getPlotView();
 		if (plotView == null || trajectory2D == null) {
 			return;
 		}
 
-		PlotCanvas canvas = plotView.getPlotCanvas();
 		try {
 			SwimTrajectory trajectory = trajectory2D.getTrajectory3D();
 			double[][] integral = fieldIntegralSamples(trajectory, FieldProbe.factory());
-			boolean havePlotData = canvas.getDataSet() != null && canvas.getDataSet().dataAdded();
-
-			if (!havePlotData) {
-				initializePlot(canvas, trajectory2D, integral);
-			} else {
-				int curveIndex = canvas.getDataSet().getCurveCount();
-				DataSet dataSet = canvas.getDataSet();
-				dataSet.addCurve("X", curveName(trajectory2D));
-				for (double[] sample : integral) {
-					dataSet.addToCurve(curveIndex, sample[0], sample[1]);
-				}
-				setCurveStyle(canvas, curveIndex);
-			}
-
+			plotView.addCurve(curveName(trajectory2D), integral);
 			ViewManager.getInstance().setVisible(plotView, true);
-			canvas.repaint();
-		} catch (DataSetException | RuntimeException exception) {
+		} catch (RuntimeException exception) {
 			Log.getInstance().error("Could not plot the trajectory magnetic-field integral");
 			Log.getInstance().exception(exception);
 		}
-	}
-
-	private static void initializePlot(PlotCanvas canvas, SwimTrajectory2D trajectory2D, double[][] integral)
-			throws DataSetException {
-		DataSet dataSet = new DataSet(DataSetType.XYXY, "X", curveName(trajectory2D));
-		canvas.getParameters().setPlotTitle("Magnetic Field Integral");
-		canvas.getParameters().setXLabel("Path Length (m)");
-		canvas.getParameters().setYLabel("<html>" + UnicodeSupport.INTEGRAL + "|<bold>B</bold> "
-				+ UnicodeSupport.TIMES + " <bold>dL</bold>| kG-m");
-		for (double[] sample : integral) {
-			dataSet.add(sample[0], sample[1]);
-		}
-		canvas.setDataSet(dataSet);
-		setCurveStyle(canvas, 0);
 	}
 
 	private static String curveName(SwimTrajectory2D trajectory2D) {
@@ -138,13 +93,4 @@ public final class TrajectoryIntegralPlotter {
 		return samples;
 	}
 
-	private static void setCurveStyle(PlotCanvas canvas, int index) {
-		Color color = PLOT_COLORS[index % PLOT_COLORS.length];
-		canvas.getDataSet().getCurveStyle(index).setFitLineColor(color);
-		canvas.getDataSet().getCurveStyle(index).setBorderColor(color);
-		canvas.getDataSet().getCurveStyle(index).setFillColor(color);
-		canvas.getDataSet().getCurveStyle(index).setSymbolType(cnuphys.splot.style.SymbolType.X);
-		canvas.getDataSet().getCurveStyle(index).setSymbolSize(6);
-		canvas.getDataSet().getCurve(index).getFit().setFitType(FitType.CUBICSPLINE);
-	}
 }

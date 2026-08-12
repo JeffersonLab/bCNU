@@ -40,7 +40,6 @@ import cnuphys.bCNU.util.Jar;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.X11Colors;
 import cnuphys.bCNU.view.BaseView;
-import cnuphys.bCNU.view.PlotView;
 import cnuphys.bCNU.view.ViewManager;
 import cnuphys.bCNU.view.VirtualView;
 import cnuphys.bCNU.wordle.Wordle;
@@ -77,6 +76,7 @@ import cnuphys.ced.event.AccumulationManager;
 import cnuphys.ced.geometry.GeometryManager;
 import cnuphys.ced.geometry.cache.GeometryCache;
 import cnuphys.ced.magfield.PlotFieldDialog;
+import cnuphys.ced.magfield.TrajectoryIntegralPlotView;
 import cnuphys.ced.noise.NoiseManager;
 import cnuphys.ced.properties.PropertiesManager;
 import cnuphys.ced.swim.SwimAllMC;
@@ -176,7 +176,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	private SectorView _sectorView36;
 
 	// plot view
-	private PlotView _plotView;
+	private TrajectoryIntegralPlotView _plotView;
 
 	// the about string
 	private static String _aboutString = "<html><span style=\"font-size:12px\">ced: the cLAS eVENT dISPLAY&nbsp;&nbsp;&nbsp;&nbsp;"
@@ -442,7 +442,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		// add plotview
 		ViewManager.getInstance().getViewMenu().addSeparator();
 
-		_plotView = new PlotView();
+		_plotView = new TrajectoryIntegralPlotView();
 
 		// the trigger bit "view"
 		ActionListener al3 = new ActionListener() {
@@ -1002,7 +1002,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 	 *
 	 * @return the plot voew;
 	 */
-	public PlotView getPlotView() {
+	public TrajectoryIntegralPlotView getPlotView() {
 		return _plotView;
 	}
 
