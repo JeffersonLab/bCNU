@@ -6,7 +6,7 @@ import java.awt.event.ItemListener;
 
 import javax.swing.AbstractButton;
 
-import cnuphys.bCNU.component.checkboxarray.CheckBoxArray;
+import edu.cnu.mdi.component.checkboxarray.CheckBoxArray;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.util.Bits;
 import cnuphys.ced.cedview.CedView;

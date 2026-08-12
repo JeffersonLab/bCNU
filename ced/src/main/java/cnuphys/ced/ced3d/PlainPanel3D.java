@@ -12,7 +12,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.awt.GLJPanel;
 
 import bCNU3D.Panel3D;
-import cnuphys.bCNU.component.checkboxarray.CheckBoxArray;
+import edu.cnu.mdi.component.checkboxarray.CheckBoxArray;
 import cnuphys.bCNU.dialog.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.component.CommonBorder;
