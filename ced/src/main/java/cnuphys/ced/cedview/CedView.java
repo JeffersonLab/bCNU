@@ -25,8 +25,6 @@ import org.jlab.geom.prim.Point3D;
 import org.jlab.geom.prim.Vector3D;
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.component.InfoWindow;
-import cnuphys.bCNU.component.TranslucentWindow;
 import cnuphys.bCNU.feedback.IFeedbackProvider;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
@@ -43,6 +41,7 @@ import cnuphys.bCNU.view.ViewManager;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
 import cnuphys.ced.clasio.ClasIoEventListenerPhase;
+import cnuphys.ced.component.TrajectoryInfoWindow;
 import cnuphys.ced.clasio.IClasIoEventListener;
 import cnuphys.ced.clasio.datatable.IDataSelectedListener;
 import cnuphys.ced.clasio.datatable.SelectedDataManager;
@@ -384,8 +383,7 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 	}
 
 	private void closeHoverWindow() {
-		TranslucentWindow.closeInfoWindow();
-		InfoWindow.closeInfoWindow();
+		TrajectoryInfoWindow.closeInfoWindow();
 	}
 
 	private void resetHovering() {
@@ -1101,11 +1099,7 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 		p.y += 4;
 
 		if (_lastTrajStr != null) {
-			if (TranslucentWindow.isTranslucencySupported()) {
-				TranslucentWindow.info(_lastTrajStr, 0.6f, p);
-			} else {
-				InfoWindow.info(_lastTrajStr, p);
-			}
+			TrajectoryInfoWindow.showInfo(_lastTrajStr, p);
 		}
 	}
 
