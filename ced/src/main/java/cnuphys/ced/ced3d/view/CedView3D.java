@@ -8,7 +8,7 @@ import javax.swing.JButton;
 import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.GraphicsUtilities;
-import cnuphys.bCNU.util.TextUtilities;
+import edu.cnu.mdi.util.TextUtils;
 import cnuphys.ced.ced3d.CedPanel3D;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.clasio.ClasIoEventManager;
@@ -168,7 +168,7 @@ public abstract class CedView3D extends PlainView3D
 	public void writeCommonProperties() {
 		// bank match
 		String propName = getPropertyName() + "_" + CedView.BANKMATCHPROP;
-		String cssStr = TextUtilities.stringArrayToString(_matches);
+		String cssStr = TextUtils.arrayToCommaSeparated(_matches);
 
 		System.err.println();
 		if (cssStr == null) {

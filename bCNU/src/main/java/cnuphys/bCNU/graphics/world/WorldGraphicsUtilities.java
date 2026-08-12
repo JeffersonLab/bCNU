@@ -23,7 +23,7 @@ import cnuphys.bCNU.graphics.style.IStyled;
 import cnuphys.bCNU.graphics.style.LineStyle;
 import cnuphys.bCNU.util.MathUtilities;
 import edu.cnu.mdi.util.Point2DSupport;
-import cnuphys.bCNU.util.TextUtilities;
+import edu.cnu.mdi.util.TextUtils;
 import cnuphys.lund.LundId;
 import cnuphys.lund.LundStyle;
 import cnuphys.lund.LundSupport;
@@ -834,7 +834,7 @@ public class WorldGraphicsUtilities {
 
 		Point p = new Point();
 		container.worldToLocal(p, x, y);
-		TextUtilities.drawGhostText(g, text, p.x + dh, p.y + dv);
+		TextUtils.drawGhostText(g, text, p.x + dh, p.y + dv);
 	}
 
 	/**
@@ -891,7 +891,7 @@ public class WorldGraphicsUtilities {
 
 		Point p = new Point();
 		container.worldToLocal(p, x, y);
-		TextUtilities.drawHaloText(g, text, p.x + dh, p.y + dv);
+		TextUtils.drawHaloText(g, text, p.x + dh, p.y + dv);
 
 	}
 

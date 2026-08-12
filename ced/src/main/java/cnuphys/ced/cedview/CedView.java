@@ -34,7 +34,7 @@ import cnuphys.bCNU.graphics.toolbar.ToolBarToggleButton;
 import cnuphys.bCNU.graphics.toolbar.UserToolBarComponent;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.ping.IPing;
-import cnuphys.bCNU.util.TextUtilities;
+import edu.cnu.mdi.util.TextUtils;
 import edu.cnu.mdi.util.UnicodeUtils;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.bCNU.view.ViewManager;
@@ -1492,7 +1492,7 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 
 		String matches = PropertiesManager.getInstance().get(propName);
 		if (matches != null) {
-			_matches = TextUtilities.cssToStringArray(matches);
+			_matches = TextUtils.commaSeparatedToArray(matches);
 		}
 	}
 
@@ -1512,7 +1512,7 @@ public abstract class CedView extends BaseView implements IFeedbackProvider, Swi
 	public void writeCommonProperties() {
 		// bank match
 		String propName = getPropertyName() + "_" + BANKMATCHPROP;
-		String cssStr = TextUtilities.stringArrayToString(_matches);
+		String cssStr = TextUtils.arrayToCommaSeparated(_matches);
 
 		System.err.println();
 		if (cssStr == null) {

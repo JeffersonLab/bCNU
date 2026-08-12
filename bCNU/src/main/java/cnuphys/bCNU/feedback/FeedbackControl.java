@@ -8,7 +8,7 @@ import java.util.Vector;
 import javax.swing.event.EventListenerList;
 
 import cnuphys.bCNU.graphics.container.IContainer;
-import cnuphys.bCNU.util.TextUtilities;
+import edu.cnu.mdi.util.TextUtils;
 
 public class FeedbackControl {
 
@@ -108,7 +108,7 @@ public class FeedbackControl {
 		requestFeedbackStrings(mouseEvent.getPoint(), wp);
 
 		// don't update if same
-		if (TextUtilities.equalStringLists(_oldFeedbackStrings, _newFeedbackStrings)) {
+		if (TextUtils.equalStringLists(_oldFeedbackStrings, _newFeedbackStrings)) {
 			return;
 		}
 

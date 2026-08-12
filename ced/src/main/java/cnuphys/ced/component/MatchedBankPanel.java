@@ -13,7 +13,7 @@ import javax.swing.JTextArea;
 import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.bCNU.log.Log;
 import edu.cnu.mdi.ui.fonts.Fonts;
-import cnuphys.bCNU.util.TextUtilities;
+import edu.cnu.mdi.util.TextUtils;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.clasio.ClasIoPresentBankPanel;
 
@@ -115,12 +115,12 @@ public class MatchedBankPanel extends JPanel {
 		}
 
 		String compactText = text.replaceAll("\\s", "");
-		return compactText.isEmpty() ? null : TextUtilities.tokens(compactText, ",");
+		return compactText.isEmpty() ? null : TextUtils.tokens(compactText, ",");
 	}
 
 	//convert the view matches to a comma separated string
 	public String matchesToString() {
-		return TextUtilities.stringArrayToString(_bankMatcher.getBanksMatches());
+		return TextUtils.arrayToCommaSeparated(_bankMatcher.getBanksMatches());
 	}
 
 
