@@ -1136,9 +1136,6 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 
 		FileUtilities.setDefaultDir("data");
 
-		// create a console log listener
-		// Log.getInstance().addLogListener(new ConsoleLogListener());
-
 //process command args
 		if ((arg != null) && (arg.length > 0)) {
 			int len = arg.length;

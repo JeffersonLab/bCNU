@@ -220,9 +220,9 @@ public class VirtualView extends BaseView
 	}
 
 	/**
-	 * Convenience method for creating a Drawing View.
+	 * Convenience method for creating a virtual desktop view.
 	 *
-	 * @return a new DrawingView object
+	 * @return a new virtual view
 	 */
 	public static VirtualView createVirtualView(int numcol) {
 
