@@ -5,7 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.format.DoubleFormat;
+import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.util.ArrayIndexSorter;
 import cnuphys.bCNU.util.PrimitiveArrayToWrapper;
 import cnuphys.ced.alldata.DataWarehouse;

@@ -11,7 +11,7 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import cnuphys.bCNU.format.DoubleFormat;
+import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.style.IStyled;
 import cnuphys.bCNU.item.DonutItem;

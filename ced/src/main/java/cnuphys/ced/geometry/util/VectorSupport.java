@@ -1,6 +1,6 @@
 package cnuphys.ced.geometry.util;
 
-import cnuphys.bCNU.format.DoubleFormat;
+import edu.cnu.mdi.format.DoubleFormat;
 
 /**
  * Static classes for treating arrays of doubles as 2D or 3D vectors

@@ -16,7 +16,7 @@ import java.util.Map;
 import org.jlab.geom.prim.Line3D;
 import org.jlab.geom.prim.Point3D;
 
-import cnuphys.bCNU.format.DoubleFormat;
+import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.SymbolDraw;
 import cnuphys.bCNU.graphics.container.IContainer;

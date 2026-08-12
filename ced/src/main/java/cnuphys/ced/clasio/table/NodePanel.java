@@ -26,7 +26,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.format.DoubleFormat;
+import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.util.Fonts;
 import cnuphys.bCNU.view.BaseView;
