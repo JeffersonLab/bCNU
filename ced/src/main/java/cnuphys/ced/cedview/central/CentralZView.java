@@ -20,7 +20,7 @@ import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import cnuphys.bCNU.component.rangeslider.RangeSlider;
+import edu.cnu.mdi.component.RangeSlider;
 import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.drawable.IDrawable;
 import edu.cnu.mdi.format.DoubleFormat;

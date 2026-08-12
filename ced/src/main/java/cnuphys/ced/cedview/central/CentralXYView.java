@@ -23,7 +23,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 
-import cnuphys.bCNU.component.rangeslider.RangeSlider;
+import edu.cnu.mdi.component.RangeSlider;
 import cnuphys.bCNU.drawable.DrawableAdapter;
 import cnuphys.bCNU.drawable.IDrawable;
 import cnuphys.bCNU.graphics.GraphicsUtilities;

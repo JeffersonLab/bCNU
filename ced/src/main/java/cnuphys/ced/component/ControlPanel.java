@@ -14,7 +14,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import cnuphys.bCNU.component.rangeslider.RangeSlider;
+import edu.cnu.mdi.component.RangeSlider;
 import cnuphys.bCNU.feedback.FeedbackPane;
 import cnuphys.bCNU.graphics.colorscale.ColorModelLegend;
 import cnuphys.bCNU.graphics.colorscale.ColorModelPanel;
