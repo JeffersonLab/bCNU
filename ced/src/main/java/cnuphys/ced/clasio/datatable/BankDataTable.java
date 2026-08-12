@@ -16,7 +16,7 @@ import javax.swing.table.TableColumn;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.ced.clasio.table.HeaderRenderer;
 import cnuphys.ced.clasio.table.SimpleRenderer;
 

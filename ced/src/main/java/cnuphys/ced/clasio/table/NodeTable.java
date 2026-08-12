@@ -1,9 +1,10 @@
 package cnuphys.ced.clasio.table;
 
+import java.awt.Font;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
@@ -16,7 +17,7 @@ import javax.swing.table.TableColumn;
 
 import org.jlab.io.base.DataEvent;
 
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.ced.alldata.ColumnData;
 import edu.cnu.mdi.ui.colors.X11Colors;
 

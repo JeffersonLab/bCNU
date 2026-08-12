@@ -9,7 +9,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 
 public class SimpleRenderer extends JTextField implements TableCellRenderer {
 

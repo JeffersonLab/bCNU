@@ -28,7 +28,7 @@ import org.jlab.io.base.DataEvent;
 
 import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.alldata.ColumnData;
 import cnuphys.ced.alldata.DataWarehouse;

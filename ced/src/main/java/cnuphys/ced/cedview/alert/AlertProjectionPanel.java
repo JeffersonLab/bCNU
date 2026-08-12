@@ -1,8 +1,9 @@
 package cnuphys.ced.cedview.alert;
 
+import java.awt.Font;
+
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.util.Dictionary;
 import java.util.Enumeration;
 
@@ -18,7 +19,7 @@ import javax.swing.event.ChangeListener;
 
 import cnuphys.bCNU.dialog.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.component.CommonBorder;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 
 public class AlertProjectionPanel extends JPanel {
 

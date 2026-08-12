@@ -28,7 +28,7 @@ import org.jlab.geom.prim.Point3D;
 
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.ced.frame.Ced;
 import cnuphys.ced.geometry.GeometryManager;
 import cnuphys.ced.geometry.cache.ACachedGeometry;

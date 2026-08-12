@@ -1,7 +1,8 @@
 package cnuphys.ced.cedview.central;
 
-import java.awt.Color;
 import java.awt.Font;
+
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -12,7 +13,7 @@ import java.util.List;
 
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.alldata.CNDAdc;
 import cnuphys.ced.alldata.CNDTdc;

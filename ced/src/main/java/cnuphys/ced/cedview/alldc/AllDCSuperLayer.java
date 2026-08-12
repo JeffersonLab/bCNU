@@ -17,7 +17,7 @@ import cnuphys.bCNU.graphics.style.LineStyle;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.item.ItemList;
 import cnuphys.bCNU.item.RectangleItem;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.ced.alldata.DataDrawSupport;
 import cnuphys.ced.alldata.DCRawHits;

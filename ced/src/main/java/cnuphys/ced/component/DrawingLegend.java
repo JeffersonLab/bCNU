@@ -1,5 +1,7 @@
 package cnuphys.ced.component;
 
+import edu.cnu.mdi.ui.fonts.Fonts;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -31,7 +33,7 @@ public class DrawingLegend extends JPanel {
 
 	private static final int TRAJSIZE = 10;
 
-	private static final Font labelFont = new Font("SansSerif", Font.PLAIN, 9);
+	private static final Font labelFont = Fonts.commonFont(Font.PLAIN, 9);
 
 	private static final Color bgColor = new Color(120, 120, 120);
 

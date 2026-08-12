@@ -16,7 +16,7 @@ import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.style.IStyled;
 import cnuphys.bCNU.item.DonutItem;
 import cnuphys.bCNU.item.ItemList;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.event.FeedbackRect;

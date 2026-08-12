@@ -16,7 +16,7 @@ import javax.swing.JComponent;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.graphics.style.LineStyle;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.ced.clasio.ClasIoEventManager;
 import cnuphys.ced.frame.CedColors;
 import cnuphys.lund.LundId;
@@ -37,7 +37,7 @@ public class PIDLegend extends JComponent {
 	// used to get the line in the right place
 	private static int _yodd = -1;
 
-	private static final Font labelFont = new Font("SansSerif", Font.PLAIN, 11);
+	private static final Font labelFont = Fonts.commonFont(Font.PLAIN, 11);
 
 	private static Stroke _stroke = GraphicsUtilities.getStroke(2, LineStyle.SOLID);
 

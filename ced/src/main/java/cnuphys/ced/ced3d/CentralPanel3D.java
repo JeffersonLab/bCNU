@@ -1,7 +1,8 @@
 package cnuphys.ced.ced3d;
 
+import edu.cnu.mdi.ui.fonts.Fonts;
+
 import java.awt.Color;
-import java.awt.Font;
 
 import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.ced.ced3d.cnd.CND3D;
@@ -44,7 +45,7 @@ public class CentralPanel3D extends CedPanel3D {
 	public void createInitialItems() {
 		// coordinate axes
 		Axes3D axes = new Axes3D(this, -xymax, xymax, -xymax, xymax, zmin, zmax, null, Color.darkGray, 1f, 6, 6, 6,
-				Color.black, X11Colors.getX11Color("Dark Green"), new Font("SansSerif", Font.PLAIN, 12), 0);
+				Color.black, X11Colors.getX11Color("Dark Green"), Fonts.defaultFont, 0);
 		addItem(axes);
 
 		// trajectory drawer

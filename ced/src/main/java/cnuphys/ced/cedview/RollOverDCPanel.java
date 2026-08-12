@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 
 import cnuphys.bCNU.component.IRollOverListener;
 import cnuphys.bCNU.component.RollOverPanel;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 
 public class RollOverDCPanel extends RollOverPanel implements IRollOverListener {
 

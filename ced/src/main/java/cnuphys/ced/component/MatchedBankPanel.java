@@ -12,7 +12,7 @@ import javax.swing.JTextArea;
 
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.log.Log;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.TextUtilities;
 import cnuphys.bCNU.view.BaseView;
 import cnuphys.ced.clasio.ClasIoPresentBankPanel;

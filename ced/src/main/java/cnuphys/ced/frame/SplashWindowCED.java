@@ -23,7 +23,7 @@ import javax.swing.border.EmptyBorder;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.ImageManager;
 import cnuphys.bCNU.graphics.splashscreen.SplashWindow;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import edu.cnu.mdi.ui.colors.X11Colors;
 
 @SuppressWarnings("serial")

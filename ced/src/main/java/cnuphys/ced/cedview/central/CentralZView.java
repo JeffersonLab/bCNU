@@ -30,7 +30,7 @@ import cnuphys.bCNU.graphics.style.LineStyle;
 import cnuphys.bCNU.graphics.world.WorldGraphicsUtilities;
 import cnuphys.bCNU.graphics.world.WorldPolygon;
 import cnuphys.bCNU.item.ItemList;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.PropertySupport;
 import cnuphys.bCNU.util.UnicodeSupport;
 import edu.cnu.mdi.ui.colors.X11Colors;

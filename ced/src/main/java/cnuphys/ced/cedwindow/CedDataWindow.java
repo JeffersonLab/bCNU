@@ -19,7 +19,7 @@ import org.jlab.io.base.DataEvent;
 
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.util.FileUtilities;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.ced.alldata.DataWarehouse;
 import cnuphys.ced.clasio.ClasIoEventManager.EventSourceType;
 import cnuphys.ced.clasio.datatable.BankDataTable;

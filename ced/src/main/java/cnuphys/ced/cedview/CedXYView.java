@@ -18,7 +18,7 @@ import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.style.LineStyle;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.Point2DSupport;
 import cnuphys.bCNU.util.UnicodeSupport;
 import edu.cnu.mdi.ui.colors.X11Colors;

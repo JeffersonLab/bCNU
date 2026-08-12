@@ -22,7 +22,7 @@ import cnuphys.bCNU.graphics.colorscale.ColorScaleModel;
 import cnuphys.bCNU.graphics.component.CommonBorder;
 import cnuphys.bCNU.graphics.component.SimpleScrollableTextArea;
 import cnuphys.bCNU.util.Bits;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.ced.cedview.CedView;
 import cnuphys.ced.cedview.alert.AlertProjectionPanel;

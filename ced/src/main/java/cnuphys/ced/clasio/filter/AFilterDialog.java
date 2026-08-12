@@ -15,7 +15,7 @@ import javax.swing.JTextArea;
 
 import cnuphys.bCNU.dialog.SimpleDialog;
 import cnuphys.bCNU.graphics.component.CommonBorder;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 
 public class AFilterDialog extends SimpleDialog {
 

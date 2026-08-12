@@ -1,10 +1,11 @@
 package cnuphys.ced.ced3d;
 
+import java.awt.Font;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,7 +29,7 @@ import cnuphys.bCNU.component.LabeledTextField;
 import cnuphys.bCNU.component.VariableRange;
 import cnuphys.bCNU.dialog.VerticalFlowLayout;
 import cnuphys.bCNU.graphics.component.CommonBorder;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.bCNU.util.UnicodeSupport;
 import cnuphys.ced.ced3d.view.SwimmingTestView3D;
 import cnuphys.ced.swim.CedSwimmerFactory;

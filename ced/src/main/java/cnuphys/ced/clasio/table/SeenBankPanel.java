@@ -2,7 +2,7 @@ package cnuphys.ced.clasio.table;
 
 import javax.swing.*;
 
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import cnuphys.ced.alldata.DataWarehouse;
 
 import java.awt.BorderLayout;

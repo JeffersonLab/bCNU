@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
 import cnuphys.bCNU.graphics.GraphicsUtilities;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 
 /**
  * A set of static methods to help ensure a uniform loon and feel

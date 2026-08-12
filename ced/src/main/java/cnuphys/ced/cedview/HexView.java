@@ -15,7 +15,7 @@ import org.jlab.geom.prim.Point3D;
 import org.jlab.geom.prim.Vector3D;
 
 import cnuphys.bCNU.graphics.container.IContainer;
-import cnuphys.bCNU.util.Fonts;
+import edu.cnu.mdi.ui.fonts.Fonts;
 import edu.cnu.mdi.ui.colors.X11Colors;
 
 @SuppressWarnings("serial")
