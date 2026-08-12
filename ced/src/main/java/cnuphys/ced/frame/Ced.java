@@ -13,6 +13,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -35,7 +37,6 @@ import cnuphys.bCNU.menu.MenuManager;
 import cnuphys.bCNU.ping.Ping;
 import cnuphys.bCNU.util.Environment;
 import cnuphys.bCNU.util.FileUtilities;
-import cnuphys.bCNU.util.Jar;
 import cnuphys.bCNU.util.PropertySupport;
 import edu.cnu.mdi.ui.colors.X11Colors;
 import cnuphys.bCNU.view.BaseView;
@@ -313,7 +314,7 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		String s = System.getProperty("java.class.path");
 
 		if ((s != null) && s.endsWith("ced.jar")) {
-			s = Jar.getManifestAttribute(s, "Class-Path");
+			s = getManifestAttribute(s, "Class-Path");
 		}
 		if (s == null) {
 			return "???";
@@ -333,6 +334,16 @@ public class Ced extends BaseMDIApplication implements MagneticFieldChangeListen
 		}
 
 		return "???";
+	}
+
+	private static String getManifestAttribute(String jarPath, String attributeName) {
+		try (JarFile jarFile = new JarFile(jarPath)) {
+			Manifest manifest = jarFile.getManifest();
+			return (manifest == null) ? null : manifest.getMainAttributes().getValue(attributeName);
+		} catch (IOException e) {
+			Log.getInstance().warning("Could not read manifest from " + jarPath + ": " + e.getMessage());
+			return null;
+		}
 	}
 
 	/**
