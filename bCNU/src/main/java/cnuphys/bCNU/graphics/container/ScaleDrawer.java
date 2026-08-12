@@ -12,7 +12,7 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 
 import cnuphys.bCNU.drawable.DrawableAdapter;
-import cnuphys.bCNU.format.DoubleFormat;
+import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.util.Fonts;
 
 /**

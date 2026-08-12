@@ -10,7 +10,7 @@ import java.awt.Rectangle;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import cnuphys.bCNU.format.DoubleFormat;
+import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import edu.cnu.mdi.component.CommonBorder;
 import cnuphys.bCNU.util.Fonts;

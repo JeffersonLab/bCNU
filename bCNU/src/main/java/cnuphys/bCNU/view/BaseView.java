@@ -31,7 +31,7 @@ import javax.swing.WindowConstants;
 
 import cnuphys.bCNU.application.Desktop;
 import cnuphys.bCNU.component.MagnifyWindow;
-import cnuphys.bCNU.format.DoubleFormat;
+import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.BaseContainer;
 import cnuphys.bCNU.graphics.container.DrawingContainer;

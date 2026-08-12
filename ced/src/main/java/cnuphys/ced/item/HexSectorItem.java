@@ -8,7 +8,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
 
-import cnuphys.bCNU.format.DoubleFormat;
+import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.graphics.GraphicsUtilities;
 import cnuphys.bCNU.graphics.container.IContainer;
 import cnuphys.bCNU.graphics.style.LineStyle;

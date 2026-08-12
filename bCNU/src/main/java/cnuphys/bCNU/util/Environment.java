@@ -22,7 +22,7 @@ import javax.imageio.ImageWriter;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import cnuphys.bCNU.format.DoubleFormat;
+import edu.cnu.mdi.format.DoubleFormat;
 import cnuphys.bCNU.log.Log;
 
 /**
