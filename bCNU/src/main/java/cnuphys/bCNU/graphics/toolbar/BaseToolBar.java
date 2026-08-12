@@ -36,16 +36,10 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	public static final int NOZOOM             = 020000;
 	public static final int CLONEBUTTON        = 040000;
 
-	public static final int RECTGRIDBUTTON     = 01000000;
-
 	// used to eliminate some basic buttons
 	public static final int CENTERBUTTON       = 040000000;
 
-	public static final int EVERYTHING = 07777777777 & ~NOZOOM & ~CLONEBUTTON & ~RECTGRIDBUTTON;
-	public static final int STANDARD = EVERYTHING & ~USERCOMPONENT & ~CLONEBUTTON;
-
-	// nobuttons!
-	public static final int NOTHING = 017777777777;
+	public static final int EVERYTHING = 07777777777 & ~NOZOOM & ~CLONEBUTTON;
 
 	/**
 	 * Text field used for messages
@@ -88,9 +82,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	// user component
 	private UserToolBarComponent _userComponent;
 
-	// are there ANY bits set
-	private boolean notNothing;
-
 	/**
 	 * Create a toolbar with all the buttons.
 	 *
@@ -111,7 +102,6 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		_container = container;
 		_container.setToolBar(this);
-		notNothing = bits != NOTHING;
 		makeButtons(bits);
 
 		Component c = _container.getComponent();
@@ -130,29 +120,27 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 	 */
 	protected void makeButtons(int bits) {
 
-		if (notNothing) {
-			if (!Bits.checkBit(bits, NOZOOM)) {
-				_zoomInButton = new ZoomInButton(_container);
-				_zoomOutButton = new ZoomOutButton(_container);
+		if (!Bits.checkBit(bits, NOZOOM)) {
+			_zoomInButton = new ZoomInButton(_container);
+			_zoomOutButton = new ZoomOutButton(_container);
 
-				_worldButton = new WorldButton(_container);
-				_boxZoomButton = new BoxZoomButton(_container);
-			}
-			_refreshButton = new RefreshButton(_container);
-			if (Bits.checkBit(bits, CENTERBUTTON)) {
-				_centerButton = new CenterButton(_container);
-			}
-
-			if (Bits.checkBit(bits, CLONEBUTTON)) {
-				_cloneButton = new CloneButton(_container);
-			}
+			_worldButton = new WorldButton(_container);
+			_boxZoomButton = new BoxZoomButton(_container);
+		}
+		_refreshButton = new RefreshButton(_container);
+		if (Bits.checkBit(bits, CENTERBUTTON)) {
+			_centerButton = new CenterButton(_container);
 		}
 
-		if (notNothing && Bits.checkBit(bits, RANGEBUTTON)) {
+		if (Bits.checkBit(bits, CLONEBUTTON)) {
+			_cloneButton = new CloneButton(_container);
+		}
+
+		if (Bits.checkBit(bits, RANGEBUTTON)) {
 			_rangeButton = new RangeButton(_container);
 		}
 
-		if (notNothing && Bits.checkBit(bits, MAGNIFYBUTTON)) {
+		if (Bits.checkBit(bits, MAGNIFYBUTTON)) {
 			_magnifyButton = new MagnifyButton(_container);
 		}
 
@@ -182,7 +170,7 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 
 		// add the text field?
 
-		if (notNothing && Bits.checkBit(bits, TEXTFIELD)) {
+		if (Bits.checkBit(bits, TEXTFIELD)) {
 
 			_textField = new JTextField(" ");
 
@@ -202,7 +190,7 @@ public class BaseToolBar extends CommonToolBar implements MouseListener, MouseMo
 
 		// if user component, add last
 
-		if (notNothing && Bits.checkBit(bits, USERCOMPONENT)) {
+		if (Bits.checkBit(bits, USERCOMPONENT)) {
 			addSeparator();
 			_userComponent = new UserToolBarComponent(_container);
 			add(_userComponent);
